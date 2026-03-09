@@ -1,0 +1,1047 @@
+Title: 2603.01532v1.pdf
+
+URL Source: https://arxiv.org/pdf/2603.01532v1
+
+Published Time: Tue, 03 Mar 2026 03:05:12 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+1
+
+# On the Intrinsic Link between Gradient Strengthening and 
+
+# Passivation Onset in Single Crystal Plasticity 
+
+Habib Pouriayevali 
+
+Researcher, Germany ,
+
+this work was partially carried out during the DFG -funded project PO -2242/3 -1 at 
+
+Technische Universität Darmst adt. 
+
+Keywords :
+
+Gradient crystal plasticity, Finite deformation, Dissipative microstress .
+
+Abstract 
+
+A finite -deformation framework for gradient crystal plasticity is developed 
+
+within a thermodynamically consistent setting grounded in Gurtin’s power -
+
+conjug ate formulation. The model introduces a flow rule that accounts explicitly for 
+
+both energetic and dissipative microstress contributions. Numerical simulations are 
+
+performed to investigate the response of single crystals subjected to passivation -type 
+
+bounda ry constraints. The results reveal that constitutive laws capable of 
+
+reproducing size -dependent strengthening at the onset of plastic flow simultaneously 
+
+generate a pronounced, nearly elastic -type response when passivation is imposed. 
+
+These findings establ ish a fundamental connection between gradient -induced yield 
+
+strengthening and boundary -driven elevation of the mechanical response, 
+
+highlighting the essential influence of dissipative gradient effects. 2
+
+1 Introduction 
+
+Classical crystal plasticity theories do not inherently account for experimentally 
+
+observed size effects in crystalline materials. The need to incorporate leng th -scale 
+
+sensitivity has therefore motivated the development of strain -gradient and gradient 
+
+crystal plasticity formulations. One of the earliest contributions in this direction was 
+
+provided by Aifantis (1984), and the subject has since evolved through sig nificant 
+
+theoretical advances (Fleck and Hutchinson, 1993; Huang et al., 2000; Forest, 2008; 
+
+Kuroda and Tvergaard, 2008; Reddy et al., 2008; Gurtin and Anand, 2009). 
+
+Numerous frameworks have been proposed to capture scale -dependent phenomena, 
+
+and extensive efforts have been devoted to clarifying the mechanical role of gradient 
+
+terms. Among these approaches, thermodynamically consistent formulations have 
+
+attracted particular attention. A comprehensive overview of modern gradient 
+
+plasticity theories is given by Voyiadjis and Song (2019). 
+
+Within gradient theories, microstresses associated with geometrically necessary 
+
+dislocations (GNDs) generate two distinct mechanical effects: gradient 
+
+strengthening and gradient hardening. The former manifests as an apparent 
+
+extension of the elastic regime or a pronounced stiffness increase at the initiation of 
+
+plastic flow. The latter corresponds to a progressive evolution of flow resistance 
+
+driven by the accumulation of GNDs during continued deformation. 
+
+Another topic of cont inuing interest concerns the response of single crystals 
+
+under passivation -type boundary conditions. Previous numerical investigations, 
+
+notably those summarized by Evans and Hutchinson (2009), demonstrated that the 
+
+presence of a passivated surface layer ca n significantly modify the initial yielding 
+
+behavior. In particular, gradient -induced yield strengthening was interpreted as an 
+
+effectively extended elastic response, with higher -order boundary tractions playing 
+
+a central role in governing this behavior. 3
+
+The present study examines whether the scale -dependent strengthening observed 
+
+at the onset of plastic deformation is intrinsically linked to the elevated response that 
+
+emerges when passivation is imposed during loading. Specifically, we address the 
+
+questio n of whether a constitutive formulation capable of reproducing gradient 
+
+strengthening at initial yield necessarily predicts the sharp increase in stiffness 
+
+associated with the activation of passivation. 
+
+The remainder of the paper is organized as follows. S ection 2 outlines the finite -
+
+deformation gradient crystal plasticity formulation in the reference configuration. 
+
+Section 3 presents the numerical results, and Section 4 summarizes the main findings 
+
+and conclusions. 
+
+2 Formulation 
+
+The formulation adopted in this work follows the finite -deformation gradient 
+
+crystal plasticity framework introduced by Gurtin (2006, 2008, 2010). The theory is 
+
+presented here in terms of the reference configuration. Although the development is 
+
+carried out in a finite -deformation setting, the model may be reduced to the small -
+
+deformation regime when appropriate .
+
+2.1 Kinematics in a single crystal 
+
+As a starting point, 
+
+𝐅 = 𝐅 e𝐅 p, det 𝐅 p = 1, 𝐂 e = 𝐅 eT𝐅 e, 𝐄 e = 1 
+
+> 2
+
+(𝐂 e − 𝐈 )
+
+and 𝐋 = 𝐋 e + 𝐅 e𝐋 p𝐅 e−1 (1)
+
+are defined, where 𝐅 represents the deformation gradient tensor, 𝐅 e and 𝐅 p denote 
+
+the elastic and inelastic distortions, respectively . det stands for the determinant of a 
+
+tensor. 𝐂 e is the right Cauchy -Green elastic tensor, 𝐄 e is the Green -Lagrangian 
+
+elastic -strain tensor, and 𝐈 is the identity tensor. 𝐋 is the velocity gradie nt, and 𝐋 e and 
+
+𝐋 p represent the elastic and plastic distortion -rate tensors given by 4
+
+Here , 𝜐 𝛼  is a flow rate  and  𝕊 𝛼 is the Schmid tensor defi ned as 
+
+where 𝛼 is a slip -system number, 𝐦 𝛼 , 𝐬 𝛼 and 𝐥 𝛼 are unit vectors representing the 
+
+normal vector of the slip plane and the glide direction of edge and screw dislocations ,
+
+respectively . These vectors are constant in the intermediate space (Gurtin and 
+
+Reddy, 2016) and vary in the reference and deformed configu rations (Gurtin, 2006) .
+
+In this study, 𝑟 stands for the reference configuration , and 𝐬 𝑟 
+
+> 𝛼
+
+, 𝐦 𝑟  
+
+> 𝛼
+
+and 𝐥 𝑟  
+
+> 𝛼
+
+are then 
+
+given by 
+
+𝐬 𝑟  
+
+> 𝛼
+
+= 𝐅 p−1𝐬 𝛼 , 𝐦 𝑟  
+
+> 𝛼
+
+= 𝐅 pT𝐦 𝛼 and 𝐥 𝑟  
+
+> 𝛼
+
+= 𝐅 p−1 𝐥 𝛼 . (4)
+
+2.2 Internal and exte rnal power s, and force balances 
+
+Guided by the principle of virtual power (Gurtin, 2008, 2010) , macroscopic and 
+
+microscopic force balances , as well as macroscopic and microscopic traction 
+
+conditions , are respectivel y derived as 
+
+Div 𝐏 + 𝐛 = 𝟎 , 𝜏 𝛼 − π𝛼 + Div 𝛏 𝛼 = 0, (5)
+
+𝐩 (𝐧 𝑟 ) = 𝐏 𝐧 𝑟 and ξ (𝐧 𝑟 )𝛼 = 𝛏 𝛼 ∙ 𝐧 𝑟 . (6)
+
+Here, 𝐏 represents the first Piola -Kirchhoff stress and 𝜏 𝛼 = 𝐂 e𝐒 e: 𝕊 𝛼 is the resolved 
+
+shear stress , where 𝐒 e represents the second Piola elastic -stress. 
+
+2.3 Measurement of dislocation densities 
+
+In the finite -deformation crystal plasticity description, by considering ∇⋕𝜐 𝛼 =
+
+𝐅 p−T∇𝜐 𝛼 , where ∇⋕ denote s gradient operation in the intermediate (lattice) space 
+
+are directional derivatives of the slip rate in the direction of glide s − 𝐬 𝛼 and 𝐥 𝛼 .
+
+𝐋 e = 𝐅 ̇ e𝐅 e−𝟏 , 𝐋 p = ∑ 𝜐 𝛼 𝕊 𝛼  
+
+> 𝛼
+
+. (2)
+
+𝕊 𝛼 = 𝐬 𝛼 ⨂ 𝐦 𝛼 , trace 𝕊 𝛼 = 0 and 𝐥 𝛼 = 𝐦 𝛼 × 𝐬 𝛼 , (3)
+
+𝜌 ̇⊢ 
+
+> 𝛼
+
+= −𝐬 𝑟  
+
+> 𝛼
+
+∙ ∇𝜐 𝛼 = −𝐬 𝛼 ∙ ∇⋕𝜐 𝛼 ,
+
+𝜌 ̇⊙ 
+
+> 𝛼
+
+= 𝐥 𝑟  
+
+> 𝛼
+
+∙ ∇𝜐 𝛼 = 𝐥 𝛼 ∙ ∇⋕𝜐 𝛼  (7)5
+
+2.4 Free -energy imbalance 
+
+Guided by the second law of thermodynamics and the balance of power s (Gurtin, 
+
+2008, 2010) , the lo cal dissipation inequality may be rewritten as 
+
+Ψ̇ − 𝐒 e ∶ 𝐄 ̇ e − ∑ (π𝛼 𝜐 𝛼 + 𝛏 𝛼 ∙ ∇𝜐 𝛼 )𝛼 ≤ 0, (8)
+
+where Ψ denotes a stored free -energy per unit reference volume and admits the 
+
+decomposition 
+
+Ψ = Ψe + Ψ𝜌 , (9)
+
+where Ψe is an elastic energy relate d to the stretching of the crystal lattice and Ψ𝜌 
+
+is a defect free -energy. Ψ𝜌 presents the defect energy contributed by GNDs only .
+
+2.4.1 Elastic energy Ψe
+
+Ψe is given in the form o f
+
+where I1 and I3 are the first and third invariants of 𝐂 e, μ is the  shear modulus , and λ
+
+is the  Lame  parameter (Bonet and Wood, 2008) .
+
+2.5 Constitutive m odel 
+
+Considering the rate of the free energ ies introduced in the previous section s,
+
+the local dissipation inequality in Eq.  8 is rewritten in 
+
+Ψe = μ 
+
+> 2
+
+(I1 − 3 − ln I3) + λ 
+
+> 2
+
+(ln I3
+
+> 1/2
+
+)2
+
+,
+
+Ψ̇ e = 𝜕 Ψe 
+
+> 𝜕 𝐄 e
+
+: 𝐄 ̇ e (10 )
+
+Ψ̇ = 𝜕 Ψe
+
+𝜕 𝐄 e : 𝐄 ̇ e + ∑ (𝑓 ⊢
+
+> 𝛼
+
+𝜌 ̇⊢ 
+
+> 𝛼
+
++ 𝑓 ⊙
+
+> 𝛼
+
+𝜌 ̇⊙ 
+
+> 𝛼
+
+)
+
+> 𝛼
+
+, (11 )
+
+Ψ̇ − 𝐒 e ∶ 𝐄 ̇ e − ∑(π𝛼 𝜐 𝛼 + 𝛏 𝛼 ∙ ∇𝜐 𝛼 )
+
+> 𝛼
+
+= (𝜕 Ψe
+
+𝜕 𝐄 e − 𝐒 e) : 𝐄 ̇ e + ∑ (−𝑓 ⊢
+
+> 𝛼
+
+𝐬 𝑟  
+
+> 𝛼
+
++ 𝑓 ⊙
+
+> 𝛼
+
+𝐥 𝑟 
+
+> 𝛼
+
+)
+
+> 𝛼
+
+∙ ∇𝜐 𝛼 
+
+(12 )6
+
+Here, t he recoverable and non -recoverable energetic microstre sses , as well as the 
+
+dissipative one , are introduced as 
+
+By substitution of Eq.  13  in to Eq.  12 , the following e xpressions associated with Eqs. 
+
+10 , are found, 
+
+A reduced form of inequality is also given by 
+
+Eq.  14  shows that the energetic microstress es 𝛏 𝑒𝑛𝑔𝑅  
+
+> 𝛼
+
+are in -slip -plane vector s.
+
+Consequently, 𝛏 𝑑𝑖𝑠  
+
+> 𝛼
+
+is assumed to be tangential to the slip plane Π𝛼 and power terms 
+
+in Eq s. 14  and  15  are redefined in 
+
+where ∇𝛼 𝜐 𝛼 = ∇𝜐 𝛼 − (𝐦 ̅ 𝑟  
+
+> 𝛼
+
+∙ ∇𝜐 𝛼 )𝐦 ̅ 𝑟 
+
+> 𝛼
+
+, and 𝐦 ̅ 𝑟  
+
+> 𝛼
+
+= 𝐦 𝑟 
+
+> 𝛼
+> |𝐦 𝑟
+> 𝛼 |
+
+.
+
+A strong form of reduced inequality in Eq.  16  is also considered by 
+
+As we know, the conventional rate -dependence plasticity theories are 
+
+accompanied by a dissipative scalar microforce π𝛼 , power -conjugated to the flow 
+
+rate 𝜐 𝛼 . This microforce is commonly defined through a power -law term and takes 
+
+− ∑ (π𝛼 𝜐 𝛼 + 𝛏 𝛼 ∙ ∇𝜐 𝛼 )𝛼 ≤ 0.
+
+𝛏 𝛼 = 𝛏 𝑒𝑛𝑔 𝑅  
+
+> 𝛼
+
++ 𝛏 𝑑𝑖𝑠  
+
+> 𝛼
+
+. (13 ) 
+
+> 𝜕 Ψe
+> 𝜕 𝐄 e
+
+= 𝐒 e,
+
+𝛏 𝑒𝑛𝑔 𝑅  
+
+> 𝛼
+
+∙ ∇𝜐 𝛼 = (−𝑓 ⊢
+
+> 𝛼
+
+𝐬 𝑟  
+
+> 𝛼
+
++ 𝑓 ⊙
+
+> 𝛼
+
+𝐥 𝑟 
+
+> 𝛼
+
+) ∙ ∇𝜐 𝛼  (14 )
+
+∑ (π𝛼 𝜐 𝛼 + 𝛏 𝑑𝑖𝑠  
+
+> 𝛼
+
+∙ ∇𝜐 𝛼 )𝛼 ≥ 0. (15 )
+
+𝛏 𝑒𝑛𝑔 𝑅  
+
+> 𝛼
+
+∙ ∇𝜐 𝛼 = 𝛏 𝑒𝑛𝑔 𝑅  
+
+> 𝛼
+
+∙ ∇𝛼 𝜐 𝛼 ,
+
+∑(π𝛼 𝜐 𝛼 + 𝛏 𝑑𝑖𝑠  
+
+> 𝛼
+
+∙ ∇𝛼 𝜐 𝛼 )
+
+> 𝛼
+
+≥ 0,
+
+(16 )
+
+π𝛼 𝜐 𝛼 ≥ 0,
+
+𝛏 𝑑𝑖𝑠  
+
+> 𝛼
+
+∙ ∇𝛼 𝜐 𝛼 ≥ 0. (17 )7
+
+a non -incremental form , found in Eq.  18 . In the same way , the dissipative higher -
+
+order stress 𝛏 𝑑𝑖𝑠  
+
+> 𝛼
+
+is also expressed i n a rate -like form , found in Eq . 20 . Thus 
+
+where 𝑚 and 𝑞 are rate -sensitivity parameters , 𝜐 0 and 𝑑 0 are constant positive -
+
+valued reference s, 𝐿 2 is a dissipative length -scale parameter . 𝑆 𝛼 is a positive -valued 
+
+slip resistance , 𝑆 𝑦 is an initial value for 𝑆 𝛼 , and 𝑆 𝑑 is a positive -valued parameter. 
+
+2.5.1 Flow rule 
+
+Considering Eq.  13 , the microscopic force bal ance given in Eq. (5)2 ta kes the 
+
+following form ,
+
+𝜏 𝛼 + Div 𝛏 𝑒𝑛𝑔 𝑅  
+
+> 𝛼
+
+= π𝛼 − Div 𝛏 𝑑𝑖𝑠  
+
+> 𝛼
+
+. (21 )
+
+The microstresses and the microforce def ined in Eqs.  14 , 18 , and  20  are as follows: 
+
+π𝛼 = 𝑆 𝛼 (|𝜐 𝛼 |
+
+> 𝜐 0
+
+)𝑚 𝜐 𝛼  
+
+> |𝜐 𝛼 |
+
+,
+
+𝛏 𝑑𝑖𝑠  
+
+> 𝛼
+
+= 𝑆 𝑑 𝐿 2 
+
+> 𝑞 +1
+
+(|∇𝛼 𝜐 𝛼 |
+
+> 𝑑 0
+
+)𝑞 ∇𝛼 𝜐 𝛼  
+
+> |∇𝛼 𝜐 𝛼 |
+
+= 𝑆 𝑑 𝐿 2 
+
+> 𝑞 +1
+
+(|∇𝛼 𝜐 𝛼 |
+
+> 𝑑 0
+
+)𝑞 1 
+
+> |∇𝛼 𝜐 𝛼 |
+
+(−𝜌 ̇⊢ 
+
+> 𝛼 𝐬 𝑟
+> 𝛼
+> |𝐬 𝑟
+> 𝛼 |2
+
++ 𝜌 ̇⊙  
+
+> 𝛼 𝐥 r
+> 𝛼
+> |𝐥 r
+> 𝛼 |2
+
+),
+
+𝛏 𝑒𝑛𝑔 𝑅  
+
+> 𝛼
+
+= 𝑆 0𝐿 1 
+
+> 2
+
+(−𝜌 ⊢
+
+> 𝛼
+
+𝐬 𝑟  
+
+> 𝛼
+
++ 𝜌 ⊙ 
+
+> 𝛼
+
+𝐥 𝑟 
+
+> 𝛼
+
+). (22 )
+
+Substitution of Eq . 22  into Eq.  21  results in 
+
+𝜏 𝛼 + 𝑆 0𝐿 1 
+
+> 2
+
+Div ((−𝜌 ⊢
+
+> 𝛼
+
+𝐬 𝑟  
+
+> 𝛼
+
++ 𝜌 ⊙ 
+
+> 𝛼
+
+𝐥 𝑟 
+
+> 𝛼
+
+))⏟
+
+> (I)
+
+= 𝑆 𝛼 (|𝜐 𝛼 |
+
+𝜐 0
+
+) 
+
+> 𝑚
+
+𝜐 𝛼 
+
+|𝜐 𝛼 |⏟
+
+> (II )
+
+− 𝑆 𝑑 𝐿 2
+
+> 𝑞 +1
+
+Div ((|∇𝛼 𝜐 𝛼 |
+
+𝑑 0
+
+) 
+
+> 𝑞
+
+∇𝛼 𝜐 𝛼 
+
+|∇𝛼 𝜐 𝛼 |)
+
+⏟ 
+
+> (III )
+
+(23 )
+
+π𝛼 = 𝑆 𝛼 (|𝜐 𝛼 |
+
+> 𝜐 0
+
+)𝑚 𝜐 𝛼  
+
+> |𝜐 𝛼 |
+
+, π𝛼 𝜐 𝛼 = 𝑆 𝛼 (|𝜐 𝛼 |
+
+> 𝜐 0
+
+)𝑚 
+
+|𝜐 𝛼 | ≥ 0, (18 )
+
+𝑆 𝛼 (0) = 𝑆 𝑦 , (19 )
+
+𝛏 𝑑𝑖𝑠  
+
+> 𝛼
+
+= 𝐿 2𝑆 𝑑 (𝐿 2|∇𝛼 𝜐 𝛼 |
+
+> 𝑑 0
+
+)𝑞 ∇𝛼 𝜐 𝛼  
+
+> |∇𝛼 𝜐 𝛼 |
+
+, (20 )8
+
+2.6 Implementation approach 
+
+In this study, the implementation of a two -dimensional version of the framework, 
+
+where ∇𝜐 𝛼 and 𝐥 𝛼 are respectively in - and out -of -plane vectors , is targ eted. T hus 
+
+𝜌 ̇⊙ 
+
+> 𝛼
+
+= 𝐥 𝑟  
+
+> 𝛼
+
+∙ ∇𝜐 𝛼 = 𝐥 𝛼 ∙ ∇⋕𝜐 𝛼 = 0 .
+
+The model is implemented through a custom user element (UEL) developed in 
+
+ABAQUS. In this approach, the evolution rate of the edge dislocation density, 𝜌 ̇⊢ 
+
+> 𝛼
+
+=
+
+−𝐬 𝑟  
+
+> 𝛼
+
+∙ ∇𝜐 𝛼 , is treated as an independent nodal variable within the finite -elem ent 
+
+discretization. 
+
+3 Results 
+
+This section presents numerical simulations of single crystals incorporating the 
+
+three slip systems specified in  Table 1. Shear is applied at a constant strain rate of 
+
+2 × 10 −4.
+
+The computational domain is discretized using plane -strain quadratic elements 
+
+(eight -node elements with nine integration points), as shown in Fig.  1a. The selected 
+
+mesh provides satisfactory insensitivity with respect to element size while 
+
+maintaining computational efficiency. To imp ose microscopically hard boundary 
+
+conditions, a surrounding layer with a thickness equal to 1% of the crystal dimension 
+
+is introduced, enforcing zero plastic slip along the boundary. 
+
+Throughout the analysis, conventional isotropic hardening associated with slip 
+
+resistance evolution is neglected, i.e., 𝑆 ̇ 𝛼 = 0 in Eq. ( 18 ). The material and model 
+
+parameters adopted in the simulations are summarized in  Table 2. The influence of 
+
+activating a passivation layer at a prescribed strain level is examined in Section  3.1 ,
+
+with representative results presented in Fig.  2.9
+
+3.1 Imposing a passivation layer at a specific strain 
+
+The proposed flow rule contains two gradient contributions: a recoverable 
+
+energetic microstress and a dissipative microstress. To examine the influence of 
+
+passivation, the crystal is first subjected to simple shear defor mation ( Fig.  1b)
+
+without any boundary layer and without constraints on plastic slip. After reaching a 
+
+prescribed strain level, a surrounding microhard boundary layer is introduced, and 
+
+the loading is continued. The resulting response is compared with that obtained when 
+
+the microhard boundary layer is enforced from the onset of deformation. 
+
+The mechanical response for four representative parameter sets, labeled A 
+
+through D, is shown in Fig.  2a. Enlarged views highlighting the onset of plastic 
+
+yielding and the activation of passivation are provided in Figs.  2b and  2c, 
+
+respectively. Data sets A and B correspond to cases in which passivation is present 
+
+throughout the entire deformation process. In contrast, data sets C and D represent 
+
+scenarios where passivati on is imposed only after 2.5% shear strain. 
+
+For parameter choices 𝐿 1 ≠ 0 and 𝐿 2 = 0 (data sets B and D), the model exhibits 
+
+gradient hardening without gradient strengthening. As expected, no extension of the 
+
+initial elastic regime is observed in these cases. When both length -scale parameters 
+
+are active (𝐿 1 = 𝐿 2 ≠ 0, data sets A and C), the formulation additionally produces 
+
+gradient strengthening. 
+
+A key observation is that the str engthening at initial yield (approximately 0.5% 
+
+shear strain in data set A) coincides quantitatively with the elevated response 
+
+observed at the instant of passivation activation (2.5% shear strain in data set C). 
+
+The dependence on internal length scale is clearly reflected in these results. 
+
+Moreover, beyond 2.5% strain, the stress –strain curves of data sets C and D closely 
+
+reproduce the behavior of data sets A and B beyond 0.5% strain, indicating a shift 
+
+in the effective response upon passivation. 10 
+
+Further insight is obtained by examining data points G, J, K, and L, marked in 
+
+Fig.  2 and summarized in  Table 3. Points G and K display nearly identical 
+
+distributions and magnitudes of GND densities, despite K corresponding to a la rger 
+
+accumulated plastic deformation. A similar correspondence is observed between 
+
+points J and L, even though L has undergone more extensive plastic flow. Notably, 
+
+points K and L (at 4% strain) include deformation from 0% to 2.5% strain under 
+
+non -passivat ed conditions, during which no boundary -induced GND accumulation 
+
+occurred. 
+
+These results indicate that constitutive models capable of reproducing scale -
+
+dependent strengthening at the onset of plastic flow inherently generate a sharp, 
+
+quasi -elastic response when passivation is activated. Conversely, formulations that 
+
+do not predic t gradient strengthening at initial yield are unable to capture the elevated 
+
+boundary -induced response associated with passivation. 
+
+4 Summary and Conclusion 
+
+This study has presented a finite -deformation gradient crystal plasticity 
+
+framework for single crystals, formulated within the theoretical structure introduced 
+
+by Gurtin. The model was employed to investigate the mechanical response of 
+
+crystals subjected to passivation -type boundary constraints. The analysis 
+
+demonstrates that constitutive formulations capable of reproducing s cale -dependent 
+
+strengthening at the initiation of plastic flow naturally predict a pronounced increase 
+
+in stiffness when passivation is activated during deformation. This establishes a 
+
+direct connection between gradient -induced yield strengthening and boun dary -
+
+driven elevation of the mechanical response. Although the observations obtained 
+
+here suggest a general underlying mechanism, further assessment across alternative 
+
+gradient crystal plasticity models would be valuable. Systematic benchmark 11 
+
+comparisons could help determine the broader applicability of the proposed 
+
+interpretation. 
+
+Acknowledgment 
+
+This work was partially supported by the German Research Foundation (DFG) under 
+
+grant PO -2242/3 -1.
+
+Table 1. Predefined slip systems, 𝒔 𝛼 and 𝒎 𝛼 .
+
+Table 2. A common set of material coefficients and modeling parameters. 
+
+Table 3. Data points G, J, K , and L , indicated in Fig.  2 are detailed (online color 
+
+figure). 
+
+Fig. 1. Fig. 2.12 
+
+References 
+
+• Aifantis, E. C. (1984). On the microstructural origin of certain inelastic models. Journal of 
+
+Engineering Materials and Technology , 106 , 326 –330. 
+
+• Bonet, J., & Wood , R. D. (2008). Nonlinear Continuum Mechanics for Finite Element 
+
+Analysis (2nd ed.). Cambridge University Press. 
+
+• Evans, A. G., & Hutchinson, J. W. (2009). A critical assessment of theories of strain 
+
+gradient plasticity. Acta Materialia , 57 , 1675 –1688. 
+
+• Flec k, N. A., & Hutchinson, J. W. (1993). A phenomenological theory for strain gradient 
+
+effects in plasticity. Journal of the Mechanics and Physics of Solids , 41 , 1825 –1857. 
+
+• Forest, S. (2008). Some links between Cosserat, strain gradient crystal plasticity and the 
+
+statistical theory of dislocations. Philosophical Magazine , 88 , 3549 –3563. 
+
+• Gurtin, M. E. (2006). The Burgers vector and the flow of screw and edge dislocations in 
+
+finite -deformation single -crystal plasticity. Journal of the Mechanics and Physics of So lids ,
+
+54 , 1882 –1898. 
+
+• Gurtin, M. E. (2008). A finite -deformation, gradient theory of single -crystal plasticity with 
+
+free energy dependent on densities of geometrically necessary dislocations. International 
+
+Journal of Plasticity , 24 , 702 –725. 
+
+• Gurtin, M. E. ( 2010). A finite -deformation, gradient theory of single -crystal plasticity with 
+
+free energy dependent on the accumulation of geometrically necessary dislocations. 
+
+International Journal of Plasticity , 26 , 1073 –1096. 
+
+• Gurtin, M. E., & Anand, L. (2009). Thermod ynamics applied to gradient theories involving 
+
+the accumulated plastic strain: The theories of Aifantis and Fleck and Hutchinson and their 
+
+generalization. Journal of the Mechanics and Physics of Solids , 57 , 405 –421. 
+
+• Gurtin, M. E., & Reddy, B. D. (2016). So me issues associated with the intermediate space 
+
+in single -crystal plasticity. Journal of the Mechanics and Physics of Solids , 95 , 230 –238. 
+
+• Huang, Y., Gao, H., Nix, W. D., & Hutchinson, J. W. (2000). Mechanism -based strain 
+
+gradient plasticity —II. Analysis. Journal of the Mechanics and Physics of Solids , 48 , 99 –
+
+128. 
+
+• Kuroda, M., & Tvergaard, V. (2008). A finite deformation theory of higher -order gradient 
+
+crystal plasticity. Journal of the Mechanics and Physics of Solids , 56 , 2573 –2584. 13 
+
+• Reddy, B. D., Ebobisse, F., & McBride, A. (2008). Well -posedness of a model of strain 
+
+gradient plasticity for plastically irrotational materials. International Journal of Plasticity ,
+
+24 , 55 –73. 
+
+• Voyiadjis, G. Z., & Song, Y. (2019). Strain gradient continuum plasticity theories: 
+
+Theoretical, numerical and experimental investigations. International Journal of Plasticity ,
+
+121 , 21 –59. 14 
+
+Fig. 1. (a) Finite -element model of the single crystal surrounded by a microhard boundary layer 
+
+(black outline). Red dots indicate nodal points. Each quadratic element contains nine integration 
+
+points. (b) Schematic representation of the applied simple shear deformati on mode. 
+
+Table 1. Predefined slip systems, 𝐬 𝛼 and 𝐦 𝛼 .
+
+Slip -system number 𝛼  Slip vector 𝐬 𝛼  Normal slip plane vector 𝐦 𝛼 
+
+1 (√3 2⁄ , 1 2⁄ ) (−1 2⁄ , √3 2⁄ )
+
+2 (1 2⁄ , √3 2⁄ ) (√3 2⁄ , −1 2⁄ )
+
+3 (−1 2⁄ , √3 2⁄ ) (√3 2⁄ , 1 2⁄ )
+
+Table 2. A common set of material coefficie nts and modeling parameters. 
+
+μ λ 𝑆 0 𝑆 𝛼 , 𝑆 𝑦  𝑆 ̇ 𝛼  𝑆 𝑑  𝕄  𝑚  𝑞 , n 𝜐 0 𝑑 0
+
+76.9 
+
+GPa 
+
+115.3 
+
+GPa 
+
+0.9 
+
+MPa 
+
+200 
+
+MPa 
+
+0
+
+MPa/s 
+
+0.2 
+
+MPa 
+
+0.2 
+
+MPa 
+
+0.05 
+
+-
+
+1.0 
+
+-
+
+1e -3
+
+𝑠 −1
+
+5e -4
+
+𝑠 −115 
+
+Passivation from the beginning o f deformation  Passivation at the shear strain of 2.5% 
+
+Data set  L1 (𝜇𝑚 ) L2 (𝜇𝑚 ) Data set  L1 (𝜇𝑚 ) L2 (𝜇𝑚 )
+
+A10  10  10  C10  10  10 
+
+A 5  5 5 C 5  5 5
+
+A 2  2 2 C 2  2 2
+
+B10  10  0 D10  10  0
+
+B 5  5 0 D 5  5 0
+
+B 2  2 0 D 2  2 016 
+
+Fig. 2. Stress –strain response of the single crystal subjected to the simple shear deformation 
+
+illustrated in Fig. 1b. Four parameter sets (A –D) are considered. (a) presents the complete 
+
+responses, while (b) and (c) provide enlarged views highlighting the onset of plastic yielding and 
+
+the activation of passivation, respectively. Data sets A and B correspond to cases where the 
+
+passivation boundary condition is applied from the beginning of deformation. Data sets C and D 
+
+represent cases in which passivat ion is introduced after 2.5% shear strain. When 𝐿 2 ≠ 0 (data 
+
+sets A and C), gradient strengthening is present. For 𝐿 2 = 0 (data sets B and D), only gradient 
+
+hardening is observed. The post -passivation response of data sets C and D b eyond 2.5% strain 
+
+closely reproduces the behavior of data sets A and B beyond 0.5% strain. Data points G, J, K, and 
+
+L are identified in the figure and further quantified in Table 3 (online color version). 
+
+Table 3. Data points G, J, K, and L, indicated in Fig. 2 are detailed (online color figure).

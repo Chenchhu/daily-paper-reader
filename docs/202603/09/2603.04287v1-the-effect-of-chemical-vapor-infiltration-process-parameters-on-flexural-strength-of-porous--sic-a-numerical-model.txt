@@ -1,0 +1,676 @@
+Title: The effect of chemical vapor infiltration process parameters on flexural strength of porous {\alpha}-SiC: A numerical model
+
+URL Source: https://arxiv.org/pdf/2603.04287v1
+
+Published Time: Thu, 05 Mar 2026 02:21:17 GMT
+
+Number of Pages: 34
+
+Markdown Content:
+# The effect of chemical vapor infiltration process parameters on flexural strength of porous α-SiC: A numerical model 
+
+## Joseph J. Marziale, Jason Sun, Eric A. Walker, Yu Chen, David Salac, James Chen ∗
+
+## Department of Mechanical and Aerospace Engineering, The State University of New York at Buffalo, Buffalo, New York 14260, United States March 5, 2026 
+
+Abstract 
+
+The flexural strength variability of α-SiC based ceramics at elevated temperatures creates the need for an Integrated Computational Materials Engineering (ICME) framework that relates the strength of a specimen directly to its manufacturing process. To create this ICME framework a model must first be developed which establishes a relationship between the chemical vapor infiltration (CVI) process and parameters, the resulting mesoscale pores, and the overall macroscale flexural strength. Here a nonlinear single pore model of CVI is developed used in conjunction with a four-way coupled themo-mechanical damage model. The individual components of the model are tested and a sample system under a four-point bending test is explored. Results indicate that specimens with an initial porosity greater than 30% require temperatures below 1273 K to maintain structural integrity, while those with initial porosities less than 30% are temperature-independent, allowing for optimization of the CVI processing time without compromising strength. 
+
+# 1 Introduction 
+
+Alpha silicon carbide, α-SiC , also called 6 H-SiC , has inspired considerable research effort because of the weak relationship between its material properties and temperature [1]. This is a valuable attribute for any system that must endure a high-temperature environment. Examples of SiC -based ceramics being used for this reason include gas turbine shrouds, vanes [2], and blades [3]; furnace linings [4]; nose cones, wings, cover plates for aerospace vehicles [5]; and heat exchangers [6, 7]. The general trends of 
+
+> ∗
+
+Corresponding Author; chenjm@buffalo.edu. 
+
+1
+
+> arXiv:2603.04287v1 [cond-mat.mtrl-sci] 4 Mar 2026
+
+the moduli representing elastic behavior and flexure response as a function of temperature are known; however, across studies, there is wide variation in what is understood to be the flexural strength, σf ,of a sintered α-SiC for each temperature. The problem of flexural strength uncertainty in α-SiC 
+
+is well documented in the literature. Early calculations of σf for α-SiC across several experiments differed by approximately 15% [1]. Follow-up statistical studies suggested that the flexural strength of samples manufactured by theoretically identical processes subjected to identical loading conditions is Weibull-distributed with a low modulus [8, 9, 10], implying a large distribution width and a large degree of uncertainty. Experimental literature suggests that the amount of constituent defects of the ceramic has a com-mensurate effect on the variation associated with the elastic behavior and flexure response [11]. There are several types of defects which can occur. Unrepresented material impurities, which for SiC com-monly includes oxygen [12, 13], can contribute to the local concentration of stress [14]. Variations in grain size and grain boundaries are instrumental in producing faults [15], as they act as disloca-tion obstacles, giving rise to the quality of brittleness, as well as providing sites for crack initiation. However the defect for which considerable research effort has been dedicated is the presence of poros-ity [16, 17, 18, 19]. It is confirmed that pores forming on multiple different length scales can all contribute to material weakening [20, 21]. The void space inherent to porosity is in fact linked to damage directly in typical phase field descriptions of fracture [22]. Any step of the manufacturing process used to fabricate α-SiC ceramics is at least in part respon-sible for creating imperfections, especially pores. Because of this, the infiltration of matrix material has emerged as a necessary component of the manufacturing process as a subsequent porosity con-trolling mechanism. SiC matrix infiltration is done in a number of ways. Some relevant methods are reactive melt infiltration [23], liquid phase infiltration [24], and sol-gel infiltration [25]. However the most common methodology is chemical vapor infiltration, or CVI [26, 27, 28, 29], because it can be tightly controlled by the processing temperature and pressure, which leads to a high purity [30]. CVI is used for the fabrication of ceramic matrix composites [27, 30, 31], or CMCs, but the process can also be applied to monolithic porous materials. Gupte and Tsamopoulous described the densification of a porous SiC preform through CVI [32]. Both the α- and β-SiC polytypes are viable options for CVI, with the surface morphology of the latter analyzed by Huang et al [33]. A CFD model of single phase SiC film growth over a fuel combustion nozzle in a hot wall reactor was presented by Bijjargi et al [34]. The utility of thin, single phase chemical vapor deposited SiC films for electronic applications is described by Xu et al [35]. Although more susceptible to fracture, monolithic SiC ceramics possess a more favorable strength and resistance to oxidation than composite materials; to reduce the disad-vantage of fracture susceptibility, densification through CVI is introduced, combining the advantages 2of both classes of materials [32]. The CVI process starts with a ceramic substrate in an enclosed chamber. A gaseous precursor is introduced from one end of a pore. The typical precursor used is methyltrichlorosilane ( M T S ) for its ability to pervade at relatively low temperatures [36, 37, 38, 39]. However, because the interfacial reaction between the M T S precursor and the SiC solid occurs at the entrance location, it is where the pores close first. After closure of the interface, further gaseous infiltration is prevented, leaving void space towards the top side. The result of a large number of pores is the increase of uncertainty in the material’s flexure response to the loading conditions, which can be demonstrated with the failure probability equation [40]. In addition to uncertainties, most deposition reactions utilized in CVI processing are relatively slow, often causing physical CVI experiments to take hundreds of hours [41, 42]. Also, CVI testing requires a non-negligible budget dedicated to laboratory equipment and material samples [43]. With cost, time, and especially uncertainty acting as barriers to physical experiments, it is therefore crucial to be able to computationally map the flexure strength and performance of α-SiC directly as a function of the process parameters that go into the porosity controlling mechanism of CVI. The need for a hierarchical relationship between processing, structure, properties, and performance was first articulated by Olson [44, 45] under the name Integrated Computational Materials Engineering (ICME), and then by Hirsch [46] as Through Process Modelling. For the simulation of metals, research done in view of the ICME hierarchy over the past few decades has been thorough [47, 48, 49, 50, 51]. And although the concept of ICME is fully transferable to ceramics, its high potential is only recently realized [52, 53, 54]. To the author’s knowledge, there does not currently exist a unified computational framework that directly connects the process parameters of chemical vapor infiltration to the flexure response of α-SiC . The purpose of this study is to relate the structure of a CVI-treated porous 
+
+α-SiC ceramic to its flexural strength directly as a function of the process parameters of pressure, temperature, reaction kinetics, and gas diffusivity. The structure of the rest of this study is as follows. Section 2 is a description of the CVI modeling strategy and its connection to a fracture prediction model, spanning an ICME framework. Section 3 provides an analysis of the relationship between several CVI process parameters and the flexure response of the resulting material, as well as an interpretation of these results as they apply to a manufacturing environment. Section 4 concludes the study. 32 Integrated Computational Materials Engineering Framework 
+
+This section describes the mathematical formulation that connects the CVI processing to the me-chanical performance of a porous specimen. This is a two-step process. First, the pore shape in a representative volume element (RVE) is evolved until the entrance location closes, stopping the infil-tration of the precursor, as in Fig. 1a. Second, the resulting RVE is used to create a finite element model of a four-point bending test, as in Fig. 1b. This is accomplished by transforming the pore shape as a function of depth into a damage parameter, ξ, which is evolved during the virtual testing process. RVL
+
+Φ
+
+rz rpt=0 t=t f
+
+> (a)
+
+## 2R V
+
+## ξ
+
+## F/2 F/2 
+
+> (b)
+
+Figure 1: The two steps of the modeling process. (a): Evolution of a representative pore during CVI processing. (b): Four-point bending test with representative volume elements containing the pore shape obtain from the CVI processing. 
+
+## 2.1 Processing to porosity 
+
+Using NumPy, the two broad physical phenomena being modeled in this section are gas transport and pore filling [55]. This study uses the single pore model due to its minimal complexity, which is attractive in such contexts as uncertainty quantification, where the model must have a set of process parameters that is sufficiently small as it is sampled a large number of times with changes in its inputs [56]. The single pore model has been repeatedly validated [31, 57, 58, 59, 60] and is summarized 4in this section. The adopted model is generalizable to CVI processes other than ones involving silicon carbide, as evidenced an early model of zirconia deposition done by Carolan [59]. The single pore model is in fact universal to systems involving a single deposition reaction with first order kinetics [61]. While this model is commonly accepted, more complex pore geometries have also been considered, and the evolution of these geometries during the CVI process differ [62]. This was most obviously demonstrated by a study comparing the mass transport of two systems of parallel pores with differing geometries (one system being pores within a singular fiber bundle, and the other being a grid of inter-bundle pores) [63]. It is found that the mass exchange in certain pore systems homogenizes the vapor composition, which alters the final infiltration time. In addition, a pore’s tortuosity increases the path length of the transporting gas [64], which increases infiltration time and residual porosity. The current study establishes a basic ICME framework relating pore radius to flexure strength, providing the foundation for future research effort in which the performance of more complex geometries [63, 65, 66] can be explored. Interested readers can refer to Vignoles, who reviewed various modeling strategies of CVI [61]. The chemical reaction responsible for the deposition of SiC is that of the M T S precursor, CH 3SiCl 3,which decomposes according to [67] 
+
+CH 3SiCl 3(g) + H2(g) −→ SiC (s) + 3 HCl (g) + H2(g) .
+
+The concentrations of each of the gaseous species are denoted as {CM T S , C H2, C HCl } = {C0, C 1, C 2} =
+
+Ci. Assuming the gas concentrations only vary in the longitudinal ( z-)direction, the conservation equation for species i can be expressed as 
+
+∂C i
+
+∂t + ∂N i
+
+∂z = Ri, (1) where Ni denotes absolute molar flux in mol m −2s−1, Ri is an algebraic term of source or sink for species i, z is the longitudinal spatial dimension, and t is time. It is assumed that the gas reaches a quasi steady-state much faster than the evolution of the pore radius and thus the time portion may be neglected, which is supported by Gupte and Tsamopolous [32]. This leads to 
+
+∂N i
+
+∂z = Ri. (2) The term Ri can be deduced by writing the conservation equation over a very thin shell of the pore 5which has thickness δz , cross sectional area A, and perimeter P. Then 
+
+∂N i
+
+∂z = siμPA , (3) where si is the stoichiometric coefficient of gas species i and μ is the reaction rate factored by the gas concentration of the functional deposition precursor M T S . Particularly 
+
+μ = k0 exp 
+
+ −Ea
+
+RT CVI 
+
+
+
+CM T S , (4) where Ea is activation energy, R is the ideal gas constant, and TCVI is temperature [57]. Thermody-namic constants corresponding to M T S are k0 = 3 .89 × 10 9 m s −1 and Ea = 296 kJ mol −1. For a cylindrical pore, P = πΦ and A = πΦ2/4, where Φ denotes the pore diameter. This means 
+
+PA = πΦ
+
+πΦ2/4 = 4Φand thus 
+
+∂N i
+
+∂z = 4siμ
+
+Φ . (5) Summing over all the gases gives 
+
+∂ bN∂z = 4bsμ 
+
+Φ , (6) where bN = P 
+
+> i
+
+Ni and bs = P 
+
+> i
+
+si. It is assumed that the absolute molar flux includes a pure diffusion term and a positive convective term, leading to the absolute molar flux [58] 
+
+Ni = −Di
+
+∂C i
+
+∂z + xi bN . (7) Therefore, the mass transfer equation to be solved becomes 
+
+Di
+
+∂2Ci
+
+∂z 2 − ∂(xi bN )
+
+∂z + 4siμ
+
+Φ = 0 . (8) Recall that the molar fraction xi is a function of gas concentration Ci:
+
+xi = Ci
+
+P 
+
+> l
+
+Cl
+
+= Ci
+
+Ci + P  
+
+> l̸=i
+
+Cl
+
+. (9) Also Substituting this into Eq. (8) leads to 
+
+∂2Ci
+
+∂z 2 − 1
+
+Di
+
+∂∂z 
+
+ Ci
+
+Ci + P  
+
+> l̸=i
+
+Cl
+
+bN
+
+
+
++ 4siμDiΦ = 0 , (10) 6M T S H2 HCl Mi (10 −3 kg/mol) 149 2 36.5 
+
+Vi (10 −6 m3/mol) 122.7 14.3 25.3 
+
+di,K (m/s √K) 3.97 34.30 8.03 Table 1: Molar masses, molar volumes, and reduced Knudsen coefficients of each gaseous species [57]. which can be discretized on a uniform grid as 
+
+Ci,j −1 − 2Ci,j + Ci,j +1 
+
+h2 − 1
+
+Di,j 
+
+12h
+
+Ci,j +1 bNj+1 
+
+Ci,j +1 + P  
+
+> l̸=i
+
+Cl,j +1 
+
+− Ci,j −1 bNj−1
+
+Ci,j −1 + P  
+
+> l̸=i
+
+Cl,j −1
+
+!
+
++ 4siμj
+
+Di,j Φj
+
+= 0 ,
+
+(11) where the subscript j represents a value at the location z, j + 1 represents a value at the next grid point z + ∆ z, etc. Diffusivity has two contributions: Fick and Knudsen diffusion. This results in 
+
+Di =
+
+ 1
+
+Di,K 
+
++ 1
+
+Di,F 
+
+−1
+
+(12) where 
+
+Di,F =
+
+ 11 − xi
+
+X
+
+> l
+
+xl
+
+Db,il 
+
+−1
+
+and Di,K = di,K ΦT 1/2CVI . (13) The quantity di,K denotes the reduced Knudsen coefficient and Db,il denotes the binary Fick diffusion coefficient between species i, l . The latter is calculated using the Gilliland formula [68], which is 
+
+Db,il = 1 .360 × 10 −3 T 3/2CVI 
+
+P (V 1/3 
+
+> i
+
++ V 1/3 
+
+> l
+
+)2
+
+ 1
+
+Mi
+
++ 1
+
+Ml
+
+1/2
+
+. (14) Molar volumes Vi, molar masses Mi, and reduced Knudsen coefficients di,k are provided for each species in Table 1. Due to the nature of the molar fraction term and the diffusion coefficients, the discretized equation, Eq. (11), results in a non-linear system to solve. Once the concentration of M T S , CM T S , is obtained, the pore diameter can be updated. The governing equation for the evolution of the pore diameter is [61] 
+
+∂Φ
+
+∂t = −2μV SiC , (15) where the reaction rate μ is defined in Eq. (4) and VSiC = 1 .25 × 10 −5m3mol −1 is the molar volume of SiC . To first-order, Eq. (15) is discretized as Φn+1  
+
+> j
+
+− Φnj
+
+∆t = −2μj VSiC , (16) 7where the superscript n represents a value at the current time t, n + 1 represents a value at the next time level t + ∆ t, etc. Reaction rate μj is calculated using the M T S concentration at grid location j.Lastly, total molar flux bN updates as 
+
+bN = μbs. (17) Before infiltration, it is assumed the pore has a uniform diameter, Φ 0 = 2 rp0, along the longitudinal direction. A Dirichlet boundary condition is considered at z = 0, and thus Ci(0 , t ) is given and will be provided in Sec. 3.2. At z = L a Neumann boundary condition is applied, ∂C i(L, t )/∂z = 0. The general solution method is outlined in Fig. 2. Given a current pore diameter, Φ( z, t ), the quasi-steady concentration profile, Ci(z), is obtained via Eq. (11). Using the updated M T S concentration, 
+
+CM T S , the reaction rate, Eq. (4), is used to update the local pore diameter via Eq. (16). If the pore diameter at z = 0 is small enough the iteration is concluded. Otherwise a step forward in time is taken. Solve for   
+
+> at quasi steady state
+> given
+> Advance
+> in time given
+> Set ,,
+> Stop
+> Yes
+> No
+
+Figure 2: The algorithm coupling gas concentration and pore size. 
+
+## 2.2 Porosity to properties 
+
+Once the CVI process concludes the shape of the pore radius, rp = Φ /2, across the length of z is used to create a cylindrical representative volume element, or RVE, of radius RV . This RVE is used to describe the heterogeneous pore microstructure in relationship to the entire SiC specimen [69]. A scalar order parameter for damage due to porosity, ξ ∈ [0 , 1], is defined by the ratio of the pore volume 8compared to the RVE volume at a given location, 
+
+ξ(z)|t=0 = πr 2
+
+> p
+
+(z)LπR 2 
+
+> V
+
+L = r2
+
+> p
+
+(z)
+
+R2
+
+> V
+
+. (18) Note that the pore’s tortuosity, which increases the path length of the transported species, is treated here as negligible. The tortuosity, τ , of an randomly constructed porous medium can be estimated as a logarithmic function of the preform porosity [70, 71], the path length calculated as τ L [64], and the RVE volume calculated as a function of the path length. Other complex pore geometries are studied seperately in Guan and Cha [72, 73], and concave inter-bundle pores are studied in Kulik [63]. Interested readers in pore modeling can refer to Vignoles [61], who reviewed various other modeling strategies of CVI. What follows is a model of damage evolution demonstrated first by Sun et al [54] and summarized here. Interested readers in nonlinear phase field modeling can refer to [74, 75, 76]. Damage variable ξ
+
+is used to define a quadratic degradation function [77] 
+
+ω = (1 − ξ)2, (19) which smoothly evolves inversely to ξ such that ω(1) = 0 and ω(0) = 1. This degradation function is then used to model the effect of porosity on the Young’s modulus, E, and Poisson’s ratio, μ [78]. The evolution of ξ over time is governed by the Allen-Cahn equation [79] 
+
+∂ξ ∂t = −M
+
+ ∂Ψ( ξ)
+
+∂ξ − ∂∂x i
+
+
+
+γ ∂ξ ∂x i
+
+ 
+
+, (20) where M is a coefficient of mobility, Ψ constitutes local free energy, and γ is the coefficient of the surface energy contribution from ξ. The local free energy, Ψ, can be decomposed into the contributions from elasticity and from damage such that Ψ = Ψ elas + Ψ frac . (21) The material upon fracture can withstand compressive stress but not tensile stress. Therefore, it is assumed that the damage only affects the tensile strain and stress. Through strain spectral decompo-sition, the elastic strain energy ψ is separated into tensile and compressive components ψ+ and ψ−.That is, 
+
+ψ = ψ+ + ψ−. (22) 9Crack irreversibility is a necessary condition as the crack does not self heal. A history variable, 
+
+H = max  
+
+> t
+
+(ψ+, Ψb), (23) is then introduced to identify the maximum tensile strain energy across time, where the free energy lower bound [80, 81, 82, 83] Ψb = − Ψfrac 
+
+ω(ξ) ξ=0 
+
+(24) ensures H ≥ 0. Then, the elastic free energy is [54] Ψelas = ω(ξ)H + ψ−. (25) Modeling the volumetric fracture energy term as a quadratic expression is an approach documented by Miehe et al [84, 81]. The corresponding fracture free energy terms are Ψfrac = gcξ2
+
+2l0
+
+, γ = gcl0
+
+2 , (26) where gc is the critical energy release rate defined by Griffith’s theory of fracture [85] and l0 is the length scale of the physical crack. As a means for calculating gc and l0, Sec. 2.2.1 is provided. 
+
+2.2.1 Energy release rate and crack length scale 
+
+The justification behind the relationship between l0 and Ψ frac in Eq. (26) is as follows. Surface cracks can be approximated in 2D with the diffuse function 
+
+ξ(x) = e−| x|/l 0 , (27) which has boundary conditions 
+
+ξ(0) = 1 , ξ(±∞ ) = 0 (28) and is a solution to the second order ordinary differential equation 
+
+−ξ′′ (x) + 1
+
+l20
+
+ξ(x) = 0 . (29) Using the principle of virtual work, its Galerkin weak form is 
+
+A(ξ) = 
+
+Z ∞−∞ 
+
+ ξ2
+
+2l0
+
++ l0|∇ ξ|2
+
+2
+
+
+
+dV, (30) 10 which has been previously seen [84, 86] and supports the idea of Moln´ ar et al that the fracture free energy is quadratic [87]. With A(ξ) as the integral of the ODE, it also represents the surface area under the curve that characterizes the crack shape. This means that the energy release rate gc can be scaled by surface area A to compute Γ = gcA = gc
+
+Z ∞−∞ 
+
+"
+
+ξ2
+
+2l0
+
++ l0|∇ ξ|2
+
+2
+
+#
+
+dV, (31) which represents the energy release across the area of the body necessary to generate a new crack. Despite gc and l0 still being classified so far as unknowns in Eq. (26) and Eq. (31), they can be solved analytically provided governing equations and boundary conditions associated with simple tension [81, 86, 88, 89]. Their solutions are 
+
+l0 = 27 256 
+
+K2
+
+> Ic
+
+σ2
+
+> c
+
+, gc = K2
+
+> Ic
+
+E , (32) where KIc is the critical stress concentration factor under mode I fracture, E is the elastic modulus, and σc is the applied critical stress associated with KIc , all of which are well-documented for many materials. With these values being known, they can be applied to the fracture energy terms in Eq. (26), which are crucial inputs to the equation characterizing the evolution of damage over time, which is Eq. (20). 
+
+## 2.3 Properties to performance 
+
+Using the finite element solver MOOSE [90], the formulation summarized in Sec. 2.2 can be used to model any mode I fracture problem. One of particular interest is the four point bending test, out of which values for flexural strength can be obtained. The simulation setup is for a standard four point bending test specified in ASTM C1161-18 [91]. A slender rectangular specimen is generated, with a length that is approximately 20 times the height. Plane stress conditions are assumed, and elements are uniformly distributed. The element size must be at least ten times smaller than the crack length scale, l0, in order to adequately resolve the crack length (various FE mesh discretizations are tried in Sec. 3.1.4). Various l0 are shown in Table 2 and are based on Eq. (32).                                                    
+
+> TFPB (K) KIC (m 1/2MPa) E(MPa) σc(MPa) gc(J /m2)l0(μm) 293.15 3.88 0.414 250 36.32 25.4 473.15 3.74 0.410 250 34.08 23.6 673.15 3.54 0.406 250 30.88 21.1 873.15 4.04 0.401 250 40.68 27.5 1073.15 4.27 0.397 250 45.97 30.8 1273.15 4.19 0.392 250 44.79 29.6 1473.15 3.95 0.387 250 40.27 26.3 1673.15 4.73 0.383 250 58.45 37.8
+
+Table 2: Temperature-dependent material properties of α-SiC [54]. 11 Two support points are set at the bottom of the specimen and two loading points are set at the top surface of the specimen, Fig. 1. A Dirichlet displacement boundary condition is applied downward onto the top of the body. In a bending test, it is assumed that the specimen is essentially one-dimensional, since the fracture is expected to propagate in the z-direction only. Because of the phase field mapping done using Eq. (18), the damage curve must always be contained between 0 and r2
+
+> p0
+
+/R 2 
+
+> V
+
+.Note that because porosity is direction-dependent, the material strength from the top surface is different from that of the bottom. Flexural strength, σf , is defined as the maximum stress that the specimen sustains, which takes place at the bottom surface, and this is a variable that will be focused on in the following sections. Work in MOOSE is undergirded by a math library provided by PETSc [92, 93, 94, 95], which offers a variety of solver and preconditioner options. The combination of an iterative PJFNK solver and a BoomerAMG preconditioner are optimal for solving the Allen-Cahn equation for phase field fracture, and are therefore utilized for this problem. Scalability characteristics of the framework, as well as additional commentary on the stability and reliability of different executioner options, are found in [54]. 
+
+# 3 Results/discussion 
+
+## 3.1 Convergence testing 
+
+The purpose of this section is to ensure the reliability of the numerical model using convergence tests. As there are no closed-form solutions that can be compared against, in all cases results will be compared to a fine mesh/small time step to ensure that the methods are converging to a single result. The time step of the CVI process is denoted by ∆ tCVI . The grid spacing of the CVI process is ∆ zCVI = L/ (N − 1), where L is the pore length and N is the number of grid points. The time step of the bending test is ∆ tFPB , and the FE mesh discretization of the bending test specimen is ∆zFPB = L/N e, where Ne is the number of elements in the FE mesh. As seen in Fig. 1, the height of the mesh is set equal to the pore length. The convergence behavior of L = {5, 0.075 } mm are compared in Secs. 3.1.1-3.1.3. The first pore length is further used in Sec. 3.2 as a means of model validation with respect to the literature. The second pore length is further used in the four point bending tests in Sec. 3.4 because it is approximately twice the crack length scale. 
+
+3.1.1 Temporal convergence 
+
+As is well known, there is a trade-off between a large (faster solve time) and a small (higher accuracy) time step. A large time step improves wall clock time as it solves for the system of gas concentration 12 10 1 10 2 10 3 10 4    
+
+> time step (s)
+> 10 9
+> 10 8
+> 10 7
+> 10 6
+> = ||  h|| /  N (m)
+
+tCVI = 10 × 2 p s, p [1, 7], N = 80 (a) L = 5 mm. 10 1 10 0 10 1 10 2    
+
+> time step (s)
+> 10 11
+> 10 10
+> 10 9
+> 10 8
+> = ||  h|| /  N (m)
+
+tCVI = 0.1 × 2 p s, p [1, 8], N = 80 (b) L = 0 .075 mm. 
+
+Figure 3: Average L2 norm of the difference in pore profile between tests with time steps ∆ tCVI =∆tbase × 2p and a test with ∆ tCVI = ∆ tbase .and pore size PDEs faster at the expense of accuracy. On the other hand, a smaller time step ensures greater accuracy, because finer changes in the gas concentration and pore profiles are accounted for, but take longer to complete. Here time steps of ∆ tCVI = ∆ tbase × 2p seconds are compared to the result obtained using ∆ tbase seconds, with the average L2-norm of the profile difference along the entire depth shown in Fig. 3 (in which constants are TCVI = 1273 K, P = 20 kPa, α = 1, L/ Φ0 = 50). The factor p = 1 , 2, 3, . . . doubles the time step in subsequent cases. For L = 5 mm the baseline is ∆tbase = 10 seconds and for L = 0 .075 mm the baseline is ∆ tbase = 0 .1 seconds. The convergence for both cases are slightly higher than first-order: for L = 5 mm it is ∼ 1.07, and for L = 0 .075 mm it is ∼ 1.30. This is expected as the time discretization is first-order accurate. Table 3 shows the solve time versus the time step. 
+
+L (mm) ∆tCVI (s) CVI Solve time (s) 5 10 = ∆ tbase 29 .22 20 14 .55 40 7.41 80 3.79 160 1.90 320 0.98 640 0.59 1280 0.38 
+
+L (mm) ∆tCVI (s) CVI Solve time (s) 0.075 0.1 = ∆ tbase 43 .41 0.2 21 .47 0.4 10 .80 0.8 5.47 1.6 2.84 3.2 1.54 6.4 0.76 12 .8 0.40 25 .6 0.19 Table 3: CVI solve time vs. time step for L = {5, 0.075 } mm, L/ Φ0 = 50. 13 10 5 10 4 10 3       
+
+> zCVI (m)
+> 10 11
+> 10 10
+> 10 9
+> 10 8
+> 10 7
+> 10 6
+> = ||  h|| /  N (m)
+
+N = 640 × 2 p, p [1, 6], tCVI = 10 s (a) L = 5 mm. 10 7 10 6 10 5      
+
+> zCVI (m)
+> 10 12
+> 10 11
+> 10 10
+> 10 9
+> 10 8
+> = ||  h|| /  N (m)
+
+N = 640 × 2 p, p [1, 6], tCVI = 0.1 s (b) L = 0 .075 mm. 
+
+Figure 4: Average L2 norm of the difference in pore profile between tests with grid spacings ∆ zCVI =
+
+L/ (Nbase × 2−p − 1) and a test with ∆ zCVI = L/ (Nbase − 1), where Nbase = 640. 
+
+3.1.2 Grid convergence 
+
+In addition to the time step, the grid spacing needs to be investigated to ensure that the relevant physics are being modelled correctly with the least amount of computational cost as the ideal grid yields an accurate solution while possessing the fewest possible grid points. In this section the pore profile is obtained using a time step of ∆ t = ∆ tbase seconds for grid spacings of ∆ zCVI = L/ (N − 1), where 
+
+N = Nbase × 2−p. The factor p = 1 , 2, . . . , 6 halves the grid spacing in subsequent tests. These are compared to the result obtained using N = Nbase = 640. As before the average L2-norm is calculated and reported in Fig. 4 (in which constants are TCVI = 1273 K, P = 20 kPa, α = 1, L/ Φ0 = 50). The convergence for both cases are approximately second-order: for L = 5 mm it is ∼ 2.19, and for 
+
+L = 0 .075 mm it is ∼ 2.11. The spatial discretization is second-order accurate, so this is expected. Table 4 compares the solve time to the number of grid points. 
+
+L (mm) N CVI Solve time (s) 5 10 0.41 20 1.86 40 7.43 80 29 .68 160 124 .63 320 569 .11 640 = Nbase 2821 .00 
+
+L (mm) N CVI Solve time (s) 0.075 10 0.63 20 2.71 40 11 .00 80 43 .99 160 168 .93 320 857 .71 640 = Nbase 4205 .11 Table 4: CVI solve time vs. grid points for L = {5, 0.075 } mm, L/ Φ0 = 50. 14 10 5 10 4 10 3     
+
+> zCVI (m)
+> 10 9
+> 10 8
+> 10 7
+> 10 6
+> = ||  h|| /  N (m)
+
+L = 5 mm, N [22, 158], tCVI N 2(a) L = 5 mm. 10 7 10 6 10 5     
+
+> zCVI (m)
+> 10 11
+> 10 10
+> 10 9
+> 10 8
+> = ||  h|| /  N (m)
+
+L = 0.075 mm, N [22, 158], tCVI N 2 (b) L = 0 .075 mm. 
+
+Figure 5: Average L2 norm of the difference in pore profile between grids with N ∈ [22 , 158] and a grid with N = 160. In all cases, ∆ tCVI ∼ N −2, ∆ zCVI = L/ (N − 1). 
+
+3.1.3 Coupled convergence 
+
+To explore the coupled nature of the CVI model the result for ∆ tCVI = ∆ tbase and ∆ zCVI = L/ (160 −1) is compared to the results obtained for ∆ zCVI = L/ (N − 1), N ∈ [20 , 158] with ∆ tCVI ∼ N −2, with the results shown in Fig. 5 (in which constants are TCVI = 1273 K, P = 20 kPa, α = 1, L/ Φ0 = 50). The order of convergence for L = 5 mm is calculated to be ∼ 2.86, and for L = 0 .075 mm is calculated to be ∼ 2.52. Table 5 shows the solve time versus the numerical parameters. 15 L (mm) N ∆tCVI (s) CVI solve time (s) 5 22 528 .93 0.04 30 284 .44 0.17 38 177 .29 0.42 46 120 .98 0.84 54 87 .79 1.61 62 66 .60 2.63 70 52 .24 4.46 78 42 .08 6.96 86 34 .61 10 .49 94 28 .97 15 .02 102 24 .61 20 .56 110 21 .16 29 .55 118 18 .39 37 .49 126 16 .12 49 .11 134 14 .26 62 .96 142 12 .70 80 .07 150 11 .38 100 .48 158 10 .25 124 .88 160 10 .00 131 .80 
+
+L (mm) N ∆tCVI (s) CVI solve time (s) 0.075 22 5.29 0.06 30 2.84 0.19 38 1.77 0.53 46 1.21 1.12 54 0.88 2.23 62 0.67 3.91 70 0.52 6.28 78 0.42 9.95 86 0.35 14 .55 94 0.29 21 .15 102 0.25 29 .50 110 0.21 39 .96 118 0.18 52 .98 126 0.16 69 .87 134 0.14 90 .62 142 0.13 115 .32 150 0.11 144 .46 158 0.10 179 .10 160 0.10 188 .99 Table 5: CVI solve time vs. coupled spacing for L = {5, 0.075 } mm, L/ Φ0 = 50. 
+
+3.1.4 FE mesh convergence 
+
+This section determines an appropriate FE mesh spacing, ∆ zFPB = L/N e, and time step, ∆ tFPB , for the four point bending tests in Sec. 3.4. For all cases, L is the height of the specimen and Ne is the number of vertical finite elements. Using Cubit, the specimen described in Sec. 2.3 is generated. The temperature of the four point bending environment is TFPB = 1073 .15 K, which corresponds to a crack length scale of l0 = 30 .8 μm(Table 2). To ensure that the crack is adequately resolved in the mesh, the spacing must be at least ten times smaller than the crack length scale, 30 .8 μm/10 = 3 .08 μm. For all cases, the height of the specimen is L = 0 .075 mm = 75 μm, because this is roughly twice the length of the expected crack. Therefore, the minimum number of elements along the height of the FE mesh is set to Ne = 28, so that ∆ zFPB = 75 μm/28 ≈ 2.67 μm < 3.08 μm. In subsequent tests the mesh is further refined and the change in flexural strength is observed. A maximum element number of Ne = 448 is chosen as the baseline. Cases with Ne = 448 and time steps ∆ tFPB = 5 , 10 , 20 ms are compared. The percent difference in σf between the 5 ms case and the 20 ms case is 0.31%. The difference between the 5 ms case and the 10 ms case is a negligible 0.10%. Therefore, a time step of 10 ms is adopted for testing. Table 6 shows the results corresponding to various mesh resolutions (in which constants are TCVI =1223 K, P = 20 kPa, L = 0 .075 mm, L/ Φ0 = 50, α = 1, 30% initial porosity, TFPB = 1073 K, ∆tFPB = 10 ms). The percent difference between the flexural strength of the coarse grid ( Ne = 28) 16 case and the fine grid ( Ne = 448) case is 0 .11%. The L∞ norm between the two cases is negligible. Neither the flexural strength nor the time to fracture are significantly affected by the mesh element spacing. Therefore it is acceptable to use ∆ zFPB = L/N e, Ne = 28 as the grid spacing in the z
+
+direction in the finite element mesh. The slope of the convergence is 1 .21, indicating approximately a first order accurate numerical method. 
+
+Ne σf (MPa) tσf (s) 28 374.332 4.99 112 374.653 4.99 224 374.729 4.98 448 374.761 4.98 Table 6: Flexural strength ( σf ) and time to fracture ( tσf ) for different mesh resolutions. 
+
+## 3.2 CVI-reduced pore distributions 
+
+This section validates the model with respect to the surrounding literature, in which a pore length of 
+
+L = 5 mm is commonly used. Based on the convergence testing in Sec. 3.1, all tests in this section utilize a time step of ∆ tCVI = 10 s and a grid spacing of ∆ zCVI = L/ (N − 1), where N = 80 is the number of grid points. This combination is chosen because of its ability to rapidly calculate solutions while not sacrificing more than an ε of 10 −8 m (Fig. 4a). The quantities of interest in the examination of a CVI process is its infiltration depth, d, and time of infiltration, tf . Infiltration depth d = (Φ 0 − Φ) /2 = rp0 − rp is defined as the amount of SiC 
+
+matrix material deposited or equivalently the degree of pore shrinkage [57, 58]. Time of infiltration, 
+
+tf , is defined as the amount of time required for the pore diameter at the surface to close. These two quantities are dependent on the physical phenomena of pore filling and gas transport. The CVI process is modeled as a function of the process parameters of temperature TCVI , pressure P , and the gas ratio α = CH2,0/C M T S, 0. At the reaction interface, α is enforced by the boundary conditions 
+
+CM T S, 0 = 11 + αPRT CVI 
+
+, CH2,0 = α
+
+1 + αPRT CVI 
+
+, CHCl, 0 = 0 , (33) where R is the ideal gas constant. Isobaric and isothermal conditions are assumed for each test. The enforcement of these boundary conditions is demonstrated in Figs. 6a, 6b (in which constants are 
+
+TCVI = 1273 K, P = 20 kPa, Φ 0 = 100 μm, L = 5 mm). At z = 0, Ci does not change from its initial magnitude. The gas ratio α = 1 leads to CH2,0 = CM T S, 0. Therefore, the concentrations at the infiltration interface are equal, as shown in Fig. 6a. However a gas ratio of α = 10 implies 
+
+CH2,0 = 10 CM T S, 0. As a result, there is no intersection in Fig. 6b. H2 remains constant as a carrier gas. Therefore, it has equal weight on the side of the reactants and that of the products. 17 0 1 2 3 4 5
+
+> z (mm)
+> 0.0
+> 0.5
+> 1.0
+> 1.5
+> 2.0
+> Ci (mol m  3)
+
+= 1 
+
+> MTS
+> H2
+> HCl
+
+(a) CM T S, 0 = CH2,0.0 1 2 3 4 5
+
+> z (mm)
+> 0.0
+> 0.5
+> 1.0
+> 1.5
+> 2.0
+> Ci (mol m  3)
+
+= 10 (b) 10 CM T S, 0 = CH2,0.
+
+Figure 6: Final gas concentration profiles with gas ratio α.This motivates the stoichiometric coefficient s1 = sH2 = 0 . The other coefficients are sM T S = −1and sHCl = 3 because of the sign convention of positive products and negative reactants. This sign convention motivates the increase in CHCl over time and across the depth of the substrate, while M T S 
+
+decomposes and diminishes. For purposes of validation, it is necessary to compare the current model with results gathered in the literature. The results of this study fall within 10% of the data reported in Ref. [57]. In Fig. 7 
+
+Figure 7: Final infiltration depth profiles with CVI temperatures 1073 K, 1173 K, 1223 K, and 1273 K compared to Ref. [57]. (in which constants are P = 20 kPa, α = 10, Φ 0 = 100 μm, L = 5 mm), the infiltration depth is sensitive to changes in temperature. This is due to the high activation energy of the CVI process being modeled (Sec. 2.1). For chemical reactions with high activation energies, variations in temperature significantly impact the progress of the chemical reaction. This physically observed behavior motivates 18 the modeling strategy, in which reaction rate exponentially increases with temperature. In Fig. 8(in which constants are TCVI = 1223 K, α = 5, Φ 0 = 34 μm, L = 5 mm), the final pore profile is relatively pressure-independent due to the length scale of the porous media being experimented on, where Knudsen diffusion is dominant. The Knudsen diffusion coefficient depends only on pore geometry and temperature, not pressure. On the other hand, Fick diffusion depends on pressure but predominates in larger pores. ..
+
+Figure 8: Final infiltration depth profiles with CVI pressures 2 kPa and 10 kPa compared to Ref. [57]. 
+
+## 3.3 Time of infiltration 
+
+3.3.1 Temperature and pressure dependence 
+
+An increase of temperature implies an increase in kinetic energy, resulting in more frequent collisions. For this reason, the deposition rate increases with temperature in the Arrhenius form, Eq. (4). This highly active reaction leads to a decrease in the amount of time required for the pore to close at the interface. In addition, an increased pressure leads to a shortening of the distance beween gas molecules, causing the overall diffusion coefficient to increase, Eqs.(13)-(14). This is demonstrated across a wide range of CVI temperatures and pressures as seen in Table 7 (in which constants are L = 5 mm, L/ Φ0
+
+= 50). Comparing this information to Fig. 7, it is clear that infiltration time and penetration depth are directly related quantities. This is expected because a longer infiltration time allows the precursor to react with the region of the substrate furthest away from the interface for a longer period of time. Consequently, if the infiltration time is larger, the final pore profile is uniform along the depth. If infiltration time is smaller, the pore profile varies more widely along the depth. 19 TCVI (K) 1273 1173 1073 
+
+> P (kPa)
+
+50 0.17 1.69 26.25 35 0.24 2.43 37.50 20 0.42 4.24 65.56 10 0.85 8.47 131.11 5 1.69 16.95 262.09 
+
+α = 1 
+
+TCVI (K) 1273 1173 1073 
+
+> P (kPa)
+
+50 0.93 9.22 144.11 35 1.33 13.67 205.86 20 2.33 23.28 360.56 10 4.66 46.11 720.52 5 9.31 92.22 1441.03 
+
+α = 10 Table 7: Time of infiltration, tf (in hours), based on CVI temperature, pressure, and gas ratio. 
+
+## 3.4 Flexure response 
+
+3.4.1 Specimen characteristics 
+
+This section demonstrates the relationship between CVI processing and flexural strength, in which a pore length of L = 0 .075 mm is used. Based on the convergence testing in Sec. 3.1, all tests in this section utilize a time step of ∆ tCVI = 0 .1 s, a CVI grid spacing of ∆ zCVI = L/ (N − 1), where 
+
+N = 80 is the number of grid points, and an FE mesh spacing of ∆ zFPB = L/N e, where Ne = 28 is the number of elements in the vertical direction. This combination is chosen because of its ability to rapidly calculate solutions while yielding minimal inaccuracy (Fig. 4b, Table 6). The porosity information can be integrated with a four-way coupled thermo-mechanical damage model for a more complex, physics-based problem. SiC based ceramics have initial porosities ranging from 9% to 95% resulting from different fabrication processes [96]. The phase field modeling of fracture can take any given porosity distribution as the initial condition of damage order parameter. The initial porosity for the entire specimen (assuming uniformly distributed pores) is defined as r2
+
+> p0
+
+/R 2 
+
+> V
+
+where 
+
+rp0 is the initial pore radius and RV is the radius of the representative volume element. Therefore the radius of the RVE can be determined as 
+
+RV = rp0
+
+√initial porosity . (34) Particularly, the cases considered in this study have initial porosities of 9%, 30%, 60%, and 95% as a representation of the wide range of SiC -based ceramic materials. The initial pore radius is 
+
+rp0 = Φ 0/2 = 0 .75 μm. The relationship between CVI temperature and the final porosity profile of the specimen is illustrated in Fig. 9. At higher temperatures, the time needed for the surface of the pores to close decreases. Consequentially, the pore diameter farther into the depth remains relatively large. Note that the final porosity will vary as a function of the depth in the pore and is related the square of the final pore radius at a particular depth. This explains the widening of the gap between cases 1273 K and 1323 K when infiltration depth is converted to porosity. The difference between the infiltration depths of 1273 K and 1323 K is 0.93 times the difference between 1073 K and 1223 K. However, the 20 difference between the final porosities of 1273 K and 1323 K is 2.55 times the difference between 1073 K and 1273 K. 
+
+3.4.2 Four point bending test 
+
+The weakening of material properties due to porosity, as well as the increase in damage across time, is represented by the degradation function Eq. (19). The previous sections explored the relationships between various processing inputs and the resulting pore structure; this section describes the relation-ship between the porous structure and the resulting performance in a flexure test. According to the procedure described in Sec. 2.3, the ASTM C1161-18 four-point bending test [91] is simulated. Each test is normalized against the fracture behavior of a specimen with no porosity ( σf 0 = 374 .33 MPa, 
+
+tσf 0 = 4 .97 s). 
+
+TCVI (K) Solve time (s, hrs) tf (s, hrs) 1073 7433.47, 2.06 3513.8, 0.98 1123 1921.52, 0.53 839.5, 0.23 1173 584.28, 0.16 227.0, 0.06 1223 130.93, 0.04 68.5, 0.02 1273 43.54, 0.01 22.8, 0.01 1323 18.53, 0.01 8.2, 0.00 Init. por. TCVI (K) σf /σ f 0 tσf /t σf 0
+
+5% 1073 0.999 1.000 1273 0.999 1.002 1323 0.999 1.004 30% 1073 0.999 1.000 1273 0.999 1.004 1323 0.912 1.153 60% 1073 0.999 1.000 1273 0.984 1.062 1323 0.565 1.525 95% 1073 0.999 1.000 1273 0.920 1.137 1323 0.001 0.004 Table 8: CVI solve time, time to infiltration ( tf ), normalized flexural strength ( σf /σ f 0), and normalized time to fracture ( tσf /t σf 0) based on CVI temperature ( TCVI ) and the specimen’s initial porosity. Fig. 10 is an illustration of the four point bending test results written in Table 8. While there is no closed form for the relationships between these parameters, qualitative inferences can be drawn from the data. The fundamental tradeoff in a manufacturing environment is between infiltration time and flexural strength. Infiltration time is improved by increasing the CVI temperature, which improves the speed of the deposition reaction. However, the infiltration time cannot be improved ad libitum without compromising the resulting material’s flexure performance. Except in cases where the specimen’s porosity prior to CVI treatment is approximately less than 30%, increasing the temperature past 1273 K leads to a crucial downgrade in flexural strength. This is because the initial condition for the damage parameter grows in proportion to the square of the pore radius. When the infiltration depth is low, small differences in the infiltration depth lead to large differences in the initial damage. On the other hand, when the infiltration depth is high, small differences in the infiltration depth lead to negligible differences in initial damage. As the processing temperature exceeds 1273 K, the infiltration 21 Increasing Temperature (a) Increasing Temperature 
+
+> (b)
+
+Figure 9: (a): Influence of temperature on infiltration depth. (b): Ratio between final porosity and initial porosity for various temperatures. 22 depth is less than half of the initial pore radius. Therefore, as temperature increases beyond this point, the initial damage increases significantly. Sensitivity to damage is likewise experienced by specimens with initial porosities exceeding 30%. For instance, the flexural strengths with the temperatures 1073 K and 1323 K for a specimen with initial porosity 9% are virtually identical. Therefore, for specimens of this type, a more relevant factor in considering the optimal manufacturing choice is CVI time of infiltration. On the other hand, the flexural strengths with the same processing parameters for specimens with an initial porosity of 60% are 374 .33 MPa and 221 .40 MPa respectively. The specimen subjected to the latter CVI conditions fails under less stress when the initial porosity of the material prior to infiltration is high at 60%. Therefore, optimizing time of infiltration should be sacrificed in favor of a more uniform densification for highly macroporous specimens. 23 CVI Processing Temperature 1073 K 1273 K 1323 K 9% 30% 60% 95% Initial Porosity Figure 10: Time-dependent stress of α-SiC specimens with initial porosities 9%, 30%, 60%, 95% and CVI processing temperatures 1073 K, 1273 K, and 1323 K. 24 4 Conclusion 
+
+In this study, to account for the variability in strength associated with chemical vapor infiltration on 
+
+α-SiC ceramics, the full hierarchical process of ICME has been utilized. The influence of the chemical vapor infiltration process on the mesoscale pores, and its effect on macroscale flexural strength, is crucial information in a limited, decision-based manufacturing environment. The results of this study show that if the specimen being densified through CVI has a low initial porosity ( ≈ 9%), the resulting flexural strength is relatively independent of the processing parameters. Therefore, the usage of a higher temperature and pressure is beneficial to reduce the overall time to infiltration. Particularly, for a specimen with an initial porosity of 9%, an increase in the CVI temperature from 1073 K to 1323 K leads to an increase in initial damage from 0.02% to 8.34%. This is associated with an unidentifiable decrease in flexural strength. However, a higher initial porosity ( ⪆ 30%) will increasingly have a flexure response that is in closer relationship to the processing parameters. Particularly, for a specimen with an initial porosity of 60%, an increase in the CVI temperature from 1073 K to 1323 K leads to an increase in initial damage from 0.16% to 55.58%. Consequentially, this temperature change leads to a decrease in flexure strength from 374.33 MPa to 221.40 MPa, which is a significant 43.5% decrease. In this case, the quality of densification competes with the quality of infiltration time, and lower processing temperatures should have higher priority in the context of a manufacturing decision. These results are self-consistent, and the formulation used to collect them is valid in relationship to the surrounding literature. Therefore, the ICME framework offered in this study is a reliable and rapid tool in evaluating the mechanical performance of diverse kinds of chemical vapor infiltrated SiC -based ceramic materials. 
+
+# 5 Acknowledgements 
+
+The authors are very grateful and wish to acknowledge David Hicks, Amberlee Haselhuhn, Anthony Koumpias, and Bradley Friend from LIFT for their ongoing support and helpful conversations. Funding for this project was provided, in part, by LIFT, the Detroit-based national manufacturing innovation institute operated by ALMMII, the American Lightweight Materials Manufacturing Innovation Insti-tute, a Michigan-based nonprofit, 501(c)3 as part of ONR Grant N00014-21-1-2660. 
+
+# References 
+
+[1] R. G. Munro, “Material properties of a sintered α-SiC,” Journal of Physical and Chemical Refer-ence Data , vol. 26, pp. 1195–1203, 1997. 25 [2] H. E. Eaton and G. D. Linsey, “Accelerated oxidation of SiC CMC’s by water vapor and protection via environmental barrier coating approach,” Journal of the European Ceramic Society , vol. 22, no. 14-15, pp. 2741–2747, 2002. [3] Z. Lu, F. Lu, J. Cao, and D. Li, “Manufacturing properties of turbine blades of carbon fiber-reinforced SiC composite based on stereolithography,” Materials and Manufacturing Processes ,vol. 29, no. 2, pp. 201–209, 2014. [4] A. Kumar, S. N. Bansal, and R. Chandraker, “Computational modeling of blast furnace cooling stave based on heat transfer analysis,” Materials Physics and Mechanics , vol. 15, no. 1, pp. 46–65, 2012. [5] A. Qinglong, C. Jie, M. Weiwei, and C. Ming, “Machining of SiC ceramic matrix composites: A review,” Chinese Journal of Aeronautics , vol. 34, no. 4, pp. 540–567, 2021. [6] T. Fend, W. V¨ olker, R. Miebach, O. Smirnova, D. Gonsior, D. Sch¨ ollgen, and P. Rietbrock, “Experimental investigation of compact silicon carbide heat exchangers for high temperatures,” 
+
+International Journal of Heat and Mass Transfer , vol. 54, no. 19-20, pp. 4175–4181, 2011. [7] Y. Takeuchi, C. Park, K. Noborio, Y. Yamamoto, and S. Konishi, “Heat transfer in SiC compact heat exchanger,” Fusion Engineering and Design , vol. 85, no. 7-9, pp. 1266–1270, 2010. [8] C. Lu, R. Danzer, and D. Fischer, “Fracture statistics of brittle materials: Weibull or normal distribution,” Physics Review E , vol. 65, p. 067102, 2002. [9] J. Gong and Y. Li, “Relationship between the estimated Weibull modulus and the coefficient of variation of the measured strength for ceramics,” Journal of the American Ceramic Society ,vol. 82, pp. 449–452, 1999. [10] A. Khalili and K. Kromp, “Statistical properties of Weibull estimators,” Journal of Materials Science , vol. 26, p. 6741–6752, 1991. [11] J. M. Fern´ andez, A. Munoz, A. de Arellano L´ opez, F. V. Feria, A. Dominguez-Rodriguez, and M. Singh, “Microstructure–mechanical properties correlation in siliconized silicon carbide ceram-ics,” Acta Materialia , vol. 51, no. 11, pp. 3259–3275, 2003. [12] A. Gali, D. Heringer, P. De´ ak, Z. Hajnal, T. Frauenheim, R. Devaty, and W. Choyke, “Iso-lated oxygen defects in 3C-and 4H-SiC: A theoretical study,” Physical Review B , vol. 66, no. 12, p. 125208, 2002. 26 [13] X. Yang, M. Liu, Y. Gao, D. Zhang, S. Feng, H. Liu, G. Yu, G. Wu, M. Wang, X. Zhou, et al. ,“Effect of oxygen on the corrosion of SiC in LiF–NaF–KF molten salt,” Corrosion Science , vol. 103, pp. 165–172, 2016. [14] G. Du, L. Zhou, P. Rossetto, and Y. Wan, “Hard inclusions and their detrimental effects on the wire sawing process of multicrystalline silicon,” Solar Energy Materials and Solar Cells , vol. 91, no. 18, pp. 1743–1748, 2007. [15] N. Swaminathan, P. J. Kamenski, D. Morgan, and I. Szlufarska, “Effects of grain size and grain boundaries on defect production in nanocrystalline 3C–SiC,” Acta Materialia , vol. 58, no. 8, pp. 2843–2853, 2010. [16] Z. Yang, H. Liu, and H. Yuan, “Micro-porosity as damage indicator for characterizing cyclic ther-mal shock-induced anisotropic damage in oxide/oxide ceramic matrix composites,” Engineering Fracture Mechanics , vol. 220, p. 106669, 2019. [17] H. Yuan and X. Li, “Critical remarks to cohesive zone modeling for three-dimensional elastoplastic fatigue crack propagation,” Engineering Fracture Mechanics , vol. 202, pp. 311–331, 2018. [18] C. Pei, D. Shi, H. Yuan, and H. Li, “Assessment of mechanical properties and fatigue performance of a selective laser melted nickel-base superalloy Inconel 718,” Materials Science and Engineering A, vol. 759, pp. 278–287, 2019. [19] R. Naslain, “SiC-matrix composites: Nonbrittle ceramics for thermo-structural application,” In-ternational Journal of Applied Ceramic Technology , vol. 2, pp. 75–84, 2005. [20] A. M. Nagaraja and S. Gururaja, “Effect of chemical vapor infiltration induced matrix porosity on the mechanical behavior of ceramic matrix minicomposites,” ASCE-ASME Journal of Risk and Uncertainty in Engineering Systems, Part B: Mechanical Engineering , vol. 6, p. 041005, 2020. [21] K. Guan, Q. Zeng, Y. Liu, X. Luan, Z. Lu, and J. Wu, “A multiscale model for CVD growth of silicon carbide,” Computational Materials Science , vol. 196, p. 110512, 2021. [22] A. Abaza, J. Laurencin, A. Nakajo, S. Meille, J. Debayle, and D. Leguillon, “Prediction of crack nucleation and propagation in porous ceramics using the phase-field approach,” Theoretical and Applied Fracture Mechanics , vol. 119, p. 103349, 2022. [23] M. Caccia and J. Narciso, “Key parameters in the manufacture of SiC-based composite materials by reactive melt infiltration,” Materials , vol. 12, no. 15, p. 2425, 2019. 27 [24] L. V. Interrante, C. Whitmarsh, and W. Sherwood, “Fabrication of SiC matrix composites by liquid phase infiltration with a polymeric precursor,” MRS Online Proceedings Library , vol. 365, pp. 139–146, 1994. [25] J.-M. Qian, J.-P. Wang, G.-J. Qiao, and Z.-H. Jin, “Preparation of porous SiC ceramic with a woodlike microstructure by sol-gel and carbothermal reduction processing,” Journal of the European Ceramic Society , vol. 24, no. 10-11, pp. 3251–3259, 2004. [26] R. Petrak, D, “Ceramic matrices,” in Composites , ASM International, 2001. [27] X. Lv, F. Ye, L. Cheng, S. Fan, and Y. Liu, “Fabrication of SiC whisker-reinforced SiC ceramic matrix composites based on 3D printing and chemical vapor infiltration technology,” Journal of the European Ceramic Society , vol. 39, pp. 3380–3386, 2019. [28] H. Barua and A. Povitsky, “Numerical model of carbon chemical vapor deposition at internal surfaces,” Vacuum , vol. 175, p. 109234, 2020. [29] H. Li, A. Li, R. Bai, and K. Li, “Numerical simulation of chemical vapor infiltration of propylene into C/C composites with reduced multi-step kinetic models,” Carbon , vol. 43, pp. 2937–2950, 2005. [30] T. Hinoki, E. Lara-Curzio, and L. L. Snead, “Mechanical properties of high purity SiC fiber-reinforced CVI-SiC matrix composites,” Fusion Science and Technology , vol. 44, no. 1, pp. 211– 218, 2003. [31] F. Langlais and G. L. Vignoles, Chemical Vapor Infiltration Processing of Ceramic Matrix Com-posites , ch. 5, pp. 86–129. Elsevier, 2018. [32] S. Gupte and J. Tsamopoulos, “Densification of porous materials by chemical vapor infiltration,” 
+
+Journal of the Electrochemical Society , vol. 136, no. 2, p. 555, 1989. [33] J.-J. Huang, C. Militzer, C. Wijayawardhana, U. Forsberg, L. Ojamae, and H. Pedersen, “Con-trolled CVD growth of highly 111-oriented 3C-SiC,” Journal of Physical Chemistry C , vol. 126, no. 23, pp. 9918 – 9925, 2022. [34] Y. S. Bijjargi, V. M. Shinde, A. Mudgal, H. Kumar, and N. E. Prasad, “CFD modeling and optimal design of SiC deposition on the fuel combustion nozzle in a commercial CVD reactor,” 
+
+Ceramics International , vol. 48, pp. 11043–11055, 2022. [35] X. Yang, R. Liu, B. Liu, and M. Liu, “Synthesis of ultra-thin two-dimensional SiC using the CVD method,” Energies , vol. 15, no. 17, 2022. 28 [36] S. V. Sotirchos and G. D. Papasouliotis, “Kinetic modelling of the deposition of SiC from methyl-trichlorosilane,” MRS Proceedings , vol. 250, pp. 35–40, 1991. [37] M. Ganz, N. Dorval, M. Lefebvre, M. P´ ealat, F. Loumagne, and F. Langlais, “ In Situ optical analysis of the gas phase during the deposition of silicon carbide from methyltrichlorosilane,” 
+
+Journal of the Electrochemical Society , vol. 143, p. 1654, 1996. [38] C. Lu, L. Cheng, C. Zhao, L. Zhang, and Y. Xu, “Kinetics of chemical vapor deposition of SiC from methyltrichlorosilane and hydrogen,” Applied Surface Science , vol. 255, pp. 7495–7499, 2009. [39] S. Ravasio, M. Masi, and C. Cavallotti, “Analysis of the gas phase reactivity of chlorosilanes,” 
+
+Journal of Physical Chemistry A , vol. 117, pp. 5221–5231, 2013. [40] F. Zok, “On weakest link theory and Weibull statistics,” Journal of the American Ceramic Society ,vol. 100, pp. 1265–1268, 2017. [41] K. Sugiyama and E. Yamamoto, “Reinforcement and antioxidizing of porous carbon by pulse CVI of SiC,” Journal of materials science , vol. 24, pp. 3756–3762, 1989. [42] H. Li, Y. Liu, Y. Liu, Q. Zeng, Y. Gu, W. Duan, R. Dou, J. Liang, and J. Li, “Influence of sintering temperature and CVI time on mechanical properties of 3d-printed alumina ceramics,” 
+
+Materials Letters , vol. 285, p. 129096, 2021. [43] Y. G. Roman and D. P. Stinton, “The preparation and economics of silicon carbide matrix com-posites by chemical vapor infiltration,” MRS Online Proceedings Library (OPL) , vol. 365, 1994. [44] G. Olson, “Computational design of hierarchically structured materials,” Science , vol. 277, pp. 1237–1242, 1997. [45] G. Olson, “Systems design of hierarchically structured materials: Advanced steels,” Journal of Computer-Aided Materials Design , vol. 4, pp. 143–156, 1998. [46] J. Hirsch, “Through process modelling,” Materials Science Forum , vol. 519-521, pp. 15–24, 2006. [47] M. Horstemeyer, Integrated Computational Materials Engineering (ICME) for Metals: Using Mul-tiscale Modeling to Invigorate Engineering Design with Science . John Wiley & Sons, Inc., 2012. [48] Z. Zhang, Y. Li, H. Li, D. Zhang, Z. Zhao, Q. Du, and J. Zhang, “ICME guided design of heat-treatable Zn-modified Al–Mg alloys,” Calphad , vol. 74, p. 102298, 2021. [49] W. Y. Wang, B. Tang, D. Lin, C. Zou, Y. Zhang, S. Shang, Q. Guan, J. Gao, L. Fan, H. Kou, H. Song, J. Ma, X. Hui, M. Gao, Z. Liu, and J. Li, “A brief review of data-driven ICME for 29 intelligently discovering advanced structural metal materials: Insight into atomic and electronic building blocks,” Journal of Materials Research , vol. 35, pp. 872–889, 2020. [50] A. Raturi, A. J., N. Gurao, and K. Biswas, “ICME approach to explore equiatomic and non-equiatomic single phase BCC refractory high entropy alloys,” Journal of Alloys and Compounds ,vol. 806, pp. 587–595, 2019. [51] C. D. Taylor, P. Lu, J. Saal, G. S. Frankel, and J. R. Scully, “Integrated computational materials engineering of corrosion resistant alloys,” npj Materials Degradation , vol. 2, p. 6, 2018. [52] J. Shi, T. Cook, and J. Matlik, Integrated Computational Materials Engineering for Ceramic Matrix Composite Development . American Institute of Aeronautics and Astronautics, 2012. [53] F. Raether and G. Seifert, “Integrated computational ceramics engineering – an approach to radically reduce time-to-market,” Ceramic Forum International/Berichte der DKG (Deutsche Keramische Gesellschaft) , 2018. [54] J. Sun, Y. Chen, J. J. Marziale, E. A. Walker, D. Salac, and J. Chen, “Damage prediction of sintered α-SiC using thermo-mechanical coupled fracture model,” Journal of the American Ceramic Society , vol. 106, no. 10, pp. 6036–6050, 2023. [55] V. M. Shinde, D. Balamurugan, H. Kumar, and N. Prasad, “Investigation of transport processes in a commercial hot wall CVD reactor with multi-substrates for high-quality pyrocarbon deposition,” 
+
+Surface Coatings Technology , vol. 425, p. 127685, 2021. [56] E. A. Walker, J. Sun, and J. Chen, “Managing uncertainty in the strength of ceramics,” Available at SSRN 4269461 , 2022. [57] R. Fedou, F. Langlais, and R. Naslain, “A model for the isothermal isobaric chemical vapor infiltration (CVI) in a straight cylindrical pore. II. Application to the CVI of SiC,” Journal of Materials Synthesis and Processing , vol. 1, pp. 61–74, 1993. [58] R. Fedou, F. Langlais, and R. Naslain, “A model for the isothermal isobaric chemical vapor infiltration (CVI) in a straight cylindrical pore. I. Description of the Model,” Journal of Materials Synthesis and Processing , vol. 1, pp. 43–52, 1993. [59] M. F. Carolan and J. N. Michaels, “Chemical vapor deposition of yttria stabilized zirconia on porous supports,” Solid State Ionics , vol. 25, pp. 207–216, 1987. [60] K. Shima, N. Sato, Y. Funato, Y. Fukushima, T. Momose, and Y. Shimogaki, “Separate evalua-tion of multiple film-forming species in chemical vapor deposition of SiC using high aspect-ratio microchannels,” Japanese Journal of Applied Physics , vol. 56, p. 06HE02, 2017. 30 [61] G. L. Vignoles, Modeling of chemical vapor infiltration processes , pp. 415–458. Woodhead Pub-lishing, 2015. [62] T.-A. Langhoff and E. Schnack, “Modelling chemical vapour infiltration of pyrolytic carbon as moving boundary problem,” Chemical engineering science , vol. 63, no. 15, pp. 3948–3959, 2008. [63] V. Kulik, A. Kulik, M. Ramm, and Y. N. Makarov, “Modeling of SiC-matrix composite formation by isothermal chemical vapor infiltration,” Journal of crystal growth , vol. 266, no. 1-3, pp. 333–339, 2004. [64] B. Ghanbarian, A. G. Hunt, R. P. Ewing, and M. Sahimi, “Tortuosity in porous media: a critical review,” Soil science society of America journal , vol. 77, no. 5, pp. 1461–1477, 2013. [65] V. Ramanuj, R. Sankaran, B. Jolly, A. Schumacher, and D. Mitchell, “Chemical vapor infiltration of additively manufactured preforms: Pore-resolved simulations and experimental validation,” 
+
+Journal of the American Ceramic Society , vol. 105, no. 4, pp. 2421–2441, 2022. [66] S. V. Sotirchos, “Dynamic modeling of chemical vapor infiltration,” AIChE journal , vol. 37, no. 9, pp. 1365–1378, 1991. [67] E. A. Walker, J. J. Marziale, and J. Chen, “Density functional theory insight into chemical vapor infiltration,” Methane , vol. 2, no. 4, pp. 415–425, 2023. [68] E. Gilliland, “Diffusion coefficients in gaseous systems,” Industrial & Engineering Chemistry ,vol. 26, no. 6, pp. 681–685, 1934. [69] C. Chateau, L. G´ el´ ebart, M. Bornert, and J. Cr´ epin, “Micromechanical modeling of the elastic be-havior of unidirectional CVI SiC/SiC composites,” International Journal of Solids and Structures ,vol. 58, pp. 322–334, 2015. [70] H. G. Kim, W. Ji, H. J. Kwon, S. Yoon, J. I. Kim, S. Bae, and N. C. Cho, “Full-scale multi-physics numerical analysis of an isothermal chemical vapor infiltration process for manufacturing C/C composites,” Carbon , vol. 172, pp. 174–188, 2021. [71] M. Matyka, A. Khalili, and Z. Koza, “Tortuosity-porosity relation in porous media flow,” Physical Review E , vol. 78, no. 2, p. 026306, 2008. [72] K. Guan, L. Cheng, Q. Zeng, H. Li, S. Liu, J. Li, and L. Zhang, “Prediction of permeability for chemical vapor infiltration,” Journal of the American Ceramic Society , vol. 96, no. 8, pp. 2445– 2453, 2013. 31 [73] C. M. Cha, D. Liliedahl, R. Sankaran, and V. Ramanuj, “Microstructural and infiltration prop-erties of woven preforms during chemical vapor infiltration,” Journal of the American Ceramic Society , vol. 105, no. 7, pp. 4595–4607, 2022. [74] L. Chen, H. W. Zhang, L. Y. Liang, Z. Liu, Y. Qi, P. Lu, J. Chen, and L.-Q. Chen, “Modulation of dendritic patterns during electrodeposition: A nonlinear phase-field model,” Journal of Power Sources , vol. 300, pp. 376–385, 2015. [75] L. Chen, F. Fan, L. Hong, J. Chen, Y. Z. Ji, S. Zhang, T. Zhu, and L. Chen, “A phase-field model coupled with large elasto-plastic deformation: application to lithiated silicon electrodes,” Journal of The Electrochemical Society , vol. 161, no. 11, p. F3164, 2014. [76] L. Chen, J. Chen, R. Lebensohn, Y. Ji, T. Heo, S. Bhattacharyya, K. Chang, S. Mathaudhu, Z. Liu, and L.-Q. Chen, “An integrated fast fourier transform-based phase-field and crystal plasticity approach to model recrystallization of three dimensional polycrystals,” Computer Methods in Applied Mechanics and Engineering , vol. 285, pp. 829–848, 2015. [77] J. M. Sargado, E. Keilegavlen, I. Berre, and J. M. Nordbotten, “High-accuracy phase-field models for brittle fracture based on a new family of degradation functions,” Journal of the Mechanics and Physics of Solids , vol. 111, pp. 458–489, 2018. [78] R. A. Perkins, W. Yang, Y. Liu, L. Chen, and C. Yenusah, “Finite element analysis of the effect of porosity on the plasticity and damage behavior of Mg AZ31 and Al 6061 T651 alloys,” in ASME International Mechanical Engineering Congress and Exposition , 2020. [79] S. M. Allen and J. W. Cahn, “Ground state structures in ordered binary alloys with second neighbor interactions,” Acta Metallurgica , vol. 20, pp. 423–433, 1972. [80] C. Chukwudozie, B. Bourdin, and K. Yoshioka, “A variational phase-field model for hydraulic fracturing in porous media,” Computer Methods in Applied Mechanics and Engineering , vol. 347, pp. 957 – 982, 2019. [81] C. Miehe, L. Sch¨ anzel, and H. Ulmer, “Phase field modeling of fracture in multi-physics problems. Part I. Balance of crack surface and failure criteria for brittle crack propagation in thermo-elastic solids,” Computer Methods in Applied Mechanics and Engineering , vol. 294, p. 449–485, 2015. [82] A. Mikeli´ c, M. F. Wheeler, and T. Wick, “Phase-field modeling through iterative splitting of hydraulic fractures in a poroelastic medium,” GEM - International Journal on Geomathematics ,vol. 10, no. 1, p. 2, 2019. 32 [83] J.-Y. Wu, “A unified phase-field theory for the mechanics of damage and quasi-brittle failure,” 
+
+Journal of the Mechanics and Physics of Solids , vol. 103, pp. 72 – 99, 2017. [84] C. Miehe, F. Welschinger, and M. Hofacker, “Thermodynamically consistent phase-field models of fracture: Variational principles and multi-field FE implementations,” International Journal for Numerical Methods in Engineering , vol. 83, pp. 1273–1311, 2010. [85] E. Z. Lajtai, “A theoretical and experimental evaluation of the griffith theory of brittle fracture,” 
+
+Tectonophysics , vol. 11, pp. 129–156, 1971. [86] X. Zhang, C. Vignes, S. Sloan, and D. Sheng, “Numerical evaluation of the phase-field model for brittle fracture with emphasis on the length scale,” Computational Mechanics , vol. 59, pp. 737– 752, 2017. [87] G. Moln´ ar, A. Doitrand, R. Estevez, and A. Gravouil, “Toughness or strength? Regularization in phase-field fracture explained by the coupled criterion,” Theoretical and Applied Fracture Me-chanics , vol. 109, p. 102736, 2020. [88] C. Kuhn, A. Schl¨ uter, and R. M¨ uller, “On degradation functions in phase field fracture models,” 
+
+Computational Materials Science , vol. 108, pp. 374–384, 2015. [89] E. Tann´ e, T. Li, B. Bourdin, J. Marigo, and C. Maurini, “Crack nucleation in variational phase-field models of brittle fracture,” Journal of the Mechanics and Physics of Solids , vol. 110, pp. 80– 99, 2018. [90] C. J. Permann, D. R. Gaston, D. Andrˇ s, R. W. Carlsen, F. Kong, A. D. Lindsay, J. M. Miller, J. W. Peterson, A. E. Slaughter, R. H. Stogner, and R. C. Martineau, “MOOSE: Enabling massively parallel multiphysics simulation,” SoftwareX , vol. 11, p. 100430, 2020. [91] C28 Committee, “Test method for flexural strength of advanced ceramics at ambient tempera-ture,” tech. rep., ASTM International, 2013. [92] S. Balay, S. Abhyankar, M. Adams, S. Benson, J. Brown, P. Brune, K. Buschelman, E. Con-stantinescu, L. Dalcin, A. Dener, V. Eijkhout, J. Faibussowitsch, W. Gropp, V. Hapla, T. Isaac, P. Jolivet, D. Karpeev, D. Kaushik, M. Knepley, F. Kong, S. Kruger, D. May, L. McInnes, R. Mills, L. Mitchell, T. Munson, J. Roman, K. Rupp, P. Sanan, J. Sarich, B. Smith, S. Zampini, H. Zhang, H. Zhang, and J. Zhang, “PETSc Web page.” https://petsc.org/ , 2022. [93] S. Balay, S. Abhyankar, M. Adams, S. Benson, J. Brown, P. Brune, K. Buschelman, E. Constan-tinescu, L. Dalcin, A. Dener, V. Eijkhout, J. Faibussowitsch, W. D. Gropp, V. Hapla, T. Isaac, 33 P. Jolivet, D. Karpeev, D. Kaushik, M. G. Knepley, F. Kong, S. Kruger, D. A. May, L. C. McInnes, R. T. Mills, L. Mitchell, T. Munson, J. E. Roman, K. Rupp, P. Sanan, J. Sarich, B. F. Smith, S. Zampini, H. Zhang, H. Zhang, and J. Zhang, “PETSc/TAO users manual,” Tech. Rep. ANL-21/39 - Revision 3.18, Argonne National Laboratory, 2022. [94] S. Balay, W. D. Gropp, L. C. McInnes, and B. F. Smith, “Efficient management of parallelism in object oriented numerical software libraries,” in Modern Software Tools in Scientific Computing ,pp. 163–202, Birkh¨ auser Press, 1997. [95] J. Zhang, J. Brown, S. Balay, J. Faibussowitsch, M. G. Knepley, O. Marin, R. T. Mills, T. Munson, B. F. Smith, and S. Zampini, “The PetscSF scalable communication layer,” IEEE Transactions on Parallel and Distributed Systems , vol. 33, pp. 842–853, 2022. [96] J. Eom, Y. Kim, and S. Raju, “Processing and properties of macroporous silicon carbide ceramics: A review,” Journal of Asian Ceramic Societies , vol. 1, pp. 220–242, 2013. 34

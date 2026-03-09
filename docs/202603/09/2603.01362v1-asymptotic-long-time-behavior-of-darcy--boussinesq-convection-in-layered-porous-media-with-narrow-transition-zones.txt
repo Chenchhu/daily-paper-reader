@@ -1,0 +1,4610 @@
+Title: Asymptotic long-time behavior of Darcy--Boussinesq convection in layered porous media with narrow transition zones
+
+URL Source: https://arxiv.org/pdf/2603.01362v1
+
+Published Time: Tue, 03 Mar 2026 02:49:20 GMT
+
+Number of Pages: 39
+
+Markdown Content:
+# Asymptotic long-time behavior of Darcy–Boussinesq convection in layered porous media with narrow transition zones 
+
+Kaijian Sha 1∗ Xiaoming Wang 1†
+
+Hao Wu 2‡ 
+
+> 1 1
+
+School of Mathematical Sciences, Eastern Institute of Technology, Ningbo, China  
+
+> 2 2
+
+School of Mathematical Sciences, Fudan University, Shanghai 200433, China 
+
+Abstract 
+
+We study the asymptotic long-time behavior of Darcy–Boussinesq convection in layered porous media with narrow transition zones in the material properties. As the transition-layer width tends to zero, we prove the upper semi-continuous convergence of the global attractor, invariant measure, and Nusselt number to their counterparts in the limiting sharp-interface model. We also show that the global attractors have finite fractal dimensions, with an explicit upper bound uniform in the transition-layer width. The analysis combines a carefully designed background temperature/contaminant profile together with a novel choice of phase space that ensures global well-posedness of the model and asymptotic compactness of the solution semi-group, and a new interpolation inequality. The phase space is associated with fractional powers of the principal elliptic operator with discontinuous coefficients. These results provide a rigorous long-time validation of the sharp-interface Darcy–Boussinesq model and extend our earlier finite-time convergence theory (H. Dong and X. Wang, SIAM J. Appl. Math. 85 (2025), 1621–1642) to the long-time regime. 
+
+Keywords: Convection in layered porous media, Darcy–Boussinesq model, global attractor, in-variant measure, Nusselt number, vanishing material interface limit, upper semi-continuity, inter-polation inequality 
+
+MSC 2020: 35Q35, 35Q86, 76D03, 76S99, 76R99 
+
+# 1 Introduction 
+
+Fluid convection in porous structures plays a fundamental role in both natural phenomena and technological applications. This subject has attracted sustained attention over the decades; see 
+
+> ∗
+
+Email: kjsha11@eitech.edu.cn 
+
+> †
+
+Email: wxm.math@outlook.com. Corresponding author. 
+
+> ‡
+
+Email: haowufd@fudan.edu.cn 
+
+1
+
+> arXiv:2603.01362v1 [math.AP] 2 Mar 2026
+
+Nield and Bejan [23] for an overview. Many mathematical studies have analyzed convection in porous settings, including well-posedness, regularity, long-time behavior, and transport bounds [8, 11, 12, 18, 24, 25, 34, 7, 5]. With the exception of recent contributions such as [5, 10], this body of work has focused primarily on media with uniform (spatially constant) material properties. In practice, porous formations are often stratified or otherwise heterogeneous. Variations in permeability and transport coefficients occur frequently in distinct layers, arising from geolog-ical processes (e.g., sediment deposition, tectonic activity, dissolution) or from engineered de-sign. A prominent application is the geological storage of carbon dioxide (CO 2), where layering can markedly influence stability, plume morphology, and convective transport; see, for instance, [3, 17, 14, 15, 13, 21, 22, 20, 26, 27, 35, 6, 16]. The review by Huppert and Neufeld [17] summa-rizes much of the literature, while [2] documents more recent progress on the role of layering in modifying—and, in some regimes, enhancing—convective transport. A widely used simplification is the sharp-interface description, in which material parameters are modeled as piecewise constant—uniform within each layer and discontinuous across interfaces—and adjacent layers are coupled through transmission conditions [14, 15, 13, 21, 22, 20, 5]. This formu-lation is mathematically convenient and often effective at macroscopic scales. However, it is also idealized: at microscopic scales, diffusive and mixing mechanisms smooth abrupt parameter jumps, so infinitely sharp transitions are not physically realizable. Moreover, while equations for homo-geneous porous flow admit rigorous derivations (e.g., via homogenization), a systematic derivation of the sharp-interface model and its interfacial conditions is subtler in layered settings. In particu-lar, the precise form of the transmission conditions—especially which components of velocity and stress should be continuous across an interface—can depend on the upscaling assumptions and the modeling regime and, therefore, merits mathematical justification. A more faithful representation allows for diffuse interfaces, where coefficients vary smoothly across thin transition layers. Following [1, 28], we refer to this as the diffuse-interface model. A natu-ral theoretical question is whether the sharp-interface formulation (together with its transmission conditions) can be justified as the singular limit of the diffuse-interface model as the transition thickness tends to zero. In previous work [10], we established convergence of the diffuse-interface model to the sharp-interface model on finite time intervals, under an initial regularity assumption formulated in terms of the system’s linear operator. Despite near-singular gradients in thin transition zones, the sharp-interface dynamics is recovered in this short-time regime. For many applications, however, the quantities of interest are intrinsically long-time or statistical, for instance, invariant measures de-scribing statistically steady states and long-time averaged transport metrics such as the Nusselt number. The purpose of this study is to precisely address the asymptotic behavior of the model in the long-time regime. We prove that, as the thickness of the transition layer ε → 0, the global attractors, invariant measures, and the Nusselt number of the diffuse-interface model (2.5)–(2.7) converge 2upper semicontinuously to their counterparts for the sharp-interface model (2.1)–(2.4). In addition, we show that the global attractors have finite fractal dimensions, and we obtain an explicit upper bound that is uniform in ε.The analysis differs substantially from [10]. Long-time theory requires a phase space that is (i) regular enough to control the nonlinear term globally in time and (ii) sufficiently large to estab-lish asymptotic compactness of the solution semigroup uniformly with respect to ε. To this end, we introduce a phase space defined via fractional powers of the principal elliptic operator of the sharp-interface model (with discontinuous coefficients). A key new ingredient is an interpolation in-equality linking this fractional-power space to standard Sobolev spaces; it yields global-in-time well-posedness and uniform-in-ε a priori bounds. Asymptotic compactness is obtained from uniform-in-time H1-estimates via a uniform Gronwall-type argument. Finally, the finite-dimensionality of the attractor follows from a squeezing-type property of the semigroup, again with constants uniform in the transition-layer thickness. Altogether, the results provide a rigorous long-time justification of the sharp-interface Darcy–Boussinesq model and extend the finite-time convergence theory of [10] to the long-time regime. The remainder of the paper is organized as follows. Section 2 introduces the sharp- and diffuse-interface formulations. Section 3 establishes preliminary estimates. Section 4 proves existence of global attractors with bounds uniform in the interface thickness. Section 5 proves upper semiconti-nuity for global attractors, invariant measures, and the Nusselt number. Section 6 derives dimension estimates. Section 7 concludes with remarks, and the Appendix collects auxiliary estimates and the proof of the new interpolation inequality. 
+
+# 2 Model Description 
+
+We consider convection in a three-dimensional layered domain Ω = (0 , L )2 ×(−H, 0), L, H > 0. The domain Ω is divided into l flat ‘layers’ or ‘strips’ by l − 1 interfaces located at z = zj ∈ (−H, 0) , j =1, 2, · · · , l − 1. In addition, we denote z0 = 0 , z l = −H. The j-th layer is given by Ωj := {x ∈ Ω : x · ez ∈ (zj , z j−1)}, for j = 1 , 2, · · · , l, 
+
+where x = ( x, y, z ) and ez stands for the unit vector in the z-direction. 32.1 The sharp interface model 
+
+Let T > 0. The Darcy–Boussinesq system describing convection in the layered domain Ω takes the following form (see [23]): 
+
+
+
+u = − Kμ (∇P + ρ0(1 + αϕ )gez ) ,
+
+∇ · u = 0 ,b∂ tϕ + u · ∇ ϕ − ∇ · (bD ∇ϕ) = 0 ,
+
+in Ω × (0 , T ). (2.1) Here, the unknowns u : Ω × (0 , T ) → R3, P : Ω × (0 , T ) → R, and ϕ : Ω × (0 , T ) → R are the fluid velocity, pressure, and concentration, respectively. The constants ρ0, α, μ, g are the reference fluid density, expansion coefficient, dynamic viscosity, and the gravity acceleration. In addition, K, b,
+
+D represent the permeability, porosity, and diffusivity coefficients, respectively. For the idealized sharp interface model, in each layer Ω j , the permeability, porosity, and diffusivity coefficients are assumed to be constant, that is, 
+
+K = K(x) = Kj , b = b(x) = bj , D = D(x) = Dj , ∀ x ∈ Ωj , 1 ≤ j ≤ l, 
+
+for a set of positive constants {Kj , b j , D j }lj=1 . On the interfaces, we assume 
+
+u · ez , P, ϕ, are continuous at z = zj , 1 ≤ j ≤ l − 1, (2.2) In addition, the system (2.1) is supplemented with the initial condition 
+
+ϕ|t=0 = ϕ0 (2.3) and the boundary conditions 
+
+u · ez |z=0 ,−H = 0 , ϕ|z=0 = c0, ϕ|z=−H = c−H , (2.4) together with periodicity in the horizontal directions ( x, y ). 
+
+2.2 The diffuse interface model 
+
+While the sharp interface model allows the physical parameters to change suddenly at the interfaces 
+
+z = zj , a physically more realistic setting would allow the material parameters to change gradually, albeit over a thin region of thickness ε, due to local diffusion. We assume that 0 < ε ≪ zj − zj+1 , ∀ j = 0 , 1, · · · , l − 1.
+
+This implies that the gradual transition layers are much thinner than the macroscopic layers. In the diffuse interface framework, the governing equations take the following form 
+
+
+
+uε = − Kε
+
+μ (∇P ε + ρ0(1 + αϕ ε)gez ) ,
+
+∇ · uε = 0 ,bε∂tϕε + uε · ∇ ϕε − ∇ · (bεDε∇ϕε) = 0 ,
+
+in Ω × (0 , T ). (2.5) 4Here, the unknowns uε : Ω × (0 , T ) → R3, P ε : Ω × (0 , T ) → R, and ϕε : Ω × (0 , T ) → R are the fluid velocity, pressure, and concentration, respectively. Kε, bε, Dε represent the permeability, porosity, and diffusivity coefficients that are essentially constant in each of the Ω j , but with a narrow thin layer of width 2 ε that allows a smooth transition between the neighboring strips. More precisely, 
+
+Kε, bε, Dε are smooth over Ω and 
+
+Kε = Kj , b ε = bj , D ε = Dj , ∀ z ∈ [zj + ε, z j−1 − ε], 2 ≤ j ≤ l − 1,Kε = K1, b ε = b1, D ε = D1, ∀ z ∈ [z1 + ε, z 0],Kε = Kl, b ε = bl, D ε = Dl, ∀ z ∈ [zl, z l−1 − ε].
+
+For simplicity, we assume that Kε, Dε, bε are continuous piecewise linear functions along the 
+
+z-direction, for example, 
+
+Kε(z) = Kj−1 + ( z − zj + ε) Kj − Kj−1
+
+2ε , ∀ z ∈ (zj − ε, z j + ε),
+
+for j = 1 , 2, · · · , l − 1. The system (2.5) is supplemented with the initial condition 
+
+ϕε|t=0 = ϕε 
+
+> 0
+
+(2.6) and the boundary conditions 
+
+uε · ez |z=0 ,−H = 0 , ϕε|z=0 = c0, ϕε|z=−H = c−H , (2.7) together with periodicity in the horizontal directions ( x, y ). 
+
+2.3 Homogenization of boundary conditions and the reduced systems 
+
+For the sake of simplicity, in the subsequent analysis, we assume 
+
+μ = 1 , ρ0αg = 1 , b = 1 .
+
+Next, to deal with the nonhomogeneous boundary condition of ϕ and ϕε, we introduce a smooth function ϕb(z; δ) on [ −H, 0] satisfying 
+
+ϕb(z; δ) = 
+
+
+
+c0, z = 0 ,c0 + c−H
+
+2 z ∈ (−H + δ, −δ),c−H , z = −H
+
+(2.8) and 
+
+|ϕ′
+
+> b
+
+| ≤ c∆
+
+δ , |ϕ′′  
+
+> b
+
+| ≤ 2c∆
+
+δ2 , (2.9) where c∆ := |c0 − c−H | and 0 < δ ≪ 1 is a small parameter to be determined later. Taking 
+
+ψ = ϕ − ϕb and p = P − ρ0gz − αρ 0
+
+Z z
+
+> −H
+
+ϕb(τ ) d τ, 
+
+5we can write the sharp interface model (2.1) as 
+
+
+
+u = −K (∇p + ψez ) ,
+
+∇ · u = 0 ,∂tψ + u · ∇ ψ + ϕ′
+
+> b
+
+u · ez − ∇ · (D∇ψ) = Dφ ′′  
+
+> b
+
+,
+
+(2.10) which is supplemented with the interfacial boundary conditions 
+
+u · ez , p, ψ are continuous at z = zj , 1 ≤ j ≤ l − 1, (2.11) the initial condition 
+
+ψ|t=0 = ψ0 := ϕ0 − ϕb, (2.12) the homogeneous boundary conditions 
+
+u · ez |z=0 ,−H = 0 , ψ|z=0 = 0 , ψ|z=−H = 0 , (2.13) and periodicity in the horizontal directions ( x, y ). 
+
+Remark 2.1. We note that ϕ′ 
+
+> b
+
+is a smooth function on [ −H, 0] that vanishes on [ −H +δ, −δ]. Then 
+
+Dϕ ′ 
+
+> b
+
+is also smooth provided that δ is sufficiently small. Consequently, it holds ∂z (Dϕ ′
+
+> b
+
+) = Dϕ ′′  
+
+> b
+
+.Using the same background function ϕb(z; δ), the diffuse interface model (2.5) can be homogenized as 
+
+uε = −Kε (∇pε + ψεez ) ,
+
+∇ · uε = 0 ,∂tψε + uε · ∇ ψε + ϕ′
+
+> b
+
+uε · ez − ∇ · (Dε∇ψε) = Dεφ′′  
+
+> b
+
+,
+
+(2.14) which is supplemented with the initial condition 
+
+ψε|t=0 = ψε 
+
+> 0
+
+:= ϕε 
+
+> 0
+
+− ϕb, (2.15) the homogeneous boundary conditions 
+
+uε · ez |z=0 ,−H = 0 , ψε|z=0 = 0 , ψε|z=−H = 0 , (2.16) and periodicity in the horizontal directions ( x, y ). 
+
+# 3 Well-posedness 
+
+3.1 Preliminaries 
+
+First, we recall some functional settings introduced in [5]. Let X be a real Banach space. We denote its norm by ∥ · ∥ X , its dual space by X∗, and the duality pairing by ⟨· , ·⟩ X∗,X . For 1 ≤ r ≤ ∞ and 
+
+k ∈ N, let Lr(Ω) and W k,r (Ω) denote the usual Lebesgue spaces and Sobolev spaces on the domain 6Ω, both with periodicity in the horizontal directions ( x, y ). The inner product in L2(Ω) is denoted by ( ·, ·) for simplicity. When r = 2, the notation Hk(Ω) = W k, 2(Ω) will be used. We denote by 
+
+W s,p (Ω) for s ≥ 0 and 1 ≤ r ≤ ∞ the fractional Sobolev–Slobodeckij spaces. When p = 2, we denote Hs(Ω) = W s, 2(Ω). Define 
+
+V := {ψ ∈ C(Ω) , ψ |Ωj ∈ C∞(Ω j ) for any j = 1 , 2, · · · , l, ψ is periodic in the horizontal directions and satisfies (2.11) , (2.13) },
+
+and H, V be the closure of V in the L2 and H1 norms, respectively. Then we recognize H = L2(Ω) and V = H1(0) (Ω), where H1(0) (Ω) denotes the subspace of H1(Ω) for functions that vanish at 
+
+z = 0 , −H and are periodic in the horizontal directions ( x, y ). Using the boundedness of D and the Poincar´ e inequality (see Lemma A.1), we can define the equivalent norm in V as ∥ψ∥V =
+
+∥√D∇ψ∥L2(Ω) . The corresponding inner product is given by ( ·, ·)1 = ( D∇· , ∇· ). For simplicity, we denote the dual product between V∗ and V by ⟨· , ·⟩ . Next, we define the higher-order space 
+
+W = {ψ ∈ V : ∂xψ, ∂ yψ ∈ H1(Ω) , D∂ z ψ ∈ H1(Ω) }
+
+endowed with the norm 
+
+∥ψ∥2 
+
+> W
+
+= ∥ψ∥2 
+
+> H1(Ω)
+
++ ∥∂xψ∥2 
+
+> H1(Ω)
+
++ ∥∂yψ∥2 
+
+> H1(Ω)
+
++ ∥D∂ z ψ∥2
+
+> H1(Ω)
+
+.
+
+We note that W is different from H2(Ω) in general. If D contains a jump discontinuity at z = zj ,
+
+j = 1 , · · · , l − 1, we can verify that W ∩ H2(Ω) = {ψ : ψ ∈ H2(Ω) , ∂ z ψ|z=zj = 0 , j = 1 , · · · , l − 1},see [5, Remark 2.3]. Concerning the fluid velocity, we introduce the space 
+
+eV := {u ∈ C(Ω) 3, u|Ωj ∈ C∞(Ω j )3 for any j = 1 , 2, · · · , l, 
+
+u is periodic in the horizontal directions and satisfies (2.10) 2, (2.11) , (2.13) },
+
+and set H to be the closure of eV in the L2-norm. Next, we introduce the notion of weak solutions of the sharp interface model (2.10)–(2.13). 
+
+Definition 3.1. Let T > 0. For any given initial datum ψ0 ∈ H , a triple ( u, p, ψ ) is called a weak solution to the problem (2.10)–(2.13) on [0 , T ], if the following properties are satisfied: 1. ψ ∈ L∞(0 , T ; H) ∩ L2(0 , T ; V) ∩ H1(0 , T ; V∗), (ψ(t2), φ ) − (ψ(t1), φ ) = 
+
+Z t2
+
+> t1
+
+(u · ∇ ψ, φ ) + ( ϕ′
+
+> b
+
+u · ez , φ ) + ( D∇ψ, ∇φ) − (Dϕ ′′  
+
+> b
+
+, φ ) d t, 
+
+for any t1, t 2 ∈ [0 , T ] and φ ∈ V , moreover, ψ(0) = ψ0 in H;2. p ∈ L2(0 , T ; V) is a weak solution to the elliptic problem 
+
+( − ∇ · (K∇p) = ∇ · (Kψ ez ), in Ω ,∂z p(x, y, −H) = ∂z p(x, y, 0) = 0 , (3.1) and p is periodic in the horizontal directions ( x, y ); 73. u ∈ L2(0 , T ; H) satisfies (2.10) 1 almost everywhere in Ω × (0 , T ). Applying the Faedo–Galerkin method and the energy method, one can obtain the following result on the existence, uniqueness, and regularity of solutions to the sharp interface model (2.10)–(2.13), see [5, Theorem 3.1, Theorem 4.2]. 
+
+Proposition 3.2. For every ψ0 ∈ H , problem (2.10) –(2.13) admits a global weak solution (u, p, ψ )
+
+on [0 , T ] in the sense of Definition 3.1. In addition, if ψ0 ∈ V , then the solution is unique and satisfies 
+
+ψ ∈ L∞(0 , T ; V) ∩ L2(0 , T ; W) ∩ H1(0 , T ; H) for any T > 0.
+
+The regularity of u can easily be deduced from the regularity of p and ψ. For any ψ ∈ H , the existence of a weak solution p to the elliptic problem (3.1) is guaranteed by the Lax–Milgram theorem. Uniqueness can be achieved if we restrict the solution p to the subspace of V with zero mean. For a piecewise smooth function ψ (smooth in each layer Ω j ), one can show that p is also piecewise smooth. For example, if ψ ∈ V , then p is piecewise in H2(Ω). Moreover, we have the following estimate for ( u, p ) (see [5, Lemma 3.1]): 
+
+Lemma 3.1. If ψ ∈ Lr(Ω) for r ∈ (1 , ∞), the solution p of the elliptic problem (3.1) satisfies 
+
+p ∈ W 1,r (Ω) and 
+
+∥p∥W 1,r (Ω) ≤ Cp∥ψ∥Lr (Ω) ,
+
+where the positive constant Cp = Cp(Kj , r ). In view of (2.10) 1, we also have 
+
+∥u∥Lr (Ω) ≤ C∥ψ∥Lr (Ω) .
+
+Remark 3.1. When r = 2, the proof of Lemma 3.1 is standard. For the case r̸ = 2, we refer to [9, Theorem 2.6]. 
+
+3.2 Well-posedness in Hs
+
+Due to the lack of uniqueness in the three-dimensional case, one cannot define a (strongly) contin-uous semigroup corresponding to the weak solution ψ(t) in the phase space H. Therefore, we shall work within a more regular Hilbert space framework. Define 
+
+Lψ = −∇ · (D∇ψ), ∀ ψ ∈ W .
+
+It follows from [5, Lemma 2.1] that the operator L is a self-adjoint positive operator, and possesses a sequence of eigenvalues {λk}∞ 
+
+> k=1
+
+where λk → ∞ as k → ∞ . The set of eigenfunctions {wk}∞ 
+
+> k=1
+
+⊂ W 
+
+forms an orthonormal basis in H, and an orthogonal basis in V. Furthermore, the norm ∥ · ∥ W is equivalent to ∥L · ∥ L2(Ω) , see Lemma A.2. 8Based on the expansion of eigenfunctions, the fractional operator Ls (s ≥ 0) and the fractional norm ∥ · ∥ Hs are defined as 
+
+Lsψ := 
+
+> ∞
+
+X
+
+> k=1
+
+λskakwk and ∥ψ∥2 
+
+> Hs
+
+:= 
+
+> ∞
+
+X
+
+> k=1
+
+λsk|ak|2 = ( L s 
+
+> 2
+
+ψ, L s 
+
+> 2
+
+ψ),
+
+respectively, for any ψ = ∞P
+
+> k=1
+
+akwk with ak = ( ψ, w k). Then we can define the Hilbert space 
+
+Hs = dom( L s 
+
+> 2
+
+) as the closure of V in the Hs-norm. It follows that 
+
+H0 = H, H1 = V, H2 = W.
+
+As usual, we define extensions of negative exponents as dual spaces, that is, H−s = ( Hs)∗ for s > 0, with the norm ∥ψ∥2 
+
+> H−s
+
+:= P∞ 
+
+> k=1
+
+λ−sk |ak|2. Then we have dense inclusions Hs1 ⊂ H s2 for s1, s 2 ∈ R,
+
+s1 ≥ s2, with continuous embedding when s1 ≥ s2 and compact embedding when s1 > s 2. Further properties of the fractional operator Ls and the fractional space Hs are summarized in Appendix B. The main result of this section is the following 
+
+Theorem 3.3. Suppose that ψ0 ∈ H s for some s ∈ ( 12 , 1) . Then problem (2.10) –(2.13) admits a global weak solution (u, p, ψ ) on [0 , T ] in the sense of Definition 3.1, which is unique and satisfies the additional regularity properties 
+
+ψ ∈ L∞(0 , T ; Hs) ∩ L2(0 , T ; H1+ s) ∩ H1(0 , T ; Hs−1), for any T > 0.
+
+Let (u1, p 1, ψ 1) and (u2, p 2, ψ 2) be two solutions with initial data ψ1,0 and ψ2,0, respectively. Then the following continuous dependence estimate holds for any t > 0:
+
+∥L s 
+
+> 2
+
+(ψ1(t) − ψ2(t)) ∥2
+
+> L2(Ω)
+
+≤ ∥L s 
+
+> 2
+
+(ψ1,0 − ψ2,0)∥2 
+
+> L2(Ω)
+
+exp 
+
+Z t
+
+> 0
+
+C
+
+
+
+∥ψ1(τ )∥ 
+
+> 42s−1
+> Hs
+
++ ∥ψ2(τ )∥ 
+
+> 42s−1
+> Hs
+
++ 1 
+
+
+
+dτ
+
+
+
+. (3.2) From Theorem 3.3 and the interpolation theory, it follows that ψ ∈ C([0 , T ]; Hs) for any T > 0. Furthermore, we can conclude 
+
+Corollary 3.4. Let s ∈ ( 12 , 1) . Problem (2.10) –(2.13) generates a strongly continuous semigroup 
+
+{S0(t)}t≥0 on the phase space Hs, that is, 
+
+S0(t) : Hs → H s, S0(t)ψ0 = ψ(t), ∀ t ≥ 0,
+
+where ψ is the unique weak solution to problem (2.10) –(2.13) corresponding to the initial datum 
+
+ψ0 ∈ H s.
+
+To Theorem 3.3, we derive some necessary a priori estimates. 9Lemma 3.2 (Lr-estimate for ψ). Let (u, p, ψ ) be a global weak solution to problem (2.10) –(2.13) .For any given r > 2, we assume the constant δ in (2.8) satisfies 
+
+0 < δ ≤ δ1(r) := 
+
+" r−1 
+
+> r2
+
+min j Dj
+
+c∆H 2 
+
+> r
+
+sup j Kj (1 + Cp)
+
+# rr−2
+
+. (3.3) 
+
+If in addition, ψ0 ∈ Lr(Ω) , then ψ ∈ L∞(0 , ∞; Lr(Ω)) satisfies 
+
+∥ψ(t)∥rLr (Ω) ≤ ∥ ψ0∥rLr (Ω) e− 2( r−1) min j DjrH 2 t + rM 0H2
+
+2( r − 1) min j Dj
+
+
+
+1 − e− 2( r−1) min j DjrH 2 t
+
+
+
+, (3.4) 
+
+for any t ≥ 0, where the positive constant M0 is given by 
+
+M0 := (8 rc ∆L 2 
+
+> r
+
+δ− 1 
+
+> r
+
+max j Dj )r
+
+r(min j Dj )r−1 . (3.5) 
+
+In particular, we have 
+
+∥ψ(t)∥rLr (Ω) ≤ rM 0H2
+
+2( r − 1) min j Dj
+
++ 1 , (3.6) 
+
+for any 
+
+t ≥ T0(∥ψ0∥Lr (Ω) ) := rH 2
+
+2( r − 1) min j Dj
+
+ln  ∥ψ0∥rLr (Ω) + 1 . (3.7) 
+
+Proof. Testing (2.10) 3 with r|ψ|r−2ψ and using integration by parts, we obtain ddt
+
+Z
+
+> Ω
+
+|ψ|r dx + 4( r − 1) 
+
+r
+
+Z
+
+> Ω
+
+D|∇| ψ| r 
+
+> 2
+
+|2 dx + r
+
+Z
+
+> Ω
+
+(ψ′
+
+> b
+
+u · ez |ψ|r−2ψ − Dφ ′′  
+
+> b
+
+|ψ|r−2ψ) d x = 0 . (3.8) Recalling that ψ′ 
+
+> b
+
+is a smooth function supported in the domain Ωδ = Ω ∩ ({− H < z < −H + δ)} ∪ {− δ, 0) })and satisfies (2.9), by H¨ older’s inequality and (2.10) 1, we get 
+
+r
+
+Z
+
+> Ω
+
+ψ′
+
+> b
+
+u · ez |ψ|r−2ψ dx ≤ rc ∆δ−1
+
+Z
+
+> Ωδ
+
+|uz || ψ|r−1 dx ≤ rc ∆δ−1∥uz ∥Lr (Ω) ∥ψ∥r−1  
+
+> Lr(Ω δ)
+
+≤ rc ∆δ−1 sup 
+
+> j
+
+Kj (∥∂z p∥Lr (Ω) + ∥ψ∥Lr (Ω) )∥ψ∥r−1  
+
+> Lr(Ω δ)
+
+.
+
+Then it follows from Lemmas 3.1, A.1 and the definition of Ω δ that 
+
+r
+
+Z
+
+> Ω
+
+ψ′
+
+> b
+
+u · ez |ψ|r−2ψ dx ≤ rc ∆δ−1 sup 
+
+> j
+
+Kj (1 + Cp)∥ψ∥Lr (Ω) ∥ψ∥r−1  
+
+> Lr(Ω δ)
+
+≤ rc ∆δ−1 sup 
+
+> j
+
+Kj (1 + Cp)∥| ψ| r 
+
+> 2
+
+∥ 2
+
+> r
+> L2(Ω)
+
+∥| ψ| r 
+
+> 2
+
+∥ 2( r−1)  
+
+> r
+> L2(Ω δ)
+
+≤ 2rc ∆H 2 
+
+> r
+
+δ r−2 
+
+> r
+
+sup 
+
+> j
+
+Kj (1 + Cp)∥∇| ψ| r 
+
+> 2
+
+∥2
+
+> L2(Ω)
+
+. (3.9) 10 Furthermore, by H¨ older’s inequality, Young’s inequality and Lemma A.1, we have 
+
+r
+
+Z
+
+> Ω
+
+Dφ ′′  
+
+> b
+
+|ψ|r−2ψ dx ≤ 2rc ∆δ−2 max  
+
+> j
+
+Dj
+
+Z
+
+> Ωδ
+
+|ψ|r−1 dx
+
+≤ 2rc ∆δ−2 max  
+
+> j
+
+Dj |Ωδ| 1 
+
+> r
+
+∥ψ∥r−1  
+
+> Lr(Ω δ)
+
+≤ 8rc ∆L 2 
+
+> r
+
+δ− 1 
+
+> r
+
+max  
+
+> j
+
+Dj ∥∇ (|ψ| r 
+
+> 2
+
+)∥ 2( r−1)  
+
+> r
+> L2(Ω δ)
+
+≤ r − 1
+
+r min  
+
+> j
+
+Dj ∥∇ (|ψ| r 
+
+> 2
+
+)∥2 
+
+> L2(Ω)
+
++ (8 rc ∆L 2 
+
+> r
+
+δ− 1 
+
+> r
+
+max j Dj )r
+
+r(min j Dj )r−1 . (3.10) Choosing δ as in (3.3) and substituting (3.9)–(3.10) into (3.8), we obtain ddt ∥ψ∥rLr (Ω) + 2( r − 1) 
+
+r ∥√D∇(|ψ| r 
+
+> 2
+
+)∥2 
+
+> L2(Ω)
+
+≤ (8 rc ∆L 2 
+
+> r
+
+δ− 1 
+
+> r
+
+max j Dj )r
+
+r(min j Dj )r−1 =: M0. (3.11) Then from Lemma A.1 and (3.11) we infer that ddt ∥ψ∥rLr (Ω) + 2( r − 1) min j Dj
+
+rH 2 ∥ψ∥rLr (Ω) ≤ M0, ∀ t > 0. (3.12) Applying Gronwall’s lemma to (3.12), we obtain the estimate (3.4). The estimate (3.6) is a direct consequence of (3.4). The proof is complete. 
+
+Lemma 3.3 (Hs-estimate for ψ). Let s ∈ ( 12 , 1) . Suppose that ψ0 ∈ H s and δ satisfies (3.3) with 
+
+r = 63−2s > 2. Then ψ ∈ L∞(0 , T ; Hs) ∩ L2(0 , T ; H1+ s) ∩ H1(0 , T ; Hs−1) for any T > 0 and satisfies 
+
+∥L s 
+
+> 2
+
+ψ(t)∥2 
+
+> L2(Ω)
+
+≤ ∥ ψ0∥2 
+
+> Hs
+
+exp 
+
+
+
+C
+
+
+
+∥ψ∥  
+
+> 42s−1
+> L∞
+> tLr
+> x
+
++ 1 
+
+
+
+t
+
+
+
++ C
+
+Z t
+
+> 0
+
+exp 
+
+
+
+C
+
+
+
+∥ψ∥  
+
+> 42s−1
+> L∞
+> tLr
+> x
+
++ 1 
+
+
+
+(t − τ )
+
+
+
+dτ, ∀ t > 0, (3.13) 
+
+where ∥ψ∥L∞  
+
+> tLr
+> x
+
+is controlled by (3.4) such that 
+
+∥ψ∥rL∞  
+
+> tLr
+> x
+
+≤ ∥ ψ0∥rLr (Ω) + rM 0H2
+
+2( r − 1) min j Dj
+
+. (3.14) 
+
+Proof. Since the space Hs is continuously embedded into Lr(Ω) with r = 63−2s , we have ψ0 ∈ Lr(Ω). Then by Lemma 3.2, we see that ψ ∈ L∞(0 , ∞; Lr(Ω)) satisfying the uniform in time estimate (3.14). Next, testing equation (2.10) 3 by Lsψ, after integration by parts, we obtain 12ddt ∥L s 
+
+> 2
+
+ψ∥2 
+
+> L2(Ω)
+
++ ∥L 1+ s 
+
+> 2
+
+ψ∥2 
+
+> L2(Ω)
+
+= −(u · ∇ ψ, Lsψ) − (ϕ′
+
+> b
+
+u · ez , Lsψ) + ( Dφ ′′  
+
+> b
+
+, Lsψ). (3.15) Using H¨ older’s inequality, Lemma 3.1 and (2.10) 1, we have 
+
+|(u · ∇ ψ, Lsψ)| ≤ ∥ u∥Lr (Ω) ∥∇ ψ∥L3(Ω) ∥L sψ∥L 61+2 s (Ω) 
+
+≤ C(∥∇ p∥Lr (Ω) + ∥ψ∥Lr (Ω) )∥∇ ψ∥L3(Ω) ∥L sψ∥L 61+2 s (Ω) 
+
+≤ C∥ψ∥Lr (Ω) ∥∇ ψ∥L3(Ω) ∥L sψ∥L 61+2 s (Ω) .
+
+11 By the Sobolev embedding theorem and Lemmas B.1–B.4, we find 
+
+∥∇ ψ∥L3(Ω) ≤ C
+
+lX
+
+j=1 
+
+∥∇ ψ∥L3(Ω j ) ≤ C
+
+lX
+
+j=1 
+
+∥ψ∥H 32 (Ω j ) ≤ C∥ψ∥H 32
+
+= C∥L 34 ψ∥L2(Ω) ≤ C∥L s 
+
+> 2
+
+ψ∥s− 12
+
+L2(Ω) ∥L 1+ s 
+
+> 2
+
+ψ∥ 32 −sL2(Ω) 
+
+and 
+
+∥L sψ∥L 61+2 s (Ω) ≤ C∥L sψ∥H1−s(Ω) ≤ C∥L 1+ s 
+
+> 2
+
+ψ∥L2(Ω) .
+
+Then it follows from Young’s inequality that 
+
+|(u · ∇ ψ, Lsψ)| ≤ C∥ψ∥Lr (Ω) ∥L s 
+
+> 2
+
+ψ∥s− 12
+
+L2(Ω) ∥L 1+ s 
+
+> 2
+
+ψ∥ 52 −sL2(Ω) 
+
+≤ 16 ∥L 1+ s 
+
+> 2
+
+ψ∥2
+
+L2(Ω) + C∥ψ∥
+
+> 42s−1
+
+Lr (Ω) ∥L s 
+
+> 2
+
+ψ∥2
+
+L2(Ω) . (3.16) Furthermore, by virtue of (2.10) 1 and Lemma B.1, we get 
+
+|(ϕ′
+
+bu · ez , Lsψ)| ≤ C∥u∥L2(Ω) ∥L sψ∥L2(Ω) ≤ C∥ψ∥L2(Ω) ∥L 1+ s 
+
+> 2
+
+ψ∥L2(Ω) 
+
+≤ C∥L s 
+
+> 2
+
+ψ∥L2(Ω) ∥L 1+ s 
+
+> 2
+
+ψ∥L2(Ω) 
+
+≤ 16 ∥L 1+ s 
+
+> 2
+
+ψ∥2
+
+L2(Ω) + C∥L s 
+
+> 2
+
+ψ∥2
+
+L2(Ω) (3.17) and 
+
+|(Dφ ′′ 
+
+b , Lsψ)| ≤ ∥ Dφ ′′ 
+
+b ∥L2(Ω) ∥L sψ∥L2(Ω) ≤ C∥L 1+ s 
+
+> 2
+
+ψ∥L2(Ω) ≤ 16 ∥L 1+ s 
+
+> 2
+
+ψ∥2
+
+L2(Ω) + C. (3.18) Substituting (3.16)–(3.18) into (3.15), we obtain ddt ∥L s 
+
+> 2
+
+ψ∥2
+
+L2(Ω) + ∥L 1+ s 
+
+> 2
+
+ψ∥2
+
+L2(Ω) ≤ C
+
+
+
+∥ψ∥
+
+> 42s−1
+
+Lr (Ω) + 1 
+
+
+
+∥L s 
+
+> 2
+
+ψ∥2
+
+L2(Ω) + C. (3.19) From (3.19), Gronwall’s lemma and (3.14), we infer that ψ ∈ L∞(0 , T ; Hs) ∩ L2(0 , T ; H1+ s) for any 
+
+T > 0 and satisfies the estimate (3.13). Finally, by comparison in (2.10) 3, we get 
+
+∥∂tψ∥Hs−1 ≤ ∥ u · ∇ ψ∥Hs−1 + ∥ϕ′
+
+bu · ez ∥Hs−1 + ∥L ψ∥Hs−1 + ∥Dφ ′′ 
+
+b ∥Hs−1
+
+≤ C
+
+
+
+∥u · ∇ ψ∥L 65−2s (Ω) + ∥ϕ′
+
+bu · ez ∥L 65−2s (Ω) + ∥ψ∥H1+ s + ∥Dφ ′′ 
+
+b ∥L 65−2s (Ω) 
+
+
+
+≤ C∥ψ∥Lr (Ω) ∥∇ ψ∥L3(Ω) + C∥ψ∥H1+ s + C
+
+≤ C∥ψ∥ 12 +s
+
+Hs ∥ψ∥ 32 −s
+
+H1+ s + C∥ψ∥H1+ s + C, 
+
+which implies that ∂tψ ∈ L2(0 , T ; Hs−1). The proof is complete. Now we are in a position to prove Theorem 3.3. 12 Proof of Theorem 3.3. The existence of a global solution with required regularity properties can be established by the Faedo–Galerkin approximation scheme described in [5], the a priori estimates in Lemmas 3.2, 3.3 together with the compactness argument. Hence, we omit the details. Next, we show the continuous dependence of the solution on the initial datum. Let ( u1, p 1, ψ 1)and ( u2, p 2, ψ 2) be two solutions corresponding to the initial data ψ1,0 and ψ2,0, respectively. Then their difference ( u, ψ, p ) := ( u1 − u2, ψ 1 − ψ2, p 1 − p2) satisfies 
+
+
+
+u = −K(∇p + ψez ),
+
+∇ · u = 0 ,∂tψ + u1 · ∇ ψ + u · ∇ ψ2 + ϕ′
+
+> b
+
+u · ez − div( D∇ψ) = 0 ,
+
+(3.20) and 
+
+ψ|t=0 = ψ0 := ψ1,0 − ψ2,0. (3.21) Testing (3.20) 3 by Lsψ and using integration by parts, we obtain 12ddt ∥L s 
+
+> 2
+
+ψ∥2 
+
+> L2(Ω)
+
++ ∥L 1+ s 
+
+> 2
+
+ψ∥2 
+
+> L2(Ω)
+
+= −(u1 · ∇ ψ, Lsψ) − (u · ∇ ψ2, Lsψ) − (ϕ′
+
+> b
+
+u · ez , Lsψ). (3.22) Similar to (3.16)–(3.17), we can derive the following inequality ddt ∥L s 
+
+> 2
+
+ψ∥2 
+
+> L2(Ω)
+
++ 12 ∥L 1+ s 
+
+> 2
+
+ψ∥2
+
+> L2(Ω)
+
+≤ C∥ψ1∥ 
+
+> 42s−1
+> Lr(Ω)
+
+∥L s 
+
+> 2
+
+ψ∥2 
+
+> L2(Ω)
+
++ C∥ψ∥ 
+
+> 42s−1
+> Lr(Ω)
+
+∥L s 
+
+> 2
+
+ψ2∥2 
+
+> L2(Ω)
+
++ C∥L s 
+
+> 2
+
+ψ∥2
+
+> L2(Ω)
+
+,
+
+where r = 63−2s . Using the Sobolev embedding theorem, we have 
+
+∥ψ1∥Lr (Ω) ≤ C∥L s 
+
+> 2
+
+ψ1∥L2(Ω) , ∥ψ∥Lr (Ω) ≤ C∥L s 
+
+> 2
+
+ψ∥L2(Ω) .
+
+Then it follows that ddt ∥L s 
+
+> 2
+
+ψ∥2 
+
+> L2(Ω)
+
++ ∥L sψ∥2
+
+> L2(Ω)
+
+≤ C∥L s 
+
+> 2
+
+ψ1∥
+
+> 42s−1
+> L2(Ω)
+
+∥L s 
+
+> 2
+
+ψ∥2 
+
+> L2(Ω)
+
++ C∥L s 
+
+> 2
+
+ψ∥
+
+> 42s−1
+> L2(Ω)
+
+∥L s 
+
+> 2
+
+ψ2∥2 
+
+> L2(Ω)
+
++ C∥L s 
+
+> 2
+
+ψ∥2
+
+> L2(Ω)
+
+≤ C∥L s 
+
+> 2
+
+ψ∥2
+
+> L2(Ω)
+
+
+
+∥L s 
+
+> 2
+
+ψ1∥L2(Ω) + ∥L s 
+
+> 2
+
+ψ2∥L2(Ω) 
+
+ 6−4s
+
+> 2s−1
+
+∥L s 
+
+> 2
+
+ψ2∥2
+
+> L2(Ω)
+
++ C∥L s 
+
+> 2
+
+ψ∥2
+
+> L2(Ω)
+
+(∥L s 
+
+> 2
+
+ψ1∥ 
+
+> 42s−1
+> L2(Ω)
+
++ 1) 
+
+≤ C∥L s 
+
+> 2
+
+ψ∥2
+
+> L2(Ω)
+
+
+
+∥ψ1∥ 
+
+> 42s−1
+> Hs
+
++ ∥ψ2∥ 
+
+> 42s−1
+> Hs
+
++ 1 
+
+
+
+. (3.23) An application of Gronwall’s lemma to (3.23) gives the continuous dependence estimate (3.2). This together with the fact that ψi ∈ L∞(0 , T ; Hs) for any T > 0 and i = 1 , 2, yields the continuous dependence of ψ(t) on its initial datum in Hs. In particular, if ψ1,0 = ψ2,0, then ψ1(t) = ψ2(t) for all t ≥ 0. Hence, the solution is unique. 13 Concerning the diffuse interface model (2.14)–(2.16) with continuous coefficients Kε, Dε, we intro-duce analogously the higher-order space 
+
+Wε = {ψ ∈ V : ∂xψ, ∂ yψ ∈ H1(Ω) , D ε∂z ψ ∈ H1(Ω) }
+
+endowed with the following norm 
+
+∥ψ∥2 
+
+> Wε
+
+= ∥ψ∥2 
+
+> H1(Ω)
+
++ ∥∂xψ∥2 
+
+> H1(Ω)
+
++ ∥∂yψ∥2 
+
+> H1(Ω)
+
++ ∥Dε∂z ψ∥2
+
+> H1(Ω)
+
+.
+
+By the construction of Dε, ∥(Dε)′∥L∞(Ω) is bounded for any fixed 0 < ε ≪ 1. Using this fact, we can verify that Wε = V ∩ H2(Ω). Next, we define the self-adjoint positive operator 
+
+Lεψ := − div( Dε∇ψ), ∀ ψ ∈ W ε,
+
+which admits properties similar to those of L (see Appendix B). Moreover, the fractional spaces 
+
+Hsε = dom(( Lε) s 
+
+> 2
+
+) are defined as the closure of V in the Hsε-norm ( s ∈ R). Then we have 
+
+H0 
+
+> ε
+
+= H, H1 
+
+> ε
+
+= V, H2 
+
+> ε
+
+= Wε.
+
+Similarly to Lemma B.3, the fractional Hsε-norm (0 < s < 1) can be interpreted as the interpolation norm between H and V, and is equivalent to the fractional Sobolev norm ∥ · ∥ Hs(Ω) . For any 0 < ε ≪ 1, we can identify Hsε = Hs for 0 < s < 1. Analogous results can be obtained for the diffuse interface model (2.14)–(2.16) using similar argu-ments for the sharp interface model. In particular, we have the following a priori Lr-estimate: 
+
+Lemma 3.4. Let (uε, p ε, ψ ε) be a global weak solution to problem (2.14) –(2.16) . For any given r > 
+
+2, we assume that the constant δ in (2.8) satisfies (3.3) . If ψε 
+
+> 0
+
+∈ Lr(Ω) , then ψ ∈ L∞(0 , ∞; Lr(Ω)) 
+
+satisfies 
+
+∥ψε(t)∥rLr (Ω) ≤ ∥ ψε
+
+> 0
+
+∥rLr (Ω) e− 2( r−1) min j DjrH 2 t + rM 0H2
+
+2( r − 1) min j Dj
+
+
+
+1 − e− 2( r−1) min j DjrH 2 t
+
+
+
+, (3.24) 
+
+for any t ≥ 0, where the constant M0 is given by (3.5) and is independent of ε. In particular, we have 
+
+∥ψε(t)∥rLr (Ω) ≤ rM 0H2
+
+2( r − 1) min j Dj
+
++ 1 (3.25) 
+
+for any 
+
+t ≥ T0(∥ψε
+
+> 0
+
+∥Lr (Ω) ) = rH 2
+
+2( r − 1) min j Dj
+
+ln( ∥ψε
+
+> 0
+
+∥rLr (Ω) + 1) .
+
+With the aid of Lemma 3.4, we can prove the well-posedness of the diffuse interface model (2.14)– (2.16) in Hs with s ∈ ( 12 , 1). 
+
+Theorem 3.5. Suppose that 0 < ε ≪ 1. For any initial data ψε 
+
+> 0
+
+∈ L2(Ω) , problem (2.14) –(2.16) 
+
+admits a global weak solution (u, p, ψ ) such that ψε ∈ L∞(0 , T ; L2(Ω)) ∩ L2(0 , T ; V) ∩ H1(0 , T ; V∗),
+
+pε ∈ L2(0 , T ; V) and uε ∈ L2(0 , T ; H) for any T > 0. If, in addition, ψε 
+
+> 0
+
+∈ H s for some s ∈ ( 12 , 1) ,then the solution is unique and satisfies 
+
+ψε ∈ L∞(0 , T ; Hs) ∩ L2(0 , T ; H1+ sε ) ∩ H1(0 , T ; Hs−1 
+
+> ε
+
+), for any T > 0,
+
+14 which also implies ψε ∈ C([0 , T ]; Hs). Let (uε
+
+> 1
+
+, ψ ε
+
+> 1
+
+, p ε
+
+> 1
+
+) and (uε
+
+> 2
+
+, ψ ε
+
+> 2
+
+, p ε
+
+> 2
+
+) be two solutions correspond-ing to the initial data ψε 
+
+> 1,0
+
+and ψε
+
+> 2,0
+
+, respectively. Then the following continuous dependence estimate holds for any t > 0:
+
+∥(Lε) s 
+
+> 2
+
+(ψε
+
+> 1
+
+(t) − ψε
+
+> 2
+
+(t)) ∥2
+
+> L2(Ω)
+
+≤ ∥ (Lε) s 
+
+> 2
+
+(ψε 
+
+> 1,0
+
+− ψε
+
+> 2,0
+
+)∥2 
+
+> L2(Ω)
+
+exp 
+
+Z t
+
+> 0
+
+C
+
+
+
+∥ψε
+
+> 1
+
+(τ )∥ 
+
+> 42s−1
+> Hs
+
++ ∥ψε
+
+> 2
+
+(τ )∥ 
+
+> 42s−1
+> Hs
+
++ 1 
+
+
+
+dτ
+
+
+
+. (3.26) As a consequence of Theorem 3.5, we have 
+
+Corollary 3.6. Let s ∈ ( 12 , 1) and 0 < ε ≪ 1. Problem (2.14) –(2.16) generates a strongly contin-uous semigroup {Sε(t)}t≥0 on the phase space Hs, that is, 
+
+Sε(t) : Hs → H s, Sε(t)ψε 
+
+> 0
+
+= ψε(t), ∀ t ≥ 0,
+
+where ψε is the unique weak solution to problem (2.14) –(2.16) corresponding to the initial datum 
+
+ψε 
+
+> 0
+
+∈ H s.
+
+# 4 Existence of Global Attractors 
+
+In this section, we study the long-time behavior of global weak solutions to the sharp interface model (2.10)–(2.13) and the diffuse interface model (2.14)–(2.16) in the framework of infinite-dimensional dynamical systems. More precisely, we prove the existence of global attractors for both models in the phase space Hs with s ∈ ( 12 , 1). The following lemma (see [29]) plays a crucial role in deriving uniform-in-time estimates. 
+
+Lemma 4.1 (Uniform Gronwall lemma) . Let g, h, y be three positive locally integrable functions on 
+
+(t0, ∞) such that y′ is locally integrable on (t0, ∞), and which satisfy 
+
+y′ ≤ gy + h, ∀ t > t 0,
+
+Z t+rt
+
+g(s) d s ≤ a1,
+
+Z t+rt
+
+h(s) d s ≤ a2,
+
+Z t+rt
+
+y(s) d s ≤ a3, ∀ t > t 0.
+
+where r, a 1, a 2, a 3 are positive constants. Then 
+
+y(t + r) ≤
+
+ a3
+
+r + a2
+
+
+
+ea1 , ∀ t ≥ t0.
+
+4.1 Sharp interface model 
+
+We first study the sharp interface model (2.10)–(2.13). 15 Theorem 4.1. Let s ∈ ( 12 , 1) . The semigroup {S0(t)}t≥0 associated with the sharp interface model 
+
+(2.10) –(2.13) possesses a global attractor A0 ⊂ H s, which is bounded in V, compact and connected in Hs.
+
+The following lemma yields the existence of an absorbing set in H.
+
+Lemma 4.2 (Dissipative L2-estimate) . Let ψ0 ∈ H and the constant δ in (2.8) satisfy 
+
+0 < δ ≤ δ2 := min j Kj min j Dj
+
+32(max j Kj )2c∆
+
+. (4.1) 
+
+Then the solution ψ of problem (2.10) –(2.13) satisfies 
+
+∥ψ(t)∥2 
+
+> L2(Ω)
+
+≤ ∥ ψ0∥2
+
+> L2(Ω)
+
+e− min j DjH2 t + M1H2
+
+min j Dj
+
+
+
+1 − e− min j DjH2 t
+
+
+
+, ∀ t ≥ 0, (4.2) 
+
+where 
+
+M1 = 8c2∆L2
+
+δ
+
+(max j Dj )2
+
+min j Dj
+
+. (4.3) 
+
+In addition, for any 
+
+t ≥ T1 := T1(∥ψ0∥L2(Ω) ) = H2
+
+min j Dj
+
+ln( ∥ψ0∥2 
+
+> L2(Ω)
+
++ 1) ,
+
+it holds 
+
+∥ψ(t)∥2 
+
+> L2(Ω)
+
+≤ M1H2
+
+min j Dj
+
++ 1 ,
+
+Z t+1 
+
+> t
+
+∥√D∇ψ(τ )∥2 
+
+> L2(Ω)
+
+dτ ≤ M1H2
+
+min j Dj
+
++ 1 + M1. (4.4) 
+
+Proof. Testing (2.10) 3 by ψ and using integration by parts, we get 12ddt ∥ψ∥2 
+
+> L2(Ω)
+
++ ∥√D∇ψ∥2 
+
+> L2(Ω)
+
+= −
+
+Z
+
+> Ω
+
+ϕ′
+
+> b
+
+uz ψ dx +
+
+Z
+
+> Ω
+
+Dφ ′′  
+
+> b
+
+ψ dx.
+
+By virtue of (2.8) and (2.9), it holds 
+
+Z
+
+> Ω
+
+ϕ′
+
+> b
+
+uz ψ dx =
+
+Z
+
+> Ωδ
+
+ϕ′
+
+> b
+
+uz ψ dx ≤ c∆δ−1∥uz ∥L2(Ω δ )∥ψ∥L2(Ω δ ), (4.5) where Ω δ := Ω ∩ ({− H < z < −H + δ} ∪ {− δ < z < 0}). Noting that both uz and ψ vanish on the boundary {z = 0 } ∪ { z = −H}, we infer from Lemma A.1 that 
+
+∥uz ∥L2(Ω δ ) ≤ 2δ∥∂z uz ∥L2(Ω δ ), ∥ψ∥L2(Ω δ ) ≤ 2δ∥∂z ψ∥L2(Ω δ ). (4.6) As a consequence, it holds 
+
+Z
+
+> Ω
+
+ϕ′
+
+> b
+
+uz ψ dx ≤ 4c∆δ∥∂z uz ∥L2(Ω δ )∥∂z ψ∥L2(Ω δ )
+
+≤ 4c∆δ(∥∂xux∥L2(Ω) + ∥∂yuy∥L2(Ω) )∥∂z ψ∥L2(Ω) . (4.7) 16 Here, we use the incompressibility condition ∇ · u = 0. In view of (2.10) 1, we have 
+
+∥∂xu∥L2(Ω) ≤ max  
+
+> j
+
+Kj (∥∂x∇p∥L2(Ω) + ∥∂xψ∥L2(Ω) ), (4.8) where the pressure p is determined by the elliptic problem (3.1). Since the permeability coefficient 
+
+K is independent of x, one can take the derivative of (3.1) with respect to x and obtain 
+
+( − div( K∇∂xp) = div( K∂ xψez ), in Ω ,∂z ∂xp(x, −H) = ∂z ∂xp(x, 0) = 0 ,
+
+and ∂xp is periodic in the horizontal directions ( x, y ). From the standard elliptic estimate, we get 
+
+∥∂x∇p∥L2(Ω) ≤ max j Kj
+
+min j Kj
+
+∥∂xψ∥L2(Ω) .
+
+This, together with (4.8), yields 
+
+∥∂xu∥L2(Ω) ≤ 2(max j Kj )2
+
+min j Kj
+
+∥∂xψ∥L2(Ω) .
+
+Similarly, we have 
+
+∥∂yu∥L2(Ω) ≤ 2(max j Kj )2
+
+min j Kj
+
+∥∂yψ∥L2(Ω) .
+
+As a consequence, Z
+
+> Ω
+
+ϕ′
+
+> b
+
+uz ψ dx ≤ 8(max j Kj )2c∆δ
+
+min j Kj
+
+∥∇ ψ∥2
+
+> L2(Ω)
+
+. (4.9) On the other hand, using H¨ older’s inequality, Young’s inequality and (4.6), we find 
+
+Z
+
+> Ω
+
+Dφ ′′  
+
+> b
+
+ψ dx ≤ 2c∆δ−2 max  
+
+> j
+
+Dj |Ωδ| 12 ∥ψ∥L2(Ω δ )
+
+≤ 4c∆Lδ − 12 max  
+
+> j
+
+Dj ∥∂z ψ∥L2(Ω δ )
+
+≤ 14 min  
+
+> j
+
+Dj ∥∇ ψ∥2 
+
+> L2(Ω)
+
++ 16 c2∆L2
+
+δ
+
+(max j Dj )2
+
+min j Dj
+
+. (4.10) Substituting (4.9), (4.10) into (4.7) and choosing δ satisfying (4.1), we get ddt ∥ψ∥2 
+
+> L2(Ω)
+
++ ∥√D∇ψ∥2 
+
+> L2(Ω)
+
+≤ 32 c2∆L2
+
+δ
+
+(max j Dj )2
+
+min j Dj
+
+=: M1. (4.11) Due to Lemma A.1, we also infer from (4.11) that ddt ∥ψ∥2 
+
+> L2(Ω)
+
++ min j Dj
+
+H2 ∥ψ∥2 
+
+> L2(Ω)
+
+≤ M1.
+
+Applying the classical Gronwall lemma, we obtain the estimate (4.2). In particular, it follows from (4.2) that 
+
+∥ψ(t)∥2 
+
+> L2(Ω)
+
+≤ M1H2
+
+min j Dj
+
++ 1 , ∀ t ≥ T1 = H2
+
+min j Dj
+
+ln( ∥ψ0∥2 
+
+> L2(Ω)
+
++ 1) . (4.12) In addition, for t ≥ T1, we integrate the energy inequality (4.11) over [ t, t + 1] to obtain 
+
+∥ψ(t + 1) ∥2 
+
+> L2(Ω)
+
++
+
+Z t+1 
+
+> t
+
+∥√D∇ψ(s)∥2 
+
+> L2(Ω)
+
+ds ≤ ∥ ψ(t)∥2 
+
+> L2(Ω)
+
++ M1 ≤ M1H2
+
+min j Dj
+
++ 1 + M1. (4.13) Combining (4.12) and (4.13), we arrive at the conclusion (4.4). 17 The next lemma gives a uniform estimate of ψ in V for large time, which implies that the trajectory 
+
+ψ(t) is uniformly compact in Hs with s ∈ ( 12 , 1). 
+
+Lemma 4.3. Let s ∈ ( 12 , 1) and ψ0 ∈ H s. We take r = 63−2s and 
+
+δ = min {δ1, δ 2}, (4.14) 
+
+where δ1 and δ2 are given in (3.3) and (4.1) , respectively. For any τ ∈ (0 , 1) , the solution ψ of problem (2.10) –(2.13) satisfies ψ ∈ L∞(τ, ∞; V). Moreover, for any t ≥ max {T0, T 1} + 1 , where T0,
+
+T1 are given in Lemma 3.2, Lemma 4.2, respectively, it holds 
+
+∥√D∇ψ(t)∥2 
+
+> L2(Ω)
+
+≤
+
+
+
+M2 + M1H2
+
+min j Dj
+
++ 1 + M1
+
+
+
+exp 
+
+"
+
+M3 + M4
+
+ rM 0H2
+
+2( r − 1) min j Dj
+
++ 1 
+
+ 2
+
+> r−3
+
+#
+
+=: M5. (4.15) 
+
+with 
+
+M2 = 32 c2∆L2δ−3(max  
+
+> j
+
+Dj )2, M3 = 32(max j Kj )4c2∆
+
+(min j Kj )2 min j Dj
+
+, (4.16) 
+
+and 
+
+M4 = 2Cs
+
+(1 + Cp)C2C 3 
+
+> r
+> u
+
+max j Kj
+
+ 2rr−3
+
+min j Dj
+
+. (4.17) 
+
+Proof. It follows from Theorem 3.3 that ψ ∈ L2(0 , T ; H1+ s) ⊂ L2(0 , T ; V) for any T ≥ 1. Then for any τ ∈ (0 , 1) there exists some τ ′ ∈ (0 , τ ) such that ψ(τ ′) ∈ V . By uniqueness, ψ can be viewed as a solution on [ τ ′, T ] with the initial datum ψ|t=τ ′ = ψ(τ ′). From Proposition 3.2, we have ψ ∈ L∞(τ ′, T ; V). In what follows, we show that ψ ∈ L∞(τ ′, ∞; V). Multiplying (2.10) 3 by Lψ and integrating over Ω, we obtain 12ddt ∥√D∇ψ∥2 
+
+> L2(Ω)
+
++ ∥L ψ∥2 
+
+> L2(Ω)
+
+=
+
+Z
+
+> Ω
+
+u · ∇ ψLψ dx +
+
+Z
+
+> Ω
+
+ϕ′
+
+> b
+
+uz Lψ dx −
+
+Z
+
+> Ω
+
+Dφ ′′  
+
+> b
+
+Lψ dx. (4.18) Using H¨ older’s inequality, Young’s inequality and (4.6), we get 
+
+Z
+
+> Ω
+
+Dφ ′′  
+
+> b
+
+Lψ dx ≤ 2c∆δ−2 max  
+
+> j
+
+Dj |Ωδ| 12 ∥L ψ∥L2(Ω δ )
+
+≤ 14 ∥L ψ∥2 
+
+> L2(Ω)
+
++ 16 c2∆L2δ−3(max  
+
+> j
+
+Dj )2. (4.19) Similarly to (4.5)–(4.9), we can deduce that 
+
+Z
+
+> Ω
+
+ϕ′
+
+> b
+
+uz Lψ dx ≤ c∆δ−1∥uz ∥L2(Ω) ∥L ψ∥L2(Ω) 
+
+≤ 2c∆(∥∂xux∥L2(Ω) + ∥∂yuy∥L2(Ω) )∥L ψ∥L2(Ω) 
+
+≤ 4(max j Kj )2c∆
+
+min j Kj
+
+(∥∂xψ∥L2(Ω) + ∥∂yψ∥L2(Ω) )∥L ψ∥L2(Ω) 
+
+18 ≤ 14 ∥L ψ∥2 
+
+> L2(Ω)
+
++ 16(max j Kj )4c2∆
+
+(min j Kj )2 ∥∇ ψ∥2
+
+> L2(Ω)
+
+. (4.20) Furthermore, using H¨ older’s inequality, Young’s inequality, (2.10) 1 and Lemmas A.2, A.4, we have 
+
+Z
+
+> Ω
+
+u · ∇ ψLψ dx
+
+≤ ∥ u∥Lr (Ω) ∥∇ ψ∥L 2rr−2 (Ω) ∥L ψ∥L2(Ω) 
+
+≤ (1 + Cp) max  
+
+> j
+
+Kj ∥ψ∥Lr (Ω) ∥∇ ψ∥L 2rr−2 (Ω) ∥L ψ∥L2(Ω) 
+
+≤ (1 + Cp)C2C 3 
+
+> r
+> u
+
+max  
+
+> j
+
+Kj ∥ψ∥Lr (Ω) ∥∇ ψ∥1− 3
+
+> r
+> L2(Ω)
+
+∥L ψ∥1+ 3
+
+> r
+> L2(Ω)
+
+≤ 14 ∥L ψ∥2 
+
+> L2(Ω)
+
++ Cs
+
+(1 + Cp)C2C 3 
+
+> r
+> u
+
+max  
+
+> j
+
+Kj
+
+ 2rr−3 ∥ψ∥ 
+
+> 2rr−3
+> Lr(Ω)
+
+∥∇ ψ∥2
+
+> L2(Ω)
+
+. (4.21) where r = 63−2s and Cs > 0 is a uniform constant depending only on s. Substituting the estimates (4.19)–(4.21) into (4.18), we obtain ddt ∥√D∇ψ∥2 
+
+> L2(Ω)
+
++ ∥L ψ∥2 
+
+> L2(Ω)
+
+≤ M2 +
+
+
+
+M3 + M4∥ψ∥ 
+
+> 2rr−3
+> Lr(Ω)
+
+
+
+∥√D∇ψ∥2 
+
+> L2(Ω)
+
+(4.22) for any t > 0, with constants M2, M 3, M 4 given in (4.16) and (4.17). Set 
+
+y(t) := ∥√D∇ψ∥2
+
+> L2(Ω)
+
+, g(t) := M3 + M4∥ψ∥ 
+
+> 2rr−3
+> Lr(Ω)
+
+, h(t) := M2.
+
+Furthermore, if t ≥ max {T0, T 1}, it follows from Lemma 3.2 and Lemma 4.2 that 
+
+Z t+1 
+
+> t
+
+y(ξ) d ξ ≤ M1H2
+
+min j Dj
+
++ 1 + M1
+
+and 
+
+Z t+1 
+
+> t
+
+g(ξ) d ξ ≤ M3 + M4 sup 
+
+> ξ∈[t,t +1]
+
+∥ψ(ξ)∥  
+
+> 2rr−3
+> Lr(Ω)
+
+≤ M3 + M4
+
+ rM 0H2
+
+2( r − 1) min j Dj
+
++ 1 
+
+ 2
+
+> r−3
+
+.
+
+Then an application of Lemma 4.1 gives 
+
+y(t + 1) ≤
+
+
+
+M2 + M1H2
+
+min j Dj
+
++ 1 + M1
+
+
+
+exp 
+
+"
+
+M3 + M4
+
+ rM 0H2
+
+2( r − 1) min j Dj
+
++ 1 
+
+ 2
+
+> r−3
+
+#
+
+,
+
+for all t ≥ max {T0, T 1}. This completes the proof. 
+
+Proof of Theorem 4.1. Let B(0 , R ) ⊂ H s be a closed ball centered at 0 with radius R > 0. Assume the initial datum ψ0 ∈ B(0 , R ). By the Sobolev embedding theorem, we find that 
+
+∥ψ0∥L2(Ω) + ∥ψ0∥Lr (Ω) ≤ C∥ψ0∥Hs < CR =: R′, where r = 63 − 2s .
+
+Define the set 
+
+B1 := 
+
+
+
+ψ ∈ V : ∥ψ∥2 
+
+> L2(Ω)
+
+≤ M1H2
+
+min j Dj
+
++ 1 , ∥∇ ψ∥2 
+
+> L2(Ω)
+
+≤ M5
+
+min j Dj
+
+
+
+, (4.23) 19 where M1 is given by (4.3) and M5 is determined in (4.15). Thanks to Lemmas 4.2 and 4.3, the solution ψ(t) = S0(t)ψ0 belongs to the set B1 for any t ≥ max {T0(R′), T 1(R′)} + 1. Since B1 is bounded in V and relatively compact in Hs, it serves a compact absorbing set for the semigroup 
+
+{S0(t)}t≥0 in the phase space Hs. Applying the abstract result [29, Theorem 1.1], we can conclude the existence of the global attractor A0 for {S0(t)}t≥0, which is given by 
+
+A0 = \
+
+> ξ≥0
+
+[
+
+> t≥ξ
+
+S0(t)B1.
+
+The proof is complete. 
+
+4.2 Diffuse interface model 
+
+We proceed to investigate the diffuse interface model (2.14)–(2.16). The following two lemmas provide estimates similar to those in Lemmas 4.2 and 4.3. The key point is that these estimates are independent of the parameter ε.
+
+Lemma 4.4. Let ψε 
+
+> 0
+
+∈ H and the constant δ in (2.8) satisfy (4.1) . Then the solution ψ to problem 
+
+(2.14) –(2.16) satisfies 
+
+∥ψε(t)∥2 
+
+> L2(Ω)
+
+≤ ∥ ψε
+
+> 0
+
+∥2
+
+> L2(Ω)
+
+e− min j DjH2 t + M1H2
+
+min j Dj
+
+
+
+1 − e− min j DjH2 t
+
+
+
+, ∀ t ≥ 0, (4.24) 
+
+where M1 is given by (4.3) . Moreover, if 
+
+t ≥ T1(∥ψε
+
+> 0
+
+∥L2(Ω) ) := H2
+
+min j Dj
+
+ln( ∥ψε
+
+> 0
+
+∥2 
+
+> L2(Ω)
+
++ 1) ,
+
+then we have 
+
+∥ψε(t)∥2 
+
+> L2(Ω)
+
+≤ M1H2
+
+min j Dj
+
++ 1 ,
+
+Z t+1 
+
+> t
+
+∥√Dε∇ψε(τ )∥2 
+
+> L2(Ω)
+
+dτ ≤ M1H2
+
+min j Dj
+
++ 1 + M1. (4.25) 
+
+Lemma 4.5. Let s ∈ ( 12 , 1) and ψε 
+
+> 0
+
+∈ H s. We take r = 63−2s and the constant δ in (2.8) satisfying 
+
+(4.14) . For any τ ∈ (0 , 1) , the solution ψε of problem (2.14) –(2.16) satisfies ψε ∈ L∞(τ, ∞; V).Moreover, for any t ≥ max {T0, T 1} + 1 , where T0, T1 are given in Lemma 3.4, Lemma 4.4, respec-tively, it holds 
+
+∥√Dε∇ψ(t)∥2 
+
+> L2(Ω)
+
+≤ M5, (4.26) 
+
+with M5 defined as in (4.15) .
+
+Remark 4.1. The proof for Lemmas 4.4, 4.5 follows the same argument as that for Lemmas 4.2, 4.3, taking advantage of the fact that Kε, D ε have the same upper and lower bounds as K, D . In particular, in the derivation of the higher-order estimate (4.26), we should use Lemma A.3 instead of Lemma A.2. The details are omitted. Similarly to Theorem 4.1, for every 0 < ε ≪ 1, we can apply Lemmas 4.4, 4.5 to establish the existence of a global attractor for the semigroup {Sε(t)}t≥0 associated with the diffuse interface model (2.14)–(2.16). 20 Theorem 4.2. Let s ∈ ( 12 , 1) . For any 0 < ε ≪ 1, the semigroup {Sε(t)}t≥0 associated with the diffuse interface model (2.14) –(2.16) possesses a global attractor Aε ⊂ H s, which is bounded in V,compact, and connected in Hs. In particular, we have 
+
+Aε = \
+
+> ξ≥0
+
+[
+
+> t≥ξ
+
+Sε(t)B1,
+
+where the set B1 is given by (4.23) .
+
+# 5 Asymptotics in the Long-time Regime 
+
+In this section, we study the asymptotic behavior of global attractors Aε and the stationary sta-tistical properties of the diffuse interface model (2.14)–(2.16) as the width of the transition layer 
+
+ε → 0. 
+
+5.1 Upper semi-continuity of the attractors 
+
+First, we investigate the stability of the family of global attractors {Aε}ε≥0 as ε → 0. 
+
+Theorem 5.1. Let s ∈ ( 12 , 1) . The family of global attractors {Aε}ε≥0 constructed in Theorems 4.1, 4.2 is upper-semicontinuous at ε = 0 , that is, 
+
+lim  
+
+> ε→0
+
+dist( Aε, A0) = 0 ,
+
+where dist( Aε, A0) is the Hausdorff semi-distance between Aε, A0 defined by 
+
+dist( Aε, A0) := sup  
+
+> f∈Aε
+
+inf 
+
+> g∈A0
+
+∥f − g∥Hs .
+
+Since we are concerning the limit as ε → 0, we can take a sufficiently small ε0 > 0 and focus on the case ε ∈ [0 , ε 0] in the subsequent analysis. 
+
+Lemma 5.1. Let s ∈ ( 12 , 1) . For ε ∈ [0 , ε 0], we have 
+
+∪ε∈[0 ,ε 0]Aε ⊂ B1,
+
+where the set B1 is given by (4.23) . Suppose that the initial datum ψε 
+
+> 0
+
+∈ B1, ε ∈ [0 , ε 0]. Then the solution ψε to the sharp interface model (2.10) –(2.13) (for ε = 0 ) or the diffuse interface model 
+
+(2.14) –(2.16) (for ε ∈ (0 , ε 0]) satisfies 
+
+∥ψε(t)∥2 
+
+> L2(Ω)
+
+≤ M1H2
+
+min j Dj
+
++ 1 , ∥∇ ψε(t)∥2 
+
+> L2(Ω)
+
+≤ M6, ∀ t ≥ 0, (5.1) 
+
+where the constant M6 ≥ 1 depends on Dj , K j , M 0, M 1, M 5, s, Ω. Moreover, it holds 
+
+Z t
+
+> 0
+
+∥L εψε∥2 
+
+> L2(Ω)
+
+ds ≤ M7(t), ∀ t ≥ 0, (5.2) 
+
+with M7(t) > 0 determined by (5.6) .
+
+21 Proof. We recall that B1 ⊂ V (see (4.23)) serves as a compact absorbing set for {Sε(t)}t≥0, ε ∈
+
+[0 , ε 0]. By the definition of the global attractor, we have Aε ⊂ B1 for every ε ∈ [0 , ε 0], so that the family of global attractors {Aε}ε∈[0 ,ε 0] is uniformly bounded in H1(Ω). Concerning the estimate (5.1), we only deal with the case ε = 0, the case ε > 0 can be treated in a similar manner with the same bounds. First, by (4.2), we have 
+
+∥ψ(t)∥2 
+
+> L2(Ω)
+
+≤
+
+ M1H2
+
+min j Dj
+
++ 1 
+
+
+
+e− min j DjH2 t + M1H2
+
+min j Dj
+
+
+
+1 − e− min j DjH2 t
+
+
+
+≤ M1H2
+
+min j Dj
+
++ 1 , ∀ t ≥ 0.
+
+Integrating (4.11) yields 
+
+∥ψ(t)∥2 
+
+> L2(Ω)
+
++
+
+Z t
+
+> 0
+
+∥√D∇ψ(τ )∥2 
+
+> L2(Ω)
+
+dτ ≤ ∥ ψ0∥2 
+
+> L2(Ω)
+
++ M1t
+
+≤ M1H2
+
+min j Dj
+
++ 1 + M1t, ∀ t ≥ 0. (5.3) By interpolation, for r = 63−2s , we also have 
+
+∥ψ0∥Lr (Ω) ≤ Cs∥ψ0∥1−sL2(Ω) ∥√D∇ψ0∥sL2(Ω) ≤ Cs
+
+ M1H2
+
+min j Dj
+
++ 1 
+
+ 1−s
+
+> 2
+
+M s 
+
+> 2
+> 5
+
+.
+
+This, together with Lemma 3.2, gives 
+
+∥ψ(t)∥rLr (Ω) ≤ Cs
+
+ M1H2
+
+min j Dj
+
++ 1 
+
+ 3(1 −s)3−2s
+
+M 
+
+> 3s
+> 3−2s
+> 5
+
++ rM 0H2
+
+2( r − 1) min j Dj
+
+=: fM , ∀ t ≥ 0. (5.4) With the aid of (5.4), the classical Gronwall lemma on a finite interval [0 , max {T0, T 1} + 1] and the uniform Gronwall lemma on [max {T0, T 1} + 1 , ∞), we can deduce from (4.22) that 
+
+∥√D∇ψ(t)∥2 
+
+> L2(Ω)
+
+≤ M ′
+
+> 5
+
+, ∀ t ≥ 0, (5.5) for some M ′ 
+
+> 5
+
+only depending on Dj , K j , M 0, M 1, M 5, s . Then we set 
+
+M6 = M ′
+
+> 5
+
+min j Dj
+
+,
+
+which yields the estimate (5.1). Moreover, integrating (4.22) with respect to time, we infer from (5.3), (5.4) that 12
+
+Z t
+
+> 0
+
+∥L ψ(τ )∥2 
+
+> L2(Ω)
+
+dτ
+
+≤ ∥ √D∇ψ0∥2 
+
+> L2(Ω)
+
++
+
+Z t
+
+> 0
+
+M2 +
+
+
+
+M3 + M4∥ψ(τ )∥ 
+
+> 2rr−3
+> Lr(Ω)
+
+
+
+∥√D∇ψ(τ )∥2 
+
+> L2(Ω)
+
+dτ
+
+≤ M5 + M2t +
+
+
+
+M3 + M4 fM 2
+
+> r−3
+
+  M1H2
+
+min j Dj
+
++ 1 + M1t
+
+
+
+=: 12 M7(t). (5.6) The proof is complete. 22 Lemma 5.1 implies that ∪ε∈[0 ,ε 0]Aε is relatively compact in Hs. Next, we prove the continuous dependence of solutions on the parameter ε. Let ( u, p, ψ ) and ( uε, p ε, ψ ε) be solutions to the sharp interface model (2.10)–(2.13) and diffuse interface model (2.14)–(2.16), respectively. Denote the difference of the solutions 
+
+eu = u − uε, ep = p − pε, eψ = ψ − ψε,
+
+and the coefficients 
+
+eK := K − Kε, eD := D − Dε.
+
+Then ( eu, ep, eψ) satisfies the following system 
+
+eu = −Kε ∇ep + eψez
+
+ − eK ∇p + ψez
+
+,
+
+∇ · eu = 0 ,∂t eψ + uε · ∇ eψ + eu · ∇ ψ + ϕ′ 
+
+> b
+
+eu · ez − ∇ · (Dε∇ eψ) − ∇ · ( eD∇ψ) = 0 .
+
+(5.7) supplemented with the initial condition 
+
+eψ|t=0 = 0 , (5.8) as well as the boundary conditions 
+
+eu · ez |z=0 ,−H = 0 , eψ|z=0 = 0 , eψ|z=−H = 0 , (5.9) with periodicity in the horizontal directions ( x, y ). 
+
+Lemma 5.2. Suppose that ψ0 = ψε 
+
+> 0
+
+∈ B1, where B1 is defined as in (4.23) . Then eψ satisfies the following estimate 
+
+∥ eψ(t)∥2 
+
+> L2(Ω)
+
+≤ M8(t)ε 16 , ∀ t ≥ 0, (5.10) 
+
+where M8(t) > 0 depends on Kj ,Dj , M0, M1, M5, Ω and t, see (5.21) .Proof. We observe that the differences of the coefficients eK, eD are piecewise linear functions sup-ported in a narrow layer of width 2 ε. Thus, we have 
+
+∥ eK∥Lr (Ω) ≤ Cε 1 
+
+> r
+
+, ∥ eD∥Lr (Ω) ≤ Cε 1 
+
+> r
+
+, ∀ r ∈ [2 , ∞). (5.11) Since ep is determined by the elliptic problem 
+
+( − ∇ · (Kε∇ep) = ∇ · Kε eψez + eK(∇p + ψez ), in Ω ,∂z ep(x, −H) = ∂z ep(x, 0) = 0 , (5.12) with periodicity in the horizontal directions ( x, y ), it follows from Lemma 3.1 and (5.11) that 
+
+∥∇ ep∥L4(Ω) ≤ C(∥Kε eψez ∥L4(Ω) + ∥ eK∇p∥L4(Ω) + ∥ eKψ ∥L4(Ω) )
+
+≤ C ∥Kε∥L∞(Ω) ∥ eψ∥L4(Ω) + ∥ eK∥L12 (Ω) (∥∇ p∥L6(Ω) + ∥ψ∥L6(Ω) )
+
+≤ C∥ eψ∥L4(Ω) + Cε 112 ∥ψ∥L6(Ω) .
+
+23 Thanks to the Sobolev embedding theorem and Lemma 5.1, we get 
+
+∥∇ ep∥L4(Ω) ≤ C∥ eψ∥L4(Ω) + Cε 112 ∥∇ ψ∥L2(Ω) ≤ C∥ eψ∥L4(Ω) + CM 12 
+
+> 6
+
+ε 112 . (5.13) Consequently, it holds 
+
+∥eu∥L4(Ω) ≤ ∥ Kε∥L∞(Ω) (∥∇ ep∥L4(Ω) + ∥ eψ∥L4(Ω) ) + ∥ eK∥L12 (Ω) (∥∇ p∥L6(Ω) + ∥ψ∥L6(Ω) )
+
+≤ C ∥ eψ∥L4(Ω) + M 12 
+
+> 6
+
+ε 112 
+
+ + Cε 112 ∥ψ∥L6(Ω) 
+
+≤ C ∥ eψ∥L4(Ω) + M 12 
+
+> 6
+
+ε 112 
+
+ + Cε 112 ∥∇ ψ∥L2(Ω) 
+
+≤ C ∥ eψ∥L4(Ω) + M 12 
+
+> 6
+
+ε 112 
+
+.
+
+(5.14) In a similar way, we can get 
+
+∥∇ ep∥L2(Ω) + ∥eu∥L2(Ω) ≤ C∥ eψ∥L2(Ω) + CM 12 
+
+> 6
+
+ε 13 . (5.15) Next, testing equation (5.7) 3 by eψ and using integration by parts, we obtain 12ddt ∥ eψ∥2 
+
+> L2(Ω)
+
++ ∥√Dε∇ eψ∥2 
+
+> L2(Ω)
+
++
+
+Z
+
+> Ω
+
+eu · ∇ ψ + ϕ′ 
+
+> b
+
+eu · ez − ∇ · ( eD∇ψ) eψ dx = 0 . (5.16) With the aid of (5.13)–(5.15), Lemmas A.2–A.4 and Young’s inequality, we can deduce that 
+
+Z
+
+> Ω
+
+(eu · ∇ ψ) eψ dx =
+
+Z
+
+> Ω
+
+(eu · ∇ eψ)ψ dx ≤ ∥∇ eψ∥L2(Ω) ∥ψ∥L4(Ω) ∥eu∥L4(Ω) 
+
+≤ min j Dj
+
+8 ∥∇ eψ∥2 
+
+> L2(Ω)
+
++ C∥ψ∥2
+
+> L4(Ω)
+
+∥eu∥2
+
+> L4(Ω)
+
+≤ min j Dj
+
+8 ∥∇ eψ∥2 
+
+> L2(Ω)
+
++ C∥∇ ψ∥2
+
+> L2(Ω)
+
+(∥ eψ∥2 
+
+> L4(Ω)
+
++ M6ε 16 )
+
+≤ min j Dj
+
+8 ∥∇ eψ∥2 
+
+> L2(Ω)
+
++ CM 6(∥ eψ∥2 
+
+> L4(Ω)
+
++ M6ε 16 )
+
+≤ min j Dj
+
+8 ∥∇ eψ∥2 
+
+> L2(Ω)
+
++ CM 6∥ eψ∥ 12
+
+> L2(Ω)
+
+∥∇ eψ∥ 32 
+
+> L2(Ω)
+
++ CM 26 ε 16
+
+≤ min j Dj
+
+4 ∥∇ eψ∥2 
+
+> L2(Ω)
+
++ CM 46 ∥ eψ∥2 
+
+> L2(Ω)
+
++ CM 26 ε 16 , (5.17) 
+
+Z
+
+> Ω
+
+ϕ′ 
+
+> b
+
+eu · ez eψ dx ≤ c∆δ−1∥eu∥L2(Ω) ∥ eψ∥L2(Ω) 
+
+≤ C(∥ eψ∥L2(Ω) + M 12 
+
+> 6
+
+ε 13 )∥ eψ∥L2(Ω) 
+
+≤ C∥ eψ∥2 
+
+> L2(Ω)
+
++ CM 6ε 23 (5.18) and 
+
+Z
+
+> Ω
+
+−∇ · ( eD∇ψ) eψ dx =
+
+Z
+
+> Ω
+
+eD∇ψ · ∇ eψ dx
+
+≤ min j Dj
+
+4 ∥∇ eψ∥2 
+
+> L2(Ω)
+
++ C∥ eD∥2
+
+> L3(Ω)
+
+∥∇ ψ∥2
+
+> L6(Ω)
+
+≤ min j Dj
+
+4 ∥∇ eψ∥2 
+
+> L2(Ω)
+
++ Cε 23 ∥ψ∥2
+
+> W
+
+24 ≤ min j Dj
+
+4 ∥∇ eψ∥2 
+
+> L2(Ω)
+
++ Cε 23 ∥L ψ∥2
+
+> L2(Ω)
+
+. (5.19) Substituting (5.17)–(5.19) into (5.16) yields ddt ∥ eψ∥2 
+
+> L2(Ω)
+
++ min  
+
+> j
+
+Dj ∥∇ eψ∥2 
+
+> L2(Ω)
+
+≤ CM 46 ∥ eψ∥2 
+
+> L2(Ω)
+
++ CM 26 ε 16 + Cε 23 ∥L ψ∥2
+
+> L2(Ω)
+
+, (5.20) where we have used the facts M6 ≥ 1 and ε ∈ (0 , 1). Since eψ(0) = 0, we infer from Gronwall’s lemma and Lemma 5.1 that 
+
+∥ eψ(t)∥2 
+
+> L2(Ω)
+
+≤
+
+Z t
+
+> 0
+
+ CM 26 ε 16 + Cε 23 ∥L ψ(τ )∥2
+
+> L2(Ω)
+
+e     
+
+> RtτCM 46dξ
+
+dτ
+
+≤ Ce CM 46 t 
+
+M 26 ε 16 t + ε 23 M7(t)
+
+
+
+≤ Ce CM 46 t  M 26 t + M7(t) ε 16 =: M8(t)ε 16 , ∀ t ≥ 0. (5.21) The proof is complete. Now we are in a position to prove Theorem 5.1. 
+
+Proof of Theorem 5.1. We assume by contradiction that the assertion is false. Then there exists a constant c > 0 and a decreasing sequence {εj }∞ 
+
+> j=1
+
+⊂ (0 , ε 0] converging to 0 such that dist( Aεj , A0) ≥ c, ∀ j ≥ 1.
+
+Since Aεj is compact in Hs, there exists an aj ∈ Aεj such that dist( aj , A0) = dist( Aεj , A0) ≥ c. 
+
+On the other hand, since A0 attracts all the bounded sets in Hs, we can choose T∗ = T∗(B1) > 0sufficiently large such that dist( S0(T∗)B1, A0) < c
+
+4 .
+
+The global attractor Aε is invariant with respect to Sε(t) for any t ≥ 0, i.e., Sε(t)Aε = Aε. Hence, for each aj ∈ Aεj , there exists bj ∈ Aεj such that Sεj (T∗)bj = aj for all j ∈ Z+. This implies that 
+
+bj ∈ Aεj ⊂ B1. By Lemmas 5.1 and 5.2, we have 
+
+∥aj − S0(T∗)bj ∥Hs ≤ Cs∥aj − S0(T∗)bj ∥1−sL2(Ω) ∥∇ (aj − S0(T∗)bj )∥sL2(Ω) 
+
+≤ Cs
+
+M8(T∗)ε 16
+
+> j
+
+ 1−s 
+
+> 2
+
+ ∥∇ (Sεj (T∗)bj )∥L2 + ∥∇ (S0(T∗)bj )∥L2(Ω) 
+
+s
+
+≤ 2CsM s
+
+> 2
+> 6
+
+M8(T∗) 1−s 
+
+> 2
+
+ε 1−s 
+
+> 12
+> j
+
+< c
+
+4 ,
+
+provided that j is sufficiently large. Hence, it holds dist( aj , A0) ≤ ∥ aj − S0(T∗)bj ∥Hs + dist( S0(T∗)bj , A0)
+
+≤ ∥ aj − S0(T∗)bj ∥Hs + dist( S0(T∗)B1, A0) ≤ c
+
+2 ,
+
+which leads to a contradiction. The proof is complete. 25 5.2 Upper semi-continuity of invariant measures 
+
+Now we study the stationary statistical properties of the diffuse interface model (2.14)–(2.16) in terms of invariant measures (see [32]). To this end, we recall the following definition: 
+
+Definition 5.2. Consider an abstract continuous dynamical system {S(t)}t≥0 on a Hilbert space 
+
+X. A Borel measure μ is called an invariant measure of {S(t)}t≥0, if 
+
+μ(E) = μ(S−1(t)E),
+
+for any t ≥ 0 and Borel measurable set E.Since invariant measures are supported in the global attractors [33], the upper semi-continuity of the global attractors established in Theorem 5.1 indicates that the statistical properties of the diffuse interface model (2.14)–(2.16) may be close to those of the sharp interface model (2.10)–(2.13). For any 0 < ε ≪ 1, we denote by IM ε the set of all invariant measures of the dynamical system (Sε(t), Hs) corresponding to the sharp interface model ( ε = 0) and the diffuse interface model (ε > 0). Lemma 5.1 implies that the semigroups {Sε(t)}t≥0, ε ∈ (0 , ε 0] are uniformly dissipative. On the other hand, by Lemma 5.2, the uniform estimate (5.1) and the interpolation inequality, we find 
+
+∥ eψ(t)∥Hs ≤ CM s
+
+> 2
+> 6
+
+M8(t) 1−s 
+
+> 2
+
+ε 1−s 
+
+> 12
+
+, ∀ t ≥ 0.
+
+This implies that the trajectories of Sε converge to those of S0 in any time interval [0 , T ] uniformly on the attractors Aε. Hence, applying the abstract result [33, Theorem 4], we can conclude 
+
+Theorem 5.3. Let s ∈ ( 12 , 1) . The sets of invariant measures {IM ε}ε∈[0 ,ε 0] are upper semi-continuous in the sense that for any sequence {με ∈ IM ε, ε ∈ (0 , ε 0]}, there exist a μ0 ∈ IM 0 and a subsequence (still denoted by {με}) such that με converges to μ0 as ε → 0 in the weak sense. 
+
+5.3 Upper semi-continuity of the Nusselt number 
+
+The Nusselt number defined via long time averages measures the concentration transport in the vertical direction (see [8, 31]): Nu ε = sup  
+
+> ψε
+> 0∈H
+
+lim sup  
+
+> T→∞
+
+1
+
+T
+
+Z T
+
+> 0
+
+1
+
+|Ω|
+
+Z
+
+> Ω
+
+uε · ez ψε dx dt. (5.22) As a corollary of Theorem 5.3, we can obtain the upper semi-continuity of the Nusselt number as 
+
+ε → 0. See, e.g., [33, Theorem 5] for details of the proof. 
+
+Theorem 5.4. There exist ergodic invariant measures νε ∈ IM ε and ν0 ∈ IM 0 such that 
+
+Nu ε =
+
+Z
+
+> H
+
+Z
+
+> Ω
+
+uε 
+
+> 0
+
+· ez ψε 
+
+> 0
+
+dx dνε(ψε
+
+> 0
+
+) and Nu 0 =
+
+Z
+
+> H
+
+Z
+
+> Ω
+
+u0 · ez ψ0 dx dν0(ψ0).
+
+Moreover, the Nusselt number is upper semi-continuous with respect to the parameter ε in the sense that 
+
+lim sup 
+
+> ε→0
+
+Nu ε ≤ Nu 0.
+
+26 6 Finite Dimensionality of Global Attractors 
+
+Attractors are usually fractal subsets of the phase space. Finite dimensionality is an important property characterizing the structure of global attractors. Let us recall the definition of fractal dimension (cf. [37, Definition 4.1]): 
+
+Definition 6.1. Let M be a precompact set in a metric space X . Nη(M, X ) is the minimal number of closed balls in X of radius η that cover the set M. Define the Kolmogorov’s entropy of M in X
+
+as 
+
+Hη(M, X ) = log 2 Nη(M, X ).
+
+Then the fractal (box-counting) dimension of M in X is defined by dim f (M, X ) = lim sup 
+
+> η→0
+
+Hη(M, X )log 2(1 /η ) ,
+
+The following result due to [37, Theorem 4.1] gives a general method to prove the finite fractal dimensionality of a compact set. 
+
+Theorem 6.2. Let E1 and E be Banach spaces, E1 be compactly embedded in E and let X ⊂ E1.Assume that there exists a map S : X → X, such that S(X) = X, and the following ‘smoothing’ property is valid 
+
+∥S a1 − S a2∥E1 ≤ C∥a1 − a2∥E , ∀ a1, a 2 ∈ X. (6.1) 
+
+Then the fractal dimension of X in E is finite and can be estimated in the following way 
+
+dim f (X, E ) ≤ H 14C
+
+(B(1 , 0, E 1), E ),
+
+where C is the same as in (6.1) and B(1 , 0, E 1) means the unit ball in E1.
+
+The main result of this section is the following 
+
+Theorem 6.3. Let s ∈ ( 12 , 1) . For every ε ∈ [0 , ε 0], the global attractor Aε constructed in Theorems 4.1, 4.2 has a finite fractal dimension. Moreover, we have 
+
+dim f (Aε, Hs) ≤ H 14CA
+
+(B(1 , 0, V), Hs), ∀ ε ∈ [0 , ε 0], (6.2) 
+
+where the constant CA > 0 depends only on Dj , Kj , Ω, c∆, δ, M1 and M5, but is independent of the parameter ε.
+
+To prove Theorem 6.3, it remains to verify the smoothing property for the semigroups {Sε(t)}t≥0,
+
+ε ∈ [0 , ε 0]. We first consider the case ε = 0: 
+
+Lemma 6.1. Let s ∈ ( 12 , 1) . Suppose (u1, p 1, ψ 1) and (u2, p 2, ψ 2) are two solutions to the sharp interface model (2.10) –(2.13) corresponding to the initial data ψ1,0, ψ 2,0 ∈ A0, respectively. Then we have 
+
+∥∇ ψ1(t) − ∇ ψ2(t)∥2 
+
+> L2(Ω)
+
+≤ M11 
+
+ 1
+
+t + t2
+
+
+
+eM9t∥L s 
+
+> 2
+
+(ψ1,0 − ψ2,0)∥2
+
+> L2(Ω)
+
+, ∀ t > 0, (6.3) 
+
+where M9, M11 are positive constants depending only on Dj , Kj , Ω, c∆, δ, M1 and M5.
+
+27 Proof. The difference of solutions ( u, ψ, p ) := ( u1 − u2, p 1 − p2, ψ 1 − ψ2) satisfies the system (3.20) with the initial condition (3.21). Integrating (3.23) with respect to time and using (3.2), we get 
+
+Z t
+
+> 0
+
+∥√D∇ψ(τ )∥2 
+
+> L2(Ω)
+
+dτ ≤
+
+Z t
+
+> 0
+
+∥L sψ(τ )∥2 
+
+> L2(Ω)
+
+dτ
+
+≤ ∥L s 
+
+> 2
+
+(ψ1,0 − ψ2,0)∥2 
+
+> L2(Ω)
+
++ C
+
+Z t
+
+> 0
+
+∥L s 
+
+> 2
+
+ψ(τ )∥2
+
+> L2(Ω)
+
+
+
+∥ψ1(τ )∥ 
+
+> 42s−1
+> Hs
+
++ ∥ψ2(τ )∥ 
+
+> 42s−1
+> Hs
+
++ 1 
+
+
+
+dτ
+
+≤ ∥L s 
+
+> 2
+
+(ψ1,0 − ψ2,0)∥2
+
+> L2(Ω)
+
+ 1 + M9te M9t . (6.4) Here, we use the fact that ψ1, ψ 2 ∈ A0 are uniformly bounded in V and take 
+
+M9 = C M 
+
+> 22s−1
+> 5
+
++ 1 .
+
+Next, testing equation (3.20) 3 by Lψ and using integration by parts, we obtain 12ddt ∥√D∇ψ∥2 
+
+> L2(Ω)
+
++ ∥L ψ∥2 
+
+> L2(Ω)
+
+= −(u1 · ∇ ψ, Lψ) − (u · ∇ ψ2, Lψ) − (ϕ′
+
+> b
+
+u · ez , Lψ). (6.5) The right-hand side of (6.5) can be estimated as follows: 
+
+Z
+
+> Ω
+
+ϕ′
+
+> b
+
+uz Lψ dx ≤ c∆δ−1∥uz ∥L2(Ω) ∥L ψ∥L2(Ω) 
+
+≤ 2c∆(∥∂xux∥L2(Ω) + ∥∂yuy∥L2(Ω) )∥L ψ∥L2(Ω) 
+
+≤ 4(max j Kj )2c∆
+
+min j Kj
+
+(∥∂xψ∥L2(Ω) + ∥∂yψ∥L2(Ω) )∥L ψ∥L2(Ω) 
+
+≤ 14 ∥L ψ∥2 
+
+> L2(Ω)
+
++ 16(max j Kj )4c2∆
+
+(min j Kj )2 ∥∇ ψ∥2
+
+> L2(Ω)
+
+. (6.6) Furthermore, using H¨ older’s inequality, Young’s inequality, (2.10) 1 and Lemmas A.2, A.4, we have 
+
+Z
+
+> Ω
+
+u1 · ∇ ψLψ dx
+
+≤ ∥ u1∥L6(Ω) ∥∇ ψ∥L3(Ω) ∥L ψ∥L2(Ω) 
+
+≤ (1 + Cp) max  
+
+> j
+
+Kj ∥ψ1∥L6(Ω) ∥∇ ψ∥L3(Ω) ∥L ψ∥L2(Ω) 
+
+≤ (1 + Cp)C2C 12 
+
+> u
+
+max  
+
+> j
+
+Kj ∥ψ1∥L6(Ω) ∥∇ ψ∥ 12
+
+> L2(Ω)
+
+∥L ψ∥ 32
+
+> L2(Ω)
+
+≤ 18 ∥L ψ∥2 
+
+> L2(Ω)
+
++ 864 (1 + Cp)C2C 12 
+
+> u
+
+max  
+
+> j
+
+Kj
+
+4∥ψ1∥4
+
+> L6(Ω)
+
+∥∇ ψ∥2
+
+> L2(Ω)
+
+, (6.7) and 
+
+Z
+
+> Ω
+
+u · ∇ ψ2Lψ dx
+
+≤ ∥ u∥L6(Ω) ∥∇ ψ2∥L3(Ω) ∥L ψ∥L2(Ω) 
+
+≤ (1 + Cp) max  
+
+> j
+
+Kj ∥ψ∥L6(Ω) ∥∇ ψ2∥L3(Ω) ∥L ψ∥L2(Ω) 
+
+≤ C1(1 + Cp) max  
+
+> j
+
+Kj ∥∇ ψ∥L2(Ω) ∥∇ ψ2∥L3(Ω) ∥L ψ∥L2(Ω) 
+
+28 ≤ C1(1 + Cp) max j Kj
+
+(min j Dj ) 12
+
+∥∇ ψ2∥L3(Ω) ∥L ψ∥ 32
+
+> L2(Ω)
+
+∥ψ∥ 12
+
+> L2(Ω)
+
+≤ 18 ∥L ψ∥2 
+
+> L2(Ω)
+
++ 864 [C1(1 + Cp) max j Kj ]4
+
+(min j Dj )2 ∥∇ ψ2∥4
+
+> L3(Ω)
+
+∥ψ∥2
+
+> L2(Ω)
+
+≤ 18 ∥L ψ∥2 
+
+> L2(Ω)
+
++ 864 [C1C2Cu(1 + Cp) max j Kj ]4
+
+(min j Dj )2 ∥L ψ2∥2
+
+> L2(Ω)
+
+∥∇ ψ2∥2
+
+> L2(Ω)
+
+∥ψ∥2
+
+> L2(Ω)
+
+. (6.8) Inserting (6.6)–(6.8) into (6.5), we obtain ddt ∥√D∇ψ∥2 
+
+> L2(Ω)
+
++ ∥L ψ∥2 
+
+> L2(Ω)
+
+≤ M10 ∥√D∇ψ∥2 
+
+> L2(Ω)
+
++ M10 ∥L ψ2∥2
+
+> L2(Ω)
+
+∥ψ∥2, (6.9) where M10 is a positive constant that depends only on Dj , K j , Ω, c ∆, δ , M1, M5. Multiplying (6.9) by t > 0 and integrating over [0 , t ] ⊂ [0 , ∞), we get 
+
+t∥√D∇ψ(t)∥2
+
+> L2(Ω)
+
+≤
+
+Z t
+
+> 0
+
+(1 + M10 τ )∥√D∇ψ(τ )∥2 
+
+> L2(Ω)
+
+dτ + M10 
+
+Z t
+
+> 0
+
+τ ∥L ψ2(τ )∥2
+
+> L2(Ω)
+
+∥ψ(τ )∥2 
+
+> L2(Ω)
+
+dτ
+
+≤ (1 + M10 t)
+
+Z t
+
+> 0
+
+∥√D∇ψ(τ )∥2 
+
+> L2(Ω)
+
+dτ + M10 tM 7(t) sup  
+
+> τ∈[0 ,t ]
+
+∥ψ(τ )∥2
+
+> L2(Ω)
+
+,
+
+(6.10) which combined with (3.2) and (6.4) yields the conclusion (6.3). 
+
+Remark 6.1. For the case ε ∈ (0 , ε 0], using the same argument as for Lemma 6.1, we can obtain a similar estimate: 
+
+∥∇ ψε
+
+> 1
+
+(t) − ∇ ψε
+
+> 2
+
+(t)∥2 
+
+> L2(Ω)
+
+≤ M11 
+
+ 1
+
+t + t2
+
+
+
+eM9t∥L s 
+
+> 2
+
+(ψε 
+
+> 1,0
+
+− ψε
+
+> 2,0
+
+)∥2
+
+> L2(Ω)
+
+, ∀ t > 0. (6.11) A careful examination of the estimates shows that the coefficients in the estimate (6.11) are inde-pendent of the parameter ε.
+
+Proof of Theorem 6.3. When ε = 0, we take 
+
+S = S0(1) , E1 = V, E = Hs, X = A0.
+
+It follows from Lemma 6.1 that 
+
+∥∇ ψ1(1) − ∇ ψ2(1) ∥2 
+
+> L2(Ω)
+
+≤ 2M11 eM9 ∥L s 
+
+> 2
+
+(ψ1,0 − ψ2,0)∥2
+
+> L2(Ω)
+
+.
+
+By the abstract result Theorem 6.2, we can conclude that dim f (A0, Hs) is finite as described in (6.2) with the constant 
+
+CA =  2M11 eM9  12 .
+
+Thanks to (6.11), similar conclusion holds for Aε, ε ∈ (0 , ε 0], with the same constant CA. Hence, the family of global attractors {Aε}ε∈[0 ,ε 0] have the same upper bound for their fractal dimensions. The proof is complete. 
+
+Remark 6.2. The upper bound for the fractal dimensions of {Aε}ε∈[0 ,ε 0] obtained in Theorem 6.3 may not be sharp, compared to the volume contraction method (see [29] and the references therein). However, the latter approach requires the semigroup Sε(t) to be uniformly quasi-differentiable with respect to the initial data, which is not available here due to the low regularity of the solutions. 29 7 Conclusion 
+
+The long-time validity of simplified models is a central issue, as they are frequently used for pre-dictive purposes in complex physical systems. In this work, we establish the long-time validity of the three-dimensional sharp-interface Darcy–Boussinesq model for convection in layered porous media by demonstrating that it arises as the zero-thickness limit of the more physically realistic diffuse-material-interface formulation. This validation has been obtained in terms of the upper semi-continuity of global attractors, invariant measures, long-time averaged statistics such as the Nusselt number, and a uniform upper bound on the fractal dimension of the attractors. Our re-sults extend the finite-time convergence analysis of [10], where the behavior of solutions and the near-singular structure of the velocity field were examined. The analysis relies on deriving uniform-in-time bounds, independent of the thickness of the tran-sition layer, in a space compactly embedded within the natural phase space. These estimates are obtained through a Hopf–Constantin–Doering type framework [8, 31] adapted to the layered setting, combined with a careful choice of weighted function spaces suited to the models under con-sideration, as well as a novel interpolation space that is associated with a fractional power of the principal linear elliptic operator with discontinuous coefficients. While the present work focuses on straight interfaces, the extension to curved interfaces can be carried out analogously by employing curvilinear coordinates, provided that the interfaces are sufficiently smooth and well separated. Although we have established upper semi-continuity of the long-time dynamics, several questions remain open. A natural direction is to investigate whether full continuity can be obtained, par-ticularly in regimes where the dynamics is turbulent or intrinsically stochastic. A more detailed characterization of global attractors, especially near the critical Rayleigh–Darcy threshold for the onset of convection [19], also deserves further study. From a statistical point of view, determining the rate of convergence of invariant measures would be of significant practical importance. Under-standing the dependence of the Nusselt number on the Rayleigh number remains a central issue in convection theory [8, 7, 16]. Finally, since physical systems are inevitably subject to randomness, it is of considerable interest to analyze how small stochastic perturbations affect the long-time dynamics [36]. 
+
+# Acknowledgments 
+
+Wu is a member of the Key Laboratory of Mathematics for Nonlinear Sciences (Fudan University), Ministry of Education of China. 30 A Some elementary lemmas 
+
+In the appendix, we collect some elementary lemmas frequently used in previous proofs. First, we give a Poincar´ e type inequality in the layer domain. 
+
+Lemma A.1. Let E = (0 , L )2 × (0 , h ) be a layer domain in R3, L, h > 0. Then it holds that 
+
+∥ψ∥L2(E) ≤ h∥∂z ψ∥L2(E) (A.1) 
+
+for any ψ ∈ H1(Ω) vanishing on the boundary [0 , L ]2 × { 0} (or [0 , L ]2 × { h}). Proof. It suffices to prove (A.1) for smooth functions. For any ( x, y, z ) ∈ E, using the fundamental theorem of calculus and H¨ older inequality, we get 
+
+|ψ(x, y, z )|2 =
+
+
+
+ψ(x, y, 0) + 
+
+Z z
+
+> 0
+
+∂z ψ(x, y, s ) d s
+
+2
+
+≤
+
+Z h
+
+> 0
+
+|∂z ψ| ds
+
+2
+
+≤ h
+
+Z h
+
+> 0
+
+|∂z ψ|2 ds. 
+
+Integrating the above inequality over E, we see that 
+
+∥ψ∥2 
+
+> L2(E)
+
+≤ h
+
+Z h
+
+> 0
+
+dz
+
+Z
+
+> (0 ,L )2
+
+dx dy
+
+Z h
+
+> 0
+
+|∂z ψ|2 ds = h2∥∂z ψ∥2
+
+> L2(E)
+
+,
+
+which leads to the conclusion. The following lemma provides some estimates involving the space W (see [5, Lemma 2.2]). 
+
+Lemma A.2. There exist two constants Cl, C u > 0 depending only on H and Dj such that 
+
+Cl∥L ψ∥L2(Ω) ≤ ∥ ψ∥W ≤ Cu∥L ψ∥L2(Ω) , ∀ ψ ∈ W . (A.2) Analogously, we have 
+
+Lemma A.3. Let 0 < ε ≪ 1 be given. There exist two constants Cl, C u > 0 depending only on H
+
+and Dj such that 
+
+Cl∥L εψ∥L2(Ω) ≤ ∥ ψ∥Wε ≤ Cu∥L εψ∥L2(Ω) , ∀ ψ ∈ W ε, (A.3) 
+
+Proof. It is easy to check that 
+
+∥L εψ∥L2(Ω) ≤ ∥ Dε∂2
+
+> x
+
+ψ∥L2(Ω) + ∥Dε∂2 
+
+> y
+
+ψ∥L2(Ω) + ∥∂z (Dε∂z ψ)∥L2(Ω) ≤ (1 + 2 max  
+
+> j
+
+Dj )∥ψ∥Wε .
+
+for any ψ ∈ W ε. Next, for any ψ ∈ W ε, we denote f := Lεψ ∈ L2(Ω). Then ψ can be viewed as the unique strong solution to the elliptic problem 
+
+(Lεψ = f in Ω ,ψ = 0 for z = 0 , −H, and periodic in the horizontal directions ( x, y ). (A.4) 31 Testing equation Lεψ = f by ψ and using integration by parts, we get 
+
+∥√Dε∇ψ∥2 
+
+> L2(Ω)
+
+≤ ∥ f ∥L2(Ω) ∥ψ∥L2(Ω) .
+
+This combined with Lemma A.1 yields 
+
+∥∇ ψ∥L2(Ω) ≤ H
+
+min j Dj
+
+∥f ∥L2(Ω) , ∥ψ∥L2(Ω) ≤ H2
+
+min j Dj
+
+∥f ∥L2(Ω) . (A.5) Next, testing equation Lεψ = f by −∂2
+
+> x
+
+ψ and using integration by parts, we get (Dε∇∂xψ, ∇∂xψ) = −(f, ∂ 2
+
+> x
+
+ψ),
+
+which together with H¨ older’s and Young’s inequalities yields that 
+
+∥∇ ∂xψ∥L2(Ω) ≤ 1min j Dj
+
+∥f ∥L2(Ω) . (A.6) Then we have 
+
+∥∂x(Dε∂z ψ)∥L2(Ω) = ∥Dε∂z ∂xψ∥L2(Ω) ≤ max  
+
+> j
+
+Dj ∥∂z ∂xψ∥L2(Ω) ≤ max j Dj
+
+min j Dj
+
+∥f ∥L2(Ω) . (A.7) A similar estimate holds for ∥∂y(Dε∂z ψ)∥L2(Ω) . Finally, using the expression −∂z (Dε∂z ψ) = 
+
+Dε∂2
+
+> x
+
+ψ + Dε∂2 
+
+> y
+
+ψ + f , we get 
+
+∥∂z (Dε∂z ψ)∥L2(Ω) ≤
+
+ 2 max j Dj
+
+min j Dj
+
++ 1 
+
+
+
+∥f ∥L2(Ω) . (A.8) Combining (A.5)–(A.8), we arrive at the conclusion (A.3). The proof is complete. 
+
+Lemma A.4. Suppose r ∈ [2 , 6] . For any ψ ∈ V , it holds that 
+
+∥ψ∥Lr (Ω) ≤ C1∥ψ∥ 3  
+
+> r−12
+> L2(Ω)
+
+∥∇ ψ∥ 32 − 3
+
+> r
+> L2(Ω)
+
+. (A.9) 
+
+Moreover, we have 
+
+∥∇ ψ∥Lr (Ω) ≤ C2∥∇ ψ∥ 3  
+
+> r−12
+> L2(Ω)
+
+∥ψ∥ 32 − 3 
+
+> r
+> W
+
+, ∀ ψ ∈ W , (A.10) 
+
+∥∇ ψ∥Lr (Ω) ≤ C2∥∇ ψ∥ 3  
+
+> r−12
+> L2(Ω)
+
+∥ψ∥ 32 − 3 
+
+> r
+> Wε
+
+, ∀ ψ ∈ W ε. (A.11) 
+
+Here, the positive constants C1, C2 depend only on r, Ω and Dj .Proof. The cases r = 2 , 6 are standard (see [5, Lemma 2.3]). For any ψ ∈ V and r ∈ (2 , 6), it follows from the classical Gagliardo–Nirenberg inequality that 
+
+∥ψ∥Lr (Ω) ≤ C∥∇ ψ∥ 32 − 3
+
+> r
+> L2(Ω)
+
+∥ψ∥ 3   
+
+> r−12
+> L2(Ω)
+
++ C∥ψ∥L2(Ω) .
+
+Since ψ vanishes at the top and bottom of ∂Ω, we infer from Lemma A.1 that 
+
+∥ψ∥Lr (Ω) ≤ C(1 + H 32 − 3 
+
+> r
+
+)∥∇ ψ∥ 32 − 3
+
+> r
+> L2(Ω)
+
+∥ψ∥ 3   
+
+> r−12
+> L2(Ω)
+
+=: C1∥∇ ψ∥ 32 − 3
+
+> r
+> L2(Ω)
+
+∥ψ∥ 3  
+
+> r−12
+> L2(Ω)
+
+,
+
+32 which gives (A.9). Next, we consider ψ ∈ W . Set e∇ψ := ( ∂xψ, ∂ yψ, D∂ z ψ). By definition, it holds 
+
+e∇ψ ∈ H1(Ω) and 
+
+∥ e∇ψ∥H1(Ω) ≤ ∥ ψ∥W .
+
+Applying the Gagliardo–Nirenberg inequality to e∇ψ, we get 
+
+∥ e∇ψ∥Lr (Ω) ≤ C∥ e∇ψ∥ 3  
+
+> r−12
+> L2(Ω)
+
+∥∇ ( e∇ψ)∥ 32 − 3 
+
+> r
+> L2(Ω)
+
++ C∥ e∇ψ∥L2(Ω) 
+
+≤ C∥ e∇ψ∥ 3  
+
+> r−12
+> L2(Ω)
+
+∥ e∇ψ∥ 32 − 3 
+
+> r
+> H1(Ω)
+
++ C∥ e∇ψ∥L2(Ω) 
+
+≤ C∥ e∇ψ∥ 3  
+
+> r−12
+> L2(Ω)
+
+∥ e∇ψ∥ 32 − 3
+
+> r
+> H1(Ω)
+
+≤ C∥ e∇ψ∥ 3  
+
+> r−12
+> L2(Ω)
+
+∥ψ∥ 32 − 3 
+
+> r
+> W
+
+,
+
+where C > 0 depends on r and Ω. Using the fact min  
+
+> j
+
+Dj ∥∇ ψ∥Lr (Ω) ≤ ∥ e∇ψ∥Lr (Ω) ≤ max  
+
+> j
+
+Dj ∥∇ ψ∥Lr (Ω) ,
+
+we can conclude (A.10) with C2 = C max j D 3    
+
+> r−12
+> j
+> min jDj
+
+.Similarly, for ψ ∈ W ε, we define ∇εψ := ( ∂xψ, ∂ yψ, D ε∂z ψ) so that 
+
+∥∇ εψ∥H1(Ω) ≤ ∥ ψ∥Wε .
+
+Applying the Gagliardo–Nirenberg inequality to ∇εψ gives 
+
+∥∇ εψ∥Lr (Ω) ≤ C∥∇ εψ∥ 3  
+
+> r−12
+> L2(Ω)
+
+∥ψ∥ 32 − 3 
+
+> r
+> Wε
+
+.
+
+Noticing that min  
+
+> j
+
+Dj ∥∇ ψ∥Lr (Ω) ≤ ∥∇ εψ∥Lr (Ω) ≤ max  
+
+> j
+
+Dj ∥∇ ψ∥Lr (Ω) ,
+
+we obtain (A.11). The proof is complete. 
+
+# B Fractional Sobolev spaces 
+
+Based on the expansion of eigenfunctions of the operator L, for any ψ = P∞ 
+
+> k=1
+
+akwk, we define 
+
+Lsψ := 
+
+> ∞
+
+X
+
+> k=1
+
+λskakwk, s ∈ R.
+
+Then we define the space Hs = dom( L s 
+
+> 2
+
+) with the norm given by 
+
+∥ψ∥2 
+
+> Hs
+
+:= 
+
+> ∞
+
+X
+
+> k=1
+
+λsk|ak|2.
+
+33 Lemma B.1. For any −∞ < s 1 < s 2 < ∞ and any ψ satisfying ∥ψ∥Hs2 < ∞, we have 
+
+∥ψ∥Hs1 ≤ λs1−s2 
+
+> 1
+
+∥ψ∥Hs2 ,
+
+and 
+
+∥ψ∥Hs ≤ ∥ ψ∥θ 
+
+> Hs1
+
+∥ψ∥1−θ 
+
+> Hs2
+
+, for any s = θs 1 + (1 − θ)s2 with θ ∈ (0 , 1) .
+
+Proof. According to [5], the eigenvalues {λk} of the self-adjoint positive operator L satisfies 0 < λ 1 ≤ λ2 ≤ · · · .
+
+Thus, 
+
+∥ψ∥2 
+
+> Hs1
+
+=
+
+> ∞
+
+X
+
+> k=1
+
+λs1 
+
+> k
+
+|ak|2 =
+
+> ∞
+
+X
+
+> k=1
+
+λs2
+
+> k
+
+λs2−s1
+
+> k
+
+|ak|2 ≤ 1
+
+λs2−s1
+
+> 1
+> ∞
+
+X
+
+> k=1
+
+λs2 
+
+> k
+
+|ak|2 = λs1−s2 
+
+> 1
+
+∥ψ∥2 
+
+> Hs2
+
+.
+
+The interpolation inequality follows from the discrete version of H¨ older’s inequality, 
+
+∥ψ∥2 
+
+> Hs
+
+=
+
+> ∞
+
+X
+
+> k=1
+
+λθs 1+(1 −θ)s2 
+
+> k
+
+|ak|2θ+2(1 −θ) ≤
+
+> ∞
+
+X
+
+> k=1
+
+λs1 
+
+> k
+
+|ak|2
+
+!θ ∞X
+
+> k=1
+
+λs2 
+
+> k
+
+|ak|2
+
+!1−θ
+
+= ∥ψ∥2θ 
+
+> Hs1
+
+∥ψ∥2(1 −θ) 
+
+> Hs2
+
+.
+
+The proof is complete. 
+
+Lemma B.2. The norms ∥ · ∥ H0 , ∥ · ∥ H1 and ∥ · ∥ H2 are equivalent to the norms ∥ · ∥ L2(Ω) , ∥ · ∥ V
+
+and ∥ · ∥ W , respectively. Proof. Any ψ ∈ H can be written as a series in terms of the orthonormal basis {wk} in H such that 
+
+ψ =
+
+> ∞
+
+X
+
+> k=1
+
+(ψ, w k)wk.
+
+Then its L2-norm is given by Parseval’s identity 
+
+∥ψ∥2 
+
+> L2(Ω)
+
+=
+
+> ∞
+
+X
+
+> k=1
+
+|(ψ, w k)|2.
+
+This implies that ∥ · ∥ L2(Ω) and ∥ · ∥ H0 are equivalent norms on H.For the case s = 1, since {wk} is also a orthogonal basis in V, any ψ ∈ V can be written as a series 
+
+ψ =
+
+> ∞
+
+X
+
+> k=1
+
+(ψ, w k)1wk := 
+
+> ∞
+
+X
+
+> k=1
+
+(D∇ψ, ∇wk)wk,
+
+which converges in V. We have the norm 
+
+∥ψ∥2 
+
+> V
+
+=
+
+> ∞
+
+X
+
+> k=1
+
+|(ψ, w k)1|2(wk, w k)1 =
+
+> ∞
+
+X
+
+> k=1
+
+|(ψ, w k)1|2(Lwk, w k) = 
+
+> ∞
+
+X
+
+> k=1
+
+|(ψ, w k)1|2λk,
+
+34 which is also equivalent to the norm ∥ψ∥H1 .Finally, any ψ ∈ W ⊂ H can be expanded as ψ = P∞ 
+
+> k=1
+
+akwk, where the series converges at least in L2(Ω). Then we have 
+
+Lψ =
+
+> ∞
+
+X
+
+> k=1
+
+akLwk =
+
+> ∞
+
+X
+
+> k=1
+
+akλkwk.
+
+Consequently, 
+
+∥L ψ∥2 
+
+> L2(Ω)
+
+=
+
+> ∞
+
+X
+
+> k=1
+
+λ2
+
+> k
+
+|ak|2 = ∥ψ∥2 
+
+> H2
+
+.
+
+These, together with Lemma A.3, show that ∥ · ∥ H2 and ∥ · ∥ W are equivalent norms on W.We have the following equivalence on the fractional norm Hs and the classical Sobolev norm Hs(Ω), 
+
+s ∈ (0 , 1), whose proof is inspired by [4, Appendix B]. 
+
+Lemma B.3. Let s ∈ (0 , 1) . The fractional Hs-norm can be interpreted as the interpolation norm between H and V, and is equivalent to the fractional Sobolev norm ∥ · ∥ Hs(Ω) . Furthermore, the fractional H1+ s-norm can be interpreted as the interpolation norm between V and W.Proof. Let us introduce the interpolation norm between H and V using the K-method [30]: 
+
+∥ψ∥s, H,V := 
+
+Z ∞
+
+> 0
+
+t−2sK2(t, ψ, H, V) dtt
+
+ 12
+
+, for s ∈ (0 , 1) ,
+
+where the K-functor is given by 
+
+K2(t, ψ, H, V) := inf  
+
+> ψ1∈V
+
+∥ψ − ψ1∥2 
+
+> L2(Ω)
+
++ t2∥ψ1∥2 
+
+> V
+
+.
+
+Let 
+
+ψ =
+
+> ∞
+
+X
+
+> k=1
+
+akwk and ψ1 =
+
+> ∞
+
+X
+
+> k=1
+
+bkwk.
+
+Then 
+
+∥ψ − ψ1∥2 
+
+> L2(Ω)
+
++ t2∥ψ1∥2 
+
+> V
+
+=
+
+> ∞
+
+X
+
+> k=1
+
+(ak − bk)2 + t2b2
+
+> k
+
+∥wk∥2 
+
+> V
+
+=
+
+> ∞
+
+X
+
+> k=1
+
+(ak − bk)2 + t2b2
+
+> k
+
+λk.
+
+Solving the minimization problem gives 
+
+K2(t, ψ, H, V) = 
+
+> ∞
+
+X
+
+> k=1
+
+(ak − bk)2 + t2b2
+
+> k
+
+λk bk = a2 
+
+> kt2λk+1
+
+=
+
+> ∞
+
+X
+
+> k=1
+
+a2
+
+> k
+
+t2λk
+
+1 + t2λk
+
+.
+
+Consequently, 
+
+Z ∞
+
+> 0
+
+t−2sK2(t, ψ, H, V) dtt =
+
+> ∞
+
+X
+
+> k=1
+
+Z ∞
+
+> 0
+
+t1−2s a2
+
+> k
+
+λk
+
+1 + t2λk
+
+dt =
+
+ 2
+
+π sin πs 
+
+−1 ∞X
+
+> k=1
+
+λsk|ak|2.
+
+35 Hence, ∥ψ∥Hs =
+
+q 2 
+
+> π
+
+sin πs ∥ψ∥s, H,V for any ψ ∈ V .Similarly, the interpolation norm between V and W is defined as 
+
+∥ψ∥s, V,W := 
+
+Z ∞
+
+> 0
+
+t−2sK2(t, ψ, V, W) dtt
+
+ 12
+
+, for s ∈ (0 , 1) ,
+
+where the K-functor becomes 
+
+K2(t, ψ, V, W) := inf  
+
+> ψ1∈W
+
+∥ψ − ψ1∥2 
+
+> V
+
++ t2∥ψ1∥2 
+
+> W
+
+.
+
+By Lemma A.3, we can use the following equivalent form of K2(t, ψ, V, W): inf  
+
+> ψ1∈W
+
+∥ψ − ψ1∥2 
+
+> V
+
++ t2∥L ψ1∥2
+
+> L2(Ω)
+
+.
+
+In a similar way, we have inf  
+
+> ψ1∈W
+
+∥ψ − ψ1∥2 
+
+> V
+
++ t2∥L ψ1∥2 
+
+> L2(Ω)
+
+=
+
+> ∞
+
+X
+
+> k=1
+
+(ak − bk)2λk + t2b2
+
+> k
+
+λ2    
+
+> kbk=a2
+> kt2λk+1
+
+=
+
+> ∞
+
+X
+
+> k=1
+
+a2
+
+> k
+
+t2λ2
+
+> k
+
+1 + t2λk
+
+,
+
+and hence, 
+
+> ∞
+
+X
+
+> k=1
+
+Z ∞
+
+> 0
+
+t1−2s a2
+
+> k
+
+λ2
+
+> k
+
+1 + t2λk
+
+dt =
+
+ 2
+
+π sin πs 
+
+−1 ∞X
+
+> k=1
+
+λs+1  
+
+> k
+
+|ak|2 =
+
+ 2
+
+π sin πs 
+
+−1
+
+∥ψ∥2 
+
+> H1+ s
+
+.
+
+This implies the equivalence of ∥ψ∥s, V,W and ∥ψ∥H1+ s for any ψ ∈ W .We note that ∥ · ∥ H1+ s is not equivalent to ∥ · ∥ H1+ s(Ω) , since the space W is different from the classical H2(Ω) space in general, see [5]. Nevertheless, we have the following result 
+
+Lemma B.4. For any s ∈ (0 , 1) and j = 1 , 2, · · · , l , there exists a constant C > 0 such that it holds that 
+
+∥ψ∥H1+ s(Ω j ) ≤ C∥ψ∥H1+ s , ∀ ψ ∈ W ,
+
+where ∥ · ∥ H1+ s(Ω j ) is the fractional Sobolev norm on the layer Ωj .Proof. For any j = 1 , · · · , l , denote 
+
+V| Ωj = {ψ|Ωj : ψ ∈ V} and W| Ωj = {ψ|Ωj : ψ ∈ W} .
+
+Then the interpolation norm between V| Ωj and W| Ωj is defined as 
+
+∥ψ∥s, V| Ωj ,W| Ωj := 
+
+Z ∞
+
+> 0
+
+t−2sK2(t, ψ, V| Ωj , W| Ωj ) dtt
+
+ 12
+
+, for s ∈ (0 , 1) ,
+
+where 
+
+K2(t, ψ, V| Ωj , W| Ωj ) = inf 
+
+> ψ1∈W| Ωj
+
+∥ψ − ψ1∥2
+
+> V| Ωj
+
++ t2∥ψ1∥2
+
+> W| Ωj
+
+.
+
+36 Noting that 
+
+K2(t, ψ, V| Ωj , W| Ωj ) ≤ inf  
+
+> ψ1∈W
+
+∥ψ − ψ1∥2 
+
+> V
+
++ t2∥ψ1∥2 
+
+> W
+
+= K2(t, ψ, V, W),
+
+one has 
+
+∥ψ∥s, V| Ωj ,W| Ωj ≤ ∥ ψ∥s, V,W , ∀ ψ ∈ W .
+
+Recall that any function ψ in W is piecewise H2(Ω). Then the restriction norm ∥ · ∥ W| Ωj coincides with the classical Sobolev norm ∥ · ∥ H2(Ω j ), and the interpolation norm ∥ · ∥ s, V| Ωj ,W| Ωj is also equivalent to the fractional Sobolev norm ∥ · ∥ H1+ s(Ω j ). Hence, 
+
+∥ψ∥H1+ s(Ω j ) ≤ C∥ψ∥s, V| Ωj ,W| Ωj ≤ C∥ψ∥s, V,W ≤ C∥ψ∥H1+ s , ∀ ψ ∈ W .
+
+The proof is complete. 
+
+Remark B.1. Similar results hold for the operators Lε and the spaces Hsε, Wε. By construction of 
+
+Dε, the generic positive constant C in the corresponding estimates is independent of the thickness of the transition layer ε.
+
+# References 
+
+[1] D. M. Anderson, G. B. McFadden, and A. A. Wheeler. Diffuse-interface methods in fluid mechanics. In Annual review of fluid mechanics, Vol. 30 , pages 139–165. Annual Reviews, Palo Alto, CA, 1998. [2] H.-R. Bahrami and A.-E. Sharifi. Application of multilayered porous media for heat transfer optimization in double pipe heat exchangers using neural network and nsga ii. Sci. Rep. ,14(1):Paper No. 31509, 2024. [3] M. J. Bickle, A. Chadwick, H. E. Huppert, M. A. Hallworth, and S. Lyle. Modelling carbon dioxide accumulation at sleipner: Implications for underground carbon storage. Earth and Planetary Science Letters , 255(1-2):164–176, 2007. [4] J. H. Bramble and X. Zhang. The analysis of multigrid methods. In Handbook of numeri-cal analysis, Vol. VII , volume VII of Handb. Numer. Anal. , pages 173–415. North-Holland, Amsterdam, 2000. [5] Y. Cao, W. Niu, and X. Wang. Well-posedness and regularity of the darcy-boussinesq system in layered porous media. Discrete Contin. Dyn. Syst. Ser. B , 30(12):4764–4783, 2025. [6] M. De Paoli. Influence of reservoir properties on the dynamics of a migrating current of carbon dioxide. Phys. Fluids , 33(1):Paper No. 016602, 01 2021. [7] M. De Paoli, S. Pirozzoli, F. Zonta, and A. Soldati. Strong rayleigh-darcy convection regime in three-dimensional porous media. J. Fluid Mech. , 943:Paper No. A51, 2022. 37 [8] C. R. Doering and P. Constantin. Bounds for heat transport in a porous layer. J. Fluid Mech. ,376:263–296, 1998. [9] H. Dong and Z. Li. The conormal and robin boundary value problems in nonsmooth domains satisfying a measure condition. J. Funct. Anal. , 281(9):Paper No. 109167, 2021. [10] H. Dong and X. Wang. Sharp material interface limit of the darcy-boussinesq system. SIAM J. Appl. Math. , 85(4):1621–1642, 2025. [11] P. Fabrie. Solutions fortes et comportement asymptotique pour un mod` ele de convection naturelle en milieu poreux. Acta Appl. Math. , 7(1):49–77, 1986. [12] P. Fabrie and B. Nicolaenko. Exponential attractors for non-dissipative systems modeling convection in porous media. Asymptotic Anal. , 12(4):295–327, 1996. [13] D. R. Hewitt. Evolution of convection in a layered porous medium. J. Fluid Mech. , 941:Paper No. A56, 2022. [14] D. R. Hewitt, J. A. Neufeld, and J. R. Lister. High rayleigh number convection in a porous medium containing a thin low-permeability layer. J. Fluid Mech. , 756:844–869, 2014. [15] D. R. Hewitt, G. G. Peng, and J. R. Lister. Buoyancy-driven plumes in a layered porous medium. J. Fluid Mech. , 883:A37, 25, 2020. [16] J. J. Hidalgo, J. Fe, L. Cueto-Felgueroso, and R. Juanes. Scaling of convective mixing in porous media. Phys. Rev. Lett. , 109:Paper No. 264503, 2012. [17] H. E. Huppert and J. A. Neufeld. The fluid mechanics of carbon dioxide sequestration. In 
+
+Annual review of fluid mechanics. , volume 46, pages 255–272. Annual Reviews, Palo Alto, CA, 2014. [18] H. Ly and E. Titi. Global gevrey regularity for the b nard convection in a porous medium with zero darcy-prandtl number. J. Nonlinear Sci. , 9:333–362, 1999. [19] T. Ma and S. Wang. Phase transition dynamics . Springer, Cham, second edition, 2019. [20] R. McKibbin. Thermal convection in a porous medium composed of alternating thick and thin layers. Int. J. Heat Mass Transfer , 26(5):761–780, 1983. [21] R. McKibbin and M. J. O’Sullivan. Onset of convection in a layered porous medium heated from below. J. Fluid Mech. , 96(2):375–393, 1980. [22] R. McKibbin and M. J. O’Sullivan. Heat transfer in a layered porous medium heated from below. J. Fluid Mech. , 111:141–173, 1981. [23] D. A. Nield and A. Bejan. Convection in porous media . Springer, Cham, fifth edition, 2017. [24] M. Oliver and E. S. Titi. Gevrey regularity for the attractor of a partially dissipative model of b nard convection in a porous medium. J. Differential Equations , 163(2):292–311, 2000. 38 [25] J. Otero, L. A. Dontcheva, H. Johnston, R. A. Worthing, A. Kurganov, G. Petrova, and C. R. Doering. High-Rayleigh-number convection in a fluid-saturated porous layer. J. Fluid Mech. ,500:263–281, 2004. [26] C. K. Sahu and M. R. Flynn. The effect of sudden permeability changes in porous media filling box flows. Transp. Porous Media , 119(1):95–118, 2017. [27] A. K. R. Salibindla, R. Subedi, V. C. Shen, A. U. M. Masuk, and R. Ni. Dissolution-driven convection in a heterogeneous porous medium. J. Fluid Mech. , 857:61–79, 2018. [28] S. K. F. Stoter, P. M ller, L. Cicalese, M. Tuveri, D. Schillinger, and T. J. R. Hughes. A diffuse interface method for the navier-stokes/darcy equations: Perfusion profile for a patient-specific human liver based on mri scans. Computer Methods in Applied Mechanics and Engineering ,321:70–102, 2017. [29] R. Temam. Infinite-dimensional dynamical systems in mechanics and physics , volume 68 of 
+
+Applied Mathematical Sciences . Springer-Verlag, New York, second edition, 1997. [30] H. Triebel. Interpolation theory, function spaces, differential operators , volume 18 of North-Holland Mathematical Library . North-Holland Publishing Co., Amsterdam-New York, 1978. [31] X. Wang. Bound on vertical heat transport at large Prandtl number. Phys. D , 237(6):854–858, 2008. [32] X. Wang. Stationary statistical properties of rayleigh-b´ enard convection at large prandtl num-ber. Comm. Pure Appl. Math. , 61(6):789–815, 2008. [33] X. Wang. Upper semi-continuity of stationary statistical properties of dissipative systems. 
+
+Discrete Contin. Dyn. Syst. , 23(1-2):521–540, 2009. [34] B. Wen, L. T. Corson, and G. P. Chini. Structure and stability of steady porous medium convection at large rayleigh number. J. Fluid Mech. , 772:197–224, 2015. [35] R. A. Wooding, S. W. Tyler, and I. White. Convection in groundwater below an evaporating salt lake: 1. onset of instability. Water Resources Research , 33(6):1199–1217, 1997. [36] L.-S. Young. What are SRB measures, and which dynamical systems have them? J. Statist. Phys. , 108(5-6):733–754, 2002. [37] S. Zelik. The attractor for a nonlinear reaction-diffusion system with a supercritical nonlin-earity and its dimension. Rend. Accad. Naz. Sci. XL Mem. Mat. Appl. (5) , 24:1–25, 2000. 39

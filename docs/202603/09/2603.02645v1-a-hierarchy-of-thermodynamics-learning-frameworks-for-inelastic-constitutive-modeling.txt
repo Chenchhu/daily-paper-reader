@@ -1,0 +1,1401 @@
+Title: A hierarchy of thermodynamics learning frameworks for inelastic constitutive modeling
+
+URL Source: https://arxiv.org/pdf/2603.02645v1
+
+Published Time: Wed, 04 Mar 2026 01:54:36 GMT
+
+Number of Pages: 27
+
+Markdown Content:
+# A H IERARCHY OF THERMODYNAMIC LEARNING FRAMEWORKS FOR INELASTIC CONSTITUTIVE MODELING 
+
+A P REPRINT 
+
+Reese E. Jones 
+
+Sandia National Laboratories Livermore CA, USA 
+
+Jan N. Fuhg ∗
+
+The University of Texas at Austin Austin TX, USA 
+
+ABSTRACT 
+
+Recent advances in physics-augmented neural networks have enabled thermodynamically consistent data-driven constitutive modeling of complex inelastic materials. Most existing approaches, how-ever, implicitly adopt a specific thermodynamic framework and embed structural assumptions such as normality, dual dissipation potentials, or other structure from manually constructed models di-rectly into the learning architecture. Consequently, differences in predictive performance may arise not only from data or network design, but also from the underlying theoretical assumptions. In this work, we present a unified comparison of several thermodynamically consistent inelastic modeling frameworks from a machine learning perspective. We consider internal-variable formulations with dissipation potential, generalized standard materials, and metriplectic structures, and we analyze their structural assumptions, admissible dependencies, convexity requirements, and implications for dissipation and evolution. Each framework is implemented within a common neural potential archi-tecture based on invariant representations and neural ordinary differential equations. This unified setting ensures that performance differences can be attributed to thermodynamic structure rather than architectural variation. The models are trained and evaluated on three representative inelastic datasets generated from high-fidelity representative volume element simulations: an elastoplastic alloy, a viscoelastic composite, and a rate-dependent crystal plasticity polycrystal. By isolating the role of thermodynamic structure, we assess how restrictions such as duality, normality, operator-based evolution, and convexity influence learnability, expressiveness, stability, and generalization. The results show that all three principled frameworks can produce accurate predictions on held-out data. The most structurally constrained did show some marginal deficiencies on the hardest dataset (an elastic-plastic microstructural sample) but had a marginal advantage on a corresponding homo-geneous material dataset. 
+
+Keywords: inelasticity, internal state variables, dissipation potential, irreversible thermodynamics, Onsager princi-ple, metriplectic dynamics, generalized standard materials, constitutive modeling frameworks, neural networks. 
+
+1 Introduction 
+
+Recently, the art of constitutive modeling has experienced rapid growth due to the use of machine learning techniques. While manually constructed phenomenological models have been successful in many applications, systematic model selection [1, 2] is rarely applied; they rely on pre-selected functional forms and evolution equations, which can lead to significant discrepancies and make systematic model construction, calibration, and automation cumbersome for complex materials. On the other hand, the success of machine learning-based constitutive models relies on more general functional representations and the deliberate introduction of physically motivated inductive learning biases, which restrict the hypothesis space in accordance with known mechanical and thermodynamic principles [3]. Both 
+
+physics-augmented neural networks (PANNs) [4–12], and related approaches such as constitutive artificial neural networks (CANNs) [13–19], adhere to this approach. Likewise, structure-preserving learning frameworks and similar concepts [20–24] have also been applied to physical contexts outside continuum mechanics. 
+
+> *
+
+Corresponding author: jan.fuhg@utexas.edu 
+
+> arXiv:2603.02645v1 [cond-mat.mtrl-sci] 3 Mar 2026
+
+Learning frameworks for modeling inelasticity A P REPRINT 
+
+In fact, data-driven constitutive modeling approaches like PANNs implicitly commit to a particular thermodynamic structure. Choices such as the existence of an underlying free energy, the form of dissipation, the role of internal vari-ables, or the assumption of associated flow are embedded directly into the model architecture or loss function, based on 
+
+a priori beliefs about the nature of the data and its compatibility to classical theories of continuum mechanics and ther-modynamics. As a result, different learning frameworks may encode fundamentally different physical assumptions, yet are rarely compared on equal footing in terms of their theoretical implications or their impact on data-driven model performance. Across many formulations, a unifying assumption is the existence of an energy potential, usually the Helmholtz free energy, that governs the reversible response of the material. The primary distinctions between frame-works then emerge in how irreversibility is modeled, namely through the introduction of internal variables, evolution equations, dissipation potentials, or more general non-equilibrium structures, all subject to the constraints imposed by the second law of thermodynamics. Within this thermodynamic setting, several distinct yet related theoretical frameworks have been developed to model inelastic material behavior. These frameworks share foundational principles, yet differ in how state variables are in-troduced, how dissipation is structured, and how evolution equations are generated. Some of the commonly employed formulations can be summarized as: • Internal state variable (ISV) theories: Inelastic behavior is represented through a finite set of internal variables whose evolution is modeled by an ordinary differential equation, with stresses derived from a free energy. The evolution is constrained only by the second law [25]. • ISV theories with dissipation potential (DP): Evolution of internal variables is governed by a dissipation potential, providing a variational structure and enforcing dissipation through convexity, as in Chaboche-type models [26]. • Generalized Standard Materials (GSM): Reversible and irreversible responses are derived from thermo-dynamic potentials linked by Legendre–Fenchel duality, leading to normality conditions and an Onsager-like thermodynamic structure [27]. • Metriplectic (MP) / General Equation for Non-Equilibrium Reversible-Irreversible Coupling (GENERIC) formulations: Non-equilibrium dynamics are described by the superposition of Hamiltonian (energy-conserving) and dissipative (entropy-producing) flows, offering a geometric and operator-based ap-proach to thermodynamic evolution [28, 29]. While these frameworks has been extensively studied, their adaptation to data-driven constitutive modeling is relatively nascent. Existing machine-learning-based approaches typically focus on a single formulation, embedding its assumptions as fixed inductive biases without contrasting the chosen framework against alternatives. Consequently, there is a lack of a unified, machine-learning-focused comparison that clarifies how different theoretical frameworks influence learnability, expressiveness, generalization, and physical consistency when models are trained from data. This gap makes it difficult to assess whether observed performance differences arise from the data, the learning architecture, or the underlying thermodynamic assumptions themselves. In particular, the following key questions arise: • What structural assumptions does each framework impose on constitutive models? • What restrictions do these assumptions introduce in a data-driven model? • How do these choices affect generalization, interpretability, and physical consistency of the predictions? In this work, we address these questions by combining a concise theoretical review of inelastic constitutive frameworks with a data-driven perspective. We emphasize the structural assumptions that are most relevant for machine learning, rather than providing an exhaustive historical account. Building on this foundation, we implement each framework within a unified computational setting based on neural representations of thermodynamic potentials, enabling a con-trolled and consistent comparison. The resulting models are then evaluated side-by-side on a variety of representative inelastic material datasets without closed-form representations to isolate the effect of the underlying thermodynamic structure from that of the learning components or dataset. In the next section, Sec.2, we review the thermodynamic foundations of inelastic constitutive modeling and introduce the theoretical frameworks considered in this work from a data-driven perspective. Sec. 3 presents the mathematical formulation of each framework and highlights its structural similarities and differences. Sec. 4 describes the unified neural implementation and training strategy. Sec. 5 describes the datasets used for comparison. The results and comparative analysis are presented in Sec. 6 and Sec. 7. Finally, Sec. 8 summarizes the main findings and discusses implications for future data-driven constitutive modeling efforts. 2Learning frameworks for modeling inelasticity A P REPRINT 
+
+2 Background 
+
+Data-driven constitutive modeling operates in challenging regimes where data are sparse, heterogeneous, and expen-sive to obtain, particularly for complex inelastic phenomena involving history dependence and evolving microstruc-ture. In such settings, purely data-driven approaches are prone to nonphysical extrapolation and poor generalization unless augmented with strong architectural priors [30]. In classical constitutive modeling, these prior conceptions arise naturally through thermodynamic principles, which restrict the admissible form of material response by enforc-ing energy conservation, dissipation, objectivity, etc. Physics-augmented machine-learning-based constitutive models implicitly inherit these same restrictions through architectural choices, loss functions, and/or training constraints. As a result, different learning frameworks correspond not merely to different regression strategies, but to different choices of theoretical structure in the sense of model selection [1, 2] beyond architectural details of the learning components. Understanding how these structures arise in classical theory is therefore essential for interpreting, comparing, and designing data-driven, physics-augmented constitutive models. 
+
+Thermodynamic theory Classical theories of inelasticity formalize these structural restrictions primarily through the distinction between conserved and dissipative aspects, and equilibrium and non-equilibrium thermodynamics. Equilibrium thermodynamics emerged from the foundational works of Carnot, Joule, and Clausius [31–33], and describes idealized states in which entropy production vanishes, and processes occur infinitely slowly. In this set-ting, material behavior can be characterized entirely by state functions , such as stress, temperature, and entropy, as formalized through the thermodynamic potentials introduced by Helmholtz, Thomson, Maxwell, and Gibbs [34–37]. Inelastic deformation, by contrast, involves irreversible processes that occur at finite rates and therefore lie outside equilibrium, requiring a description of how the system evolves subject to the second law. Non-equilibrium thermody-namics [38–42] provides this extension by introducing rates, fluxes, and additional variables to represent irreversible processes and history dependence, but much of this work focused on fluids and chemistry, not solids. Early thermody-namic treatments of irreversibility by Duhem and Bridgman [43, 44] established dissipation and entropy production as fundamental constraints on admissible processes, while emphasizing their physical and mechanical interpretation in real materials (for a historical review, refer to Ref. [45]). A significant conceptual step was taken by Onsager [38, 39], who introduced additional, non-observable variables to account for irreversible processes near equilibrium. These variables, which are assumed represent (microscopic/statistical) internal degrees of freedom governing dissipation, provide the first appearance of what are now termed internal state variables. Furthermore, Onsager showed that, in the near-equilibrium regime, linear relations between thermodynamic forces and fluxes satisfy the second law if and only if the associated phenomenological coefficients obey reciprocal symmetry relations. This result implies the existence of a quadratic dissipation function and an equivalent variational principle, establishing a prototype for dissipation-potential-based evolution laws. Eckart [46] subsequently embedded Onsager’s force–flux framework into continuum mechanics by formulating local balance laws for entropy production that are compatible with stress, strain rate, and heat flux. This step translated Onsager’s internal variables from an abstract thermodynamic setting into a form appli-cable to deformable continua and laid the groundwork for internal-variable formulations in solid mechanics. Related mechanical interpretations of internal variables were further developed in the context of microstructure by Kröner [47]. The internal state variable concept was formalized as a systematic constitutive framework by Coleman and Gurtin [25], who postulated that the thermodynamic state of an inelastically deforming material is determined by the observable variables together with a finite set of internal state variables. * While the Coleman–Gurtin framework establishes a ther-modynamically consistent state space, it leaves the evolution equations for the internal variables largely unspecified beyond the requirement of non-negative dissipation. The local equilibrium hypothesis, i.e., equilibrium thermody-namic relationships hold in local environments in real processes, is typically assumed. Subsequent developments can be interpreted as different strategies for closing this constitutive gap. An early systematic closure was provided by generalized standard materials (GSM), a theory devised by Halphen and Nguyen [27, 50]. In GSM, the evolution of internal variables is derived from a dissipation potential dual to the free energy through convex analysis and variational principles, leading to normality and associated flow. This additional structure guarantees thermodynamic consistency by construction, but significantly restricts the class of admissible constitutive behaviors. Chaboche [26] subsequently developed a widely-used class of internal-variable constitutive models that retain the thermodynamic framework of Coleman and Gurtin while relaxing the strict duality and normality requirements of GSM. By allowing the yield surface, flow rule, and internal variable evolution equations to be specified independently, Chaboche-type models accommodate non-associated flow, complex cyclic behavior, and multiple hardening mechanisms, and have proven particularly effective in engineering applications. Alternative mathematical frameworks have also been explored, although more thoroughly in fluid mechanics. Metriplectic [28] 
+
+> *Later, Maugin [48] introduced the idea of internal variables relaxing to equilibrium, and Reese and Govindjee [49] developed a nonlinear Maxwell model with equilibrium and non-equilibrium potentials.
+
+3Learning frameworks for modeling inelasticity A P REPRINT 
+
+(as in metric and sympletic ) and GENERIC [29] formulations were developed for system-level thermodynamics; they can be adapted to the evolution of internal variables and impose structural constraints on admissible internal dynamics. These essentially identical frameworks restrict the admissible form of the dynamics by decomposing it into reversible and irreversible components governed by distinct symplectic and metric operators. More discussion of alternative modeling frameworks will be given in Sec.3. 
+
+Physics-augmented data-driven models Motivated by these theoretical foundations, a rapidly growing number of developments have used machine learning for constitutive modeling of inelastic materials. Rather than treating consti-tutive response as an unconstrained regression problem, many successful approaches embed physical assumptions into the learning architecture, such as energy conservation/dissipation and objectivity. We see that learning frameworks in which thermodynamic admissibility and satisfaction of other principles are guaranteed by the structure of the model class itself, rather than penalized or learned from data, are advantageous. An early adoption of the internal state variable framework in a data-driven setting [51] utilized a neural ODE-based model [52, 53]; it targeted inelastic homogeneous and microstructured materials and was shown to be a capable repre-sentation of elastic-plastic and viscoelastic behavior. To the authors’ knowledge, the approach of Flaschel et al. [54] is the first data-driven framework that explicitly adopts the generalized standard materials structure, including a dual dissipation potential and variationally derived evolution equations. Subsequent neural-network-based formulations embed this explicit GSM structure by parameterizing the free energy and the dual dissipation potential with convex or monotonic neural networks, enabling thermodynamic consistency by construction while learning constitutive behavior from data [5, 11, 55]. By contrast, a number of recent data-driven constitutive modeling approaches combine neural networks with thermodynamic structure without explicitly adopting the dual GSM formulation. In these methods, neural networks are used to parameterize a Helmholtz free energy together with a dissipation-related potential, while architectural constraints such as convexity, monotonicity, or invariance are imposed to ensure objectivity and positive dissipation by construction [17,56–58]. Inelastic evolution is typically formulated through stress- or force-driven flow rules enabling the learning of history-dependent behavior from stress–strain data alone. 
+
+Name Symbol 
+
+Internal energy ϵ
+
+(Absolute) temperature T
+
+(Helmholtz) free energy ψ = ϵ − T η 
+
+Entropy η = −∂T ψ
+
+Dissipation potential ϕ
+
+Dissipation Γ
+
+Time t
+
+Reference position X
+
+Current position x
+
+Motion x = χ(X, t )
+
+Deformation gradient F = ∂Xχ
+
+(Right Cauchy-Green) stretch tensor C = FT F
+
+(Lagrange) strain tensor E = 12 (C − I)
+
+(Second Piola-Kirchhoff) stress tensor S = ∂Eψ
+
+(Reference) heat flux vector q
+
+Internal state κ
+
+Conjugate force k = ∂κψ
+
+Flow r = ˙ κ
+
+Table 1: Notation. Although some of these approaches are motivated by the GSM framework and share its use of energetic and dissipative potentials, the evolution equations do not arise from an explicit primal-dual dissipation structure based on Legendre-Fenchel duality. Hence, they are structurally closer to Chaboche-type internal-variable models. In contrast, most recent data-driven efforts adopting metriplectic or GENERIC structure focus on learning thermodynamic generators or operators at the level of the global dynamical system, using regression, neural networks, or physics-informed architectures, with primary applications in dynamical system iden-tification, reduced-order modeling, or surrogate sim-ulation [23, 59, 60]. Direct application of metriplec-tic or GENERIC formulations to constitutive model-ing remains comparatively rare. A number of authors [61–63], most notably Hutter and co-workers [64–67], have applied the framework to constitutive modeling of inelastic materials. Nevertheless, most of the re-sulting formulations are problem-specific and gener-ally do not constitute systematic, extensible constitu-tive modeling frameworks comparable to those devel-oped within GSM or ISV-based approaches. 
+
+3 Theory 
+
+Although elasticity theory is the most mature and agreed-upon aspect of constitutive modeling, many technologically relevant processes are dissipative and inelastic. There are a number of widely accepted principles that guide inelastic theory. These, together with some general considerations, form the foundation of inelastic theory. Here we outline four inelastic modeling frameworks, starting with internal state variable theory [25], with the goal of highlighting their similarity and differences. Loosely speaking, each theory can be seen as a restriction of the previous theory via 4Learning frameworks for modeling inelasticity A P REPRINT 
+
+more structure and, hence, embedded phenomenology. Here we use notation summarized in Table 1 and consider the non-isothermal context, but do not focus on heat flow. 
+
+3.1 Principles 
+
+A starting point for rational mechanics treatments of inelasticity is a Helmholtz free energy that gives a sequence of elastic materials indexed by internal state variables [25, 40]. Other frameworks take a similar sequence-of-models approaches [68] to represent the evolution of a dissipative system. Unlike stress, deformation, and temperature, these internal variables are largely unobservable and hence their number and definition are subject to debate. This state-based treatment of history/path dependence contrasts with memory kernel treatments that are generally less adaptable. (Note the change of approach from a memory kernel to a finite-dimensional state is warranted by the assumption of 
+
+fading memory [69, 70].) The thermodynamic state and potentials that modeling frameworks are based on are not unique. The Legendre-Fenchel (LF) transform: 
+
+ϕ∗(Y, Z) = sup X
+
+ ϕ(X, Z) − X · Y , (1) provides one route to change the potential and its dependent variables through the property Y = ∂Xϕ. For instance, internal energy ϵ in terms of the entropy η results from the transformation of the Helmholtz free energy ψ:
+
+ψ(E, T ) = sup η ϵ(E, η ) − ηT , (2) with respect to the absolute temperature T . The potential, its primary kinematic variable, and the conjugate flux form a generalized work-conjugate triple. We will focus on the Helmholtz free energy ψ, Lagrange strain E, and second Piola-Kirchhoff stress S∂Eψ; however, we will not concentrate on kinematics other than staying in the finite deformation context. Materials with such a thermodynamic potential are subject to the Euler balances and the second law of thermody-namics. The local balance of energy is: 
+
+ρ0 ˙ϵ = S · ˙E − ∇X · q + ρ0r , (3) Colloquially, the second law of thermodynamics requires that the entropy, as a measure of disorder, does not decrease in a closed system. More formally, the Clausius-Duhem statement of the second law in local form: 
+
+ρ0 ˙η − ρ0
+
+rT − ∇X · q
+
+T ≥ 0 , (4) plays a central role in constraining mechanics models. This reduces to 
+
+Γ ≡ S · ˙E − ˙ψ ≥ 0 , (5) assuming the Fourier inequality q · ∇XT ≤ 0 holds and the system is isothermal ˙T = 0 .The Coleman-Noll (C-N) procedure [71], starting with the Clausius-Duhem inequality (4) results in: 
+
+(S − ∂Eψ) · ˙E + ( η + ∂T ψ) ˙T + ( −∂κψ) · ˙κ − 1
+
+ρ0T q · ∇XT ≥ 0 (6) where the rates are assumed to act like arbitrary variations so that the ( local equilibrium ) thermodynamic connections: 
+
+S = ∂Eψ (7) 
+
+η = −∂T ψ (8) can be made. This is inherently a local-equilibrium argument. Here κ represents any additional dependencies of the free energy ψ, such as internal states. With the Fourier inequality and these identities, Eq. (5) becomes: 
+
+Γ = −∂κψ · ˙κ ≥ 0 . (9) Additional considerations, such as invariance/equivariance with respect to change of coordinates/material frame, and material stability/polyconvexity, are important and will be addressed in Sec. 4, but we will not discuss them in detail here; please refer to Ref. [72], for instance. 5Learning frameworks for modeling inelasticity A P REPRINT 
+
+3.2 Assumptions 
+
+Most applications of constitutive modeling are implicitly based on the axioms of a simple material [70,73,74], such as: (a) local dependence/no higher order gradients than the first order deformation gradient, and (b) dependence only on the history of the deformation gradient (and temperature) at a material point. There are important applications where stochastic or representative volume samples of the material microstructure or other non-locality need to be treated, and some of the simple material results [75] have been extended to these cases; however, we will focus on simple (homogeneous) materials. Another fundamental consideration is that state functions, such as temperature and stress, are generally only well de-fined in thermodynamic equilibrium. This generally requires that the relevant relaxation processes occur on timescales that are short and length-scales that are long with respect to the time- and length-scales of observation. The dimen-sionless Deborah number in rheology quantifies this notion [48]. Different quantities can be connected to different relaxation mechanisms (such as dislocations for deformation and electrons for heat transfer in metals) and hence scales. Reversibility also plays a role, for example, the elastic deformation of a perfect single crystal and an amorphous glass are both usually considered steady states, although the relaxation times tend to zero and infinity, respectively. Typ-ically, local equilibrium is assumed [48], whereby the equilibrium relations such as S = ∂Eψ, hold in potentially rapid and heterogeneous processes. Other approaches, such as extended irreversible thermodynamics [76, 77] where fluxes are treated as independent fields and temperature has a dependence on heat flux, exist but are not prevalent in continuum mechanics. 
+
+3.3 Formulations 
+
+In this section, we frame a number of currently used material modeling frameworks in terms of their structure, as-sumptions, and the dynamics of the hidden states. We are not necessarily trying to establish a taxonomy, merely contrasting the frameworks in light of their utility in machine learning. The formulations are introduced in order of increasing structural restriction, beginning with the least constrained closure and progressing toward frameworks that impose progressively stronger thermodynamic structure. Table 2 summarizes distinctions between the formulations we consider. 
+
+Internal state variable (ISV) Coleman and Gurtin (C-G) [25] proposed a general theory of inelasticity based on internal state variables (ISVs), which was later expanded upon by numerous authors [48, 78, 79]. Following standard (equilibrium) thermodynamic theory, stress is defined as the derivative of the Helmholtz free energy with respect to the deformation measure: 
+
+S = ∂Eψ(E, κ, T ) , (10) while the flow of internal states κ is given by an ordinary differential equation (ODE): 
+
+˙κ = r(E, κ, T ) , (11) where inputs are given by the equipresence assumption [70], but are generally unrestricted. C-G do not prescribe structure to the flow r other than the dissipation requirement: 
+
+Γ ≡ S · ˙E − ˙ψ = −∂κψ · ˙κ = k · r ≥ 0 (12) resulting from the second law (4) and the definition of a conjugate force 
+
+k = −∂κψ . (13) Note there is no explicit dependence of the free energy on the deformation rate ˙E (C-N implications would be invalid if so) and no dissipation potential in the original formulation. Furthermore, yield-like behavior was not considered in the original ISV theory; however, it can be enhanced to accommodate switching behavior [57, 80]. 
+
+Dissipation potential (DP) After Coleman and Gurtin [25], Chaboche [26] and others [81, 82] introduced a pseu-dopotential ϕ to determine the flow: 
+
+˙κ = ∂kϕ (14) Imposing a convex (in k), non-negative dissipation potential that vanishes at the origin is a means of enforcing the dissipation requirement (12): 
+
+Γ = −∂κψ · ˙κ = k · ∂kϕ ≥ 0 . (15) There are other means, such as requiring a degree of homogeneity [83] or monotonicity in positively homogeneous stress invariants [58]. However, the convexity of the dissipation potential remains the most common and widely 6Learning frameworks for modeling inelasticity A P REPRINT 
+
+adopted sufficient condition. If a yield function is available, the dissipation potential is often formulated as the yield function plus a deviation, and hence, DP does not assume associative flow (with respect to yield). Yield behavior and the rate-independent Karush-Kuhn-Tucker conditions complicate this formulation, as they do each of the frameworks we present. This and the ISV framework are based on local-equilibrium assumptions; the next theory accommodates non-equilibrium thermomechanics. 
+
+Remark. As a segue to the next formulation, the dissipation potential ϕ has a dual dissipation potential ϕ∗ through the LF transform: 
+
+ϕ∗( ˙ κ; Z) = sup k
+
+  ˙κ · k − ϕ(k; Z) (16) 
+
+such that ∂Z ϕ∗ = ∂Z ϕ where Z = {E, ˙E, κ, T, . . . }. With the dual potential, there is a connection between the free energy and dissipation potential via the conjugate force 
+
+k ≡ − ∂κψ = ∂ ˙κϕ∗ , (17) 
+
+where the first form is the definition (13) , and second is a direct result of the LF transform (16) . This is also known as the Biot relation and is difficult to enforce on the potentials ψ and ϕ due to its differential nature. Also, the LF transform (16) leads directly to the identity 
+
+Γ = ϕ + ϕ∗ . (18) 
+
+Generalized standard material (GSM) As a departure from Coleman-Gurtin and related classical theory, Halpern and Nguyen [27,84] developed the Generalized Standard Material (GSM) theory. In GSM, fluxes are tied to potentials via a form of Onsager reciprocity [38, 39]. Both the physical stress [55, 85]: 
+
+S = ∂Eψ + ∂ ˙Eϕ∗ (19) and the internal forces: 
+
+∂κψ + ∂ ˙κϕ∗ (20) are additively split into equilibrium and non-equilibrium contributions [41, 42] and connected to free energy 
+
+ψ = ψ(E, κ; T ) (21) and dissipation potential 
+
+ϕ∗ = ϕ∗( ˙E, ˙κ; T ) , (22) which are dependent on the observable deformation and internal state, and their rates, respectively. Note the restriction of dependencies for free energy and dissipation potential, ψ only depends on kinematic variables 
+
+{E, κ}, and ϕ∗ only rates of these variables. † Note this formulation invalidates the use of the Coleman-Noll rule (6) to associate potential derivatives with fluxes due to the explicit dependence of the stress on the strain rate. It is assumed that the Biot relation [27, 86]: 
+
+∂κψ + ∂ ˙κϕ∗ ≡ 0 , (23) which is interpreted as a microbalance [87]), connects the free energy and dissipation potential. With this formulation the (mechanical) dissipation requirement (12) reduces to: 
+
+Γ = ( S − ∂Eψ) · ˙E − ∂κψ · ˙κ = ∂ ˙Eϕ∗ · ˙E + ∂ ˙κϕ∗ · ˙κ ≥ 0 (24) after using the Biot relationship (23). Eq. (24) is an extended version of Eq. (15) after noting the alternative definition of k in Eq. (17). So it is sufficient for ϕ∗( ˙E, ˙κ; T ) to be convex, non-negative, and to attain its minimum at ( ˙E, ˙κ) = (0, 0) (e.g., ϕ∗(0, 0) = 0 ). In this theory, the primal (rate-based) ϕ∗ and dual (force-based) ϕ dissipation potentials must be LT duals of one another, i.e. : 
+
+ϕ(k; κ, T ) = sup 
+
+> ˙κ
+
+(k · ˙κ − ϕ∗( ˙ κ; κ, T )) , (25) and conversely, 
+
+ϕ∗( ˙ κ; κ, T ) = sup 
+
+> k
+
+(k · ˙κ − ϕ(k; κ, T )) . (26) In the primal (rate–based) formulation, Biot’s relation (23) gives 
+
+k + ∂ ˙κϕ∗( ˙ κ; ˙E, T ) = 0 (27)       
+
+> †Here, and in the other frameworks, we assume the temperature Tacts as a variable parameter as opposed to a kinematic variable with a rate; it is also possible to have ϕ∗depend on ˙Tinstead.
+
+7Learning frameworks for modeling inelasticity A P REPRINT 
+
+which (implicitly) determines ˙κ. In the dual (force-based) formulation, the flow/normality rule becomes 
+
+˙κ = ∂kϕ(k; ˙E, T ) , (28) as in the DP formulation. However, in a GSM formulation, the pseudo-potential ϕ must only depend on {k; κ, T }
+
+rather than on the full state Z, and must be interpreted as the dual potential in the sense of convex conjugacy (25). With the dual formulation. the dissipation requirement Eq. (24) becomes 
+
+Γ = −∂ ˙Eϕ∗ · ˙E − ∂ ˙κϕ∗ · ˙κ = −∂ ˙Eϕ · ˙E − k · ∂kϕ ≥ 0 (29) by virtue of the LF transform Eq. (26). 
+
+Metripletic (MP) The metripletic (MP) [28, 88] and the related General Equation for Non-Equilibrium Reversible-Irreversible Coupling (GENERIC) [29, 89] formalisms are not specifically tailored to constitutive modeling. Instead, these frameworks are meant to be a general representation of non-equilibrium thermodynamics [89] across a variety of scales; nevertheless, a few authors [61, 63–67] have applied them to constitutive modeling of inelastic materials. 
+
+Remark. In addition to a general set of states z, the metriplectic formalism has four structures: a (symplectic) Hamiltonian operator L(z), a (metric) dissipation operator M(z), an energy potential e, and an entropy potential s.The dynamical system is simply 
+
+˙z = L∂ze + M∂zs , (30) 
+
+or more generally [90] 
+
+˙z = L∂ze + ∂z∗ Ξ( z, z∗)|z∗=∂zs , (31) 
+
+where Ξ is a generalized dissipation potential. The two components drive different aspects of the dynamics. The energy potential e generates Hamiltonian dynamics, such that: 
+
+˙e = ∂ze · ˙z = ∂ze · L ∂ze ≡ 0 , (32) 
+
+since L = −LT is skew-symmetric, while the dissipation potential s generates an entropy-producing flow: 
+
+˙s = ∂zs · ˙z = ∂zs · M ∂zs ≥ 0 , (33) 
+
+given that K = KT is symmetric, positive definite. The degeneracy conditions 
+
+L∂zs = 0 and M∂ze = 0 , (34) 
+
+are necessary for Eq. (32) and Eq. (33) to hold. Note the non-decreasing s can play the role of a Lyapunov function on the dynamics [90] and this framework is typically described in terms of a Poisson bracket (with an attendant Jacobi identity) [91], which we omit for consistency with other formulations. 
+
+As in the DP and GSM formulations, this MP formulation relies on two potentials doing separate tasks; here, it is Hamiltonian dynamics with dissipation added to describe relaxation to a thermodynamic equilibrium. Following Ziegler’s discussion [92], suggesting a Hamiltonian micro-system evolving with macro state variables, we apply the MP framework to the dynamics of the internal states: 
+
+˙κ = L ∂κϵ
+
+|{z} 
+
+> g
+
++M ∂κϕ
+
+|{z} 
+
+> h
+
+(35) Based on fact that s is associated with the Massieu potential/ free entropy [60, 61, 93], we identify s with the entropy 
+
+η as modeled by ϕ and e with the internal energy ϵ as the stress potential, which is consistent with the definition of ψ
+
+(2) with fixed temperature. With the definition of the free energy (2) and 
+
+k ≡ ∂κψ = ∂κϵ − T ∂κη = h − T g (36) the dissipation requirement (12) for MP reduces to: 
+
+Γ = −k · ˙κ = −(h − T g) · (Lh + Mg ) = T g · Mg ≥ 0 (37) after using the MP flow (35) and degeneracy conditions (34). Thermodynamic admissibility is therefore ensured inde-pendently of the functional forms of ψ and ϕ other than the degeneracy conditions (34) and the operator symmetries. 
+
+Remark. The form of the MP dynamics is reminiscent of flow due to quasi-quadratic potentials [38, 39, 83]: 
+
+Φh = 12 h · Lh and ΦC = 12 g · Mg (38) 
+
+such that 
+
+˙κ = ∂hΦh + ∂gΦg. (39) 
+
+Here, Φh is a pseudo-potential. 
+
+8Learning frameworks for modeling inelasticity A P REPRINT 
+
+Implicit standard materials (ISM) As mentioned, the ISV framework leaves the evolution map r largely unre-stricted beyond the dissipation requirement (12). A structured intermediate generalization is provided by implicit standard materials (ISM) [94, 95], in which the evolution is not given by an explicit map, such as ˙κ = r(E, κ), but instead by an implicit force–flux relation generated by a bipotential β:
+
+β(k, ˙κ) ≥ k · ˙κ. (40) Admissible pairs (k, ˙κ) lie on the monotone graph defined by equality in this generalized Fenchel inequality. This construction guarantees non-negative dissipation by design, while remaining more general than the discussed struc-tures of DP, GSM, and MP structures. In particular, DP and GSM correspond to separable convex choices of the bipotential, while MP can be interpreted as a quadratic metric specialization (see App. A). To the authors’ knowledge, a physics-augmented neural network (PANN) implementation of the full ISM framework has not yet been reported. Although ISM provides a unifying and highly general convex-analytic structure, embedding a general bipotential di-rectly into neural potential-based architectures introduces additional modeling and optimization challenges. For this reason, the present work focuses on the DP, GSM, and MP subclasses, leaving a PANN realization of ISM for future work. Feature ISV DP GSM MP local equilibrium assumed assumed not assumed not assumed free energy required required required allowed convexity allowed allowed required allowed internal variables included included included allowed dissipation potential allowed required required required 
+
+convexity allowed allowed required metric dual potential no no yes no dependence on state free free restricted free normality/associated flow allowed allowed required allowed Table 2: Summary of distinctions between the four constitutive frameworks. 
+
+4 Implementation 
+
+We implement our interpretations of potential-based DP, GSM, and MP within a common framework consisting of: an energy potential, a dissipation potential, a stress rule, and a flow rule. Fig. 1 illustrates the common framework. We use the flexible Input specific neural network (ISNN) [96] to implement the potentials and a neural ODE [52, 53] approach for the evolution. The implementation differences are summarized in Table 3 at the end of this section. In the following, we drop the temperature dependence for convenience. 
+
+Invariance We assume all the ISVs are scalar invariants, although other approaches could be taken [57]. For the observable inputs, we assume isotropy and use the Cayley-Hamilton invariants for deformation measure C and Landau invariants for the rate ˙C: IC
+
+z }| { I ˙C
+
+z }| {
+
+I1 = tr C − 2 I4 = tr ˙C
+
+I2 = 12 (tr C∗ − 2) I5 = 12 tr ˙C2
+
+I3 = √det C I6 = 13 tr ˙C3
+
+| {z } 
+
+> IC,˙C
+
+(41) where C∗ = det( C)C−T and I3 is det F, not the conventional det C, for polyconvexity considerations. We remark that other invariants are possible [97] and that this can be extended to anisotropy [98]. Since the two arguments, C and 
+
+˙C, are related by a time derivative, these 6 invariants are sufficient (see appendix of Ref. [51]. To maintain invertibility, we use the stretch C instead of the strain E, we shift the deformation invariants so that I1,2,3 = 1 in the reference configuration for convenience. The basis elements B result from derivatives of the inviarants: BC = {∂CIa}6 
+
+> a=1
+
+and 
+
+B ˙C = {∂ ˙CIa}6
+
+> a=1
+
+.Note, with this choice of invariants, the GSM dissipation (29) can be written as: 
+
+Γ = −∂ ˙Eϕ · ˙E − k · ∂kϕ (42) 
+
+= −∂I ˙C ϕ ∂ ˙CI ˙C · ˙C − k · ∂kϕ ≥ 0
+
+9Learning frameworks for modeling inelasticity A P REPRINT 
+
+and further simplified with the aid of the identities: 
+
+˙C · ∂ ˙Ctr ˙C = tr ˙C = I4 , ˙C · ∂ ˙C 12 tr ˙C2 = tr ˙C2 = 2 I5 , ˙C · ∂ ˙C 13 tr ˙C3 = tr ˙C3 = 3 I6 . (43) 
+
+Potentials Based on the theory in Sec. 3, the energy and dissipation potentials have different input arguments de-pending on the particular framework. The dissipation potential (DP) framework has an (equilibrium) free energy 
+
+ψ = ˆψ(IC, κ) , (44) We ensure that ψ is polyconvex [99] by having ψ be convex and montone in I1,I3 and convex in I3 > 0 [100–102]. We allow the DP dissipation potential to depend on the deformation and rate invariants as well as the internal state and conjugate force 
+
+ϕDP = ϕDP (k, IC, ˙C, κ) . (45) The GSM framework prescribes the same free energy dependence as DP and a dissipation potential 
+
+ϕGSM = ϕGSM (k, I ˙C) , (46) only dependent on the conjugate force and the rate invariants. Our version of the MP framework uses an internal energy potential: 
+
+ϵ = ϵ(IC, κ) , (47) with the same inputs as free energy in the other frameworks, while the dissipation potential: 
+
+ϕMP = ϕMP (κ, IC, ˙C) , (48) only depends on the internal state and the full set of invariants, but not the conjugate force. 
+
+Stress The DP implementation uses the standard (local equilibrium) stress rule: 
+
+S = 2 ∂Cψ . (49) The MP implementation uses the equivalent stress rule: 
+
+S = 2 ∂Cϵ , (50) while our implementation of the GSM model uses an Onsager-like rule: 
+
+S = 2 ∂Cψ + 2 ∂ ˙CϕGSM (51) We impose that the stress is zero in the reference state: 
+
+S = 0 if (C = I, ˙C = 0, κ = 0) (52) using normalization schemes. For the DP and MP formulations, we shift the free energy 
+
+ψ = ˆψ(IC, κ) − pψ (I3 − 1) . (53) by ‡
+
+pψ (κ) = 
+
+h
+
+2∂I1
+
+ˆψ + 4 ∂I2
+
+ˆψ + ∂I3
+
+ˆψ
+
+i
+
+> IC=0
+
+. (54) For the GSM formulation, this shift of the free energy is needed in addition to a similar correction of the raw dissipation potential: 
+
+ϕGSM = ˆϕGSM (k, I ˙C) − pϕ(k) I4 , (55) where the normalization component: 
+
+pϕ(k) = ∂I4
+
+ˆϕGSM (k, I ˙C) k=0,I ˙C=0
+
+, (56) is affine in I4.§ This correction is expressed in terms of I4 = tr ˙C since B4 = ∂ ˙CI4 = I remains nonzero at ˙C = 0,whereas the other basis elements (derivatives of higher-order rate invariants) vanish at the quiescent reference state, making I4 the only invariant capable of removing a linear drift contribution in ∂ ˙CϕGSM and thereby enforcing zero stress in the reference state. ¶
+
+> ‡
+
+This normalization results from the general form 
+
+S = 2  (∂I1 ψ + I1∂I2 ψ) I − ∂I2 ψ C + I3∂I3 ψ C−1
+
+restricted to the reference configuration C = I.
+
+> §
+
+These corrections are of the general form ϕ(x) = ˆϕ(x) − ˆϕ(x0) − ∂x ˆϕ x0
+
+· (x − x0).
+
+> ¶
+
+Note, I4 = tr ˙C = 0 does not imply ˙C = 0, as opposed to I5 = ∥ ˙C∥2 which can also be used in the normalization. 
+
+10 Learning frameworks for modeling inelasticity A P REPRINT 
+
+Flow In both the DP and GSM implementations, the flow ˙κ = r is given by the gradient of the dissipation potential with respect to the conjugate force: 
+
+r = ∂kϕ , (57) while the MP implementation uses metriplectic dynamics for the evolution of the internal states: 
+
+r = L∂κϵ + M∂κϕ . (58) Dissipation is associated with flow, which implies: 
+
+r = 0 if k = 0 . (59) To enforce this, we employ shifts analogous to those used in the stress normalization schemes: 
+
+r = ˆϕ − ∂k ˆϕ k=0
+
+· k (60) To maintain parity (in terms of NN parameters) between the MP implementation and the others, we employ fixed L
+
+and M:
+
+[L]ij =
+
+
+
+1 i > j 
+
+−1 i < j 
+
+0 else and [M]ij =
+
+2 i = j
+
+1 else (61) that do not bias the evolution toward particular components of the internal state vector. Others have used fixed operators [103], albeit adapted to the particular physics. Learnable operators [24] may offer representational advantages and are easily implemented, but they are out of scope for this work. The MP degeneracy conditions (34) can be embedded by transforming the operators with projections [24] 
+
+L′(κ) = PgLP g and M′(κ) = PhMP h (62) where g ≡ ∂κϕ and 
+
+Pg = I − g
+
+∥g∥ ⊗ g
+
+∥g∥ (63) and likewise for Ph.
+
+Remark. It may be better to parameterize the operators such as Pg as P′ 
+
+> g
+
+= ( g · g)I − g ⊗ g to handle cases were 
+
+g → 0 but P′ 
+
+> g
+
+not a projection. In fact, Birtea [104], as an alternative to the method we adopt [24], uses P′ as the operator M′, thus subverting the need to learn or choose M.
+
+Dissipation To satisfy dissipation, the DP formulation employs a dissipation potential ϕ(k) that is convex in the conjugate force, non-negative, and minimized at k = 0. Under these conditions, 
+
+Γ = k · r = k · ∂kϕ ≥ 0 . (64) For the GS formulation, the dual dissipation potential ϕ∗( ˙E, ˙κ) must be convex in its kinematic rate arguments and minimized at ( ˙E, ˙κ) = ( 0, 0), in part due to the dissipation requirement Eq. (29). Akin to the polyconvexity require-ments on the free energy, ϕGSM is monotonic and convex in the rate invariants since it needs to be convex in the rate of deformation, while it is convex in conjugate force since k is simply a collection of scalar invariants. The MP for-mulation satisfies the dissipation requirement by virtue of the symmetries of the operators L and M together with the degeneracy conditions (34). 
+
+5 Data 
+
+To generate training and testing data, we use three different inelastic representative volume elements (RVEs): an alloy, a composite, and a polycrystal. We use a single realization of each and run 256 trajectories of cyclic uniaxial loading using: 
+
+F(t) = I + X
+
+> i
+
+ai sin( ωit) ei ⊗ ei , (65) where the amplitudes ai and frequencies ωi are drawn from uniform distributions. This deformation is applied via periodic boundary conditions. Each trajectory has 200 steps, and we observe only the 11 components of the resulting stress trajectories in emulation of typical uniaxial experiments. || 
+
+> || The invariant formulation we adopt generally informs the other components.
+
+11 Learning frameworks for modeling inelasticity A P REPRINT inputs: C, κ                          
+
+> invariants IC,˙Cinvariants IC
+> potential ϕpotential ψ
+> derivative k=−∂κψ
+> flow f=∂Kϕ
+> integration ˙κ=f
+> dissipation Γ = k·fderivative S= 2 ∂Cψ
+> outputs: S,Γ,κ
+
+Figure 1: Schematic of the DP framework component DP GSM MP energy ψ(IC, κ) ψ(IC, κ) ϵ(IC, κ)
+
+minimum at IC = 1 IC = 1 IC = 1 
+
+monotone & convex I1, I 2 I1, I 2 I1, I 2
+
+convex I3 I3 I3
+
+free κ κ κ
+
+dissipation ϕ(k, IC, ˙C, κ) ϕ(k, I ˙C) ϕ(IC, ˙C, κ)
+
+minimum at k = 0 k = 0, I ˙C = 0 –monotone & convex – I ˙C –convex k k –free IC, ˙C, κ – IC, ˙C, κ
+
+stress S = 2 ∂Cψ S = 2 ∂Cψ + 2 ∂ ˙Cϕ S = 2 ∂Cψ
+
+conjugate force k = −∂κψ k = −∂κψ k = −∂κϵ + T ∂κϕ
+
+flow r = ∂kϕ r = ∂kϕ r = L∂κϵ + M∂κϕ
+
+dissipation k · r k · r + ∂I ˙C ϕ ∂ ˙CI ˙C · ˙C k · r
+
+Table 3: Implementation comparison. Note T = 1 is assumed for MP. 
+
+5.1 AlSi 10 Mg elastic-plastic alloy (EP) 
+
+AlSi 10 Mg is a common additive manufacturing material. We simplify it to an alloy of elastic Si and elastic-plastic Al, where the alloy structure was generated using a Gaussian random field [105] on a 25 3 structured mesh. Both phases use a St. Venant elastic response, and the Al phase employs a J2 plastic model. Table 4 summarizes the material 12 Learning frameworks for modeling inelasticity A P REPRINT 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+> STRAIN [%]
+> 100
+> 50
+> 0
+> 50
+> 100
+> STRESS [MPa]
+
+Figure 2: AlSi 10 Mg alloy properties of the constituents. Fig. 2 shows the realization of the alloy and a bundle of stress-strain responses to the cyclic loading (65). The hysteresis displays minimal hardening and rate dependence. Ref. [106] has more details of this RVE. Property value Silicon Youngs modulus 140 [GPa] Poisson’s ratio 0.3 volume fraction 8.3% Aluminum Youngs modulus 70 [GPa] Poisson’s ratio 0.32 Yield stress 120 [MPa] Hardening modulus 10.0 [MPa] Exponential hardening coefficient 0.27 time step 0.005 [s] Table 4: Elastic-plastic parameters 
+
+5.2 Glass bead reinforced viscoelastic silicone (VE) 
+
+Reinforced polymers are common engineering materials for applications that need flexible yet durable materials. Composite of elastic glass of various radii and viscoelastic polymer, as can be seen in Fig. 3. Table 5 summarizes the material properties of the constituents. Fig. 3 shows the realization of the composite on an unstructured mesh with 25800 elements. A St.Venant model was used for the glass, while the Universal Polymer Model (UPM) [107], a complex Prony series/discrete memory kernel model, was used for the polymer matrix. The UPM model includes a wide variety of time-scales, and the hysteresis displays rate-dependence consistent with this viscoelastic behavior. The hysteresis shown in Fig. 3 is characteristic of a viscoelastic material; however, the elastic beads make the composite response non-rheologically simple. Ref. [51] has more details. 
+
+5.3 Fe viscoplastic polycrystal (VP) 
+
+Crystal plasticity (CP) RVEs are often used as subgrid models of complex plastic behavior in metals. We used a standard CP finite element [108] on a 25 3 structured mesh to simulate a Fe (FCC) polycrystal. A power-law flow rule and the well-known Kocks-Mecking hardening minus recovery [109] were employed on all 12 slip planes. Table 6 summarizes the material properties. Fig. 4 shows the realization of the polycrystal and the response curves where rate-dependence and plasticity are apparent. Ref. [51] has more details. 13 Learning frameworks for modeling inelasticity A P REPRINT 
+
+Property value Glass Young’s modulus 60 [GPa] Poisson’s ratio 0.33 volume fraction 13.5% Silicone bulk modulus 920 [MPa] glassy shear modulus 3.62 [MPa] rubbery shear modulus 0.84 [MPa] relaxation times 1 [ μs] : 3.16 [ks] time step 0.005 [s] Table 5: Viscoelastic composite parameters 3 2 1 0 1 2 3
+
+> STRAIN [%]
+> 0.20
+> 0.15
+> 0.10
+> 0.05
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> STRESS [MPa]
+
+Figure 3: Silicone-glass bead composite 
+
+6 Results 
+
+We used as identical as possible potentials for the DP, GSM, and MP NN implementations, where the differences are primarily due to the number of inputs to the dissipation potential prescribed by the frameworks. Table 7 summarizes the chosen architectural details. The dimension of the hidden ISV space is the most arbitrary; the size was chosen based on previous studies [51, 57, 80]. We used the ADAM optimizer [110] with a learning rate of 0.001 for 80,000 epochs with a early-stopping patience of 8,000 epochs. Predictions were made with the weights that achieved the best 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+> STRAIN [%]
+> 800
+> 600
+> 400
+> 200
+> 0
+> 200
+> 400
+> 600
+> 800
+> STRESS [MPa]
+
+Figure 4: FCC Fe polycrystal 14 Learning frameworks for modeling inelasticity A P REPRINT 
+
+Property value Elastic moduli C11 204.6 [GPa] C12 137.7 [GPa] C44 126.2 [GPa] Hardening modulus 600 [MPa] Recovery modulus 1 [MPa] Initial hardening 150 [MPa] Rate exponent 20 time step 0.05 [s] Table 6: Crystal plasticity parameters for FCC Fe. in-training test losses. The datasets were split into 80% training data, 10% in-training test data, and 10% post-training validation data. All results depicted in this section are for predictions on the held-out validation data. potential ψ ϕ
+
+DP GSM MP number of ISVs 6 6input dimension 9 18 9 12 number of layers 2 2number of parameters 345 1606 1545 1550 activation softplus softplus Table 7: NN potential parameters. Input dimensions depend on formulation hence the number of parameters in the DP, GSM, and MP implementations. 
+
+6.1 Elastoplasticity (EP) RVE data 
+
+Fig. 5 shows representative predictions on held-out EP validation data for each of the model frameworks. This is arguably the most challenging phenomenon to represent due to the switching between conservative/elastic and dissi-pative/plastic behavior. All three models predict the validation data well, although the DP model clearly has the best predictions, while the GS has issues with the initial response, and MP seems to suffer from phase error in predicting the trajectories. The ability of GSM models to represent elasto-plasticity apparently depends on the ability of the dissi-pation potential to represent gradient jumps at the origin [85] and the resulting subdifferential. In preliminary studies, we tried a ReLU activation for the dissipation potential, but it did not perform as well as the Softplus we ultimately used. The relaxed potential formulation of Holthusen and Kuhl [58] may have utility with this issue. The dissipation predicted from each model shows high-frequency content commensurate with the loading; however, the magnitudes are significantly different for each of the models, and the dissipation for the DP model does not go to zero. This erroneous feature of the DP model can be fixed with gating of the flow [80]; however, no cause for the disagreement in the dissipation response, such as different units, is obvious. The strong linear trends in the evolution of the internal variables for the DP predictions may be the intermediate cause of the dissipation offset. Clearly, each model is discovering hidden states with different evolution patterns: DP has oscillatory trajectories with harmonic variations, GSM has a transient then mild oscillatory growth around a mean, while MP has oscillatory trajectories that have a steady mean and others that grow in magnitude. 
+
+6.2 Viscoelasticity (VE) RVE data 
+
+Fig. 6 shows predictions of held-out VE validation data. All predictions are nearly perfect in accuracy, which is expected since the ODE-like framework of each model is closest to that of classical viscoelasticity. Again, we see differences in the dissipation, with DP showing a slowly decreasing trend which conforms to physical expectations, GS is nearly constant in mean after a transient, and MP shows dissipation growth in some of the trials. Unlike in the EP example, here all models have strong linear trends with superposed oscillations in their internal state trajectories. Notably, DP has some internal state trajectories with steady means. We conjecture that the strong linear trends may be evidence that only a lower-dimensional manifold in internal state space is needed to represent the phenomenology and, hence, certain aspects of the evolution are not constrained by data. 15 Learning frameworks for modeling inelasticity A P REPRINT 0.0 0.2 0.4 0.6 0.8 1.0                  
+
+> TIME
+> 20
+> 10
+> 0
+> 10
+> 20
+> STATE
+> INTERNAL EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.0
+> 0.5
+> 1.0
+> 1.5
+> 2.0
+> 2.5
+> DISSIPATION
+> DISSIPATION EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> STRESS
+> RESPONSE
+> 0.999 1.000 1.001 1.002
+> DEFORMATION
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> STRESS
+> HYSTERESIS
+> 1.0 0.5 0.0 0.5 1.0
+> TRUE
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> PREDICTION
+> PARITY
+
+(a) DP 0.0 0.2 0.4 0.6 0.8 1.0                  
+
+> TIME
+> 4
+> 3
+> 2
+> 1
+> 0
+> 1
+> 2
+> STATE
+> INTERNAL EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> DISSIPATION
+> DISSIPATION EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 1.5
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> STRESS
+> RESPONSE
+> 0.999 1.000 1.001 1.002
+> DEFORMATION
+> 1.5
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> STRESS
+> HYSTERESIS
+> 1.0 0.5 0.0 0.5 1.0
+> TRUE
+> 1.5
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> PREDICTION
+> PARITY
+
+(b) GSM 0.0 0.2 0.4 0.6 0.8 1.0                  
+
+> TIME
+> 15
+> 10
+> 5
+> 0
+> 5
+> 10
+> 15
+> STATE
+> INTERNAL EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> DISSIPATION
+> DISSIPATION EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> STRESS
+> RESPONSE
+> 0.999 1.000 1.001 1.002
+> DEFORMATION
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> STRESS
+> HYSTERESIS
+> 1.0 0.5 0.0 0.5 1.0
+> TRUE
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> PREDICTION
+> PARITY
+
+(c) MP 
+
+Figure 5: EP prediction comparison 
+
+6.3 Viscoplasticity (VP) RVE data 
+
+Fig. 7 shows representative predictions on held-out VP validation data for the VP dataset, where, like the VE data, the model predictions are highly accurate. Also we differences in the dissipation trajectories across the three models, although in this case, there is a decreasing trend to the MP dissipation, while DP and GS resemble their VE responses. Interestingly, the internal state trajectories for each of the models are qualitatively different: DP has strong linear trends, GS has nearly steady oscillations, while MP has some trajectories with mild growth or decay. These results seem to corroborate the conjecture that, depending on data and the presumed size of the internal state space, there are ambiguities in the dynamics due to the sensitivities of the observable stress to these states. 
+
+7 Discussion 
+
+To continue with the investigation of the commonalities and distinctions between the three formulations, we examine (projections) of the potentials. Fig. 8 shows the learned free energy for DP, GSM, and MP, taking the VP dataset as representative. Recall that each framework shares the same NN representation for ψ, although, in GSM, the ϕ also contributes to the stress. The particular potentials all resemble each other, especially given the fact that the limited locus of the accessible invariants depicted by the red samples [111]; i.e., gradients along this locus match across the potentials. The main differences are not in the observable invariant projections, but in the internal state aspects, which necessarily differ given the different dynamics. Interestingly, in this aspect, GSM is seemingly distinct, but this could merely be due to the fungibility of the internal state components, e.g., the internal state component of one model may be most highly correlated with a different component of another. As expected, the fitted dissipation potentials shown in Fig. 9 show more qualitative differences. The left panel shows the projection of ϕ onto the first two components of the conjugate force k, while the middle panel shows the pro-jection onto the first component of the internal state κ and conjugate force. The right panel shows a projection onto the observable deformation I1 and rate I4 invariants. The dissipation potentials in the observable projection largely resemble each other, with the strongest sensitivities in rate invariant I4. The DP shows some deviation from convexity in I4, which is enforced in the GSM model. The projections in the other planes are radically different, in part due to 16 Learning frameworks for modeling inelasticity A P REPRINT 0.0 0.2 0.4 0.6 0.8 1.0                 
+
+> TIME
+> 0
+> 2
+> 4
+> 6
+> 8
+> 10
+> 12
+> 14
+> STATE
+> INTERNAL EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> 0.25
+> DISSIPATION
+> DISSIPATION EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> STRESS
+> RESPONSE
+> 1.000 1.002 1.004 1.006
+> DEFORMATION
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> STRESS
+> HYSTERESIS
+> 0.5 0.0 0.5 1.0
+> TRUE
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> PREDICTION
+> PARITY
+
+(a) DP 0.0 0.2 0.4 0.6 0.8 1.0                 
+
+> TIME
+> 12
+> 10
+> 8
+> 6
+> 4
+> 2
+> 0
+> 2
+> STATE
+> INTERNAL EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> 1.25
+> 1.50
+> 1.75
+> DISSIPATION
+> DISSIPATION EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> STRESS
+> RESPONSE
+> 1.000 1.002 1.004 1.006
+> DEFORMATION
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> STRESS
+> HYSTERESIS
+> 0.5 0.0 0.5 1.0
+> TRUE
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> PREDICTION
+> PARITY
+
+(b) GSM 0.0 0.2 0.4 0.6 0.8 1.0                 
+
+> TIME
+> 20
+> 0
+> 20
+> 40
+> 60
+> 80
+> STATE
+> INTERNAL EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> DISSIPATION
+> DISSIPATION EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> STRESS
+> RESPONSE
+> 1.000 1.002 1.004 1.006
+> DEFORMATION
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> STRESS
+> HYSTERESIS
+> 0.5 0.0 0.5 1.0
+> TRUE
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> PREDICTION
+> PARITY
+
+(c) MP 
+
+Figure 6: VE prediction comparison the fungibility of the internal state components and the corresponding conjugate forces. Nevertheless, the flatness of the MP in the 1-2 conjugate force plane is remarkable, which seems to indicate it is not using these components to represent the data. In contrast, the enforced convexity of the DP and GSM in this plane is apparent. Of some interest is the variation of the DP dissipation potential in the κ1-k1 projection. Overall, it appears that the NNs are learning fairly simple, nearly constant/linear/quadratic dependencies. We now make a statistical assessment of the performance of each model on held-out data. Fig. 10a summarizes the 3 formulations (DP, GS, MP) performance across the 3 RVE-based datasets described in Sec. 5 for multiple training sessions where the train/test/validation data has been shuffled, as have the initial weights. Generally, all models give good representations and predictions, although the GSM seems to underperform relative to DP and MP across the three datasets we used. To investigate whether this ranking is due to the lack of a closed form / simple dependence of the data, we ran the same study on 4 benchmark datasets: (a) hyperelastic Neohookean basis, which was the basis for other 3 models, (b) J2 finite elastoplasticity with linear hardening, (c) memory kernel-type viscoelasticity, and (d) Perzyna-type viscoplastic model based on (b). Each data-generating model used a standard implementation [112], and more details can be found in Ref. [80]. Interestingly Fig. 10b shows the trend, loosely speaking, reverses with GSM moderately outperforming the other two formulations. It is easy to conjecture that the more constrained structure of the GSM framework is responsible for these findings, i.e., it represents clean stress-strain history relations well but is mildly hampered if the data does not satisfy some of the strict embedded requirements, such as associative flow. 
+
+8 Conclusion 
+
+We presented a unified thermodynamic and machine learning comparison of three constitutive frameworks: dissipa-tion potential (DP), generalized standard materials (GSM), and metriplectic (MP). By embedding each framework within an identical neural potential architecture, we isolated the effect of thermodynamic structure from architectural and training choices. The theoretical and numerical comparison revealed a hierarchy of structural restriction. The DP formulation enforces convexity in the conjugate force and guarantees dissipation while allowing flexible state dependence. GSM additionally imposes Legendre–Fenchel duality and normality, restricting admissible evolution through convexity in both forces and rates. MP introduces operator-based reversible and irreversible flows that sepa-17 Learning frameworks for modeling inelasticity A P REPRINT 0.0 0.2 0.4 0.6 0.8 1.0              
+
+> TIME
+> 15
+> 10
+> 5
+> 0
+> 5
+> STATE
+> INTERNAL EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> DISSIPATION
+> DISSIPATION EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> STRESS
+> RESPONSE
+> 0.9925 0.9950 0.9975 1.0000 1.0025 1.0050 1.0075
+> DEFORMATION
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> STRESS
+> HYSTERESIS
+> 0.5 0.0 0.5 1.0
+> TRUE
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> PREDICTION
+> PARITY
+
+(a) DP 0.0 0.2 0.4 0.6 0.8 1.0              
+
+> TIME
+> 3
+> 2
+> 1
+> 0
+> 1
+> 2
+> 3
+> STATE
+> INTERNAL EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> DISSIPATION
+> DISSIPATION EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> STRESS
+> RESPONSE
+> 0.9925 0.9950 0.9975 1.0000 1.0025 1.0050 1.0075
+> DEFORMATION
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> STRESS
+> HYSTERESIS
+> 0.5 0.0 0.5 1.0
+> TRUE
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> PREDICTION
+> PARITY
+
+(b) GSM 0.0 0.2 0.4 0.6 0.8 1.0              
+
+> TIME
+> 20
+> 15
+> 10
+> 5
+> 0
+> 5
+> 10
+> STATE
+> INTERNAL EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.000
+> 0.025
+> 0.050
+> 0.075
+> 0.100
+> 0.125
+> 0.150
+> 0.175
+> 0.200
+> DISSIPATION
+> DISSIPATION EVOLUTION
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> TIME
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> STRESS
+> RESPONSE
+> 0.9925 0.9950 0.9975 1.0000 1.0025 1.0050 1.0075
+> DEFORMATION
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> STRESS
+> HYSTERESIS
+> 0.5 0.0 0.5 1.0
+> TRUE
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> PREDICTION
+> PARITY
+
+(c) MP 
+
+Figure 7: VP prediction comparison rate energy-conserving and entropy-producing dynamics. Across the elastoplastic, viscoelastic, and viscoplastic RVE datasets, theory-based structural bias proved to create accurate models, although in some cases it limited expres-sive flexibility. GSM provided the most tightly constrained and thermodynamically transparent formulation, while DP achieved comparable predictive accuracy with fewer structural assumptions. Our interpretation of MP offered a geometrically consistent evolution framework and naturally accommodates operator-based dynamics, and gave predic-tions on par with the other representations while generating different internal dynamics. These results demonstrate that thermodynamic model selection acts as an inductive bias in data-driven constitutive modeling that aids generalization behavior. In future work, we will investigate learnable operators in the MP setting, implicit standard material (ISM) formu-lations via bipotentials, and extensions to nonlocal [113] and inverse problems. This is in pursuit of the larger goal of a unified and extensible machine learning framework that can accommodate the spectrum of solid material phe-nomenology, which can distinguish between rate-dependent and rate-independent elastoplastic responses and identify the anisotropic structure required by the data, while preserving thermodynamic admissibility by construction. The MP operator-based decomposition cleanly separates reversible and irreversible mechanisms and suggests a pathway toward learning generalized skew and metric operators that remain thermodynamically admissible by construction. ** 
+
+The fact that ISM can represent DP, GSM, and MP formulations indicates a potential to be a more encompassing formulation than any of them, albeit with some numerical challenges to surmount. Both avenues have the potential to be superior data-driven PANNs for material response. 
+
+** The MP formulation provides a structured setting for the evolution of tensorial internal variables. For example, for a symmetric second-order tensor A, the reversible contribution may take the form 
+
+˙A = ΩA − AΩ , Ω = ˙RR T ,
+
+which corresponds to the action of a skew operator on the space of second-order tensors and represents an objective, energy-conserving evolution. Here R is the local rotation from the polar decomposition of the deformation gradient. 
+
+18 Learning frameworks for modeling inelasticity A P REPRINT 0.975 1.000 1.025 
+
+I1  
+
+> 0.96
+> 0.98
+> 1.00
+> 1.02
+> 1.04
+> I2
+> 0.975 1.000 1.025
+
+I1    
+
+> 0.96
+> 0.98
+> 1.00
+> 1.02
+> 1.04
+> I3
+> 200 100 0100 200
+> 1
+> 0.96
+> 0.98
+> 1.00
+> 1.02
+> 1.04
+> I3
+
+(a) DP 0.975 1.000 1.025 
+
+I1  
+
+> 0.96
+> 0.98
+> 1.00
+> 1.02
+> 1.04
+> I2
+> 0.975 1.000 1.025
+
+I1    
+
+> 0.96
+> 0.98
+> 1.00
+> 1.02
+> 1.04
+> I3
+> 200 100 0100 200
+> 1
+> 0.96
+> 0.98
+> 1.00
+> 1.02
+> 1.04
+> I3
+
+(b) GSM 0.975 1.000 1.025 
+
+I1  
+
+> 0.96
+> 0.98
+> 1.00
+> 1.02
+> 1.04
+> I2
+> 0.975 1.000 1.025
+
+I1    
+
+> 0.96
+> 0.98
+> 1.00
+> 1.02
+> 1.04
+> I3
+> 200 100 0100 200
+> 1
+> 0.96
+> 0.98
+> 1.00
+> 1.02
+> 1.04
+> I3
+
+(c) MP 
+
+Figure 8: Free energy ψ visualization 
+
+Acknowledgements 
+
+We would like to thank Anthony Gruber (Sandia) for insights into metriplectic learning methods. This work was funded by the Laboratory Directed Research and Development (LDRD) program at Sandia National Laboratories; this funding is gratefully acknowledged. Sandia National Laboratories is a multi-mission laboratory managed and operated by National Technology & Engineering Solutions of Sandia, LLC (NTESS), a wholly owned subsidiary of Honeywell International Inc., for the U.S. Department of Energy’s National Nuclear Security Adminis-tration (DOE/NNSA) under contract DE-NA0003525. This written work is authored by an employee of NTESS. The employee, not NTESS, owns the right, title and interest in and to the written work and is responsible for its contents. Any subjective views or opinions that might be expressed in the written work do not necessarily represent the views of the U.S. Government. The publisher acknowledges that the U.S. Government retains a non-exclusive, paid-up, irrevocable, world-wide license to publish or reproduce the published form of this written work or allow others to do so, for U.S. Government purposes. The DOE will provide public access to results of federally sponsored research in accordance with the DOE Public Access Plan. This material is based upon work partially supported by the U.S. National Science Foundation under award No. 2452029. The opinions, findings, and conclusions, or recommendations expressed are those of the authors and do not necessarily reflect the views of the NSF. The authors acknowledge the Texas Advanced Computing Center (TACC) at The University of Texas at Austin for providing computational resources that have contributed to the research results reported within this paper. 19 Learning frameworks for modeling inelasticity A P REPRINT 10 5 0 5 10 
+
+k1      
+
+> 10
+> 5
+> 0
+> 5
+> 10
+> k2
+> 200 100 0100 200
+> 1
+> 10
+> 5
+> 0
+> 5
+> 10
+> k1
+> 0.975 1.000 1.025
+
+I1
+
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> I4
+
+(a) DP 10 5 0 5 10 
+
+k1      
+
+> 10
+> 5
+> 0
+> 5
+> 10
+> k2
+> 200 100 0100 200
+> 1
+> 10
+> 5
+> 0
+> 5
+> 10
+> k1
+> 0.975 1.000 1.025
+
+I1
+
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> I4
+
+(b) GSM 10 5 0 5 10 
+
+k1      
+
+> 10
+> 5
+> 0
+> 5
+> 10
+> k2
+> 200 100 0100 200
+> 1
+> 10
+> 5
+> 0
+> 5
+> 10
+> k1
+> 0.975 1.000 1.025
+
+I1
+
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> I4
+
+(c) MP 
+
+Figure 9: Dissipation potential ϕ visualization 
+
+A Implicit standard material (ISM) theory 
+
+The ISV framework leaves the evolution map r largely unrestricted beyond the dissipation requirement. Implicit standard materials [94, 95, 114] introduce additional structure by replacing the explicit flow rule with an implicit force–flux relation generated by a bipotential .
+
+Definition (Bipotential) A function 
+
+β = β( ˙ κ, k; Z) (A.1) is called a bipotential if, in addition to lower semicontinuity, it satisfies the following properties: 1. Separate convexity of the implicit functions: 
+
+˙κ 7 → β(k, ˙κ) is convex for fixed k, (A.2) 
+
+k 7 → β(k, ˙κ) is convex for fixed ˙κ. (A.3) 2. Generalized Fenchel inequality: 
+
+β(k, ˙κ) ≥ k · ˙κ for all (k, ˙κ) . (A.4) Here, Z = {E, κ, T, . . . } denotes a collection of auxiliary variables, which we suppress in the remainder of this section. Geometrically, the bipotential defines a surface in the ( ˙ κ, k) space that lies below the bilinear form k · ˙κ.The admissible evolution corresponds to those points where the two surfaces coincide. The conjugate force remains determined by the free energy as in the DP formulation, 
+
+k = −∂κψ . (A.5) 20 Learning frameworks for modeling inelasticity A P REPRINT EP VE VP     
+
+> 10 4
+> 10 3
+> 10 2
+> 10 1
+> RMSE
+> Model
+> DP
+> GS
+> MP
+
+(a) RVE/no closed form elastic plastic viscoelastic viscoplastic          
+
+> 10 9
+> 10 8
+> 10 7
+> 10 6
+> 10 5
+> 10 4
+> 10 3
+> 10 2
+> 10 1
+> RMSE
+> Model
+> DP
+> GS
+> MP
+
+(b) Homogeneous/closed form 
+
+Figure 10: Summary of validation errors for 10 independent trainings. The role of the bipotential is to define the admissible evolution of the internal variables through an implicit force–flux relation. Given the thermodynamic force k, the evolution rate ˙κ is required to satisfy 
+
+˙κ ∈ ∂kβ( ˙ κ, k). (A.6) Equivalently, admissible pairs ( ˙ κ, k) lie on the monotone graph characterized by 
+
+k ∈ ∂ ˙κβ, ˙κ ∈ ∂kβ. (A.7) Thermodynamic constraints then follow immediately from the generalized Fenchel inequality, since 
+
+Γ = k · ˙κ = β(k, ˙κ) ≥ 0. (A.8) If the bipotential is therefore normalized such that 
+
+β(k, ˙κ) ≥ 0, (A.9) on admissible pairs, thermodynamic consistency is ensured. We now examine specializations of ISM that correspond to common frameworks. 
+
+Dissipation potential (DP) In the classical dual dissipation potential formulation, the bipotential is chosen such that the force–flux relation is generated by a single convex potential depending only on the conjugate force. We write 
+
+β(k, ˙κ) = ϕ(k) − k · ˙κ. (A.10) The dual dissipation potential is assumed to satisfy 
+
+ϕ(k) convex, lower semicontinuous , ϕ(0) = 0 . (A.11) 21 Learning frameworks for modeling inelasticity A P REPRINT 
+
+Admissible evolution is characterized by the subdifferential relation 
+
+˙κ ∈ ∂kϕ(k) (A.12) By convexity of ϕ, the Fenchel inequality yields 
+
+ϕ(k) ≥ k · ˙κ. (A.13) Since ϕ(0) = 0 and convex functions attain their global minimum at stationary points, it follows that 
+
+ϕ(k) ≥ 0. (A.14) Consequently, 
+
+Γ = k · ˙κ ≥ 0 . (A.15) 
+
+Generalized standard material (GSM) The classical associative GSM structure is recovered when the bipotential is chosen in separable Fenchel form, i.e., 
+
+β(k, ˙κ) = ϕ∗( ˙ κ) + ϕ(k), (A.16) where ϕ∗ and ϕ form a Legendre–Fenchel dual pair. In particular, the dual potential ϕ = ϕ∗ is defined by 
+
+ϕ(k) = sup 
+
+> ˙κ
+
+(k · ˙κ − ϕ∗( ˙ κ)) , (A.17) and conversely 
+
+ϕ∗( ˙ κ) = sup 
+
+> k
+
+(k · ˙κ − ϕ(k)) , (A.18) By construction, this duality implies the Fenchel inequality 
+
+ϕ∗( ˙ κ) + ϕ(k) ≥ k · ˙κ. (A.19) Equality holds if and only if k and ˙κ are dual variables, i.e., 
+
+k ∈ ∂ ˙κϕ∗( ˙ κ) ⇐⇒ ˙κ ∈ ∂kϕ(k) (A.20) which yields associative normality. Under this condition, dissipation reduces to 
+
+Γ = k · ˙κ ≥ 0 . (A.21) This duality is not available for a general bipotential. A general bipotential β(k, ˙κ) is only assumed to be separately convex and to satisfy the generalized Fenchel inequality 
+
+β(k, ˙κ) ≥ k · ˙κ. (A.22) In contrast to the separable GSM choice β = ϕ + ϕ∗, an arbitrary (non-separable) β does not define a convex function of ˙κ whose Legendre–Fenchel transform produces a dual convex function of k. Equivalently, for general β there need not exist potentials ϕ∗( ˙ κ) and ϕ(k) such that 
+
+β( ˙ κ, k) = ϕ∗( ˙ κ) + ϕ(k) , (A.23) which is tied to the identity (18). The Legendre–Fenchel structure, and thus the one-to-one dual pairing between flux and force, is therefore a special case enforced by the separable GSM ansatz. 
+
+Metriplectic form A metriplectic-type structure is obtained when the bipotential is generated by a quadratic metric residual. We consider 
+
+β( ˙ κ, k) = 12 ( ˙ κ − M k )2 − 12 k · M k , (A.24) where the metric operator M = M(E, κ) is symmetric positive-definite: 
+
+M = MT ⪰ 0 . (A.25) Admissibility enforces the metric relation 
+
+˙κ = M k . (A.26) The resulting dissipation becomes 
+
+Γ = k · ˙κ = k · M k ≥ 0 , (A.27) which follows from the positive semi-definiteness of the M operator. 22 Learning frameworks for modeling inelasticity A P REPRINT 
+
+References 
+
+[1] Heinz Linhart and Walter Zucchini. Model selection. John Wiley & Sons, 1986. [2] Jie Ding, Vahid Tarokh, and Yuhong Yang. Model selection techniques: An overview. IEEE Signal Processing Magazine , 35(6):16–34, 2018. [3] Jan N Fuhg, Govinda Anantha Padmanabha, Nikolaos Bouklas, Bahador Bahmani, WaiChing Sun, Nikolaos N Vlassis, Moritz Flaschel, Pietro Carrara, and Laura De Lorenzis. A review on data-driven constitutive laws for solids: Jn fuhg et al. Archives of Computational Methods in Engineering , 32(3):1841–1883, 2025. [4] Dominik K Klein, Rogelio Ortigosa, Jesús Martínez-Frutos, and Oliver Weeger. Finite electro-elasticity with physics-augmented neural networks. Computer Methods in Applied Mechanics and Engineering , 400:115501, 2022. [5] Max Rosenkranz, Karl A Kalina, Jörg Brummund, WaiChing Sun, and Markus Kästner. Viscoelasticty with physics-augmented neural networks: model formulation and training methods without prescribed internal vari-ables. Computational Mechanics , 74(6):1279–1301, 2024. [6] Jan Niklas Fuhg, Reese Edward Jones, and Nikolaos Bouklas. Extreme sparsification of physics-augmented neural networks for interpretable model discovery in mechanics. Computer Methods in Applied Mechanics and Engineering , 426:116973, 2024. [7] Antoine Benady, Emmanuel Baranger, and Ludovic Chamoin. Nn-mcre: A modified constitutive relation error framework for unsupervised learning of nonlinear state laws with physics-augmented neural networks. Inter-national Journal for Numerical Methods in Engineering , 125(8):e7439, 2024. [8] Clément Jailin, Antoine Benady, Remi Legroux, and Emmanuel Baranger. Experimental learning of a hypere-lastic behavior with a physics-augmented neural network. Experimental Mechanics , 64(9):1465–1481, 2024. [9] Asghar A Jadoon, Karl A Kalina, Manuel K Rausch, Reese Jones, and Jan Niklas Fuhg. Inverse design of anisotropic microstructures using physics-augmented neural networks. Journal of the Mechanics and Physics of Solids , page 106161, 2025. [10] Adrian Buganza Tepole, Asghar Arshad Jadoon, Manuel Rausch, and Jan Niklas Fuhg. Polyconvex physics-augmented neural network constitutive models in principal stretches. International Journal of Solids and Struc-tures , page 113469, 2025. [11] Karl A Kalina, Jörg Brummund, and Markus Kästner. A physics-augmented neural network framework for finite strain incompressible viscoelasticity. arXiv preprint arXiv:2511.02959 , 2025. [12] Martin Zlati´ c and Marko ˇ Cana ¯ dija. Recovering mullins damage hyperelastic behaviour with physics augmented neural networks. Journal of the Mechanics and Physics of Solids , 193:105839, 2024. [13] Kevin Linka, Markus Hillgärtner, Kian P Abdolazizi, Roland C Aydin, Mikhail Itskov, and Christian J Cy-ron. Constitutive artificial neural networks: A fast and general approach to predictive data-driven constitutive modeling by deep learning. Journal of Computational Physics , 429:110010, 2021. [14] Kevin Linka and Ellen Kuhl. A new family of constitutive artificial neural networks towards automated model discovery. Computer Methods in Applied Mechanics and Engineering , 403:115731, 2023. [15] Hagen Holthusen, Lukas Lamm, Tim Brepols, Stefanie Reese, and Ellen Kuhl. Theory and implementation of inelastic constitutive artificial neural networks. Computer Methods in Applied Mechanics and Engineering ,428:117063, 2024. [16] Birte Boes, Jaan-Willem Simon, and Hagen Holthusen. Accounting for plasticity: An extension of inelastic constitutive artificial neural networks. arXiv preprint arXiv:2407.19326 , 2024. [17] Hagen Holthusen, Lukas Lamm, Tim Brepols, Stefanie Reese, and Ellen Kuhl. Polyconvex inelastic constitutive artificial neural networks. PAMM , 24(3):e202400032, 2024. [18] Kian P Abdolazizi, Kevin Linka, and Christian J Cyron. Viscoelastic constitutive artificial neural networks (vcanns)–a framework for data-driven anisotropic nonlinear finite viscoelasticity. Journal of computational physics , 499:112704, 2024. [19] Prakash Thakolkaran, Yaqi Guo, Shivam Saini, Mathias Peirlinck, Benjamin Alheit, and Siddhant Kumar. Can kan cans? input-convex kolmogorov-arnold networks (kans) as hyperelastic constitutive artificial neural net-works (cans). Computer Methods in Applied Mechanics and Engineering , 443:118089, 2025. [20] Samuel Greydanus, Misko Dzamba, and Jason Yosinski. Hamiltonian neural networks. Advances in neural information processing systems , 32, 2019. 23 Learning frameworks for modeling inelasticity A P REPRINT 
+
+[21] Miles Cranmer, Sam Greydanus, Stephan Hoyer, Peter Battaglia, David Spergel, and Shirley Ho. Lagrangian neural networks. arXiv preprint arXiv:2003.04630 , 2020. [22] Zhengdao Chen, Jianyu Zhang, Martin Arjovsky, and Léon Bottou. Symplectic recurrent neural networks. arXiv preprint arXiv:1909.13334 , 2019. [23] David González, Francisco Chinesta, and Elías Cueto. Thermodynamically consistent data-driven computa-tional mechanics. Continuum Mechanics and Thermodynamics , 31(1):239–253, 2019. [24] Anthony Gruber, Kookjin Lee, Haksoo Lim, Noseong Park, and Nathaniel Trask. Efficiently parameterized neural metriplectic systems. In The Thirteenth International Conference on Learning Representations , 2025. [25] Bernard D Coleman and Morton E Gurtin. Thermodynamics with internal state variables. The journal of chemical physics , 47(2):597–613, 1967. [26] Jean Lemaitre and Jean-Louis Chaboche. Mechanics of solid materials . Cambridge university press, 1994. [27] Bernard Halphen and Quoc Son Nguyen. Sur les matériaux standard généralisés. Journal de mécanique ,14(1):39–63, 1975. [28] Philip J Morrison. Bracket formulation for irreversible classical fields. Physics Letters A , 100(8):423–427, 1984. [29] Hans Christian Öttinger and Miroslav Grmela. Dynamics and thermodynamics of complex fluids. II. illustra-tions of a general formalism. Physical Review E , 56(6):6633, 1997. [30] Jan N Fuhg, Govinda Anantha Padmanabha, Nikolaos Bouklas, Bahador Bahmani, WaiChing Sun, Nikolaos N Vlassis, Moritz Flaschel, Pietro Carrara, and Laura De Lorenzis. A review on data-driven constitutive laws for solids. Archives of Computational Methods in Engineering , pages 1–43, 2024. [31] Sadi Carnot. Reflections on the motive power of fire, and on machines fitted to develop that power. Paris: Bachelier , 108(1824):1824, 1824. [32] James Prescott Joule. Xxxii. on the calorific effects of magneto-electricity, and on the mechanical value of heat. 
+
+The London, Edinburgh, and Dublin Philosophical Magazine and Journal of Science , 23(152):263–276, 1843. [33] Rudolf Clausius. Ueber die bewegende kraft der wärme und die gesetze, welche sich daraus für die wärmelehre selbst ableiten lassen. Annalen der Physik , 155(3):368–397, 1850. [34] Hermann Ludwig Ferdinand von Heimholtz. Ueber die Erhaltung der Kraft: eine physikalische Abhandlung: vorgetragen in der Sitzung der physikalischen Gesellschaft zu Berlin am 23sten Juli 1847 . G. Reimer, 1847. [35] William Thomson. Xv.—on the dynamical theory of heat, with numerical results deduced from mr joule’s equivalent of a thermal unit, and m. regnault’s observations on steam. Transactions of the Royal Society of Edinburgh , 20(2):261–288, 1853. [36] J Clerk-Maxwell. Xxii.—on the dynamical evidence of the molecular constitution of bodies. Journal of the Chemical Society , 28:493–508, 1875. [37] Josiah Willard Gibbs. Graphical methods in the thermodynamics of fluids. Transactions of the Connecticut Academy of Arts and Sciences , 1:309–342, 1873. [38] Lars Onsager. Reciprocal relations in irreversible processes. I. Physical review , 37(4):405, 1931. [39] Lars Onsager. Reciprocal relations in irreversible processes. II. Physical review , 38(12):2265, 1931. [40] Ilya Prigogine and Pierre Van Rysselberghe. Introduction to thermodynamics of irreversible processes. Journal of The Electrochemical Society , 110(4):97C, 1963. [41] Sybren Ruurds De Groot and Peter Mazur. Non-equilibrium thermodynamics . Courier Corporation, 2013. [42] Georgy Lebon, David Jou, and José Casas-Vázquez. Understanding non-equilibrium thermodynamics: foun-dations, applications, frontiers . Springer, 2008. [43] Pierre Duhem. II. Quelques réflexions au sujet de la physique expérimentale . Hermann, 2015. [44] Percy Williams Bridgman. The thermal conductivity of liquids under pressure. In Proceedings of the American Academy of Arts and Sciences , volume 59, pages 141–169. JSTOR, 1923. [45] Mark F Horstemeyer and Douglas J Bammann. Historical review of internal state variable theory for inelasticity. 
+
+International Journal of Plasticity , 26(9):1310–1334, 2010. [46] Carl Eckart. The thermodynamics of irreversible processes. i. the simple fluid. Physical Review , 58(3):267, 1940. [47] E Kröner. How the internal state of a plastically deformed body is to be described in a continuum theory. 1965. 24 Learning frameworks for modeling inelasticity A P REPRINT 
+
+[48] Gerard A Maugin and Wolfgang Muschik. Thermodynamics with internal variables. part i. general concepts. 1994. [49] Stefanie Reese and Sanjay Govindjee. A theory of finite viscoelasticity and numerical aspects. International journal of solids and structures , 35(26-27):3455–3482, 1998. [50] Paul Germain, Quoc Son Nguyen, and Pierre Suquet. Continuum thermodynamics. Journal of applied mechan-ics , 50:1010–1020, 1983. [51] Reese E Jones, Ari L Frankel, and KL Johnson. A neural ordinary differential equation framework for modeling inelastic stress response via internal state variables. Journal of Machine Learning for Modeling and Computing ,3(3), 2022. [52] Ricky TQ Chen, Yulia Rubanova, Jesse Bettencourt, and David K Duvenaud. Neural ordinary differential equations. Advances in neural information processing systems , 31, 2018. [53] Emilien Dupont, Arnaud Doucet, and Yee Whye Teh. Augmented neural odes. Advances in neural information processing systems , 32, 2019. [54] Moritz Flaschel, Siddhant Kumar, and Laura De Lorenzis. Automated discovery of generalized standard mate-rial models with euclid. Computer Methods in Applied Mechanics and Engineering , 405:115867, 2023. [55] Moritz Flaschel, Paul Steinmann, Laura De Lorenzis, and Ellen Kuhl. Convex neural networks learn generalized standard material models. Journal of the Mechanics and Physics of Solids , 200:106103, 2025. [56] Vahidullah Taç, Manuel K Rausch, Francisco Sahli Costabal, and Adrian Buganza Tepole. Data-driven anisotropic finite viscoelasticity using neural ordinary differential equations. Computer methods in applied mechanics and engineering , 411:116046, 2023. [57] Reese E Jones, Asghar Jadoon, D Thomas Seidl, and Jan N Fuhg. A physics-augmented neural network frame-work for modeling and detecting thermo-visco-plastic behavior. arXiv preprint arXiv:2512.09284 , 2025. [58] Hagen Holthusen and Ellen Kuhl. A complement to neural networks for anisotropic inelasticity at finite strains. 
+
+Computer Methods in Applied Mechanics and Engineering , 450:118612, 2026. [59] David Nieto Simavilla, Andrea Bonfanti, Imanol GarcÃa de Beristain, Pep EspaÃ ±ol, and Marco Ellero. Ham-mering at the entropy: A generic-guided approach to learning polymeric rheological constitutive equations using pinns. arXiv preprint arXiv:2409.07545 , 2024. [60] Quercus Hernández, Alberto Badías, Francisco Chinesta, and Elías Cueto. Port-metriplectic neural net-works: thermodynamics-informed machine learning of complex physical systems. Computational Mechanics ,72(3):553–561, 2023. [61] Alexander Mielke. Formulation of thermoelastic dissipative material behavior using generic. Continuum Me-chanics and Thermodynamics , 23(3):233–256, 2011. [62] Chady Ghnatios, Iciar Alfaro, David González, Francisco Chinesta, and Elias Cueto. Data-driven generic modeling of poroviscoelastic materials. Entropy , 21(12):1165, 2019. [63] Mark Schiebl and Peter Betsch. Structure-preserving space-time discretization of large-strain thermo-viscoelasticity in the framework of generic. International Journal for Numerical Methods in Engineering ,122(14):3448–3488, 2021. [64] Markus Hütter and Bob Svendsen. On the formulation of continuum thermodynamic models for solids as general equations for non-equilibrium reversible-irreversible coupling. Journal of Elasticity , 104(1):357–368, 2011. [65] Markus Hütter and Theo A Tervoort. Continuum damage mechanics: combining thermodynamics with a thoughtful characterization of the microstructure. Acta mechanica , 201(1):297–312, 2008. [66] Markus Hütter and Theo A Tervoort. Finite anisotropic elasticity and material frame indifference from a nonequilibrium thermodynamics perspective. Journal of Non-Newtonian Fluid Mechanics , 152(1-3):45–52, 2008. [67] Markus Hütter and Theo A Tervoort. Statistical-mechanics based modeling of anisotropic viscoplastic defor-mation. Mechanics of Materials , 80:37–51, 2015. [68] Miroslav Grmela. Why generic? Journal of non-newtonian fluid mechanics , 165(17-18):980–986, 2010. [69] C-C Wang. The principle of fading memory. Archive for Rational Mechanics and Analysis , 18(5):343–366, 1965. [70] Clifford Truesdell and Walter Noll. The non-linear field theories of mechanics. In The non-linear field theories of mechanics , pages 1–579. Springer, 2004. 25 Learning frameworks for modeling inelasticity A P REPRINT 
+
+[71] Bernard D Coleman and Walter Noll. The thermodynamics of elastic materials with heat conduction and viscosity. In The foundations of mechanics and thermodynamics: Selected papers , pages 145–156. Springer, 1974. [72] Jan N Fuhg, Asghar Jadoon, Oliver Weeger, D Thomas Seidl, and Reese E Jones. Polyconvex neural network models of thermoelasticity. Journal of the Mechanics and Physics of Solids , 192:105837, 2024. [73] Walter Noll. A new mathematical theory of simple materials. Archive for Rational Mechanics and Analysis ,48(1):1–50, 1972. [74] Donald R Smith. An introduction to continuum mechanics-after Truesdell and Noll , volume 22. Springer Science & Business Media, 1993. [75] Vito Antonio Cimmelli, Antonio Sellitto, and Vita Triani. A generalized coleman–noll procedure for the ex-ploitation of the entropy principle. Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences , 466(2115):911–925, 2010. [76] David Jou, José Casas-Vázquez, and Georgy Lebon. Extended irreversible thermodynamics. Reports on Progress in Physics , 51(8):1105, 1988. [77] David Jou, Jose Casas-Vazquez, and Georgy Lebon. Extended irreversible thermodynamics revisited (1988-98). 
+
+Reports on Progress in Physics , 62(7):1035, 1999. [78] J Kratochvil and OW Dillon Jr. Thermodynamics of elastic-plastic materials as a theory with internal state variables. Journal of Applied Physics , 40(8):3207–3218, 1969. [79] DL McDowell. Internal state variable theory. In Handbook of Materials Modeling: Methods , pages 1151–1169. Springer, 2005. [80] Reese E Jones and Jan N Fuhg. An attention-based neural ordinary differential equation framework for modeling inelastic processes. arXiv preprint arXiv:2502.10633 , 2025. [81] Hans Ziegler. Some extremum principles in irreversible thermodynamics, with application to continuum me-chanics. Progress in solid mechanics, vol. 4 , pages 93–193, 1963. [82] JJ Moreau. Sur les lois de frottement, de viscosité et de plasticité. CR Acad. Sci. Paris Sér. II Méc. Phys. Chim. Sci. Univers Sci. Terre , 271:608–611, 1970. [83] Niels Saabye Ottosen and Matti Ristinmaa. The mechanics of constitutive modeling . Elsevier, 2005. [84] Quoc Son Nguyen. Mechanical modelling of anelasticity. Revue de Physique Appliquée , 23(4):325–330, 1988. [85] AT McBride, B Daya Reddy, and Paul Steinmann. Dissipation-consistent modelling and classification of ex-tended plasticity formulations. Journal of the Mechanics and Physics of Solids , 119:118–139, 2018. [86] Maurice A Biot. Theory of stress-strain relations in anisotropic viscoelasticity and relaxation phenomena. 
+
+Journal of applied physics , 25(11):1385–1391, 1954. [87] Laurent Stainier. A variational approach to modeling coupled thermo-mechanical nonlinear dissipative behav-iors. Advances in Applied Mechanics , 46:69–126, 2013. [88] Philip J Morrison. A paradigm for joined hamiltonian and dissipative systems. Physica D: Nonlinear Phenom-ena , 18(1-3):410–419, 1986. [89] Miroslav Grmela and Hans Christian Öttinger. Dynamics and thermodynamics of complex fluids. I. develop-ment of a general formalism. Physical Review E , 56(6):6620, 1997. [90] Miroslav Grmela. Rheological modeling with generic and with the onsager principle. arXiv preprint arXiv:2507.22144 , 2025. [91] Miroslav Grmela. Generic guide to the multiscale dynamics and thermodynamics. Journal of Physics Commu-nications , 2(3):032001, 2018. [92] Hans Ziegler. Thermomechanics. Quarterly of Applied Mathematics , 30(1):91–107, 1972. [93] Herbert B Callen. Thermodynamics and an introduction to thermostatistics. John Wiley& Sons , 2, 1993. [94] Gery De Saxcé. Une généralisation de l’inégalité de fenchel et ses applications aux lois constitutives. Comptes rendus de l’Académie des sciences. Série 2, Mécanique, Physique, Chimie, Sciences de l’univers, Sciences de la Terre , 314(2):125–129, 1992. [95] G Bodovillé. The implicit standard material theory for modelling the nonassociative behaviour of metals. 
+
+Archive of Applied Mechanics , 71(6):426–435, 2001. [96] Asghar A Jadoon, D Thomas Seidl, Reese E Jones, and Jan N Fuhg. Input specific neural networks. Computa-tional Mechanics , pages 1–23, 2026. 26 Learning frameworks for modeling inelasticity A P REPRINT 
+
+[97] Jan N Fuhg, Nikolaos Bouklas, and Reese E Jones. Stress representations for tensor basis neural networks: al-ternative formulations to finger–rivlin–ericksen. Journal of Computing and Information Science in Engineering ,24(11):111007, 2024. [98] Jan N Fuhg, Nikolaos Bouklas, and Reese E Jones. Learning hyperelastic anisotropy from data via a tensor basis neural network. Journal of the Mechanics and Physics of Solids , 168:105022, 2022. [99] John M Ball. Convexity conditions and existence theorems in nonlinear elasticity. Archive for rational mechan-ics and Analysis , 63(4):337–403, 1976. [100] Jörg Schröder and Patrizio Neff. Invariant formulation of hyperelastic transverse isotropy based on polyconvex free energy functions. International journal of solids and structures , 40(2):401–445, 2003. [101] Alexander Mielke. Necessary and sufficient conditions for polyconvexity of isotropic functions. Journal of Convex Analysis , 12(2):291, 2005. [102] Jörg Schröder. Anisotropie polyconvex energies. Poly-, quasi-and rank-one convexity in applied mechanics ,pages 53–105, 2010. [103] Quercus Hernández, Alberto Badías, David González, Francisco Chinesta, and Elías Cueto. Structure-preserving neural networks. Journal of Computational Physics , 426:109950, 2021. [104] Petre Birtea and Dan Com˘ anescu. Asymptoic stability of dissipated hamilton–poisson systems. SIAM Journal on Applied Dynamical Systems , 8(3):967–976, 2009. [105] Yang Liu, Jingfa Li, Shuyu Sun, and Bo Yu. Advances in gaussian random field generation: a review. Compu-tational Geosciences , 23(5):1011–1047, 2019. [106] Reese E Jones, Craig M Hamel, Dan Bolintineanu, Kyle Johnson, Robert Buarque de Macedo, Jan Fuhg, Nikolaos Bouklas, and Sharlotte Kramer. Multiscale simulation of spatially correlated microstructure via a latent space representation. International Journal of Solids and Structures , 301:112966, 2024. [107] Kevin Nicholas Long and Judith Alice Brown. A linear viscoelastic model calibration of sylgard 184. Technical report, Sandia National Lab.(SNL-NM), Albuquerque, NM (United States), 2017. [108] Franz Roters, Philip Eisenlohr, Thomas R Bieler, and Dierk Raabe. Crystal plasticity finite element methods: in materials science and engineering , volume 1. Wiley Online Library, 2010. [109] H Mecking and UF Kocks. Kinetics of flow and strain-hardening. Acta metallurgica , 29(11):1865–1875, 1981. [110] Diederik P Kingma and Jimmy Ba. Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980 , 2014. [111] Jan N Fuhg and Nikolaos Bouklas. On physics-informed data-driven isotropic and anisotropic constitutive mod-els through probabilistic machine learning and space-filling sampling. Computer Methods in Applied Mechanics and Engineering , 394:114915, 2022. [112] Juan C Simo and Thomas JR Hughes. Computational inelasticity . Springer, 1998. [113] Philipp Junker and Daniel Balzani. An extended hamilton principle as unifying theory for coupled problems and dissipative microstructure evolution. Continuum Mechanics and Thermodynamics , 33(4):1931–1956, 2021. [114] Géry de Saxcé and Lahbib Bousshine. Implicit standard materials. In Inelastic Behaviour of Structures under Variable Repeated Loads: Direct Analysis Methods , pages 59–76. Springer, 2002. 27

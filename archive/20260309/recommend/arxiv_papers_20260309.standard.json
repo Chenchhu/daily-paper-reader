@@ -1,0 +1,355 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-03-09T19:28:22.584091+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 3,
+    "deep_cap": 6,
+    "deep_selected": 3,
+    "quick_candidates": 6,
+    "quick_skim_target": 11,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2603.01532v1",
+      "title": "On the Intrinsic Link between Gradient Strengthening and Passivation Onset in Single Crystal Plasticity",
+      "abstract": "A finite-deformation framework for gradient crystal plasticity is developed within a thermodynamically consistent setting grounded in Gurtin's power-conjugate formulation. The model introduces a flow rule that accounts explicitly for both energetic and dissipative microstress contributions. Numerical simulations are performed to investigate the response of single crystals subjected to passivation-type boundary constraints. The results reveal that constitutive laws capable of reproducing size-dependent strengthening at the onset of plastic flow simultaneously generate a pronounced, nearly elastic-type response when passivation is imposed. These findings establish a fundamental connection between gradient-induced yield strengthening and boundary-driven elevation of the mechanical response, highlighting the essential influence of dissipative gradient effects.",
+      "authors": [
+        "Habib Pouriayevali"
+      ],
+      "primary_category": "physics.comp-ph",
+      "categories": [
+        "physics.comp-ph",
+        "cond-mat.mtrl-sci"
+      ],
+      "published": "2026-03-02T07:02:50+00:00",
+      "link": "https://arxiv.org/pdf/2603.01532v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "finite-deformation framework for gradient crystal plasticity",
+      "llm_evidence_cn": "梯度晶体塑性的有限变形框架",
+      "llm_evidence": "梯度晶体塑性的有限变形框架",
+      "canonical_evidence": "梯度晶体塑性的有限变形框架",
+      "llm_tldr_en": "Explores the link between gradient strengthening and passivation in single crystal plasticity.",
+      "llm_tldr_cn": "探讨了单晶塑性中梯度强化与钝化起始之间的内在联系。",
+      "llm_tldr": "探讨了单晶塑性中梯度强化与钝化起始之间的内在联系。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "crystal plasticity and viscoplastic phase field",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.04287v1",
+      "title": "The effect of chemical vapor infiltration process parameters on flexural strength of porous α-SiC: A numerical model",
+      "abstract": "The flexural strength variability of α-SiC based ceramics at elevated temperatures creates the need for an Integrated Computational Materials Engineering (ICME) framework that relates the strength of a specimen directly to its manufacturing process. To create this ICME framework a model must first be developed which establishes a relationship between the chemical vapor infiltration (CVI) process and parameters, the resulting mesoscale pores, and the overall macroscale flexural strength. Here a nonlinear single pore model of CVI is developed used in conjunction with a four-way coupled themo-mechanical damage model. The individual components of the model are tested and a sample system under a four-point bending test is explored. Results indicate that specimens with an initial porosity greater than 30% require temperatures below 1273 K to maintain structural integrity, while those with initial porosities less than 30% are temperature-independent, allowing for optimization of the CVI processing time without compromising strength.",
+      "authors": [
+        "Joseph J. Marziale",
+        "Jason Sun",
+        "Eric A. Walker",
+        "Yu Chen",
+        "David Salac",
+        "James Chen"
+      ],
+      "primary_category": "cond-mat.mtrl-sci",
+      "categories": [
+        "cond-mat.mtrl-sci"
+      ],
+      "published": "2026-03-04T17:03:15+00:00",
+      "link": "https://arxiv.org/pdf/2603.04287v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "thermo-mechanical damage model for porous ceramics",
+      "llm_evidence_cn": "多孔陶瓷的热力损伤模型",
+      "llm_evidence": "多孔陶瓷的热力损伤模型",
+      "canonical_evidence": "多孔陶瓷的热力损伤模型",
+      "llm_tldr_en": "Couples a chemical vapor infiltration model with a thermo-mechanical damage model for porous SiC.",
+      "llm_tldr_cn": "将化学气相渗透模型与热力耦合损伤模型结合，研究多孔碳化硅强度。",
+      "llm_tldr": "将化学气相渗透模型与热力耦合损伤模型结合，研究多孔碳化硅强度。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "thermo hydro mechanical coupling in porous rock mass fracture",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.04354v1",
+      "title": "Out-of-distribution transfer of PDE foundation models to material dynamics under extreme loading",
+      "abstract": "Most PDE foundation models are pretrained and fine-tuned on fluid-centric benchmarks. Their utility under extreme-loading material dynamics remains unclear. We benchmark out-of-distribution transfer on two discontinuity-dominated regimes in which shocks, evolving interfaces, and fracture produce highly non-smooth fields: shock-driven multi-material interface dynamics (perturbed layered interface or PLI) and dynamic fracture/failure evolution (FRAC). We formulate the downstream task as terminal-state prediction, i.e., learning a long-horizon map that predicts the final state directly from the first snapshot without intermediate supervision. Using a unified training and evaluation protocol, we evaluate two open-source pretrained PDE foundation models, POSEIDON and MORPH, and compare fine-tuning from pretrained weights against training from scratch across training-set sizes to quantify sample efficiency under distribution shift.",
+      "authors": [
+        "Mahindra Rautela",
+        "Alexander Most",
+        "Siddharth Mansingh",
+        "Aleksandra Pachalieva",
+        "Bradley Love",
+        "Daniel O Malley",
+        "Alexander Scheinker",
+        "Kyle Hickmann",
+        "Diane Oyen",
+        "Nathan Debardeleben",
+        "Earl Lawrence",
+        "Ayan Biswas"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-03-04T18:19:35+00:00",
+      "link": "https://arxiv.org/pdf/2603.04354v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "foundation models for dynamic fracture and failure evolution",
+      "llm_evidence_cn": "动态断裂与失效演化的基础模型",
+      "llm_evidence": "动态断裂与失效演化的基础模型",
+      "canonical_evidence": "动态断裂与失效演化的基础模型",
+      "llm_tldr_en": "Benchmarks PDE foundation models for predicting terminal states in dynamic fracture and material failure.",
+      "llm_tldr_cn": "评估PDE基础模型在预测动态断裂和材料失效最终状态方面的表现。",
+      "llm_tldr": "评估PDE基础模型在预测动态断裂和材料失效最终状态方面的表现。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "numerical simulation of crack initiation and propagation",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2603.01420v1",
+      "title": "Tackling multiphysics problems via finite element-guided physics-informed operator learning",
+      "abstract": "This work presents a finite element-guided physics-informed operator learning framework for multiphysics problems with coupled partial differential equations (PDEs) on arbitrary domains. Implemented with Folax, a JAX-based operator-learning platform, the proposed framework learns a mapping from the input parameter space to the solution space with a weighted residual formulation based on the finite element method, enabling discretization-independent prediction beyond the training resolution without relying on labaled simulation data. The present framework for multiphysics problems is verified on nonlinear thermo-mechanical problems. Two- and three-dimensional representative volume elements with varying heterogeneous microstructures, and a close-to-reality industrial casting example under varying boundary conditions are investigated as the example problems. We investigate the potential of several neural operator backbones, including Fourier neural operators (FNOs), deep operator networks (DeepONets), and a newly proposed implicit finite operator learning (iFOL) approach based on conditional neural fields. The results demonstrate that FNOs yield highly accurate solution operators on regular domains, where the global topology can be efficiently learned in the spectral domain, and iFOL offers efficient parametric operator learning capabilities for complex and irregular geometries. Furthermore, studies on training strategies, network decomposition, and training sample quality reveal that a monolithic training strategy using a single network is sufficient for accurate predictions, while training sample quality strongly influences performance. Overall, the present approach highlights the potential of physics-informed operator learning with a finite element-based loss as a unified and scalable approach for coupled multiphysics simulations.",
+      "authors": [
+        "Yusuke Yamazaki",
+        "Reza Najian Asl",
+        "Markus Apel",
+        "Mayu Muramatsu",
+        "Shahed Rezaei"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-03-02T03:52:51+00:00",
+      "link": "https://arxiv.org/pdf/2603.01420v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "operator learning for nonlinear thermo-mechanical problems",
+      "llm_evidence_cn": "非线性热力学问题的算子学习",
+      "llm_evidence": "非线性热力学问题的算子学习",
+      "canonical_evidence": "非线性热力学问题的算子学习",
+      "llm_tldr_en": "A finite element-guided operator learning framework for solving coupled multiphysics and thermo-mechanical problems.",
+      "llm_tldr_cn": "一种有限元引导的算子学习框架，用于解决耦合的多物理场和热力学问题。",
+      "llm_tldr": "一种有限元引导的算子学习框架，用于解决耦合的多物理场和热力学问题。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "thermo hydro mechanical coupling in porous rock mass fracture",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2603.01362v1",
+      "title": "Asymptotic long-time behavior of Darcy--Boussinesq convection in layered porous media with narrow transition zones",
+      "abstract": "We study the asymptotic long-time behavior of Darcy--Boussinesq convection in layered porous media with narrow transition zones in the material properties. As the transition-layer width tends to zero, we prove the upper semi-continuous convergence of the global attractor, invariant measure, and Nusselt number to their counterparts in the limiting sharp-interface model. We also show that the global attractors have finite fractal dimensions, with an explicit upper bound uniform in the transition-layer width. The analysis combines a carefully designed background temperature/contaminant profile together with a novel choice of phase space that ensures global well-posedness of the model and asymptotic compactness of the solution semigroup, and a new interpolation inequality. The phase space is associated with fractional powers of the principal elliptic operator with discontinuous coefficients. These results provide a rigorous long-time validation of the sharp-interface Darcy--Boussinesq model and extend our earlier finite-time convergence theory (H. Dong and X. Wang, SIAM J. Appl. Math. 85 (2025), 1621--1642) to the long-time regime.",
+      "authors": [
+        "Kaijian Sha",
+        "Xiaoming Wang",
+        "Hao Wu"
+      ],
+      "primary_category": "math.AP",
+      "categories": [
+        "math.AP"
+      ],
+      "published": "2026-03-02T01:42:06+00:00",
+      "link": "https://arxiv.org/pdf/2603.01362v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Darcy-Boussinesq convection in layered porous media",
+      "llm_evidence_cn": "分层多孔介质中的Darcy-Boussinesq对流",
+      "llm_evidence": "分层多孔介质中的Darcy-Boussinesq对流",
+      "canonical_evidence": "分层多孔介质中的Darcy-Boussinesq对流",
+      "llm_tldr_en": "Analysis of long-time behavior of convection in layered porous media with transition zones.",
+      "llm_tldr_cn": "分析具有过渡带的分层多孔介质中对流的渐近长期行为。",
+      "llm_tldr": "分析具有过渡带的分层多孔介质中对流的渐近长期行为。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "multiphysics coupling in porous media",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.02968v1",
+      "title": "Phase-field investigation of non-isothermal solidification coupled with melt flow dynamics",
+      "abstract": "Solidification, coupled with melt flow, plays a critical role in determining the microstructure and properties of materials in several manufacturing processes. Phase-field models coupled with the Navier-Stokes equations are widely used to model and simulate these dynamics. However, most existing models neglect essential thermodynamic couplings, particularly the capillary (Korteweg) stress in the momentum equation. This stress, which arises from the coupling between the phase field and the melt flow, accounts for thermal capillary effects during non-isothermal solidification. Neglecting it leads to models inconsistent with non-equilibrium thermodynamics and incapable of capturing capillarity-driven melt flow. In this work, we present a thermodynamically consistent, non-isothermal phase-field model for solidification coupled with melt flow, incorporating cross-coupling terms and explicitly including the Korteweg stress in the momentum equation. Model validation is performed for solidification-only cases, followed by simulations of dendritic growth under melt flow. The results show that thermal capillary effects induce flow near the interface, influencing dendrite tip velocity and morphology. Simulations under forced convection further demonstrate asymmetric dendrite growth due to the imposed flow field. Additionally, we numerically demonstrate the influence of viscosity interpolation schemes on enforcing the no-slip boundary condition in phase-field models with melt flow.",
+      "authors": [
+        "Timileyin David Oyedeji",
+        "Aaron Brunk",
+        "Yangyiwei Yang",
+        "Herbert Egger",
+        "Holger Marschall",
+        "Bai-Xiang Xu"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "cond-mat.mtrl-sci"
+      ],
+      "published": "2026-03-03T13:23:19+00:00",
+      "link": "https://arxiv.org/pdf/2603.02968v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "phase-field investigation of non-isothermal solidification and melt flow",
+      "llm_evidence_cn": "非等温凝固与熔体流动的相场研究",
+      "llm_evidence": "非等温凝固与熔体流动的相场研究",
+      "canonical_evidence": "非等温凝固与熔体流动的相场研究",
+      "llm_tldr_en": "A phase-field model incorporating capillary stress for non-isothermal solidification coupled with melt flow.",
+      "llm_tldr_cn": "一种结合毛细应力的相场模型，用于模拟非等温凝固与熔体流动的耦合。",
+      "llm_tldr": "一种结合毛细应力的相场模型，用于模拟非等温凝固与熔体流动的耦合。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "phase field modeling of fracture and damage",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2603.02645v1",
+      "title": "A hierarchy of thermodynamics learning frameworks for inelastic constitutive modeling",
+      "abstract": "Recent advances in physics-augmented neural networks have enabled thermodynamically consistent data-driven constitutive modeling of complex inelastic materials. Most existing approaches, however, implicitly adopt a specific thermodynamic framework and embed structural assumptions such as normality, dual dissipation potentials, or other structure from manually constructed models directly into the learning architecture. Consequently, differences in predictive performance may arise not only from data or network design, but also from the underlying theoretical assumptions. In this work, we present a unified comparison of several thermodynamically consistent inelastic modeling frameworks from a machine learning perspective. We consider internal-variable formulations with dissipation potential, generalized standard materials, and metriplectic structures, and we analyze their structural assumptions, admissible dependencies, convexity requirements, and implications for dissipation and evolution. Each framework is implemented within a common neural potential architecture based on invariant representations and neural ordinary differential equations. This unified setting ensures that performance differences can be attributed to thermodynamic structure rather than architectural variation. The models are trained and evaluated on three representative inelastic datasets generated from high-fidelity representative volume element simulations: an elastoplastic alloy, a viscoelastic composite, and a rate-dependent crystal plasticity polycrystal. By isolating the role of thermodynamic structure, we assess how restrictions such as duality, normality, operator-based evolution, and convexity influence learnability, expressiveness, stability, and generalization.",
+      "authors": [
+        "Reese E. Jones",
+        "Jan N. Fuhg"
+      ],
+      "primary_category": "cond-mat.mtrl-sci",
+      "categories": [
+        "cond-mat.mtrl-sci"
+      ],
+      "published": "2026-03-03T06:22:02+00:00",
+      "link": "https://arxiv.org/pdf/2603.02645v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "thermodynamically consistent inelastic constitutive modeling",
+      "llm_evidence_cn": "热力学一致的非弹性本构模型",
+      "llm_evidence": "热力学一致的非弹性本构模型",
+      "canonical_evidence": "热力学一致的非弹性本构模型",
+      "llm_tldr_en": "Compares thermodynamic frameworks for data-driven inelastic constitutive modeling using machine learning.",
+      "llm_tldr_cn": "从机器学习角度比较了用于非弹性本构建模的热力学一致性框架。",
+      "llm_tldr": "从机器学习角度比较了用于非弹性本构建模的热力学一致性框架。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "constitutive laws for rock damage and plasticity",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.05080v1",
+      "title": "Quantifying Salt Precipitation During CO2 Injection: How Flow Rate, Temperature, and Phase State Control Near-Wellbore Crystallization",
+      "abstract": "Salt precipitation near injection wells can reduce permeability, induce excess pressure buildup, and reduce injectivity within days to weeks of CO2 injection, yet the pore-scale mechanisms coupling multiphase flow, evaporation, and crystallization warrant further detailed quantification across variable phase states and flow regimes. We present high-resolution microfluidic experiments that systematically quantify the dynamics of halite crystallization during CO2-driven brine evaporation across liquid, gaseous, and supercritical phases (50-80 bar, 20--60 C, Pe = 50--1440). Crystallization kinetics are controlled by transport, with the Avrami rate constant (K) increasing by two orders of magnitude with the Peclet number and exhibiting the dependence of the temperature of Arrhenius (Ea = 58.6 kJ/mol. Supercritical CO2 achieves superior displacement efficiency (residual saturation 0.22-0.36, fractal dimension D = 1.79-1.82) and the fastest evaporation (Sherwood numbers 2-3x higher than the liquid phase), reducing the nucleation time from 57 min (20C, liquid) to <1 min (40-60 C, gas/supercritical). The final fractions of crystal increase 10-fold from liquid (0.008) to gas-phase conditions (0.08--0.12), confirming that convective transport and phase state dominate over diffusion-limited mechanisms. Despite probabilistic nucleation, final crystal distributions are spatially rather uniform with no systematic inlet-outlet bias. These quantitative relationships between dimensionless parameters (Pe, Sh), kinetic constants (K, Ea) and phase-dependent displacement patterns provide critical benchmarks for validating pore-scale models and predicting near-wellbore permeability impairment in geological storage of saline and hypersaline CO2.",
+      "authors": [
+        "Karol M. Dąbrowski",
+        "Mohammad Nooraiepour",
+        "Mohammad Masoudi"
+      ],
+      "primary_category": "physics.geo-ph",
+      "categories": [
+        "physics.geo-ph"
+      ],
+      "published": "2026-03-05T11:52:20+00:00",
+      "link": "https://arxiv.org/pdf/2603.05080v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "multiphase flow and crystallization in porous media",
+      "llm_evidence_cn": "多孔介质中的多相流与结晶",
+      "llm_evidence": "多孔介质中的多相流与结晶",
+      "canonical_evidence": "多孔介质中的多相流与结晶",
+      "llm_tldr_en": "Quantifies salt precipitation dynamics during CO2 injection in porous media using microfluidics.",
+      "llm_tldr_cn": "通过微流控实验量化了二氧化碳注入过程中多孔介质内的盐析动力学。",
+      "llm_tldr": "通过微流控实验量化了二氧化碳注入过程中多孔介质内的盐析动力学。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "multiphysics coupling in porous media",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2603.02800v1",
+      "title": "HERB: a unified framework for the evaluation of Hydrogen Embrittlement mechanisms driven by the Rice-Beltz concept",
+      "abstract": "The multiscale picture of hydrogen embrittlement (HE) mechanisms has been under controversy for a long time. Here I report a thermomechanically-consistent HERB framework driven by the Rice-Beltz concept meanwhile incorporating the hydrogen transport near the crack-tip and void growth within the plastic zone. Triggered solely by dislocation emission from the crack tip, the HERB theory unifies multiple HE mechanisms, such as HEDE, HELP, NVC and HESIV within a single framework. Specifically, a generalized model for predicting the hydrogen-informed dislocation emission is established by incorporating the Rice-Beltz model with the transition state theory. Accounting for the dynamic variation of the trapping energy of spherical inclusions, hydrogen transport is modeled in the dislocation free zone in front of the crack tip. Semi-analytical expressions of the density of geometrically necessary dislocations are obtained by incorporating the Hutchinson-Rice-Rosengren solution with the conventional theory of mechanism-based strain gradient plasticity model. By exploring the feasibility of stochastic analysis, the present theory demonstrates that the hydrogen-informed void dynamics is dominated by the dislocation density between the limits of Lifshitz-Allen-Cahn and Lifshitz-Slyozov-Wagner laws, even though individual events remain unpredictable. These insights fundamentally reshape hydrogen/dislocation interactions across multiple scales, including the core width, short-range and long-range levels.",
+      "authors": [
+        "Kai Zhao"
+      ],
+      "primary_category": "cond-mat.mtrl-sci",
+      "categories": [
+        "cond-mat.mtrl-sci",
+        "math-ph",
+        "physics.app-ph"
+      ],
+      "published": "2026-03-03T09:37:46+00:00",
+      "link": "https://arxiv.org/pdf/2603.02800v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "hydrogen transport near crack-tip and void growth",
+      "llm_evidence_cn": "裂纹尖端附近的氢传输与孔洞生长",
+      "llm_evidence": "裂纹尖端附近的氢传输与孔洞生长",
+      "canonical_evidence": "裂纹尖端附近的氢传输与孔洞生长",
+      "llm_tldr_en": "Introduces a thermomechanically-consistent framework for hydrogen embrittlement and crack-tip mechanisms.",
+      "llm_tldr_cn": "引入了一个热力学一致的氢脆框架，统一了裂纹尖端的多种脆化机制。",
+      "llm_tldr": "引入了一个热力学一致的氢脆框架，统一了裂纹尖端的多种脆化机制。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "numerical simulation of crack initiation and propagation",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

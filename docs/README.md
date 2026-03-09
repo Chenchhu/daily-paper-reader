@@ -6,67 +6,49 @@
 - [推荐链路与日报结构说明](/newbie/workflow)
 
 ## 每次日报
-- 最新运行日期：2026-02-08 ~ 2026-03-09
-- 运行时间：2026-03-09 05:28:51 UTC
+- 最新运行日期：2026-03-09
+- 运行时间：2026-03-09 19:30:09 UTC
 - 运行状态：成功
-- 本次总论文数：15
-- 精读区：0
-- 速读区：15
+- 本次总论文数：9
+- 精读区：3
+- 速读区：6
 
 ### 今日简报（AI）
-今日速览 15 篇前沿论文，深度揭示地幔水循环机制并突破固体力学仿真边界。
-重点推荐
-- 详情：[/20260208-20260309/README](/20260208-20260309/README)
+今日精选 9 篇前沿研究，深度解析单晶塑性强化机制与多孔碳化硅的工艺优化。
+重点关注梯度强化与钝化起始的内在联系，以及化学气相渗透参数对 α-SiC 弯曲强度的定量影响。
+建议优先研读单晶塑性与材料制备的数值模型，并关注物理信息算子学习在多物理场问题中的应用。
+- 详情：[/202603/09/README](/202603/09/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [On the Intrinsic Link between Gradient Strengthening and Passivation Onset in Single Crystal Plasticity](/202603/09/2603.01532v1-on-the-intrinsic-link-between-gradient-strengthening-and-passivation-onset-in-single-crystal-plasticity)  
+   标签：评分：8.0/10、query:pf-roc
+   evidence：梯度晶体塑性的有限变形框架
+2. [The effect of chemical vapor infiltration process parameters on flexural strength of porous α-SiC: A numerical model](/202603/09/2603.04287v1-the-effect-of-chemical-vapor-infiltration-process-parameters-on-flexural-strength-of-porous--sic-a-numerical-model)  
+   标签：评分：8.0/10、query:pf-roc
+   evidence：多孔陶瓷的热力损伤模型
+3. [Out-of-distribution transfer of PDE foundation models to material dynamics under extreme loading](/202603/09/2603.04354v1-out-of-distribution-transfer-of-pde-foundation-models-to-material-dynamics-under-extreme-loading)  
+   标签：评分：8.0/10、query:pf-roc
+   evidence：动态断裂与失效演化的基础模型
 
 ### 速读区论文标签
-1. [Water-induced buoyancy controls transient water storage in the mantle transition zone](/20260208-20260309/2602.13820v1-water-induced-buoyancy-controls-transient-water-storage-in-the-mantle-transition-zone)  
-   标签：评分：9.0/10、query:pf-roc
-   evidence：地幔岩石的二维热-水-力-化 (THMC) 耦合模拟
-2. [SoliDualSPHysics: An extension of DualSPHysics for solid mechanics with hyperelasticity, plasticity, and fracture](/20260208-20260309/2602.15149v1-solidualsphysics-an-extension-of-dualsphysics-for-solid-mechanics-with-hyperelasticity-plasticity-and-fracture)  
-   标签：评分：9.0/10、query:pf-roc
-   evidence：耦合SPH的脆性断裂相场方法
-3. [Adaptive isogeometric analysis of high-order phase-field fracture based on THB-splines](/20260208-20260309/2602.21685v1-adaptive-isogeometric-analysis-of-high-order-phase-field-fracture-based-on-thb-splines)  
-   标签：评分：9.0/10、query:pf-roc
-   evidence：高阶相场断裂的自适应等几何分析
-4. [Consistent initialization of mixed-dimensional multiphysics models for fractured reservoirs under geomechanical constraints and field measurements](/20260208-20260309/2603.01835v1-consistent-initialization-of-mixed-dimensional-multiphysics-models-for-fractured-reservoirs-under-geomechanical-constraints-and-field-measurements)  
-   标签：评分：9.0/10、query:pf-roc
-   evidence：裂隙储层的多物理场模型和地质力学约束
-5. [Damage Prediction of Sintered α-SiC Using Thermo-mechanical Coupled Fracture Model](/20260208-20260309/2603.04753v1-damage-prediction-of-sintered--sic-using-thermo-mechanical-coupled-fracture-model)  
-   标签：评分：9.0/10、query:pf-roc
-   evidence：损伤相场与热力耦合断裂模型
-6. [An Energy-Stable, Bound-Preserving and Locally Conservative Numerical Framework for Multicomponent Gas Flow in Poroelastic Media](/20260208-20260309/2602.10550v1-an-energy-stable-bound-preserving-and-locally-conservative-numerical-framework-for-multicomponent-gas-flow-in-poroelastic-media)  
-   标签：评分：8.0/10、query:pf-roc
-   evidence：多组分气体流动与多孔弹性介质固体变形的耦合
-7. [Bound-Preserving Adaptive Time-Stepping Method with Energy Stability for Simulating Compressible Gas Flow in Poroelastic Media](/20260208-20260309/2602.10803v2-bound-preserving-adaptive-time-stepping-method-with-energy-stability-for-simulating-compressible-gas-flow-in-poroelastic-media)  
-   标签：评分：8.0/10、query:pf-roc
-   evidence：涉及可变形岩石的多孔弹性介质中的气体流动
-8. [Adaptive Physics Transformer with Fused Global-Local Attention for Subsurface Energy Systems](/20260208-20260309/2602.11208v1-adaptive-physics-transformer-with-fused-global-local-attention-for-subsurface-energy-systems)  
-   标签：评分：8.0/10、query:pf-roc
-   evidence：用于地下能源系统和耦合物理过程的神经算子
-9. [A physics-informed data-driven framework for modeling hyperelastic materials with progressive damage and failure](/20260208-20260309/2602.11414v1-a-physics-informed-data-driven-framework-for-modeling-hyperelastic-materials-with-progressive-damage-and-failure)  
-   标签：评分：8.0/10、query:pf-roc
-   evidence：渐进损伤与破坏的本构建模
-10. [Eigenfracture approximation of quasi-static crack growth in brittle materials](/20260208-20260309/2602.11915v1-eigenfracture-approximation-of-quasi-static-crack-growth-in-brittle-materials)  
-   标签：评分：8.0/10、query:pf-roc
-   evidence：基于特征变形的准静态裂纹扩展变分理论
-11. [Multiscale Hyperbolic-Parabolic Models for Nonlinear Reactive Transport in Heterogeneously Fractured Porous Media](/20260208-20260309/2602.16439v1-multiscale-hyperbolic-parabolic-models-for-nonlinear-reactive-transport-in-heterogeneously-fractured-porous-media)  
-   标签：评分：8.0/10、query:pf-roc
-   evidence：裂隙多孔介质中反应输运的多尺度模型
-12. [Optimal Error Estimates of a new Multiphysic Finite Element Method for Nonlinear Poroelasticity model with Hencky-Mises Stress Tensor](/20260208-20260309/2602.19457v1-optimal-error-estimates-of-a-new-multiphysic-finite-element-method-for-nonlinear-poroelasticity-model-with-hencky-mises-stress-tensor)  
-   标签：评分：8.0/10、query:pf-roc
-   evidence：非线性多孔弹性模型的多物理场有限元法
-13. [Surrogate models for Rock-Fluid Interaction: A Grid-Size-Invariant Approach](/20260208-20260309/2602.22188v1-surrogate-models-for-rock-fluid-interaction-a-grid-size-invariant-approach)  
-   标签：评分：8.0/10、query:pf-roc
-   evidence：多孔介质中岩石-流体相互作用的代理模型
-14. [A phase-field framework for anisotropic viscoelastic-viscoplastic fracture in short fiber-reinforced polymers in hygrothermal environments](/20260208-20260309/2603.02826v1-a-phase-field-framework-for-anisotropic-viscoelastic-viscoplastic-fracture-in-short-fiber-reinforced-polymers-in-hygrothermal-environments)  
-   标签：评分：8.0/10、query:pf-roc
-   evidence：湿热环境下各向异性粘弹性-粘塑性断裂的相场框架
-15. [Insights into hydrogen-induced vacancy stability and creep in chemically complex alloys](/20260208-20260309/2603.03707v1-insights-into-hydrogen-induced-vacancy-stability-and-creep-in-chemically-complex-alloys)  
-   标签：评分：8.0/10、query:pf-roc
-   evidence：氢诱导空位稳定性与扩散介导的蠕变
+1. [Tackling multiphysics problems via finite element-guided physics-informed operator learning](/202603/09/2603.01420v1-tackling-multiphysics-problems-via-finite-element-guided-physics-informed-operator-learning)  
+   标签：评分：7.0/10、query:pf-roc
+   evidence：非线性热力学问题的算子学习
+2. [Phase-field investigation of non-isothermal solidification coupled with melt flow dynamics](/202603/09/2603.02968v1-phase-field-investigation-of-non-isothermal-solidification-coupled-with-melt-flow-dynamics)  
+   标签：评分：7.0/10、query:pf-roc
+   evidence：非等温凝固与熔体流动的相场研究
+3. [Quantifying Salt Precipitation During CO2 Injection: How Flow Rate, Temperature, and Phase State Control Near-Wellbore Crystallization](/202603/09/2603.05080v1-quantifying-salt-precipitation-during-co2-injection-how-flow-rate-temperature-and-phase-state-control-near-wellbore-crystallization)  
+   标签：评分：7.0/10、query:pf-roc
+   evidence：多孔介质中的多相流与结晶
+4. [Asymptotic long-time behavior of Darcy--Boussinesq convection in layered porous media with narrow transition zones](/202603/09/2603.01362v1-asymptotic-long-time-behavior-of-darcy--boussinesq-convection-in-layered-porous-media-with-narrow-transition-zones)  
+   标签：评分：6.0/10、query:pf-roc
+   evidence：分层多孔介质中的Darcy-Boussinesq对流
+5. [A hierarchy of thermodynamics learning frameworks for inelastic constitutive modeling](/202603/09/2603.02645v1-a-hierarchy-of-thermodynamics-learning-frameworks-for-inelastic-constitutive-modeling)  
+   标签：评分：6.0/10、query:pf-roc
+   evidence：热力学一致的非弹性本构模型
+6. [HERB: a unified framework for the evaluation of Hydrogen Embrittlement mechanisms driven by the Rice-Beltz concept](/202603/09/2603.02800v1-herb-a-unified-framework-for-the-evaluation-of-hydrogen-embrittlement-mechanisms-driven-by-the-rice-beltz-concept)  
+   标签：评分：6.0/10、query:pf-roc
+   evidence：裂纹尖端附近的氢传输与孔洞生长
 
 
 ### ⚡ 这个站点能做什么
