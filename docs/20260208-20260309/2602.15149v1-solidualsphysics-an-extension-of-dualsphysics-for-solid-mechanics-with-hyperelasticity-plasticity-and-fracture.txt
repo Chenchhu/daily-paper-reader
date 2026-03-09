@@ -1,0 +1,5723 @@
+Title: SoliDualSPHysics: An extension of DualSPHysics for solid mechanics with hyperelasticity, plasticity, and fracture
+
+URL Source: https://arxiv.org/pdf/2602.15149v1
+
+Published Time: Wed, 18 Feb 2026 01:10:06 GMT
+
+Number of Pages: 81
+
+Markdown Content:
+# SoliDualSPHysics: An extension of DualSPHysics for solid mechanics with hyperelasticity, plasticity, and fracture 
+
+Mohammad Naqib Rahimi a, George Moutsanidis b, ∗
+
+> aSynopsys Inc., Austin, TX 78746, USA
+> bDepartment of Mechanical and Aerospace Engineering, Rutgers University, Piscataway, NJ 08854, USA
+
+Abstract 
+
+We introduce SoliDualSPHysics, a novel open-source and GPU-accelerated software that extends DualSPHysics to enable the numerical simulation of hyperelastic, finite-strain plastic, and brittle fracture behavior in deformable solids within a unified smoothed particle hydrodynamics (SPH) formulation. The software implements a total Lagrangian formulation for solid mechanics that allows direct application of external loads and boundary conditions, enabling independent solid mechanics simulations. Brittle fracture is modeled through a phase-field approach coupled with SPH, allowing crack initiation, propagation, and branching under dynamic loading without the need for additional criteria or local refinement. The framework also supports user-defined math-ematical expressions to prescribe time- and space-dependent quantities, complementing the solid and fracture extensions and enhancing flexibility across existing and future DualSPHysics appli-cations. Leveraging DualSPHysics’ native CPU /GPU parallel architecture, the software achieves substantial computational acceleration for large-scale simulations, and the implementation is ver-ified and validated against benchmark numerical problems and experimental data, demonstrating accuracy, robustness, and favorable scaling performance. Comprehensive implementation details and user documentation are provided to ensure reproducibility and to support further development by the community. The framework and source code are freely available through a public GitHub repository. 
+
+Keywords: SPH; Meshfree methods; Plasticity; Phase-field; Fracture; DualSPHysics 
+
+1. Introduction 
+
+Smoothed particle hydrodynamics (SPH) is a well-established particle-based methods with a remarkable application history across many fields. It was originally developed as an interpolation technique for studying astrophysical phenomena [1, 2], and was later extended to fluid mechanics   
+
+> ∗Corresponding author
+> Email address: george.moutsanidis@rutgers.edu (George Moutsanidis)
+> arXiv:2602.15149v1 [cs.CE] 16 Feb 2026
+
+problems [3], and even solid mechanics [4] and fluid-structure interaction (FSI) [5], among others. In SPH, a continuum domain is discretized into a set of particles, commonly referred to as SPH particles, and any functions or their derivatives appearing in the governing conservation equations are approximated through a kernel interpolation (or kernel expansion), which provides a meshfree means of spatial discretization. One of the major advantages of SPH over other existing particle-based and meshfree methods is that the inclusion of new physics is straightforward, and it can thus be easily extended to new applications [6]. In the context of solid mechanics, its ability to handle extreme material distortion and significant deformations makes it particularly suitable for simulat-ing large-deformation problems, where conventional Lagrangian mesh-based techniques fail due to mesh entanglement and the need for frequent mesh updating or remeshing. Many variants of the method have emerged since its initial appearance, and the interested reader is referred to [7–13] and the references therein. In line with the popularity of SPH, several remarkable open-source and high-performance codes have been developed over the years and applied to a wide range of challenging engineering mechanics problems. Many of these frameworks, such as SPHysics [14], GPUSPH [15], AQUAg-pusph [16], SPlisHSPlasH [17], and openMaelstrom [18], are primarily focused on computational fluid dynamics (CFD) applications, including free-surface and incompressible flow simulations, and might possess basic FSI functionalities, typically limited to rigid-body motion. A few other codes have included solid mechanics and more extended FSI capabilities. For example, PySPH [19], in addition to its CFD capabilities, incorporates formulations for elastic dynamics based on the total Lagrangian SPH (TLSPH) approach. SPHinXsys [20] includes both CFD and FSI fea-tures, as well as a simplified approach for modeling structural damage and fracture through a damage factor integrated into the SPH kernel calculations [21], though its parallel performance is limited compared to GPU-accelerated frameworks. PersianSPH [22] provides similar capabil-ities but with limited parallelization, while SPHERA [23] is mainly tailored for geophysical and hydraulic problems involving sediment transport and granular materials. Among the available tools, one of the most widely used open-source SPH frameworks is DualSPHysics [24, 25]. Dual-SPHysics is designed to run on both CPU and GPU architectures, with GPU acceleration o ff ering large speed-ups for SPH simulations. DualSPHysics primarily targets incompressible and weakly compressible flow simulations (WCSPH), and also includes some fluidstructure interaction func-tionality. Undoubtedly, these works have provided a valuable toolbox for the engineering community to simulate challenging and complex problems across many applications. Nevertheless, they have been primarily focused on computational fluid dynamics, and despite their broad range of capabil-ities, their application to deformable solid mechanics remains limited. Solid mechanics function-alities, if present, are restricted to simplified or rigid-body representations. In particular, general 2formulations that allow the direct application of external loads, boundary conditions, and material constitutive models for deformable solids are rarely supported. Thus, the availability of open-source and high-performance SPH codes tailored to standalone solid mechanics or fluid-structure interaction problems is relatively limited. Moreover, the ability to model brittle fracture in a phys-ically consistent manner remains largely absent from current open-source SPH software. Over-all, fracture remains relatively underexplored within the SPH community. SPH researchers have mostly relied on ad hoc empirical local damage models, cracking particle approaches, pseudo-spring and virtual link methods, and cohesive zone models. However, these approaches come with limitations and drawbacks. For example, local damage models [26] are based on empirical damage laws rather than comprehensive fracture theories and lead to mesh dependency and non-convergent results under refinement. The cracking particle approach [27] resembles the extended finite element method (XFEM) [28, 29]; therefore, fracture surfaces need to be tracked, and the local enrichment of the approximation space leads to increased computational cost. In the pseudo-spring approach [30–32], damage evolution is based on relatively simple linear damage models, and the softening curve of the damage law may lead to instabilities; previous studies have also shown that these methods are prone to spurious damage patterns. Finally, in cohesive zone models [12, 33, 34], kinematic enrichment is performed (similar to XFEM), which can lead to increased computational time and more complex implementation. Very recently, the authors in [35–38] enhanced SPH with a phase-field model for brittle frac-ture. The phase-field approach to brittle fracture is a variational formulation based on the min-imization of an energy functional and originates from Gri ffi th’s theory of fracture [39]. In this framework, cracks are not explicitly introduced in the solid domain; instead, the fracture surface is approximated by a phase-field parameter that di ff uses the discontinuity over a narrow region. The phase-field parameter represents the material integrity, and is a continuous variable that de-scribes the smooth transition from the fully intact to the fully damaged state. The evolution of the phase-field parameter is governed by a partial di ff erential equation (PDE), and thus the fracture problem is reformulated as a system of PDEs that fully determine the evolution of cracks. It is worth noting that there are no conditions or phenomenological rules in order to determine crack nucleation, propagation, branching, and coalescence. Therefore, phase-field models of fracture do not require any numerical tracking of evolving discontinuities. In this work, we introduce SoliDualSPHysics by extending the open-source software Dual-SPHysics to enable the simulation of hyperelastic, plastic, and brittle fracture behaviors of de-formable solids within a unified SPH framework. The solid mechanics capabilities of the frame-work are based on a total Lagrangian SPH formulation, and allow the direct application of external loads and boundary conditions, enabling standalone solid mechanics simulations. Furthermore, brittle fracture capabilities are introduced through the phase-field approach, which allows the natu-3ral capture of crack initiation, propagation, branching, and coalescence without any ad hoc criteria, local refinement, or numerical tracking of evolving discontinuities. The framework includes the following salient capabilities: (1) a user-defined mathematical and logical expression parser, (2) flexible velocity and traction boundary conditions, (3) hyperelastic (Neo-Hookean and St. Venant– Kirchho ff ) and finite-strain J2 plasticity constitutive models, (4) phase-field modeling of brittle fracture, (5) multi-resolution and independent time-step refinement for solid mechanics, and (6) full CPU and GPU parallelization. Implementation details are provided to facilitate reproducibil-ity and further development by the SPH community. The code is verified and validated against benchmark numerical problems and experimental results, and the GPU implementation is shown to deliver meaningful acceleration and favorable performance for large-scale solid mechanics and fracture simulations. The developed software is released as open source and is freely available through a public GitHub repository, together with example cases and documentation to support reproducibility and further development. This paper is organized as follows. In Section Section 2, we review the theoretical formulation underlying the proposed framework. Section Section 3 describes the extension of DualSPHysics and the implementation details of SoliDualSPHysics. In Section Section 4, we present a series of numerical examples and a representative performance study that demonstrate the accuracy, robust-ness, and computational e ffi ciency of the software for problems in hyperelasticity, plasticity, and fracture mechanics. Finally, in Section Section 5 we draw conclusions and outline future research directions. 
+
+2. Formulation 
+
+In this section, we briefly review the theoretical formulation underlying SoliDualSPHysics. For completeness, and to keep the presentation self-contained, we closely follow the developments presented in our previous work [35, 36, 40, 41]. 
+
+2.1. Momentum Balance 
+
+We consider the problem of nonlinear elastodynamics. Omitting boundary and initial condi-tions for brevity, the momentum balance in strong form over the undeformed configuration reads 
+
+ρ0 ˙v = ∇0 · P + ρ0f in Ω0, (1) where ρ0 is the mass density in the undeformed configuration, v is the velocity of the material, P is the first Piola-Kirchho ff stress tensor, f is a body force per unit mass, Ω0 is the undeformed domain of the solid material, ∇0 denotes derivatives with respect to the undeformed configuration, and the 4superimposed dot denotes time di ff erentiation. The first Piola-Kirchho ff stress is defined as 
+
+P = FS , (2) where F is the deformation gradient tensor and S is the second Piola-Kirchho ff stress tensor, de-fined as 
+
+F = ∂x
+
+∂X = ∂u
+
+∂X + I, (3) 
+
+S = ∂ψ e
+
+∂E , (4) respectively. Here, u is the displacement, x and X are the position vectors in the deformed and undeformed configurations, respectively, I is the identity tensor, ψe is the elastic strain-energy density defined through an appropriate constitutive model, and E is the Green-Lagrange strain tensor defined as 
+
+E = 12
+
+(FT F − I). (5) 
+
+2.2. Phase-Field of Brittle Fracture 
+
+The evolution of brittle fracture is modeled using a phase-field formulation, governed by the following equation 2Gcϵ0
+
+c2 ¨s + 1
+
+M ˙s + 2sH − Gc
+
+(
+
+2ϵ0∇20 s + 1 − s
+
+2ϵ0
+
+)
+
+= 0 in Ω0. (6) Here, s is the phase-field (or damage) variable, which provides a smooth approximation of a frac-ture surface. It continuously interpolates between the intact material state ( s = 1) and the fully fractured state ( s = 0). The parameter ϵ0 has dimensions of length and controls the width of the regularized crack region. In the limit ϵ0 → 0, the phase-field approximation converges to a sharp fracture surface. In practice, ϵ0 must be chosen su ffi ciently small so as not to alter the underlying fracture physics, while remaining comparable to or larger than the spatial discretization length to ensure proper numerical regularization. To model the loss of material sti ff ness, the elastic strain energy density is defined as 
+
+ψe = s2ψ+ 
+
+> e
+
++ ψ− 
+
+> e
+
+. (7) 
+
+ψ+ 
+
+> e
+
+and ψ− 
+
+> e
+
+are the positive and negative parts of the elastic strain energy density, respectively, which will be defined later on according to the particular constitutive models employed. Evidently, crack propagation is only allowed in tension since the phase-field parameter is applied only to the tensile part of the elastic strain energy. H is the so-called history functional used to model the 5irreversibility condition (i.e., cracks do not heal), and is defined as 
+
+H(X, t) = max  
+
+> τ≤t
+
+(ψ+ 
+
+> e
+
+(X, τ)). (8) 
+
+M is a damping parameter controlling the rate at which local damage information di ff uses into the bulk material, and in our framework is defined as 
+
+M ≤ c
+
+2 √4Gcϵ0H + G2
+
+> c
+
+, (9) so that the phase-field equation does not exhibit a wave-like behavior and evolves monotonically. Finally, c is a speed limit on the propagation of the phase-field parameter through the undamaged material and is taken to be equal to the sound speed. 
+
+Remark 1. It is important to note that Eq.(6) is a hyperbolic equation. This contrasts with pre-vailing phase-field models for brittle fracture, which employ elliptic formulations. As explained in [35, 40, 41], elliptic models become problematic when lumped-mass explicit dynamics schemes are employed, such as in SPH, since a global linear system must be solved at every time step to determine the phase-field variable. Although elliptic formulations can in principle be embedded within explicit frameworks, this would require solving a global system at each time step, leading to a substantial increase in computational cost. 
+
+2.3. Constitutive Modeling 
+
+We consider two hyperelastic constitutive models commonly used in solid mechanics: the St. Venant–Kirchho ff model and a compressible neo-Hookean model. These models are coupled to the phase-field formulation, enabling the simulation of brittle fracture. Additionally, an extension to J2 elastoplasticity is introduced in a subsequent subsection. At present, this extension is limited to elastoplastic response without fracture, as modeling ductile fracture mechanisms is beyond the scope of the present work. 
+
+2.3.1. St. Venant–Kirchho ff Model 
+
+For a St. Venant–Kirchho ff material model, the elastic strain energy density functional is de-fined as 
+
+ψe = 12λ(tr E)2 + μtr( E2), (10) where λ and μ are the Lamé parameters. We then define 
+
+ψ+ 
+
+> e
+
+= 12λ{tr E}2 
+
+> +
+
++ μtr( E+E+), (11) 6ψ− 
+
+> e
+
+= 12λ{tr E}2 
+
+> −
+
++ μtr( E−E−), (12) where the following decomposition is employed 
+
+E+ = QΛ+QT , (13) 
+
+E− = QΛ−QT , (14) 
+
+E = QΛQT . (15) 
+
+Λ = diag( λ1, λ2, λ3) contains the eigenvalues of E on its diagonal, Q has the corresponding eigen-vectors as its columns, Λ± = diag( λ± 
+
+> 1
+
+, λ± 
+
+> 2
+
+, λ± 
+
+> 3
+
+), and { . }± selects the ± part of its argument, i.e. 
+
+{x}± =
+
+
+
+x x ∈ R±
+
+0 otherwise . (16) The second PiolaKirchho ff stress can then be computed by di ff erentiating the strain energy density 
+
+ψe with respect to the Green-Lagrange strain tensor E,
+
+S± = ∂ψ ±
+
+> e
+
+∂E = λ {tr E}±I + 2μE±, (17) and 
+
+S = s2S+ + S−. (18) 
+
+2.3.2. Neo-Hookean Model 
+
+In the neo-Hookean model, the elastic strain energy density functional is expressed as 
+
+ψe = μ
+
+2 (I1 − 3) − μ ln J + λ
+
+2 (ln J)2, (19) where J = det F, and I1 = tr( C). Accordingly, the positive and negative parts of the elastic strain energy density are given as 
+
+ψ+ 
+
+> e
+
+=
+
+
+
+U(J) + ψe(b) J ≥ 1
+
+ψe(b) J < 1, (20) 
+
+ψ− 
+
+> e
+
+=
+
+
+
+0 J ≥ 1
+
+U(J) J < 1, (21) where 
+
+U(J) = 12κ
+
+(12(J2 − 1) − ln J
+
+)
+
+, (22) 
+
+ψe(b) = 12μ(tr b − 3), (23) 7b = FF T , (24) 
+
+b = J −2/3b, (25) where κ = λ + 2μ 
+
+> 3
+
+is the bulk modulus. The second PiolaKirchho ff stress can then be computed as 
+
+S = 2∂ψ e
+
+∂b , (26) which results in 
+
+S = 2
+
+
+
+s2
+
+(
+
+U′(J) ∂J 
+
+> ∂b
+
++ ∂ψ e(b)
+
+> ∂b
+
+)
+
+J ≥ 1
+
+U′(J) ∂J 
+
+> ∂b
+
++ s2 ∂ψ e(b) 
+
+> ∂b
+
+J < 1. (27) The derivatives in the above expression are computed as 
+
+U′(J) = 12κ(J − J−1), (28) 
+
+∂J
+
+∂b = ∂ √det b
+
+∂b = 12 Jb−1, (29) 
+
+∂ψ e
+
+∂b = ∂ψ e
+
+∂b
+
+∂b
+
+∂b = J−2/3
+
+2 μ
+
+(
+
+I − 13
+
+(tr b)b−1
+
+)
+
+. (30) Substituting the above equations into Eq.(27) we get 
+
+S =
+
+
+
+s2
+
+(12 κ(J2 − 1)b−1 + J−2/3μ(I − 13
+
+(tr b)b−1)) 
+
+J ≥ 1 
+
+> 12
+
+κ(J2 − 1)b−1 + s2
+
+(
+
+J−2/3μ(I − 13
+
+(tr b)b−1)) 
+
+J < 1. (31) 
+
+Remark 2. In the absence of fracture (s = 1), the above constitutive relations reduce to their classical hyperelastic counterparts corresponding to the St. Venant–Kirchho ff and neo-Hookean material models. 
+
+2.3.3. Extension to Finite-Strain J 2 Plasticity 
+
+In addition to the hyperelastic material models described above, we extend the framework to rate-independent J2 elastoplasticity suitable for finite deformations. Unlike small-strain plasticity, finite-strain elastoplasticity requires careful treatment of large rotations and an appropriate elastic– plastic decomposition to ensure frame objectivity and thermodynamic consistency. We adopt a finite-strain formulation based on the multiplicative decomposition of the deforma-tion gradient [42, 43] 
+
+F = FeFp, (32) where Fe and Fp represent the elastic and plastic parts of the deformation gradient, respectively. 8This decomposition is fundamentally di ff erent from the additive strain decomposition E = Ee + Ep
+
+and ensures that finite rotations are properly accounted for in the plastic evolution. The elastic response is characterized through the elastic right Cauchy–Green tensor, 
+
+Ce = FTe Fe = CC −1 
+
+> p
+
+, (33) where C = FT F is the total right Cauchy–Green tensor and Cp = FTp Fp is the plastic metric tensor. In our computational framework, Cp is stored as an internal variable (initialized to the identity tensor) and evolved according to the plastic flow rule. The elastic free energy is decomposed into volumetric and isochoric parts, 
+
+ψe(Ce) = ψvol (Je) + ψiso ( ¯ Ce), (34) where Je = det( Fe) is the elastic volume ratio. In our implementation, 
+
+Je = √det( Ce) = JJp
+
+, J = det( F), Jp = det( Fp) =
+
+√
+
+det( Cp). (35) Since plastic flow is enforced to be isochoric (det Fp = 1), we have Jp = 1 and therefore Je = J in the present implementation. The isochoric elastic right Cauchy–Green tensor is ¯Ce = J−2/3 
+
+> e
+
+Ce. (36) The volumetric and isochoric contributions are given by [44] 
+
+ψvol (J) = κ
+
+4
+
+(J2 − 1 − 2 ln J) , (37) 
+
+ψiso ( ¯ Ce) = μ
+
+2
+
+(tr( ¯ Ce) − 3) . (38) The Mandel stress tensor is introduced as the work-conjugate to the plastic velocity gradient [45–47], 
+
+M = CeSe = Ce
+
+∂ψ e
+
+∂Ee
+
+, (39) where Se is the elastic part of the second Piola–Kirchho ff stress and Ee = 12 (Ce − I) is the elastic Green-Lagrange strain. For the hyperelastic model above, the deviatoric Mandel stress is 
+
+Mdev = μ dev( ¯ Ce), where dev( ¯ Ce) = ¯Ce − 13tr( ¯ Ce) I. (40) Plastic yielding is governed by a von Mises ( J2) yield criterion expressed in terms of the Mandel 9stress as 
+
+f (M, ¯ εp) = σeq − σy( ¯ εp) ≤ 0, (41) where the equivalent stress is defined as 
+
+σeq =
+
+√32 Mdev : Mdev , (42) and ¯ εp denotes the accumulated equivalent plastic strain. The yield stress σy accounts for isotropic hardening through a linear relationship σy = σy0 + H ¯εp, where σy0 is the initial yield stress, and 
+
+H is the hardening parameter. An associative flow rule governs the evolution of the plastic metric tensor [48] ˙Cp = 2˙ γ NC p, where N = ∂ f
+
+∂M = 32σeq 
+
+Mdev , (43) and the evolution of the equivalent plastic strain is ˙¯εp =
+
+√23 ˙γ, (44) subject to the standard Kuhn–Tucker loading /unloading conditions, ˙γ ≥ 0, f ≤ 0, ˙γ f = 0. (45) The elastoplastic constitutive equations are integrated using a predictor–corrector return map-ping scheme adapted for the multiplicative framework. At each material point and time step, a trial elastic state is computed by freezing plastic evolution, 
+
+Ctr  
+
+> e
+
+= Cn+1(Cnp)−1, (46) leading to the trial Mandel stress Mtr . If the yield condition f (Mtr , ¯ εp,n) ≤ 0 is satisfied, the response remains elastic. Otherwise, a radial return correction is applied, 
+
+Mn+1dev =
+
+(
+
+1 − 3μ ∆γσtr eq 
+
+)
+
+Mtr dev , (47) where the plastic multiplier increment is determined from the consistency condition, 
+
+∆γ = σtr eq − σy( ¯ εp,n)3μ + H
+
+√23
+
+. (48) 10 Then, ¯εp,n+1 = ¯εp,n +
+
+√23 ∆γ. (49) The plastic metric is updated according to 
+
+Cn+1 
+
+> p
+
+= Cnp + 2∆γ Ntr Cnp, (50) where Ntr = 32σtr eq Mtr dev is the flow direction. To enforce plastic incompressibility (det( Fp) = 1), we apply the volume-preserving projection 
+
+Cn+1 
+
+> p
+
+← (det Cn+1
+
+> p
+
+)−1/3
+
+Cn+1 
+
+> p
+
+. (51) Finally, the second Piola–Kirchho ff stress is computed as 
+
+Sn+1 = 1
+
+Je
+
+C−1 
+
+> e
+
+Mn+1dev C−1 
+
+> e
+
++ κ
+
+2(J2 − 1) C−1, (52) which combines the deviatoric response (derived from the Mandel stress) with the volumetric contribution. The multiplicative decomposition F = FeFp, introduced by Lee [42] and developed extensively by Simo et al . [43, 48], addresses certain limitations through its intrinsic geometric structure. The plastic metric Cp = FTp Fp provides a frame-invariant description of plastic deformation, and the Mandel stress formulation ensures thermodynamic consistency while naturally handling material rotation. These theoretical advantages make multiplicative elastoplasticity the preferred framework for simulating problems with large plastic deformations, metal forming, and penetration mechanics [43, 49, 50]. 
+
+Remark 3. Plastic deformation leads to irreversible energy dissipation, while the elastic strain-energy density governs only the recoverable response. For this reason, and because modeling ductile fracture mechanisms lies beyond the scope of the present work, the J2 elastoplastic model is employed without coupling to the phase-field formulation. When plasticity is activated, the framework therefore describes elastoplastic solid mechanics without fracture. 
+
+Remark 4. While additive decomposition E = Ee + Ep of the Green–Lagrange strain is often used in finite element implementations for moderate strains, it encounters fundamental theoretical limi-tations when applied to total Lagrangian frameworks undergoing large deformations, as discussed extensively in the computational plasticity literature [43, 51]: (i) The additive decomposition is rigorously valid only for infinitesimal strains where the dis-tinction between reference and current configurations is negligible [52]. When applied to 11 finite strains, the use of Green–Lagrange strain E = 12 (C − I) as a primary strain measure can lead to nonphysical response under large rotations and volumetric deformations for certain constitutive choices (e.g., St. Venant–Kirchho ff ) [53]. (ii) Classical continuum mechanics requires that constitutive equations be invariant under su-perposed rigid body motions (frame-indi ff erence or objectivity) [54, 55]. For finite de-formations, this requirement is naturally satisfied by formulations based on multiplicative decomposition of the deformation gradient, whereas additive strain decompositions require additional rotational corrections to maintain objectivity during large rotations [56, 57]. (iii) The dissipation inequality for rate-independent plasticity requires careful definition of driv-ing forces and flow rules. In the multiplicative framework, the Mandel stress emerges nat-urally as the thermodynamically conjugate force to the plastic flow in the intermediate con-figuration [58, 59]. Additive decompositions, when extended beyond small strains, require additional assumptions to ensure thermodynamic consistency [60]. (iv) J2 plasticity is predicated on volume-preserving plastic flow (det( Fp) = 1). The multi-plicative decomposition automatically preserves this constraint geometrically through the structure F = FeFp [42]. In contrast, ensuring tr( ˙ Ep) = 0 in the additive framework does not guarantee plastic incompressibility at finite strains, particularly under complex loading paths involving large rotations [43]. 
+
+2.4. Total Lagrangian SPH Discretization 
+
+In this subsection, we present how the governing equations (i.e., momentum balance and phase-field of fracture) are discretized employing a total Lagrangian SPH approach. We begin by dis-cretizing the deformation gradient for particle i as 
+
+Fi = I + 1
+
+ρ0i
+
+> Ni
+
+∑
+
+> j=1
+
+m0j (uj − ui) ⊗ ∇ 0W0ij , (53) or in index notation as 
+
+Fks  
+
+> i
+
+= δks + 1
+
+ρ0i
+
+> Ni
+
+∑
+
+> j=1
+
+m0j uk
+
+> ji
+
+∂W0ij 
+
+∂Xs
+
+> j
+
+. (54) Here, Ni is the total number of particles located within the interpolation space, also known as the neighborhood, influence, or support domain, of particle i, and ρ0i is the density of particle i in the undeformed configuration. j is a neighbor particle to i, m0j is its mass in the undeformed state, 
+
+W0ij is the kernel function relating particles i and j, Xs 
+
+> j
+
+is the s component of the initial coordinate of particle j, uk 
+
+> ji
+
+is the k component of the displacement di ff erence vector uji = uj − ui, δks is the Kronecker delta, and ∂W0ij /∂ Xs 
+
+> j
+
+is the corrected derivative of the Lagrangian kernel. 12 Similarly, the momentum balance equation for particle i can be written as 
+
+dvi
+
+dt =
+
+> Ni
+
+∑
+
+> j=1
+
+m0j
+
+ Pi
+
+ρ20i
+
++ Pj
+
+ρ20j
+
++ Pvij 
+
+ · ∇ 0W0ij + f0i, (55) or in index notation as 
+
+dv k
+
+> i
+
+dt =
+
+> Ni
+
+∑
+
+> j=1
+
+m0j
+
+
+
+Pks 
+
+> i
+
+ρ20i
+
++ Pks 
+
+> j
+
+ρ20j
+
++ Pks vij 
+
+ ∂W0ij 
+
+∂Xs
+
+> j
+
++ f k
+
+> 0i
+
+, (56) where Einstein’s summation rule is employed for the repeated index s. Pi and Pj are the first Piola-Kirchho ff stress tensors for particles i and j, respectively. An artificial viscosity term is included to mitigate numerical instabilities (e.g., spurious modes and shock-like jumps). Following [61], we define 
+
+Pvij = det( Fi) πij F−1 
+
+> i
+
+, (57) with 
+
+πij = 1
+
+ρ0i
+
+(β2G2 
+
+> ij
+
+− β1 c0iGij 
+
+) , (58) where 
+
+c0i =
+
+√
+
+κ + 43 μρ0i
+
+(59) is the (reference) sound speed, β1 and β2 are scalar coe ffi cients, and 
+
+Gij = h (vi − vj) · (Xi − Xj)
+
+r20ij + 0.001 h2 . (60) Here, r0ij = |Xi − Xj| is the initial distance between particles i and j. In most of the numerical examples in this paper we set β1 = 0.04 and β2 = 0, unless otherwise stated. Finally, the phase-field equation for particle i is discretized as ¨si = c2
+
+2ϵ0
+
+2ϵ0∇20 si + 1 − si
+
+2ϵ0
+
+− 2 √4ϵ0Hi/Gci + 1
+
+c ˙si − 2siHi/Gci
+
+ , (61) in which we have substituted Mi = c/(2 
+
+√
+
+4Gciϵ0Hi + G2
+
+> ci
+
+). The Laplacian of the phase field above is calculated using the SPH Laplacian operator as 
+
+∇20 si = 2
+
+> Ni
+
+∑
+
+> j=1
+
+(si − sj) V0j
+
+rs
+
+> 0ij
+
+|r0ij |2
+
+∂W0ij 
+
+∂Xs
+
+> j
+
+, (62) 13 where r0ij = Xi − Xj is the initial distance vector between particles i and j. It should be further pointed out that when phase-field of fracture is employed in this work, the deformation gradient is computed as 
+
+Fkm  
+
+> i
+
+=
+
+
+
+> 1
+> ρ0i
+
+∑Ni 
+
+> j=1
+
+m0j uk
+
+> ji
+> ∂W0ij
+> ∂Xm
+> j
+
++ δkm si > sl
+
+δkm otherwise , (63) where sl = 0.1 is the phase-field limit introduced to improve the numerical stability, as explained in [35]. 
+
+2.5. Time Integration 
+
+After spatial discretization, the semi-discrete system is advanced in time using explicit time integration schemes. Two alternatives are available: a Verlet scheme and a symplectic (leapfrog-type) scheme, presented in Algorithm 1 and Algorithm 2, respectively. The stable time step is selected to satisfy stability constraints accounting for 
+
+• a CFL-type constraint based on wave propagation and particle velocity, 
+
+• an acceleration-based constraint associated with explicit time integration. Accordingly, we enforce 
+
+∆t ≤ CCFL min( ∆tv, ∆ta) , (64) where CCFL is a user-defined factor. The individual bounds are defined as 
+
+∆tv = hc0 + ∥v∥max 
+
+, (65) 
+
+∆ta =
+
+√
+
+h
+
+∥a∥max 
+
+, (66) where h denotes the SPH smoothing length (i.e., the kernel interaction radius), c0 is the refer-ence sound speed, v is the particle velocity vector, and a is the particle acceleration vector. The quantities ∥v∥max and ∥a∥max denote the maximum magnitudes of particle velocity and acceleration, respectively, over the computational domain. 14 Algorithm 1 Verlet Time Integration (single step for a specific particle) 
+
+Given: u n, vn, an, sn, ˙ sn, ¨ sn
+
+Step 1: Contact Forces if Nbodies > 1 then 
+
+Compute contact forces between bodies 
+
+end if Step 2: Internal Forces 
+
+Compute deformation gradient F
+
+Compute strain E = 12
+
+(FT F − I)
+
+Compute stress S = f (E) (Constitutive Model) 
+
+if fracture = true then 
+
+Compute phase-field second derivative ¨ sn+1
+
+Degrade stress S ← s2
+
+> n
+
+S+ + S−
+
+end if 
+
+Compute first Piola–Kirchho ff stress P = FS 
+
+Compute acceleration a
+
+Add artificial viscosity a ← a + avisc 
+
+Add external forces a ← a + fext 
+
+Step 3: Apply Boundary Conditions 
+
+Apply velocity BCs (modify v directly) Apply force BCs (add to a)
+
+Step 4: Update vn+1 = vn + ∆ t an
+
+un+1 = un + ∆ t vn+1
+
+xn+1 = X + un+1
+
+if fracture = true then 
+
+˙sn+1 = ˙sn + ∆ t ¨sn+1
+
+sn+1 = sn + ∆ t ˙sn+1
+
+end if Step 5: Update Global Arrays 
+
+Copy updated positions /velocities to main particle arrays 15 Algorithm 2 Symplectic (Leapfrog) Time Integration (single step for a specific particle) 
+
+Given: u n, vn, an− 12 , sn, ˙ sn, ¨ sn− 12
+
+Step 1: Predictor vn+ 12 = vn− 12 + ∆ t an− 12
+
+un+ 12 = un + ∆t 
+
+> 2
+
+vn+ 12
+
+xn+ 12 = X + un+ 12
+
+if fracture = true then 
+
+˙sn+ 12 = ˙sn + ∆t 
+
+> 2
+
+¨sn− 12
+
+sn+ 12 = sn + ∆t 
+
+> 2
+
+˙sn+ 12
+
+end if Step 2: Contact Forces if Nbodies > 1 then 
+
+Compute contact forces between bodies 
+
+end if Step 3: Internal Forces (at the n + 12 level) Compute deformation gradient F
+
+Compute strain E = 12
+
+(FT F − I)
+
+Compute stress S = f (E) (Constitutive Model) 
+
+if fracture = true then 
+
+Compute phase-field second time derivative ¨ sn+ 12
+
+Degrade stress S ← s2 
+
+> n+12
+
+S+ + S−
+
+end if 
+
+Compute first Piola–Kirchho ff stress P = FS 
+
+Compute acceleration an+ 12
+
+Add artificial viscosity an+ 12 ← an+ 12 + avisc 
+
+Add external forces an+ 12 ← an+ 12 + fext 
+
+Step 4: Apply Boundary Conditions 
+
+Apply velocity BCs (modify v directly) Apply force BCs (add to a)
+
+Step 5: Corrector vn+1 = vn+ 12 + ∆t 
+
+> 2
+
+an+ 12
+
+un+1 = un+ 12 + ∆t 
+
+> 2
+
+vn+1
+
+xn+1 = X + un+1
+
+if fracture = true then 
+
+˙sn+1 = ˙sn+ 12 + ∆t 
+
+> 2
+
+¨sn+ 12
+
+sn+1 = sn+ 12 + ∆t 
+
+> 2
+
+˙sn+1
+
+end if Step 6: Update Global Arrays 
+
+Copy updated positions /velocities to main particle arrays 16 3. DualSPHysics Architecture and Extension to SoliDualSPHysics 
+
+DualSPHysics is a modular, GPU-accelerated open-source SPH framework designed for high-performance simulations of fluid dynamics and multi-physics problems [24, 25, 62]. Its archi-tecture supports solvers for single- and multi-phase flows, fluid–structure interaction (FSI), and coupling with external libraries such as Project Chrono and MoorDyn. Limited support for de-formable structures has also been introduced [62]; however, these features are primarily restricted to small-strain elasticity within FSI settings. The present work extends DualSPHysics to enable standalone simulations of hyperelasticity, finite-strain plasticity, and brittle fracture in deformable solids, together with complex boundary conditions and user-defined expressions. In what fol-lows, we first outline the structure of the original framework and then describe how the governing equations and total Lagrangian SPH discretization presented in Section Section 2 are incorporated through the newly developed solid mechanics and phase-field fracture solvers. 
+
+3.1. DualSPHysics Framework 
+
+The base DualSPHysics code includes the following solvers and features: 
+
+• Single-phase free-surface flows : Capability to simulate dam breaks, wave propagation, and open-channel flows. 
+
+• Multi-phase systems : Support for Newtonian–Newtonian, gas–liquid, and liquid–granular interactions. 
+
+• Coupled physics : Integration with the Discrete Element Method (DEM), Project Chrono (rigid-body dynamics), and MoorDyn (mooring systems). 
+
+• Fluid boundary conditions : Support for walls, periodic domains, inflow /outflow bound-aries, and advanced viscosity models (laminar and LES turbulence). 
+
+• Pre- and post-processing tools : GenCase (particle generation), the DesignPhysics FreeCAD GUI, and PartVTK /IsoSurface utilities for visualization in ParaView. The DesignPhysics FreeCAD GUI provides a user-friendly interface and supports various input options but does not currently include support for deformable solid mechanics, as shown in Fig. 1. The framework employs a hybrid CPU–GPU architecture, using CUDA kernels for core SPH operations (e.g., neighbor search and force calculations) and OpenMP for CPU parallelization. Its modular design facilitates extensions while maintaining compatibility with existing solvers. 17 Figure 1: DesignPhysics FreeCAD plugin for DualSPHysics. The GUI enables interactive setup of fluid simulation cases; support for deformable solid mechanics is not included in the standard release. 
+
+18 3.2. Base DualSPHysics XML Input 
+
+DualSPHysics simulations are configured via XML files (Fig. 2), structured as:  
+
+> 1
+
+<constantsdef > ... </ constantsdef >  
+
+> 2
+
+<geometry > ... </ geometry >  
+
+> 3
+
+<motion > ... </ motion >  
+
+> 4
+
+<execution > ... </ execution >  
+
+> 5
+
+<parameters > ... </ parameters >  
+
+> 1
+
+<?xml version ="1.0" encoding ="UTF -8" ?>  
+
+> 2
+
+<case app=" DesignSPHysics ">  
+
+> 3
+
+<casedef >  
+
+> 4
+
+<constantsdef >  
+
+> 5
+
+...  
+
+> 6
+
+</ constantsdef >  
+
+> 7
+
+</ mkconfig >  
+
+> 8
+
+<geometry >  
+
+> 9
+
+<definition dp="0.004">  
+
+> 10
+
+...  
+
+> 11
+
+</ definition >  
+
+> 12
+
+<commands >  
+
+> 13
+
+<mainlist >  
+
+> 14
+
+<setmkbound mk="0"/>  
+
+> 15
+
+<drawfilestl file="Wheel.stl" />  
+
+> 16
+
+</ mainlist >  
+
+> 17
+
+</ commands >  
+
+> 18
+
+</ geometry >  
+
+> 19
+
+</ casedef >  
+
+> 20
+
+<execution >  
+
+> 21
+
+<special >  
+
+> 22
+
+...  
+
+> 23
+
+</ special >  
+
+> 24
+
+<parameters >  
+
+> 25
+
+...  
+
+> 26
+
+</ parameters >  
+
+> 27
+
+</ execution >  
+
+> 28
+
+</case > 
+
+Figure 2: Structure of a DualSPHysics XML input file. In the standard framework, solid geometries are treated as rigid boundaries; modeling deformable structures requires the extensions introduced in this work. 
+
+Case constants such as gravity, reference fluid density, smoothing length, and CFL coe ffi cient are defined in the <constantsdef> section. The <geometry> section defines the computational do-main using CAD files or built-in commands for simple geometries, as documented in the o ffi cial DualSPHysics documentation. By default, solid geometries are treated as rigid boundaries within the DualSPHysics FSI solver. Therefore, any moving or deformable structure must be defined as a boundary with prescribed motion in the <motion> section. Definitions related to special options, 19 such as inlet /outlet conditions, Project Chrono and MoorDyn coupling, and piston motion, are specified in the <special> section. The <parameters> section includes numerical settings such as the kernel type and time-integration constants. 
+
+3.3. Extensions for Solid and Fracture Mechanics in SoliDualSPHysics 
+
+The development of a graphical user interface to support user-defined expressions, solid dy-namics, plasticity, and fracture mechanics is beyond the scope of the present work and is left for future development. At this stage, all functionality is configured through the XML input files. To enable user-defined expressions, deformable solid mechanics, plasticity, and fracture mechanics, new input blocks are introduced under <special><mathexpressions> and <special><deformstrucs> .The overall workflow is outlined below. First, the geometry of interest is defined in the <geometry> section (e.g., via CAD files) using distinct mk identifiers. Deformable bodies are then flagged as moving objects in the <motion> 
+
+section. Once defined, boundary conditions can be applied either directly through user-defined expressions or indirectly through proximity-based auxiliary geometries. For instance, consider a car wheel deforming under pressure from an axle. The axle may be introduced as an auxiliary rigid geometry positioned within a distance dp of the intended contact region, as illustrated in Fig. 3. Boundary conditions for each <deformstrucbody> can be prescribed either as velocity constraints or as applied surface tractions. For force-type loading, SoliDualSPHysics provides two equivalent specification routes: 1. direct prescription of surface traction (e.g., via a user-defined expression), or 2. definition of an auxiliary rigid body whose proximity /contact with the deformable structure generates an equivalent traction-like load. The second option is intended solely as a mechanism to impose an external load and should not be confused with general contact interactions between deformable bodies. The material properties and main structural parameters are specified within the <execution> section under the <special>< deformstrucs> subsection for each <deformstrucbody mkbound="mkid"> , as shown in Fig. 4. 
+
+3.3.1. Modeling Fracture 
+
+To enable fracture modeling via the phase-field approach, the input cards shown in Fig. 5 must be specified. It should be noted that fracture modeling is not compatible with J2 plasticity. If J2
+
+plasticity is activated ( <constitmodel value="3"> ), the fracture option is automatically disabled. 
+
+3.3.2. Application of Boundary Conditions 
+
+Velocity and force boundary conditions can be applied using the <bcvel> and <bcforce> input cards, respectively, as shown in Fig. 6. Each of these sections can have the following attributes: 20 1 <geometry >  
+
+> 2
+
+...  
+
+> 3
+
+<commands >  
+
+> 4
+
+<mainlist >  
+
+> 5
+
+<setshapemode >actual | dp | bound </ setshapemode >  
+
+> 6
+
+<setmkbound mk="0"/>  
+
+> 7
+
+<drawfilestl file="Wheel.stl" />  
+
+> 8
+
+<setmkbound mk="1"/>  
+
+> 9
+
+<drawfilestl file="Tube.stl"/>  
+
+> 10
+
+</ mainlist >  
+
+> 11
+
+</ commands >  
+
+> 12
+
+</ geometry >  
+
+> 13
+
+<motion >  
+
+> 14
+
+<objreal ref="0">  
+
+> 15
+
+<begin mov="1" start="0" />  
+
+> 16
+
+<mvnull id="1" />  
+
+> 17
+
+</ objreal >  
+
+> 18
+
+</ motion >  
+
+> 19
+
+...  
+
+> 20
+
+<special >  
+
+> 21
+
+<deformstrucs >  
+
+> 22
+
+<deformstrucbody mkbound ="0">  
+
+> 23
+
+<bcforce type =2 mkid="1" y="5.0 e6" comment =" Traction boundary condition applied as 5 MPa in y direction " /> 
+
+> 24
+
+...  
+
+> 25
+
+</ deformstrucbody >  
+
+> 26
+
+</ deformstrucs >  
+
+> 27
+
+</ special > 
+
+> (a)
+> (b)
+
+Figure 3: (a) Geometry and boundary condition definitions in XML input file in SoliDualSPHysics. (b) Visual repre-sentation of geometry and boundary conditions in SoliDualSPHysics. 
+
+21 1 <deformstrucs >  
+
+> 2
+
+<deformstrucbody mkbound ="0">  
+
+> 3
+
+<density value="7800.0 " comment ="Mass density " units_comment ="kg/m^3" />  
+
+> 4
+
+<youngmod value="210.0 e9" comment ="Young ’s Modulus " units_comment ="Pa" />  
+
+> 5
+
+<poissratio value="0.3" comment ="Poisson ’s ratio" />  
+
+> 6
+
+<constitmodel value="1" comment =" Constitutive model 1:SVK" />  
+
+> 7
+
+<artvisc factor1 ="0.2" factor2 ="0.0" comment =" Art. visc. factors " />  
+
+> 8
+
+<mapfac value="4" comment ="Map factor: x4 refinement " />  
+
+> 9
+
+...  
+
+> 10
+
+</ deformstrucbody >  
+
+> 11
+
+</ deformstrucs > 
+
+Figure 4: Properties of deformable structures along with the pre-existing notch definitions in the XML input file in SoliDualSPHysics.  
+
+> 1
+
+<deformstrucbody mkbound ="1">  
+
+> 2
+
+...  
+
+> 3
+
+<!-- Enables fracture . Default: false. Not available with J2 plasticity .-->  
+
+> 4
+
+<fracture value="true" comment =" Enables fracture " />  
+
+> 5
+
+<!-- Critical energy release rate. Required if fracture is enabled .-->  
+
+> 6
+
+<Gc value="2700.0 " comment =" Fracture toughness [J/m^2]" />  
+
+> 7
+
+<!-- Phase -field length scale. Required if fracture is enabled .-->  
+
+> 8
+
+<pflenscale value="0.002" comment ="Length scale [m]" />  
+
+> 9
+
+<!-- Phase -field limit for soft particles . Default: 0.05. -->  
+
+> 10
+
+<pflim value="0.1" comment ="Phase -field threshold for soft particles " />  
+
+> 11
+
+<!-- Pre - existing notch plane defined by 4 points in 3D.-->  
+
+> 12
+
+<!-- Up to 512 notches can be applied to a body.-->  
+
+> 13
+
+<notch >  
+
+> 14
+
+<p1 x=" -2.0e-3" y=" -5.0e-3" z="0.02" />  
+
+> 15
+
+<p2 x="50.0e-3" y=" -5.0e-3" z="0.02" />  
+
+> 16
+
+<p3 x="50.0e-3" y="25.0e-3" z="0.02" />  
+
+> 17
+
+<p4 x=" -2.0e-3" y="25.0e-3" z="0.02" />  
+
+> 18
+
+</notch >  
+
+> 19
+
+</ deformstrucbody > 
+
+Figure 5: Fracture configuration for deformable solids. 
+
+22 1 <deformstrucbody mkbound ="1">  
+
+> 2
+
+...  
+
+> 3
+
+<!--Force boundary condition type 1: point force [N], 2: surface distributed [N/m^2], 3: acceleration .-->  
+
+> 4
+
+<bcforce type="..." x="..." ye="2" ze="1" tst="..." tend="..." comment =" Force boundary condition , x is constant value , y and z are expressions id=2 and expression id=1, respectively . Applied between times tst and tend" />  
+
+> 5
+
+<bcforce mkid="4" xe="2" comment =" Applies force type =2 on surface near body with mk_bound =4 in x direction according to expression id=2" />  
+
+> 67
+
+<!-- Velocity boundary condition .-->  
+
+> 8
+
+<bcvel xe="2" ye="2" z="0.0" tst="..." tend="..." comment =" Velocity boundary condition , x and y are expression id=2, z is constant value. Applied between times tst and tend to the entire body" />  
+
+> 9
+
+<bcvel mkid="4" xe="2" ye="2" z="0.0" tst="..." tend="..." comment =" Velocity boundary condition , x and y are expression id=2, z is constant value. Applied between times tst and tend to particles on surface near body with mk_bound =4" />  
+
+> 10
+
+</ deformstrucbody > 
+
+Figure 6: Input format for velocity and force boundary conditions. 
+
+• mkid : The mkbound identifier of the auxiliary geometry from which the boundary condition is applied. If not specified, the condition is applied to the entire deformable structure body. 
+
+• x: If provided, applies the given value to the x-component of velocity or force. 
+
+• y: If provided, applies the given value to the y-component of velocity or force. 
+
+• z: If provided, applies the given value to the z-component of velocity or force. 
+
+• xe : If provided, applies a user-defined expression to the x-component of velocity or force. 
+
+• ye : If provided, applies a user-defined expression to the y-component of velocity or force. 
+
+• ze : If provided, applies a user-defined expression to the z-component of velocity or force. 
+
+• tst : Starting time of the boundary condition. If not specified, the condition is applied from the beginning of the simulation. 
+
+• tend : Ending time of the boundary condition. If not specified, the condition remains active for the entire duration of the simulation. 
+
+• type : (Force input card only.) Specifies the type of force boundary condition: (1: point force [N], 2: surface-distributed force [N /m2], 3: acceleration [m /s2]). 23 3.3.3. Measuring Quantities 
+
+The input card shown in Fig. 7 can be used to measure quantities such as average displacement and total force on particles located on or near a surface defined by four points. At present, each  
+
+> 1
+
+<measureplane >  
+
+> 2
+
+<p1 x="..." y="..." z="..." />  
+
+> 3
+
+<p2 x="..." y="..." z="..." />  
+
+> 4
+
+<p3 x="..." y="..." z="..." />  
+
+> 5
+
+<p4 x="..." y="..." z="..." />  
+
+> 6
+
+</ measureplane > 
+
+Figure 7: Input card for measurements on a specific surface. 
+
+<measureplane> supports output of average displacement and total force only. The implementation can be extended in the future to include additional quantities, such as energy or stress. 
+
+3.3.4. Full List of Keywords in deformstrucs Class 
+
+The complete set of supported keywords and their functionalities is summarized in Listing 1. 
+
+Listing 1: A full list of input cards for modeling deformable structures in SoliDualSPHysics.  
+
+> 1
+
+<deformstrucs >  
+
+> 2
+
+<!-- If given , will overwrite the adaptive timestep for deformstrucbodies -->  
+
+> 3
+
+<timestep value="..." comment ="User - defined time step value" />  
+
+> 4
+
+<!-- If given , will multiply the contact potential by the given factor -->  
+
+> 5
+
+<contcoeff value="..." comment =" Contact potential multiplier " />  
+
+> 6
+
+<deformstrucbody mkbound ="1">  
+
+> 7
+
+<bcforce ... comment ="Force boundary condition " />  
+
+> 8
+
+<bcvel ... comment =" Velocity boundary condition " />  
+
+> 9
+
+<mapfac value="4" comment ="x4 refinement , default: 1" />  
+
+> 10
+
+<nbsrange value="1" comment ="If provided , restricts neighbor search to 1particle in each direction . Default is original support length " />  
+
+> 11
+
+<density value="..." comment ="Mass density [kg/m^3]" />  
+
+> 12
+
+<artvisc factor1 ="..." factor2 ="..." comment =" Artificial viscosity factors , default: factor1 =0.2 factor2 =0" />  
+
+> 13
+
+<!-- Elastic constants - Option 1: Young ’s modulus and Poisson ’s ratio -->  
+
+> 14
+
+<youngmod value="..." comment ="Young ’s Modulus [Pa]" />  
+
+> 15
+
+<poissratio value="..." comment ="Poisson ’s ratio [-]" />  
+
+> 16 17
+
+<!-- Elastic constants - Option 2: Lame parameters directly -->  
+
+> 18
+
+<!-- <u_lambda value ="..." comment =" Lame lambda [Pa]" /> -->  
+
+> 19
+
+<!-- <u_mu value ="..." comment =" Lame mu (shear modulus ) [Pa]" /> -->  
+
+> 20 21
+
+<!-- Elastic constants - Option 3: Bulk and shear modulus -->  
+
+> 22
+
+<!-- <u_bulk value ="..." comment =" Bulk modulus [Pa]" /> --> 
+
+24 23 <!-- <u_mu value ="..." comment =" Shear modulus [Pa]" /> -->  
+
+> 24 25
+
+<!-- Constitutive model: 1= SVK ( default ), 2=Neo -Hookean , 3=J2 -->  
+
+> 26
+
+<constitmodel value="2" comment ="1:SVK , 2:Neo -Hookean , 3:J2 plasticity " />  
+
+> 27 28
+
+<!-- For J2 plasticity only ( required if constitmodel =3) -->  
+
+> 29
+
+<yieldstress value="..." comment =" Initial yield stress [Pa]" />  
+
+> 30
+
+<hardening value="..." comment =" Hardening modulus [Pa]" />  
+
+> 31 32
+
+<!-- Used for multi -body contact between deformstrucs -->  
+
+> 33
+
+<restcoef value="..." comment =" Restitution coefficient , default =1.0" />  
+
+> 34
+
+<kfric value="..." comment =" Friction coefficient , default =0.0" />  
+
+> 35 36
+
+<!-- Enables fracture . Default: false. Not available with J2 plasticity .-->  
+
+> 37
+
+<fracture value="true" comment =" Enables fracture " />  
+
+> 38
+
+<!-- If given , will restrict the damage of particles satisfying the expression to the value of the expression (can only be between 0 and 1) -->  
+
+> 39
+
+<restrictphi value=" expressionID " comment =" Restricts phase -field propagation according to expression ID"/>  
+
+> 40
+
+<!-- Critical energy release rate. Required if fracture is enabled .-->  
+
+> 41
+
+<Gc value="..." comment =" Fracture toughness [J/m^2]" />  
+
+> 42
+
+<!-- Phase -field length scale. Required if fracture is enabled .-->  
+
+> 43
+
+<pflenscale value="..." comment ="Length scale [m]" />  
+
+> 44
+
+<!-- Phase -field limit for soft particles . Default: 0.1. -->  
+
+> 45
+
+<pflim value="..." comment ="Phase -field threshold for soft particles " />  
+
+> 46
+
+<!-- Pre - existing notch surfaces defined by 4 points in 3D.-->  
+
+> 47
+
+<!-- Up to 512 notches can be applied to a body.-->  
+
+> 48
+
+<notch >  
+
+> 49
+
+...  
+
+> 50
+
+</notch >  
+
+> 51
+
+<notch >  
+
+> 52
+
+...  
+
+> 53
+
+</notch >  
+
+> 54 55
+
+<!-- Measuring surfaces defined by 4 points in 3D.-->  
+
+> 56
+
+<!-- Up to 512 measureplanes can be applied to a body.-->  
+
+> 57
+
+<measureplane >  
+
+> 58
+
+...  
+
+> 59
+
+</ measureplane >  
+
+> 60
+
+<measureplane >  
+
+> 61
+
+...  
+
+> 62
+
+</ measureplane > 
+
+25 63 </ deformstrucbody >  
+
+> 64 65
+
+<deformstrucbody mkbound ="2">  
+
+> 66
+
+...  
+
+> 67
+
+</ deformstrucbody >  
+
+> 68 69
+
+<deformstrucbody mkbound ="3">  
+
+> 70
+
+...  
+
+> 71
+
+</ deformstrucbody >  
+
+> 72
+
+...  
+
+> 73
+
+</ deformstrucs > 
+
+3.4. User-Defined Expressions 
+
+SoliDualSPHysics supports user-defined mathematical and logical expressions within the <special><mathexpressions> section. The input format is shown in Fig. 8. The following features  
+
+> 1
+
+<execution >  
+
+> 2
+
+<special >  
+
+> 3
+
+<mathexpressions >  
+
+> 4
+
+<userexpression id="1" comment ="Math expression ">  
+
+> 5
+
+<locals value="L0 =0.2; kw =9.375; cs =57.0"/>  
+
+> 6
+
+<expression value="if(x0 <=0.0 ,0.0 , if(t <=0.0 ,0.01 * cs * (( cos(kw*L0)+cosh( kw*L0))*( cosh(kw*x0)-cos(kw*x0)) + (sin(kw*L0)-sinh(kw*L0))*( sinh(kw* x0)-sin(kw*x0)))/ (( cos(kw*L0)+cosh(kw*L0))*( cosh(kw*L0)-cos(kw*L0)) +(sin(kw*L0)-sinh(kw*L0))*( sinh(kw*L0)-sin(kw*L0))),skip))"/>  
+
+> 7
+
+</ userexpression >  
+
+> 8
+
+<userexpression id="2" comment ="Math expression ">  
+
+> 9
+
+<expression value="if(x0 <0.0 ,0.0 , skip)"/>  
+
+> 10
+
+</ userexpression >  
+
+> 11
+
+</ mathexpressions >  
+
+> 12
+
+</ special >  
+
+> 13
+
+</ execution > 
+
+Figure 8: Input format for user-defined space- and time-dependent mathematical and logical expressions. 
+
+are supported: 
+
+• Built-in variables: initial position ( x0 , y0 , z0 ), current position ( x, y, z), displacement ( ux ,
+
+uy , uz ), time ( t), timestep ( dt ), and particle spacing ( dx ). 
+
+• Arithmetic operators: +, −, ∗, /.
+
+• Mathematical functions: log , ln , pow , sqrt , abs .
+
+• Trigonometric and hyperbolic functions: sin , cos , tan , cot , sinh , cosh , tanh , coth .26 • Logical operators: <, >, <=, >=, == , ! =, and , or .
+
+• Nested if clauses. 
+
+• Local variable definitions via the <locals> tag. 
+
+• The keyword Skip or skip , which causes a branch of an if clause to perform no operation. This is particularly useful when applying expressions to only a subset of particles. The <userexpression> block with id = 2 shown in Fig. 8 assigns a constant zero value to particles satisfying X1 < 0, while the block with id = 1 corresponds to 
+
+F(X1, t) =
+
+
+
+0.0 X1 ≤ 0.0 0.01 cs f (X1)  
+
+> f(L0)
+
+X1 > 0.0 and t ≤ 0.0 do nothing otherwise, (67) where the function f (x) is 
+
+f (x) = [cos( kwL0) + cosh( kwL0)] [cosh( kw x) − cos( kw x)] 
+
++ [sin( kwL0) − sinh( kwL0)] [sinh( kw x) − sin( kw x)]. (68) This example corresponds to the boundary conditions of a freely oscillating cantilever beam, where an initial velocity field is prescribed while the left end remains constrained throughout the simula-tion. Table 1–Table 3 summarize the supported variables, functions, and operators. 
+
+> Table 1: Built-in expression variables
+
+Variable Description Units 
+
+x0 Initial X-position m
+
+y0 Initial Y-position m
+
+z0 Initial Z-position m
+
+x Current X-position m
+
+y Current Y-position m
+
+z Current Z-position m
+
+ux X-displacement m
+
+uy Y-displacement m
+
+uz Z-displacement m
+
+t Current time s
+
+dt Current time step s
+
+dx Particle spacing m27 Table 2: Mathematical functions 
+
+Function Arguments Description Example 
+
+sin(x) 1 Sine sin(2*3.14159*t) cos(x) 1 Cosine cos(omega*t) tan(x) 1 Tangent tan(angle) sinh(x) 1 Hyperbolic sine sinh(x0) cosh(x) 1 Hyperbolic cosine cosh(x0) tanh(x) 1 Hyperbolic tangent tanh(x0/L) cot(x) 1 Cotangent cot(angle) coth(x) 1 Hyperbolic cotangent coth(x0) sqrt(x) 1 Square root sqrt(x0*x0+y0*y0) log(x) 1 Base-10 logarithm log(10) ln(x) 1 Natural logarithm ln(J) pow(x,y) 2 Power: xy pow(r,1.5) abs(x) 1 Absolute value abs(ux) if(c,t,f) 3 Conditional if(x0<0.5,1,0) 
+
+> Table 3: Expression operators with precedence
+
+Operator Precedence Associativity Description 
+
+or 1 Left Logical OR 
+
+and 2 Left Logical AND 
+
+<, >, <=, >=, ==, != 3 Left Comparison 
+
++, - 4 Left Addition, Subtraction 
+
+*, / 5 Left Multiplication, Division 
+
+ˆ 6 Right Exponentiation 
+
+3.5. Deformable-Structure Output Files 
+
+SoliDualSPHysics generates the following output files for deformable-structure simulations: 
+
+• Domain information : Information such as TLSPH cell division, number of neighbors, and initial particle velocities is written to the TLSPH_INFO directory. 
+
+• Energy tracking : The file DeformStruc_Energies.csv records the strain energy, kinetic energy, and fracture or plastic energy of each deformable structure over time. 
+
+• Measurements : The files MeasuringPlData*.csv contain measurement data associated with each <measureplane> .
+
+• VTK files : The directory DeformStruc/ contains VTK files with particle displacements, Cauchy stress components, and phase-field or plastic strain variables. 28 3.6. SoliDualSPHysics CPU /GPU Implementation 
+
+The core algorithms and C++ functions for deformable structures are imple-mented in the SoliDualSPHysics codebase within the files JSphCpuSingle.h/.cpp and 
+
+JSphGpuSingle.h/.cpp , corresponding to OpenMP-based CPU and GPU parallel execution, respectively. The CUDA kernels are implemented in JSphGpu_DefStruc_ker.h/.cu , while additional CUDA-optimized macros and inline functions are defined in TypesDef_GPU.h . The files JSphCpu_ExpressionParser.h/.cpp and JSphGpu_ExpressionParser.h/.cu contain the implementation and compilation logic for user-defined mathematical expressions on CPU and GPU architectures, respectively. A schematic overview of the CPU implementation, including the main functions and algorithmic workflow, is shown in Fig. 9. The GPU implementation follows a similar structure and naming convention, with computationally intensive operations parallelized across CUDA thread blocks. 
+
+3.7. Features and Capabilities of SoliDualSPHysics 
+
+The main features and capabilities of SoliDualSPHysics are summarized below: 1. Support for user-defined time- and space-dependent mathematical and logical expressions. 2. Flexible velocity and traction boundary conditions, applicable globally or to selected struc-tural groups. 3. Hybrid CPU–GPU parallel implementation based on OpenMP and CUDA. 4. Multi-resolution capability allowing independent particle-spacing refinement for each de-formable structure body. 5. Independent time-step refinement for solid mechanics, enabling optimal stability constraints without interfering with other time-integration parameters. 6. Support for hyperelastic constitutive models (St. Venant–Kirchho ff and Neo-Hookean) and finite-strain J2 plasticity with isotropic hardening. 7. Phase-field modeling of brittle fracture based on a hyperbolic formulation. 8. Tension-driven crack propagation enforced through decomposition of the strain tensor. 9. Definition of pre-existing cracks using geometric notch specifications. 10. Local measurement of displacements and forces on user-defined surface regions. 11. DEM-based contact interaction between deformable structures, leveraging the existing DEM contact implementation available in DualSPHysics. 29 Figure 9: Workflow of the CPU implementation for deformable structures in SoliDualSPHysics. The GPU implemen-tation follows a similar structure but parallelizes computationally heavy calculations across CUDA thread blocks. 
+
+30 4. Numerical Examples 
+
+In this section, we demonstrate the capabilities of SoliDualSPHysics through a set of numerical examples. Simulations were executed on two machines, each in CPU-only and GPU-accelerated modes (four compute configurations total). Machine 1 is a personal Windows 11 Pro laptop with an Intel Core Ultra 9 185H CPU (16 cores / 22 logical processors) and 63.5 GB RAM, equipped with a CUDA-capable NVIDIA GeForce RTX 4070 Laptop GPU (8 GB VRAM) (NVIDIA-SMI 560.94; CUDA 12.6). Machine 2 is a Rutgers University workstation running Ubuntu 24.04.3 with an Intel Xeon w9-3595X CPU (60 physical cores / 120 hardware threads) and 93 GB RAM, equipped with an NVIDIA RTX 4000 Ada Generation GPU (20 GB VRAM) (NVIDIA-SMI /driver 580.95.05; CUDA driver 13.0; CUDA compilation tools 12.0). Unless stated otherwise, CPU runs use 22 threads on Machine 1 and 96 threads on Machine 2, while GPU runs use a single GPU. Performance is evaluated separately for a representative case in the final subsection. The input files for all cases are provided in the Appendices. 
+
+4.1. Elasto-Dynamic Cases 4.1.1. Free Oscillation of a Cantilever Beam 
+
+We consider the free oscillation of a cantilever beam, a classical benchmark for assessing dis-persion and numerical dissipation in total Lagrangian SPH formulations [4, 37, 63]. The beam has length L0 = 0.2 m and height H0 = 0.02 m and is clamped at X1 = 0, as illustrated in Fig. 10. The material is modeled using the St. Venant–Kirchho ff constitutive law with μ = 0.715 MPa, 
+
+κ = 3.25 MPa, and density ρ0 = 1000 kg /m3, resulting in a shear-wave speed cs = 57 m /s[4, 37, 63]. A two-dimensional plane-strain setting is adopted with unit out-of-plane thickness 
+
+W0 = 1 m. The base particle spacing is dp = 1 mm. Mapping factors mapfac = 2, 4, 8 are consid-
+
+> Figure 10: Free oscillation of a cantilever beam. Problem setup.
+
+ered, corresponding to spatial resolutions ∆x = 0.5 mm, 0.25 mm, and 0.125 mm in the deformable body. The beam is initialized with a spatially varying velocity field in the X3-direction, 
+
+v3(X1, t = 0) = 0.01 cs
+
+f (X1)
+
+f (L0) , (69) 31 where 
+
+f ( ¯ x) =[cos( kwL0) + cosh( kwL0)][cosh( kw ¯x) − cos( kw ¯x)] 
+
++[sin( kwL0) − sinh( kwL0)][sinh( kw ¯x) − sin( kw ¯x)], (70) and kwL0 = 1.875 corresponds to the fundamental vibration mode. This velocity profile is imple-mented via a user-defined expression (Fig. 8) and applied through the XML input file, as shown in Fig. 11.  
+
+> 1
+
+<deformstrucbody mkbound ="1">  
+
+> 2
+
+<bcvel ze="1" xe="2" ye="2" comment =" Velocity BC" />  
+
+> 3
+
+<density value="1000.0 " comment ="Mass density " units_comment ="kg/m^3" />  
+
+> 4
+
+<u_mu value="0.715 e6" comment ="Shear modulus " units_comment ="Pa" />  
+
+> 5
+
+<u_bulk value="3.25 e6" comment ="Bulk modulus " units_comment ="Pa" />  
+
+> 6
+
+<constitmodel value="1" comment =" Constitutive model 1:SVK" />  
+
+> 7
+
+<artvisc factor1 ="0.015" factor2 ="0.01" comment =" Art. Visc." />  
+
+> 8
+
+<mapfac value="4" comment ="x4 refinement " />  
+
+> 9
+
+<measureplane comment =" Measure tip disp.">  
+
+> 10
+
+<p1 x=" 199.999e-3" y="#Lys" z="#LzMn" />  
+
+> 11
+
+<p2 x=" 199.999e-3" y="#Lyf + 0.5e-3" z="#LzMn" />  
+
+> 12
+
+<p3 x=" 199.999e-3" y="#Lyf + 0.5e-3" z="#LzMp" />  
+
+> 13
+
+<p4 x=" 199.999e-3" y="#Lys" z="#LzMp" />  
+
+> 14
+
+</ measureplane >  
+
+> 15
+
+</ deformstrucbody > 
+
+Figure 11: Free oscillation of a cantilever beam. XML definition of the deformable structure body and measurement plane used to extract the free-end displacement. 
+
+Under linear Euler–Bernoulli beam theory, the analytical solution for the free-end deflection, strain energy, and kinetic energy is 
+
+u3(L0, t) = 0.01 cs
+
+ω1
+
+sin( ω1t), (71) 
+
+Ee = ρ0L0H0W0
+
+8 (0.01 cs)2 sin 2(ω1t), (72) 
+
+Ek = ρ0L0H0W0
+
+8 (0.01 cs)2 cos 2(ω1t), (73) where 
+
+ω1 = k2
+
+> w
+
+√
+
+EI 
+
+ρ0H0W0
+
+, I = W0H30
+
+12 . (74) Since the present formulation is finite-strain hyperelastic, small deviations from the linear ana-lytical solution are expected due to geometric nonlinear e ff ects, particularly at larger oscillation amplitudes. 32 Fig. 12a–b present the time history of the free-end deflection in the X3- and X1-directions, respectively. Excellent agreement is observed with the analytical solution and reference FEM results. The energy evolution shown in Fig. 12c demonstrates near-conservative exchange between kinetic (KE) and potential (PE) energies, indicating minimal numerical dissipation. The Cauchy stress σ11 contours at t = 0.57 s are displayed in Fig. 12d and show close agreement with the results reported in [37, 64]. Reproducibility is facilitated through SoliDualSPHysics s XML-based 0 0.2 0.4 0.6 0.8 1
+
+Time [s] 
+
+-0.02 -0.01 00.01 0.02 0.03 0.04   
+
+> X3 Deflection of the free end  DualSPHysics 0.5mm
+> DualSPHysics 0.25mm
+> DualSPHysics 0.125mm
+> Analytical solution
+> FEM
+> Rahimi et. al.
+> Khayyer et. al.
+> (a)
+
+0 0.2 0.4 0.6 0.8 1
+
+Time [s] 
+
+-2e-03 -2e-03 -1e-03 -5e-04 0e+00  
+
+> X1 Deflection of the free end
+> DualSPHysics 0.5mm
+> DualSPHysics 0.25mm
+> DualSPHysics 0.125mm
+> FEM (b)
+
+0 0.2 0.4 0.6 0.8 1
+
+Time [s] 
+
+00.05 0.1 0.15 0.2  
+
+> Energy [J]
+> DualSPHysics KE
+> DualSPHysics PE
+> FEM KE
+> FEM PE
+> Analyt. KE
+> Analyt. PE
+> (c) (d)
+
+Figure 12: Free oscillation of a cantilever beam. (a) Time history of the free-end deflection in the X3-direction. (b) Time history of the free-end deflection in the X1-direction. (c) Kinetic (KE) and potential (PE) energies for 
+
+∆x = 0.125 mm. (d) Cauchy stress σ11 at t = 0.57 s. Comparison is made with the analytical solution, finite element simulations, and reference results from the literature [37, 64]. The analytical solution predicts zero X1-deflection under the small-strain assumption. 
+
+input structure (see Appendix 1), which enables concise specification of complex initial fields and boundary conditions. 33 4.1.2. Free Oscillation of a Cantilever Plate 
+
+We next consider the three-dimensional counterpart of the cantilever beam example presented in Section Section 4.1.1. The cantilever plate geometry (Fig. 13) has dimensions L0 = 0.2 m, 
+
+H0 = 0.02 m, and W0 = 0.06 m. The plate is clamped at X1 = 0 and initialized with the same velocity field defined in Eq. 69. The material parameters are identical to those of the 2D case, and the St. Venant–Kirchho ff constitutive model is employed. The discretization uses a particle spacing of ∆x = 0.5 mm, resulting in approximately two million particles. The complete XML input file is provided in Appendix 2. 
+
+> Figure 13: Free oscillation of a cantilever plate. Problem setup.
+
+The analytical small-strain solution for the fundamental bending mode is identical in form to that of the beam example and is derived from linear Euler–Bernoulli theory. As in the 2D case, mi-nor deviations are expected due to geometric nonlinearities inherent to the finite-strain formulation. Fig. 14 compares the predicted tip deflection and energy evolution with the analytical small-strain solution. The dominant oscillation frequency is accurately reproduced, and the expected exchange between kinetic (KE) and potential (PE) energies is observed, with negligible numerical drift, in-dicating stable long-time integration. 0 0.2 0.4 0.6 0.8 1        
+
+> Time [s]
+> -0.02 -0.01 00.01 0.02 0.03
+> X3 Deflection of the free end  DualSPHysics Analytical solution
+> (a) 00.2 0.4 0.6 0.8 1
+> Time [s]
+> 00.00 0.00 0.01 0.01 0.01 0.01
+> Energy [J]
+> DualSPHysics KE
+> DualSPHysics PE
+> Analyt. KE
+> Analyt. PE (b)
+> Figure 14: Free oscillation of the cantilever plate. (a) Time history of the free-end deflection in the X3-direction. (b) Kinetic (KE) and potential (PE) energies of the system. Comparison is made with the analytical small-strain solution.
+
+The Cauchy stress σ11 contours shown in Fig. 15 further confirm physically consistent bending 34 behavior. The peak stress occurs near the clamped region and evolves smoothly over time without spurious oscillations, consistent with an elastic, bending-dominated response.         
+
+> Figure 15: Free oscillation of a cantilever plate. Contours of Cauchy stress σ11 at t=35 ms and t=70 ms.
+
+4.1.3. Large Deformation of a 3D Cantilever Beam 
+
+We consider a three-dimensional cantilever beam subjected to a ramped, distributed surface traction to induce large deformation. The beam geometry (Fig. 16) has length L0 = 0.1 m, height 
+
+H0 = 0.01 m, and width W0 = 0.01 m, and is clamped at X1 = 0. The material is modeled using a compressible Neo-Hookean constitutive law with density ρ0 = 7800 kg /m3, Youngs modulus 
+
+E = 210 GPa, and Poissons ratio ν = 0.3. The discretization uses a particle spacing of ∆x = 1 mm with mapfac = 1. A distributed surface traction with peak magnitude Fmax = 1.75 × 10 9 N/m2 is applied through a linear ramp over Tmax = 1 s: 
+
+F(t) =
+
+
+
+Fmax t/Tmax t ≤ Tmax ,
+
+Fmax otherwise. (75) The traction is prescribed using user-defined expressions, as shown in Fig. 17. The complete XML 
+
+> Figure 16: Large deformation of a 3D cantilever beam. Problem setup.
+
+input file is provided in Appendix 3. This example is included to demonstrate the application of force boundary conditions in SoliDualSPHysics via a ramped distributed surface traction. The stress contours in Fig. 18 exhibit the expected bending-dominated pattern, with peak σ11 
+
+concentrated near the clamped end. The stress distribution evolves smoothly during loading and subsequent dynamic response, without spurious oscillations. The tip-deflection history shown in Fig. 19 demonstrates a smooth transition from the loading ramp to the dynamic response phase, 35 1 <special >  
+
+> 2
+
+<mathexpressions >  
+
+> 3
+
+<userexpression id="1" comment ="Math expression ">  
+
+> 4
+
+<locals value="Fmax = -1.75 e9; Tmax =1.0; xtip =0.099; "/>  
+
+> 5
+
+<expression value="if(x0 >xtip ,if(t<=Tmax ,t/Tmax ,1.0)*Fmax ,skip)"/>  
+
+> 6
+
+</ userexpression >  
+
+> 7
+
+<userexpression id="2" comment ="Math expression ">  
+
+> 8
+
+<expression value="if(x0 <=0.0 ,0.0 , skip)"/>  
+
+> 9
+
+</ userexpression >  
+
+> 10
+
+</ mathexpressions >  
+
+> 11
+
+<deformstrucs >  
+
+> 12
+
+<deformstrucbody mkbound ="1">  
+
+> 13
+
+<bcforce type="2" ze="1" comment =" Distributed load" />  
+
+> 14
+
+<bcvel xe="2" ye="2" ze="2" comment =" Velocity constraint in x,y,z" />  
+
+> 15
+
+<density value="7800.0 " comment ="Mass density " units_comment ="kg/m^3" />  
+
+> 16
+
+<youngmod value="210.0 e9" comment ="Young Modulus " units_comment ="Pa" />  
+
+> 17
+
+<poissratio value="0.3" comment ="Poisson ’s ratio" />  
+
+> 18
+
+<constitmodel value="2" comment =" Constitutive model 2:Neo - Hookean " />  
+
+> 19
+
+<avfactor value="0.1" comment =" Artificial viscosity factor " />  
+
+> 20
+
+<mapfac value="1" comment ="x1 refinement " />  
+
+> 21
+
+<measureplane comment =" Measure tip displacement ">  
+
+> 22
+
+<p1 x="100.4e-3" y="#Ly *0.455 " z="#Lz *0.455 " />  
+
+> 23
+
+<p2 x="100.4e-3" y="#Ly *0.555 " z="#Lz *0.455 " />  
+
+> 24
+
+<p3 x="100.4e-3" y="#Ly *0.555 " z="#Lz *0.555 " />  
+
+> 25
+
+<p4 x="100.4e-3" y="#Ly *0.455 " z="#Lz *0.555 " />  
+
+> 26
+
+</ measureplane >  
+
+> 27
+
+</ deformstrucbody >  
+
+> 28
+
+</ deformstrucs >  
+
+> 29
+
+</ special > 
+
+Figure 17: Large deformation of a 3D cantilever beam. XML definition of the deformable structure body, boundary conditions, and measurement plane. 
+
+Figure 18: Large deformation of a 3D cantilever beam. Contour plots of σ11 at various time instances. 
+
+36 0 0.5 1 1.5 2    
+
+> Time [s]
+> -0.1 -0.08 -0.06 -0.04 -0.02 0
+> Deflection [m]
+> in X 1direction
+> in X 3direction Figure 19: Large deformation of a 3D cantilever beam. Free end deflection in the X1- and X3-directions as a function of time..
+
+with no evidence of numerical instability. The overall displacement and stress trends are in quali-tative agreement with reference results reported in [65, 66]. 
+
+4.1.4. Twisting 3D Column 
+
+This case assesses the framework’s ability to resolve torsional dynamics and the associated propagation of stress waves. We consider a three-dimensional elastic column (Fig. 20) of height 
+
+L0 = 6 m aligned with the X3-axis and square cross-section of side length H0 = 1 m. The column is assigned a non-uniform initial angular velocity about the X3-axis and is subsequently clamped at its base ( X3 = 0) at t = 0, allowing the system to evolve freely thereafter. The prescribed angular velocity profile is 
+
+ω0(X3) = 105 sin 
+
+(πX3
+
+2L0
+
+)
+
+, (76) implemented through Cartesian velocity components using user-defined expressions, as shown in Fig. 21. The velocity field is applied only at t = 0 to initialize the torsional motion, while the base of the column remains constrained throughout the simulation. The material is modeled as a compressible Neo-Hookean solid with density ρ0 = 1100 kg /m3, Youngs modulus E = 1.7 ×10 7 Pa, and Poissons ratio ν = 0.45. The column is discretized using a particle spacing of ∆x = 0.0333 m. The complete case definition is provided in Appendix 4. Fig. 22 shows the evolution of σ33 during the first 200 ms. Immediately after the base constraint is enforced, a clean torsional wave propagates along the column. The structure subsequently un-dergoes elastic recovery toward its undeformed configuration, completing approximately half a torsional cycle by t ≈ 180 ms. The absence of spurious high-frequency oscillations in the stress field indicates stable wave propagation and adequate numerical regularization. The predicted dy-namics are consistent with the trends reported in [67]. 37 Figure 20: Twisting 3D column. Problem setup.  
+
+> 1
+
+<special >  
+
+> 2
+
+<mathexpressions >  
+
+> 3
+
+<userexpression id="1" comment ="User expression ">  
+
+> 4
+
+<locals value="xcent =0.5; ycent =0.5; omega =105.0 "/>  
+
+> 5
+
+<expression value="if(z0 <=0.0 ,0.0 , if(t<=0, omega*sin (0.2619047* z0)*( ycent -y0),skip))"/>  
+
+> 6
+
+</ userexpression >  
+
+> 7
+
+<userexpression id="2" comment ="User expression ">  
+
+> 8
+
+<locals value="xcent =0.5; ycent =0.5; omega =105.0 "/>  
+
+> 9
+
+<expression value="if(z0 <=0.0 ,0.0 , if(t<=0, omega*sin (0.2619047* z0)*(x0 -xcent),skip))"/>  
+
+> 10
+
+</ userexpression >  
+
+> 11
+
+<userexpression id="3" comment ="User expression ">  
+
+> 12
+
+<expression value="if(z0 <=0.0 ,0.0 , skip)"/>  
+
+> 13
+
+</ userexpression >  
+
+> 14
+
+</ mathexpressions >  
+
+> 15
+
+<deformstrucs >  
+
+> 16
+
+<deformstrucbody mkbound ="1">  
+
+> 17
+
+<bcvel xe="1" ye="2" ze="3" comment =" Velocity BC" />  
+
+> 18
+
+<density value="1100.0 " comment ="Mass density "/>  
+
+> 19
+
+<youngmod value="170.0 e5" comment ="Young Modulus "/>  
+
+> 20
+
+<poissratio value="0.45" comment ="Poisson ’s ratio" />  
+
+> 21
+
+<artvisc factor1 ="0.5" factor2 ="0.0" comment ="Art. Visc." />  
+
+> 22
+
+<constitmodel value="2" comment ="Const. model 2:Neo - Hookean " />  
+
+> 23
+
+<mapfac value="3" />  
+
+> 24
+
+</ deformstrucbody >  
+
+> 25
+
+</ deformstrucs >  
+
+> 26
+
+</ special > 
+
+Figure 21: Twisting 3D column. Definition of deformable structure body and boundary conditions. 
+
+38 Figure 22: Twisting 3D column. Contours of Cauchy stress σ33 during the first 200 ms of the simulation, shown at 10 ms intervals from left to right. 
+
+39 4.2. Fracture Cases 4.2.1. Dynamic Crack Branching 
+
+To demonstrate the framework’s capability to model dynamic brittle fracture, we simulate the benchmark problem of crack branching in a pre-notched plate subjected to tensile loading [35, 39]. The plate geometry ( L0 = 100 mm, H0 = 40 mm) with a pre-existing notch of length 50 mm is shown in Fig. 23. A constant traction boundary condition ( σ33 = 1 MPa) is applied on the top and bottom surfaces for the duration of the simulation. The material parameters are Young’s modulus 
+
+E = 32 GPa, Poisson’s ration ν = 0.2, density ρ0 = 2450 kg /m3, and fracture energy Gc = 3 J /m2.The St. Venant–Kirchho ff constitutive model is employed in combination with the phase-field formulation. The phase-field length scale is set to ϵ0 = 0.125 mm, and the particle spacing is 
+
+∆x = 0.06125 mm. The complete XML definition of the case is provided in Appendix 5. 
+
+> Figure 23: Dynamic crack branching. Problem setup.
+
+Fig. 24 presents contours of the phase-field variable (representing the crack path) and the σ33 
+
+component of the Cauchy stress at approximately 80 ¸ ts. Crack initiation occurs at the notch tip at approximately 14 ¸ ts, followed by branching at approximately 35 ¸ ts with a divergence angle of about 60 ◦. The crack propagates symmetrically, in agreement with previously reported results [35, 39, 40]. The stress concentration near the crack tip is consistent with theoretical expectations for dynamic brittle fracture. The evolution of strain energy (SE) and fracture energy (FE) is shown in Fig. 25. As crack propagation progresses, the strain energy decreases while the fracture energy increases, indicating proper energy transfer from stored elastic energy to crack surface formation. The predicted energy histories closely match the results reported in [35, 39]. 
+
+4.2.2. Kaltho ff -Winkler Experiment 
+
+Here we simulate the classical Kaltho ff –Winkler impact experiment [68], in which a pre-notched plate subjected to dynamic shear loading exhibits brittle crack initiation at a characteristic angle. This benchmark is widely used to assess the ability of numerical methods to capture dy-namic fracture under mixed-mode loading. The plate geometry ( L0 = 100 mm, H0 = 100 mm) 40 Figure 24: Dynamic crack branching. Contours of the phase-field variable (left) and the Cauchy stress component σ33 
+
+(right) at t = 80 μs. The deformed configuration is magnified by a factor of 50 for visualization. 0 10 20 30 40 50 60 
+
+Time[ s] 
+
+> 00.1 0.2
+> Energy[J]
+
+Figure 25: Dynamic crack branching. Evolution of strain energy (SE) and fracture energy (FE), compared with results from Rahimi et al . [35] and Borden et al . [39]. 
+
+41 with a pre-existing notch of length 50 mm is shown in Fig. 26. The material response is modeled using the St. Venant–Kirchho ff constitutive model coupled with the hyperbolic phase-field formu-lation for brittle fracture. The material parameters are Young’s modulus E = 190 GPa, Poisson’s ratio ν = 0.3, density ρ0 = 8000 kg /m3, and fracture energy Gc = 22.13 kJ /m2. The phase-field length scale and particle spacing are set to ϵ0 = 0.15 mm and ∆x = 0.125 mm, respectively. Impact 
+
+> Figure 26: Kaltho ff -Winkler experiment. (a) Problem setup. (b) Ramped velocity boundary condition applied to the impact region.
+
+loading is applied as a ramped velocity boundary condition in the X1-direction to the region labeled 
+
+mk="2" (auxiliary geometry). The imposed velocity profile is 
+
+vx(t) =
+
+ 
+
+> tt0
+
+· 16.5 m /s t ≤ t0,16.5 m /s otherwise, (77) where t0 = 1 ¸ ts. The time-dependent profile is implemented via nested if clauses in the XML input file using <mathexpressions> . The complete case definition is provided in Appendix 6. Fig. 27 shows the phase-field contours (crack path) and the σ11 component of the Cauchy stress at t = 80 ¸ ts. Crack initiation occurs at approximately t ≈ 23 ¸ ts, followed by diagonal crack propagation forming an angle of approximately 70 ◦ with respect to the notch plane, consistent with experimental observations and prior numerical studies [35, 39, 68]. The stress field exhibits the expected concentration near the crack tip during propagation, without spurious oscillations. The energy evolution is shown in Fig. 28. During crack propagation, strain energy (SE) decreases while fracture energy (FE) increases, indicating proper conversion of stored elastic energy into fracture surface energy. The predicted energy histories are in close agreement with the results reported in [35, 39]. 42 Figure 27: Kaltho ff -Winkler experiment. Contours of the phase-field variable (crack path) and the Cauchy stress component σ11 at t = 80 ¸ ts. 0 20 40 60 80 100 
+
+Time[ s] 
+
+> 01234567
+> Energy[KJ]
+
+Figure 28: Kaltho ff -Winkler experiment. Evolution of strain energy (SE) and fracture energy (FE), compared with results from Rahimi et al . [35] and Borden et al . [39]. 
+
+43 4.2.3. Four-Point Bending 
+
+As a final fracture benchmark, we simulate dynamic four-point bending of a pre-notched beam and investigate the influence of the initial crack inclination on subsequent crack growth. The specimen contains a pre-existing slit crack of width 2 mm and height 6 mm, introduced at three tilt angles θ0 ∈ { 90 ◦, 60 ◦, 45 ◦} (tilted in the X2-direction), following the benchmark of Hug et al . [69]. The beam geometry ( L0 = 80 mm, H0 = 20 mm, W0 = 10 mm) is shown in Fig. 29. The material properties are density ρ0 = 50 kg /m3, Youngs modulus E = 12.44 GPa, and Poissons ratio ν = 0.3, and the Saint Venant–Kirchho ff constitutive model is employed. Brittle fracture is described using the hyperbolic phase-field formulation with fracture energy Gc = 11.8 × 10 3 J/m2 and phase-field length scale ϵ0 = 0.25 mm. The particle spacing is set to ∆x = 0.2 mm. Four-point bending is imposed through prescribed velocities applied over four localized loading /support regions on the top and bottom surfaces, with a maximum magnitude of Vmax = 10 m /s maintained for the duration of the simulation. The complete case definition is provided in Appendix 7.    
+
+> Figure 29: Four-point bending. Problem setup. θ0denotes the initial tilt angle of the pre-existing crack in the X2-direction.
+
+Strongly localized kinematic boundary conditions may induce non-physical damage nucleation in particle-based simulations due to steep gradients near constrained particles [70–72]. To prevent spurious crack initiation at the loading points, we enforce a lower bound on the phase-field variable in small neighborhoods around the four boundary-condition regions using the <restrictphi> key-word. Specifically, particles satisfying the user-defined expression with id=1 are constrained to remain nearly intact ( s ≥ 0.9999), ensuring that fracture initiates only from the pre-existing notch while leaving the bulk response una ff ected. Fig. 31 presents the evolution of the phase-field variable for the three initial crack inclina-tions. In all cases, damage initiates at the pre-notch tip and evolves into a well-defined crack that propagates through the beam, demonstrating robust handling of mixed-mode crack growth under dynamic bending. For θ0 = 90 ◦, crack propagation is predominantly planar and mode-I domi-nated, rapidly localizing into a nearly straight fracture band. For inclined notches ( θ0 = 60 ◦ and 44 1 <special >  
+
+> 2
+
+<mathexpressions >  
+
+> 3
+
+<userexpression id="1" comment ="phi constrain ">  
+
+> 4
+
+<expression value=" if(z0 <0.00090 and x0 >=0.002525 and x0 <=0.005475 , 0.9999 , if(z0 <0.00090 and x0 >=0.074525 and x0 <=0.077475 , 0.9999 , if (z0 >0.01910 and x0 >=0.018450 and x0 <=0.021400 , 0.9999 , if(z0 >0.01910 and x0 >=0.058600 and x0 <=0.061550 , 0.9999 , skip))))"/>  
+
+> 5
+
+</ userexpression >  
+
+> 6
+
+<userexpression id="2" comment ="z bc">  
+
+> 7
+
+<locals value="Velmax =10.0"/>  
+
+> 8
+
+<expression value="if(z0 <0.00010 and x0 >=0.003825 and x0 <=0.004225 , Velmax , if(z0 <0.00010 and x0 >=0.075625 and x0 <=0.076175 , Velmax , if (z0 >0.01990 and x0 >=0.01970 and x0 <=0.020100 , -Velmax , if(z0 >0.01990 and x0 >=0.059900 and x0 <=0.060250 , -Velmax , skip))))"/>  
+
+> 9
+
+</ userexpression >  
+
+> 10
+
+</ mathexpressions >  
+
+> 11
+
+<deformstrucs >  
+
+> 12
+
+<deformstrucbody mkbound ="1">  
+
+> 13
+
+<bcvel ze="2" />  
+
+> 14
+
+<restrictphi value="1"/>  
+
+> 15
+
+<density value="50.0" />  
+
+> 16
+
+<youngmod value="12.44 e9" />  
+
+> 17
+
+<poissratio value="0.3" />  
+
+> 18
+
+<fracture value="1" />  
+
+> 19
+
+<Gc value="11.8 e3" />  
+
+> 20
+
+<pflenscale value="0.25e-3" />  
+
+> 21
+
+<notch >  
+
+> 22
+
+<p1 x="0.04" y="0.0e-3" z=" -1.0e-3" />  
+
+> 23
+
+<p2 x="0.04" y="0.0e-3" z="0.0056 " />  
+
+> 24
+
+<p3 x="#xc0" y="10.0e-3" z="0.0056 " />  
+
+> 25
+
+<p4 x="#xc0" y="10.0e-3" z=" -1.0e-3" />  
+
+> 26
+
+</notch >  
+
+> 27
+
+</ deformstrucbody >  
+
+> 28
+
+</ deformstrucs >  
+
+> 29
+
+</ special > 
+
+Figure 30: Four-point bending. Definition of the deformable body, velocity boundary conditions, and phase-field restriction near the loading regions. 
+
+45 45 ◦), early crack growth initially follows the slit orientation and subsequently kinks as bending-induced tensile stresses dominate. This reorientation produces a curved damage band and stronger mixed-mode characteristics. At later stages, the crack reaches the tensile surface and extends along the top region, reflecting the transition from notch-controlled initiation to global bending-driven propagation. The final fracture surfaces extracted from the damaged region are shown in Fig. 32.         
+
+> Figure 31: Four-point bending. Crack evolution visualized through contours of the phase-field variable sfor θ0=
+> 90 ◦, 60 ◦, 45 ◦at selected times. Particles with s<0.1 are omitted for clarity.
+
+The θ0 = 90 ◦ case produces an essentially planar surface, whereas the inclined-notch cases de-velop more tortuous and non-planar fracture surfaces, indicating increased shear contribution and mixed-mode kinematics. Overall, the predicted crack paths and qualitative surface morphologies agree with the numerical and experimental trends reported in [69], supporting the capability of SoliDualSPHysics to reproduce angle-dependent crack growth in three-dimensional bending. 
+
+4.3. Plasticity Cases 4.3.1. Flyer Plate Impact 
+
+This benchmark examines large-deformation plasticity and deformable–deformable contact by impacting two identical plates at a relative speed of 400 m /s. The configuration is shown in Fig. 33. Each plate is assigned an initial velocity of ±200 m /s (applied at t = 0), resulting in a symmetric head-on collision about the mid-plane. The plates are modeled as square blocks of dimensions 1 m × 1 m in a plane-strain configuration. The material response is described using the finite-strain 
+
+J2 elastoplastic model with isotropic hardening. Both plates are assigned density ρ0 = 7870 kg /m3,46 Figure 32: Four-point bending. Final fracture surfaces for θ0 = 90 ◦, 60 ◦, 45 ◦. Increased tortuosity and out-of-plane deformation are observed as the initial crack tilt enhances mixed-mode e ff ects. Particles with s < 0.1 are omitted for clarity. 
+
+Young’s modulus E = 200 GPa, Poisson’s ratio ν = 0.29, initial yield stress σy0 = 400 MPa, and hardening modulus H = 100 MPa. The particle spacing is set to ∆x = 0.01 m. Contact between the bodies is handled using the DEM-based interaction model with restitution coe ffi cient 0.95 and contact scaling coe ffi cient contcoeff = 5. The complete XML setup is shown in Fig. 34. 
+
+> Figure 33: Flyer plate impact. Problem setup.
+
+Fig. 35 shows the evolution of equivalent plastic strain following impact. At early times, plas-ticity initiates at the contact interface and near the impacted corners, consistent with the high compressive stresses and sharp strain gradients generated by the collision. As time advances, the plastic zone expands away from the interface and the bodies exhibit the expected lateral spreading (barreling /mushrooming) under intense compressive loading. At later times, as particle distribu-tions become increasingly distorted, minor contact irregularities may appear due to the limitations of pairwise DEM-type interaction under extreme deformation. Such behavior is typical in particle-based impact simulations. A more advanced particle-to-surface contact formulation based on in-47 1 <special >  
+
+> 2
+
+<deformstrucs >  
+
+> 3
+
+<contcoeff value="5" />  
+
+> 4
+
+<deformstrucbody mkbound ="1">  
+
+> 5
+
+<bcvel z=" -200.0" tend="0.0"/>  
+
+> 6
+
+<density value="7870.0 " />  
+
+> 7
+
+<youngmod value="200.0 e9" />  
+
+> 8
+
+<poissratio value="0.29" />  
+
+> 9
+
+<artvisc factor1 ="0.05" factor2 ="0.0" />  
+
+> 10
+
+<constitmodel value="3" />  
+
+> 11
+
+<restcoef value="0.95" />  
+
+> 12
+
+<yieldstress value="4.0 e8" />  
+
+> 13
+
+<hardening value="1.0 e8" />  
+
+> 14
+
+</ deformstrucbody >  
+
+> 15
+
+<deformstrucbody mkbound ="2">  
+
+> 16
+
+<bcvel z="200.0" tend="0.0"/>  
+
+> 17
+
+<density value="7870.0 " />  
+
+> 18
+
+<youngmod value="200.0 e9" />  
+
+> 19
+
+<poissratio value="0.29" />  
+
+> 20
+
+<artvisc factor1 ="0.05" factor2 ="0.0" />  
+
+> 21
+
+<constitmodel value="3" />  
+
+> 22
+
+<restcoef value="0.95" />  
+
+> 23
+
+<yieldstress value="4.0 e8" />  
+
+> 24
+
+<hardening value="1.0 e8" />  
+
+> 25
+
+</ deformstrucbody >  
+
+> 26
+
+</ deformstrucs >  
+
+> 27
+
+</ special > 
+
+Figure 34: Flyer plate impact. Definition of deformable structure bodies and boundary conditions. 
+
+48 Figure 35: Flyer plate impact. Evolution of equivalent plastic strain at selected time instants following impact. 
+
+terface reconstruction could further improve robustness in highly distorted regimes; this extension is left for future work. 
+
+4.3.2. 3D Taylor Bar Impact 
+
+Finally, we simulate the plastic deformation of a Taylor bar subjected to impact, a standard benchmark for assessing large-strain J2 plasticity algorithms under high-rate loading [73, 74]. The geometry is shown in Fig. 36 and consists of a cylindrical bar of initial length L0 = 32.4 mm and radius R0 = 3.2 mm. The material response is governed by the finite-strain J2 plasticity model with isotropic hardening. The material parameters are density ρ0 = 8930 kg /m3, Young’s modulus 
+
+E = 117 GPa, Poisson’s ratio ν = 0.35, initial yield stress σy0 = 400 MPa, and hardening modulus 
+
+H = 100 MPa. The bar is discretized using a particle spacing of ∆x = 0.2 mm and is assigned an initial axial velocity v3 = −227 m /s. Impact against a rigid surface is modeled by enforcing zero axial velocity on particles located at the base ( X3 ≈ 0), while the remainder of the bar retains the prescribed initial velocity at t = 0. This condition is implemented via a user-defined expression (see Fig. 37), which sets v3 = 0 for particles at the base and v3 = −227 m /s elsewhere at the initial time. The full case setup is provided in Appendix 9. Fig. 38 compares the predicted radial expansion against axial shortening of the bar. The com-puted trajectory closely follows the reference results of Chen et al . [73] and Montans et al . [74], indicating that the implemented multiplicative return-mapping procedure accurately captures the 49 Figure 36: 3D Taylor bar impact. Problem setup.  
+
+> 1
+
+<special >  
+
+> 2
+
+<mathexpressions >  
+
+> 3
+
+<userexpression id="1">  
+
+> 4
+
+<locals value="Vinit = -227;"/>  
+
+> 5
+
+<expression value="if(z <1.0e -12 ,0.0 , if(t <=0.0 , Vinit ,skip))"/>  
+
+> 6
+
+</ userexpression >  
+
+> 7
+
+</ mathexpressions >  
+
+> 8
+
+<deformstrucs >  
+
+> 9
+
+<deformstrucbody mkbound ="1">  
+
+> 10
+
+<bcvel ze="1" />  
+
+> 11
+
+<density value="8930.0 "/>  
+
+> 12
+
+<youngmod value="1.17 e11" />  
+
+> 13
+
+<poissratio value="0.35" />  
+
+> 14
+
+<artvisc factor1 ="0.05" factor2 ="0.0" />  
+
+> 15
+
+<constitmodel value="3"/>  
+
+> 16
+
+<yieldstress value="400.0 e6" />  
+
+> 17
+
+<hardening value="100.0 e6" />  
+
+> 18
+
+</ deformstrucbody >  
+
+> 19
+
+</ deformstrucs >  
+
+> 20
+
+</ special > 
+
+Figure 37: 3D Taylor bar impact. Definition of deformable structure body and boundary conditions. 
+
+50 global plastic flow and final upset geometry. The equivalent plastic strain fields in Fig. 39 show 0 2 4 6 8 10 
+
+Reduction in length[mm]      
+
+> 012345
+> Increase in radius[mm]
+> Figure 38: 3D Taylor bar impact. Radial expansion versus axial shortening of the bar, compared with reference solutions from Chen et al . [73] and Montans et al . [74]
+> Figure 39: 3D Taylor bar impact. Contours of equivalent plastic strain during the first 100 μs after impact (shown at 20 μs intervals from left to right). Plastic deformation localizes near the impacted end and progressively spreads as mushrooming develops. The predicted strain patterns are consistent with published benchmark results [73, 74].
+
+strong localization near the impacted end, where compressive stresses and plastic flow are highest immediately after impact. As deformation progresses, the plastic zone spreads radially and axially, leading to the characteristic mushrooming profile of the Taylor bar. The resulting deformed shapes and strain distributions are consistent with published benchmark solutions [73, 74], demonstrating the robustness of the present implementation for large-deformation elastoplastic dynamics. 51 4.4. Performance Analysis 
+
+This section evaluates the computational performance of the present software for the four-point bending benchmark under multiple constitutive and damage settings, and quantifies the benefits of CPU parallelism and GPU acceleration. The benchmark variants are: 
+
+• CaseA1: St. Venant–Kirchho ff hyperelasticity, 
+
+• CaseA2: Neo-Hookean hyperelasticity, 
+
+• CaseB1: fracture-enabled St. Venant–Kirchho ff hyperelasticity, 
+
+• CaseB2: fracture-enabled Neo-Hookean hyperelasticity, and 
+
+• CaseC: finite-strain J2 plasticity with isotropic hardening. Within each case, we keep numerical settings identical across hardware backends (particle reso-lution, time-integration settings, and solver parameters); across cases, only constitutive /fracture options di ff er. Fig. 40a compares the five benchmark variants at a fixed particle count (1M particles) on both machines. Across all cases, the GPU time per step is highly stable: on Machine 1, GPU tim-ings vary by less than 0.25% across constitutive choices, and on Machine 2 the variation is below 0.15%. This indicates that, at this scale, the per-step cost is dominated by kernels common to all configurations (e.g., neighbor interaction and particle update stages), while the incremental cost of switching between plasticity, SVK or NH constitutive models, or enabling fracture, remains comparatively small along the GPU path. On the CPU, the spread across cases is larger (approxi-mately 9–11%), consistent with the higher relative impact of constitutive and damage updates in a CPU execution path. Overall, Fig. 40a confirms a consistent reduction in time per step with GPU execution on both machines. On Machine 1, the GPU is consistently ∼3.7–4.1 × faster than the 22-thread CPU configuration across the five cases (equivalently, ∼3.7–4.1 × higher throughput). On Machine 2, the GPU re-mains faster, but the gap is smaller because the many-core CPU is substantially stronger: the GPU provides approximately ∼1.55–1.71 × speedup over the 96-thread CPU configuration, depending on the case. Overall, these results show that the GPU implementation delivers robust acceleration, while the relative gain depends on the strength of the CPU subsystem and the parallel e ffi ciency attained by the CPU implementation. Fig. 40b reports CPU strong-scaling for CaseA1 at 1M particles. Both platforms exhibit the ex-pected decrease in time per step as the number of CPU threads increases, followed by diminishing returns once memory bandwidth, synchronization overheads, and parallel-region costs become sig-nificant. On Machine 1, scaling improves up to the full 22-thread configuration, reaching an overall 52 CaseA1 CaseA2 CaseB1 CaseB2 CaseC 
+
+Test case (1M particles) 
+
+00.1 0.2 0.3 0.4 0.5 
+
+> Time [s/step]
+> Machine 1 GPU
+> Machine 2 GPU
+> Machine 1 CPU (22)
+> Machine 2 CPU (96) (a)
+
+0 20 40 60 80 
+
+CPU cores 
+
+020 40 60 80  
+
+> Speedup (x)
+> Machine 1 CPU
+> Machine 2 CPU
+> Ideal (b)
+
+10 6
+
+Particles 
+
+00.2 0.4 0.6 0.8 11.2 
+
+> Time [s/step]
+> Machine 1 CPU (22)
+> Machine 1 GPU
+> Machine 2 CPU (96)
+> Machine 2 GPU
+> (c)
+
+Figure 40: (a) Time per step for the five benchmark variants at 1M particles on Machine 1 and Machine 2, comparing CPU execution (maximum available thread count) and GPU execution. (b) CPU strong-scaling for CaseA1 at 1M particles on Machine 1 and Machine 2; speedup is reported relative to the single-core baseline. (c) Problem-size scaling for CaseA1: time per step as a function of particle count on Machine 1 and Machine 2 for CPU (maximum available thread count) and GPU runs (particle count is shown on a logarithmic scale). 
+
+53 speedup of ∼6× relative to the single-core baseline, after which benefits saturate. On Machine 2, the stronger CPU subsystem yields better scaling, reaching ∼12 × speedup at 22 threads and con-tinuing to improve up to around 50 threads (speedup ∼14 ×), after which scaling plateaus and may slightly regress at the largest thread count shown. This behavior is consistent with strong-scaling limits in bandwidth-bound particle interaction kernels. Fig. 40c evaluates CaseA1 across multiple particle counts using the maximum machine capac-ity on each backend. The results exhibit near-linear scaling of time per step with particle count (equivalently, throughput decreases approximately inversely with particle count), consistent with the expected O(N) cost of particle updates when the average neighbor count is controlled. For ex-ample, increasing the problem size from 260k to 3.345M particles reduces throughput by roughly an order of magnitude while the particle count increases by about 12.9 ×, indicating close-to-linear scaling in the dominant kernels. The Machine 2 GPU consistently delivers the best performance over the tested range and maintains a stable advantage over the Machine 2 CPU configuration. At the largest particle counts, some deviations from ideal linear scaling are observed, especially for Machine 1 CPU, consistent with increasing memory-bandwidth pressure in the particle interaction kernels. In summary, Fig. 40 demonstrates: 
+
+• stable per-step cost across a range of constitutive models and fracture settings (especially on GPU), 
+
+• significant acceleration from GPU execution on both platforms, and 
+
+• strong-scaling benefits on CPU up to moderate thread counts. These trends indicate that further CPU performance gains would likely require improved mem-ory locality and reduced synchronization overhead, while additional GPU improvements would primarily stem from kernel-level optimizations and reduced memory tra ffi c. 
+
+5. Conclusions 
+
+We introduced SoliDualSPHysics, an open-source, GPU-accelerated extension of Dual-SPHysics for the simulation of standalone solid mechanics problems involving hyperelasticity, finite-strain plasticity, and brittle fracture within a unified smoothed particle hydrodynamics (SPH) framework. The governing equations are discretized using a total Lagrangian SPH formulation, while brittle fracture is incorporated through a hyperbolic phase-field approach that enables crack initiation, propagation, branching, and coalescence without explicit crack tracking. Finite-strain J2
+
+plasticity is formulated using a multiplicative decomposition, ensuring objectivity and thermody-namic consistency under large deformations. The framework further supports user-defined mathe-matical expressions for prescribing complex time- and space-dependent boundary conditions, and 54 leverages DualSPHysics’ native CPU /GPU parallel architecture to achieve high computational ef-ficiency. The numerical examples demonstrate very good agreement with published computational re-sults and experimental observations, and demonstrate that the software reproduces the major qual-itative and quantitative features of the considered applications. The performance study indicates near-linear problem-size scaling in the dominant kernels and substantial GPU acceleration relative to multi-core CPU execution, with expected strong-scaling saturation at high thread counts. Overall, this work establishes SoliDualSPHysics as a robust and extensible solid mechanics and fracture module within the DualSPHysics ecosystem. Future developments will focus on tightly coupled fluid–structure interaction with large deformations and fracture, further performance opti-mization, and application to complex real-world engineering problems. 
+
+Code Availability 
+
+The source code of SoliDualSPHysics is openly available at: https: // github.com /naqibr /
+
+SoliDualSPHysics. 
+
+Acknowledgments 
+
+This work was supported by the National Science Foundation under Grant No. 2545336. The authors are grateful to the developers of the open-source DualSPHysics code. 55 Appendices: XML Input files for SoliDualSPHysics cases 1. Free oscillation of a cantilever beam  
+
+> 1
+
+<?xml version ="1.0" encoding ="UTF -8" ?>  
+
+> 2
+
+<case >  
+
+> 3
+
+<casedef >  
+
+> 4
+
+<constantsdef >  
+
+> 5
+
+<gravity x="0" y="0" z="0.0" comment =" Gravitational acceleration " units_comment ="m/s^2" />  
+
+> 6
+
+<rhop0 value="997" comment =" Reference density of the fluid" units_comment ="kg/m^3" />  
+
+> 7
+
+<hswl value="0" auto="true" comment =" Maximum still water level to calculate speedofsound using coefsound " units_comment ="metres (m)" /> 
+
+> 8
+
+<gamma value="7" comment =" Polytropic constant for water used in the state equation " />  
+
+> 9
+
+<speedsystem value="10" auto="false" comment =" Maximum system speed (by default the dam -break propagation is used)" />  
+
+> 10
+
+<coefsound value="10" comment =" Coefficient to multiply speedsystem " />  
+
+> 11
+
+<coefh value="1.0" comment =" Coefficient to calculate the smoothing length (h=coefh*sqrt (3* dp ^2) in 3D)" />  
+
+> 12
+
+<cflnumber value="0.2" comment =" Coefficient to multiply dt" />  
+
+> 13
+
+</ constantsdef >  
+
+> 14
+
+<mkconfig boundcount ="240" fluidcount ="9" />  
+
+> 15
+
+<geometry >  
+
+> 16
+
+<definition dp="1.0e-3" units_comment ="metres (m)">  
+
+> 17
+
+<pointmin x=" -20.5e-3" y="0.5e-3" z=" -20.5e-3" />  
+
+> 18
+
+<pointmax x="220.5e-3" y="0.5e-3" z="40.5e-3" />  
+
+> 19
+
+</ definition >  
+
+> 20
+
+<commands >  
+
+> 21
+
+<mainlist >  
+
+> 22
+
+<newvar Lxs=" -1.5e-3" Lxf="200.5e-3"/>  
+
+> 23
+
+<newvar Lys="0.5e-3" Lyf="19.0e-3"/>  
+
+> 24
+
+<newvar Lzs="0.5e-3" Lzf="19.0e-3"/>  
+
+> 25
+
+<newvar LzMn="9.5e-3" LzMp="10.5e-3"/>  
+
+> 26
+
+<setdrawmode mode="full" />  
+
+> 27
+
+<setshapemode > actual | bound </ setshapemode >  
+
+> 28
+
+<setmkbound mk="1" />  
+
+> 29
+
+<drawbox >  
+
+> 30
+
+<boxfill >solid </ boxfill >  
+
+> 31
+
+<point x="#Lxs" y="#Lys" z="#Lzs" />  
+
+> 32
+
+<size x="#Lxf" y="#Lyf" z="#Lzf" />  
+
+> 33
+
+</ drawbox > 
+
+56 34 </ mainlist >  
+
+> 35
+
+</ commands >  
+
+> 36
+
+</ geometry >  
+
+> 37
+
+<motion >  
+
+> 38
+
+<objreal ref="1">  
+
+> 39
+
+<begin mov="1" start="0" />  
+
+> 40
+
+<mvnull id="1" />  
+
+> 41
+
+</ objreal >  
+
+> 42
+
+</ motion >  
+
+> 43
+
+</ casedef >  
+
+> 44
+
+<execution >  
+
+> 45
+
+<special >  
+
+> 46
+
+<mathexpressions >  
+
+> 47
+
+<userexpression id="1" comment ="Math expression ">  
+
+> 48
+
+<locals value="L0 =0.2; kw =9.375; cs =57.0"/>  
+
+> 49
+
+<expression value="if(x0 <=0.0 ,0.0 , if(t <=0.0 ,0.01 * cs * (( cos(kw*L0) +cosh(kw*L0))*( cosh(kw*x0)-cos(kw*x0)) + (sin(kw*L0)-sinh(kw*L0) )*( sinh(kw*x0)-sin(kw*x0)))/ (( cos(kw*L0)+cosh(kw*L0))*( cosh(kw* L0)-cos(kw*L0)) + (sin(kw*L0)-sinh(kw*L0))*( sinh(kw*L0)-sin(kw* L0))),skip))"/>  
+
+> 50
+
+</ userexpression >  
+
+> 51
+
+<userexpression id="2" comment ="Math expression ">  
+
+> 52
+
+<expression value="if(x0 <=0.0 ,0.0 , skip)"/>  
+
+> 53
+
+</ userexpression >  
+
+> 54
+
+</ mathexpressions >  
+
+> 55
+
+<deformstrucs >  
+
+> 56
+
+<deformstrucbody mkbound ="1">  
+
+> 57
+
+<bcvel ze="1" xe="2" ye="2" comment =" Velocity BC" />  
+
+> 58
+
+<density value="1000.0 " comment ="Mass density " units_comment ="kg/m^3 " />  
+
+> 59
+
+<u_mu value="0.715 e6" comment ="Shear Modulus " units_comment ="Pa" />  
+
+> 60
+
+<u_bulk value="3.25 e6" comment ="Bulk Modulus " units_comment ="Pa" />  
+
+> 61
+
+<constitmodel value="1" comment =" Constitutive model 1:SVK" />  
+
+> 62
+
+<artvisc factor1 ="0.015" factor2 ="0.01" comment =" Art. Visc." />  
+
+> 63
+
+<mapfac value="4" comment ="x4 refinement " />  
+
+> 64
+
+<measureplane comment =" Measure tip displacement ">  
+
+> 65
+
+<p1 x=" 199.999e-3" y="#Lys" z="#LzMn" />  
+
+> 66
+
+<p2 x=" 199.999e-3" y="#Lyf + 0.5e-3" z="#LzMn" />  
+
+> 67
+
+<p3 x=" 199.999e-3" y="#Lyf + 0.5e-3" z="#LzMp" />  
+
+> 68
+
+<p4 x=" 199.999e-3" y="#Lys" z="#LzMp" />  
+
+> 69
+
+</ measureplane >  
+
+> 70
+
+</ deformstrucbody >  
+
+> 71
+
+</ deformstrucs > 
+
+57 72 </ special >  
+
+> 73
+
+<parameters >  
+
+> 74
+
+<parameter key=" StepAlgorithm " value="1" comment ="Step Algorithm 1:Verlet , 2 :Symplectic " />  
+
+> 75
+
+<parameter key="Kernel " value="2" comment =" Interaction Kernel 1:Cubic Spline , 2 :Wendland " />  
+
+> 76
+
+<parameter key="Visco" value=" 8.92678034e-7" comment =" Viscosity value" /> 
+
+> 77
+
+<parameter key=" TimeMax " value="1.0" comment ="Time of simulation " units_comment =" seconds " />  
+
+> 78
+
+<parameter key=" TimeOut " value="0.001" comment ="Time out data" units_comment =" seconds " />  
+
+> 79
+
+<simulationdomain comment =" Defines domain of simulation ">  
+
+> 80
+
+<posmin x="default -10%" y="default - 10%" z=" default - 10%" comment ="e. g.: x=0.5 , y=default -1, z=default -10%" />  
+
+> 81
+
+<posmax x=" default +10%" y=" default + 10%" z=" default + 10%" />  
+
+> 82
+
+</ simulationdomain >  
+
+> 83
+
+</ parameters >  
+
+> 84
+
+</ execution >  
+
+> 85
+
+</case > 
+
+2. Free oscillation of a cantilever plate  
+
+> 1
+
+<?xml version ="1.0" encoding ="UTF -8" ?>  
+
+> 2
+
+<case >  
+
+> 3
+
+<casedef >  
+
+> 4
+
+<constantsdef >  
+
+> 5
+
+<gravity x="0" y="0" z="0.0"/>  
+
+> 6
+
+<rhop0 value="997" />  
+
+> 7
+
+<hswl value="0" auto="true" />  
+
+> 8
+
+<gamma value="7" />  
+
+> 9
+
+<speedsystem value="10" auto="false" />  
+
+> 10
+
+<coefsound value="10" />  
+
+> 11
+
+<coefh value="1.0" />  
+
+> 12
+
+<cflnumber value="0.2" />  
+
+> 13
+
+</ constantsdef >  
+
+> 14
+
+<mkconfig boundcount ="240" fluidcount ="9"/>  
+
+> 15
+
+<geometry >  
+
+> 16
+
+<definition dp="1.0e-3" units_comment ="metres (m)">  
+
+> 17
+
+<pointmin x=" -20.5e-3" y=" -40.5e-3" z=" -20.5e-3"/>  
+
+> 18
+
+<pointmax x="220.5e-3" y="100.5e-3" z="40.5e-3"/>  
+
+> 19
+
+</ definition >  
+
+> 20
+
+<commands > 
+
+58 21 <mainlist >  
+
+> 22
+
+<newvar Lxs=" -1.5e-3" Lxf="200.5e-3"/>  
+
+> 23
+
+<newvar Lys="0.5e-3" Lyf="59.0e-3"/>  
+
+> 24
+
+<newvar Lzs="0.5e-3" Lzf="19.0e-3"/>  
+
+> 25
+
+<newvar LzMn="9.5e-3" LzMp="10.5e-3"/>  
+
+> 26
+
+<newvar LyMn="0.0" LyMp="60.0e-3"/>  
+
+> 27
+
+<setdrawmode mode="full"/>  
+
+> 28
+
+<setshapemode > actual | bound </ setshapemode >  
+
+> 29
+
+<setmkbound mk="1"/>  
+
+> 30
+
+<drawbox >  
+
+> 31
+
+<boxfill >solid </ boxfill >  
+
+> 32
+
+<point x="#Lxs" y="#Lys" z="#Lzs"/>  
+
+> 33
+
+<size x="#Lxf" y="#Lyf" z="#Lzf"/>  
+
+> 34
+
+</ drawbox >  
+
+> 35
+
+</ mainlist >  
+
+> 36
+
+</ commands >  
+
+> 37
+
+</ geometry >  
+
+> 38
+
+<motion >  
+
+> 39
+
+<objreal ref="1">  
+
+> 40
+
+<begin mov="1" start="0"/>  
+
+> 41
+
+<mvnull id="1"/>  
+
+> 42
+
+</ objreal >  
+
+> 43
+
+</ motion >  
+
+> 44
+
+</ casedef >  
+
+> 45
+
+<execution >  
+
+> 46
+
+<special >  
+
+> 47
+
+<mathexpressions >  
+
+> 48
+
+<userexpression id="1" comment ="Math expression ">  
+
+> 49
+
+<locals value="L0 =0.2; kw =9.375; cs =57.0"/>  
+
+> 50
+
+<expression value="if(x0 <=0.0 ,0.0 , if(t <1.0e -12 ,0.01 * cs * (( cos(kw* L0)+cosh(kw*L0))*( cosh(kw*x0)-cos(kw*x0)) + (sin(kw*L0)-sinh(kw* L0))*( sinh(kw*x0)-sin(kw*x0)))/ (( cos(kw*L0)+cosh(kw*L0))*( cosh( kw*L0)-cos(kw*L0)) + (sin(kw*L0)-sinh(kw*L0))*( sinh(kw*L0)-sin( kw*L0))),skip))"/>  
+
+> 51
+
+</ userexpression >  
+
+> 52
+
+<userexpression id="2" comment ="Math expression ">  
+
+> 53
+
+<expression value="if(x0 <=0.0 ,0.0 , skip)"/>  
+
+> 54
+
+</ userexpression >  
+
+> 55
+
+</ mathexpressions >  
+
+> 56
+
+<deformstrucs >  
+
+> 57
+
+<deformstrucbody mkbound ="1">  
+
+> 58
+
+<bcvel ze="1" xe="2" ye="2" comment =" Velocity BC"/>  
+
+> 59
+
+<density value="1000.0 " /> 
+
+59 60 <u_mu value="0.715 e6" />  
+
+> 61
+
+<u_bulk value="3.25 e6" />  
+
+> 62
+
+<constitmodel value="1" comment ="Const. model 1:SVK"/>  
+
+> 63
+
+<artvisc factor1 ="0.1" factor2 ="0.0" />  
+
+> 64
+
+<mapfac value="2" comment ="x2 refinement "/>  
+
+> 65
+
+<measureplane comment =" Measure tip displacement at the free end">  
+
+> 66
+
+<p1 x=" 199.999e-3" y="#LyMn" z="#LzMn"/>  
+
+> 67
+
+<p2 x=" 199.999e-3" y="#LyMp" z="#LzMn"/>  
+
+> 68
+
+<p3 x=" 199.999e-3" y="#LyMp" z="#LzMp"/>  
+
+> 69
+
+<p4 x=" 199.999e-3" y="#LyMn" z="#LzMp"/>  
+
+> 70
+
+</ measureplane >  
+
+> 71
+
+</ deformstrucbody >  
+
+> 72
+
+</ deformstrucs >  
+
+> 73
+
+</ special >  
+
+> 74
+
+<parameters >  
+
+> 75
+
+<parameter key=" StepAlgorithm " value="1" />  
+
+> 76
+
+<parameter key="Kernel " value="2" />  
+
+> 77
+
+<parameter key="Visco" value=" 8.92678034e-7" />  
+
+> 78
+
+<parameter key=" TimeMax " value="1.0" />  
+
+> 79
+
+<parameter key=" TimeOut " value="0.001" />  
+
+> 80
+
+<simulationdomain > 
+
+> 81
+
+<posmin x="default -10%" y="default - 10%" z=" default - 10%" />  
+
+> 82
+
+<posmax x=" default +10%" y=" default + 10%" z=" default + 10%"/>  
+
+> 83
+
+</ simulationdomain >  
+
+> 84
+
+</ parameters >  
+
+> 85
+
+</ execution >  
+
+> 86
+
+</case > 
+
+3. Large deformation of a 3D cantilever beam  
+
+> 1
+
+<?xml version ="1.0" encoding ="UTF -8" ?>  
+
+> 2
+
+<case >  
+
+> 3
+
+<casedef >  
+
+> 4
+
+<constantsdef >  
+
+> 5
+
+<gravity x="0" y="0" z="0.0" />  
+
+> 6
+
+<rhop0 value="997" />  
+
+> 7
+
+<hswl value="0" auto="true" />  
+
+> 8
+
+<gamma value="7" />  
+
+> 9
+
+<speedsystem value="10" auto="false" />  
+
+> 10
+
+<coefsound value="10" />  
+
+> 11
+
+<coefh value="1.0" />  
+
+> 12
+
+<cflnumber value="0.2" />  
+
+> 13
+
+</ constantsdef > 
+
+60 14 <mkconfig boundcount ="240" fluidcount ="9"/>  
+
+> 15
+
+<geometry >  
+
+> 16
+
+<definition dp="1.0e-3" units_comment ="metres (m)">  
+
+> 17
+
+<pointmin x=" -5.5e-3" y=" -1.5e-3" z=" -1.5e-3"/>  
+
+> 18
+
+<pointmax x="110.5e-3" y="20.5e-3" z="20.5e-3"/>  
+
+> 19
+
+</ definition >  
+
+> 20
+
+<commands >  
+
+> 21
+
+<mainlist >  
+
+> 22
+
+<newvar Lx="100.0e-3" Ly="9.0e-3" Lz="9.0e-3"/>  
+
+> 23
+
+<setdrawmode mode="full"/>  
+
+> 24
+
+<setmkbound mk="1"/>  
+
+> 25
+
+<drawbox >  
+
+> 26
+
+<boxfill >solid </ boxfill >  
+
+> 27
+
+<point x=" -1.5e-3" y="0.50e-3" z="0.50e-3"/>  
+
+> 28
+
+<size x="101.0e-3" y="#Ly" z="#Lz"/>  
+
+> 29
+
+</ drawbox >  
+
+> 30
+
+</ mainlist >  
+
+> 31
+
+</ commands >  
+
+> 32
+
+</ geometry >  
+
+> 33
+
+<motion >  
+
+> 34
+
+<objreal ref="1">  
+
+> 35
+
+<begin mov="1" start="0"/>  
+
+> 36
+
+<mvnull id="1"/>  
+
+> 37
+
+</ objreal >  
+
+> 38
+
+</ motion >  
+
+> 39
+
+</ casedef >  
+
+> 40
+
+<execution >  
+
+> 41
+
+<special >  
+
+> 42
+
+<mathexpressions >  
+
+> 43
+
+<userexpression id="1" comment ="Math expression ">  
+
+> 44
+
+<locals value="Fmax = -1.75 e9; Tmax =1.0; xtip =0.099; "/>  
+
+> 45
+
+<expression value="if(x0 >xtip ,if(t<=Tmax ,t/Tmax ,1.0)*Fmax ,skip)"/>  
+
+> 46
+
+</ userexpression >  
+
+> 47
+
+<userexpression id="2" comment ="Math expression ">  
+
+> 48
+
+<expression value="if(x0 <=0.0 ,0.0 , skip)"/>  
+
+> 49
+
+</ userexpression >  
+
+> 50
+
+</ mathexpressions >  
+
+> 51
+
+<deformstrucs >  
+
+> 52
+
+<deformstrucbody mkbound ="1">  
+
+> 53
+
+<bcforce type="2" ze="1" comment =" Distributed load"/>  
+
+> 54
+
+<bcvel xe="2" ye="2" ze="2" comment =" Velocity constraint in x,y,z"/>  
+
+> 55
+
+<density value="7800.0 " />  
+
+> 56
+
+<youngmod value="210.0 e9" /> 
+
+61 57 <poissratio value="0.3" />  
+
+> 58
+
+<constitmodel value="2" comment ="Const. model 2:Neo - Hookean "/>  
+
+> 59
+
+<artvisc factor1 ="0.1" factor2 ="0.0" />  
+
+> 60
+
+<mapfac value="1" comment ="x1 refinement "/>  
+
+> 61
+
+<measureplane comment =" Measure tip displacement ">  
+
+> 62
+
+<p1 x="100.4e-3" y="#Ly *0.455 " z="#Lz *0.455 "/>  
+
+> 63
+
+<p2 x="100.4e-3" y="#Ly *0.555 " z="#Lz *0.455 "/>  
+
+> 64
+
+<p3 x="100.4e-3" y="#Ly *0.555 " z="#Lz *0.555 "/>  
+
+> 65
+
+<p4 x="100.4e-3" y="#Ly *0.455 " z="#Lz *0.555 "/>  
+
+> 66
+
+</ measureplane >  
+
+> 67
+
+</ deformstrucbody >  
+
+> 68
+
+</ deformstrucs >  
+
+> 69
+
+</ special >  
+
+> 70
+
+<parameters >  
+
+> 71
+
+<parameter key=" StepAlgorithm " value="1" />  
+
+> 72
+
+<parameter key="Kernel " value="2" />  
+
+> 73
+
+<parameter key="Visco" value=" 8.92678034e-7" />  
+
+> 74
+
+<parameter key=" CoefDtMin " value="0.01" />  
+
+> 75
+
+<parameter key=" TimeMax " value="2.0" />  
+
+> 76
+
+<parameter key=" TimeOut " value="0.002" />  
+
+> 77
+
+<simulationdomain > 
+
+> 78
+
+<posmin x="default -10%" y="default - 10%" z=" default - 10%"/>  
+
+> 79
+
+<posmax x=" default +10%" y=" default + 10%" z=" default + 10%"/>  
+
+> 80
+
+</ simulationdomain >  
+
+> 81
+
+</ parameters >  
+
+> 82
+
+</ execution >  
+
+> 83
+
+</case > 
+
+4. Twisting 3D column  
+
+> 1
+
+<?xml version ="1.0" encoding ="UTF -8" ?>  
+
+> 2
+
+<case >  
+
+> 3
+
+<casedef >  
+
+> 4
+
+<constantsdef >  
+
+> 5
+
+<gravity x="0" y="0" z="0.0"/>  
+
+> 6
+
+<rhop0 value="997" />  
+
+> 7
+
+<hswl value="0" auto="true" />  
+
+> 8
+
+<gamma value="7" />  
+
+> 9
+
+<speedsystem value="10" auto="false" />  
+
+> 10
+
+<coefsound value="10" />  
+
+> 11
+
+<coefh value="1.0" />  
+
+> 12
+
+<cflnumber value="0.01"/>  
+
+> 13
+
+</ constantsdef > 
+
+62 14 <mkconfig boundcount ="240" fluidcount ="9" />  
+
+> 15
+
+<geometry >  
+
+> 16
+
+<definition dp="0.1" units_comment ="metres (m)">  
+
+> 17
+
+<pointmin x=" -1.05" y=" -1.05" z=" -1.05" />  
+
+> 18
+
+<pointmax x="1.55" y="1.55" z="6.55" />  
+
+> 19
+
+</ definition >  
+
+> 20
+
+<commands >  
+
+> 21
+
+<mainlist >  
+
+> 22
+
+<newvar Lx="0.95" Ly="0.95" Lz="5.95"/>  
+
+> 23
+
+<setdrawmode mode="full" />  
+
+> 24
+
+<setmkbound mk="1" />  
+
+> 25
+
+<drawbox >  
+
+> 26
+
+<boxfill >solid </ boxfill >  
+
+> 27
+
+<point x="0.05" y="0.05" z=" -0.4" />  
+
+> 28
+
+<size x="#Lx" y="#Ly" z="6.35" />  
+
+> 29
+
+</ drawbox >  
+
+> 30
+
+</ mainlist >  
+
+> 31
+
+</ commands >  
+
+> 32
+
+</ geometry >  
+
+> 33
+
+<motion >  
+
+> 34
+
+<objreal ref="1">  
+
+> 35
+
+<begin mov="1" start="0" />  
+
+> 36
+
+<mvnull id="1" />  
+
+> 37
+
+</ objreal >  
+
+> 38
+
+</ motion >  
+
+> 39
+
+</ casedef >  
+
+> 40
+
+<execution >  
+
+> 41
+
+<special >  
+
+> 42
+
+<mathexpressions >  
+
+> 43
+
+<userexpression id="1" comment ="User expression ">  
+
+> 44
+
+<locals value="xcent =0.5; ycent =0.5; omega =105.0 "/>  
+
+> 45
+
+<expression value="if(z0 <=0.0 ,0.0 , if(t<=0, omega*sin (0.2619047* z0)*( ycent -y0),skip))"/>  
+
+> 46
+
+</ userexpression >  
+
+> 47
+
+<userexpression id="2" comment ="User expression ">  
+
+> 48
+
+<locals value="xcent =0.5; ycent =0.5; omega =105.0 "/>  
+
+> 49
+
+<expression value="if(z0 <=0.0 ,0.0 , if(t<=0, omega*sin (0.2619047* z0)*( x0 -xcent),skip))"/>  
+
+> 50
+
+</ userexpression >  
+
+> 51
+
+<userexpression id="3" comment ="User expression ">  
+
+> 52
+
+<expression value="if(z0 <=0.0 ,0.0 , skip)"/>  
+
+> 53
+
+</ userexpression >  
+
+> 54
+
+</ mathexpressions > 
+
+63 55 <deformstrucs >  
+
+> 56
+
+<deformstrucbody mkbound ="1">  
+
+> 57
+
+<bcvel xe="1" ye="2" ze="3" comment =" Velocity BC" />  
+
+> 58
+
+<density value="1100.0 " comment ="Mass density "/>  
+
+> 59
+
+<youngmod value="170.0 e5" comment ="Young Modulus "/>  
+
+> 60
+
+<poissratio value="0.45" comment =" Poisson ratio" />  
+
+> 61
+
+<artvisc factor1 ="0.5" factor2 ="0.0" comment ="Art. Visc." />  
+
+> 62
+
+<constitmodel value="2" comment ="Const. model 2:Neo - Hookean " />  
+
+> 63
+
+<mapfac value="3" />  
+
+> 64
+
+</ deformstrucbody >  
+
+> 65
+
+</ deformstrucs >  
+
+> 66
+
+</ special >  
+
+> 67
+
+<parameters >  
+
+> 68
+
+<parameter key=" StepAlgorithm " value="1" />  
+
+> 69
+
+<parameter key="Kernel " value="2" />  
+
+> 70
+
+<parameter key="Visco" value=" 8.92678034e-7" />  
+
+> 71
+
+<parameter key=" CoefDtMin " value="0.001" />  
+
+> 72
+
+<parameter key=" TimeMax " value="1.5"/>  
+
+> 73
+
+<parameter key=" TimeOut " value="0.001"/>  
+
+> 74
+
+<simulationdomain >  
+
+> 75
+
+<posmin x="default -10%" y="default - 10%" z=" default - 10%" />  
+
+> 76
+
+<posmax x=" default +10%" y=" default + 10%" z=" default + 10%" />  
+
+> 77
+
+</ simulationdomain >  
+
+> 78
+
+</ parameters >  
+
+> 79
+
+</ execution >  
+
+> 80
+
+</case > 
+
+5. Dynamic crack branching  
+
+> 1
+
+<?xml version ="1.0" encoding ="UTF -8" ?>  
+
+> 2
+
+<case >  
+
+> 3
+
+<casedef >  
+
+> 4
+
+<constantsdef >  
+
+> 5
+
+<gravity x="0" y="0" z="0.0" />  
+
+> 6
+
+<rhop0 value="997" />  
+
+> 7
+
+<hswl value="0" auto="true" />  
+
+> 8
+
+<gamma value="7" />  
+
+> 9
+
+<speedsystem value="10" auto="false" />  
+
+> 10
+
+<coefsound value="10" />  
+
+> 11
+
+<coefh value="1.0" />  
+
+> 12
+
+<cflnumber value="0.2" />  
+
+> 13
+
+</ constantsdef >  
+
+> 14
+
+<mkconfig boundcount ="240" fluidcount ="9" /> 
+
+64 15 <geometry >  
+
+> 16
+
+<definition dp="0.125e-3" units_comment ="metres (m)">  
+
+> 17
+
+<pointmin x=" -1.06125e-3" y="0.50e-3" z=" -1.06125e-3" />  
+
+> 18
+
+<pointmax x=" 100.06125e-3" y="0.50e-3" z=" 50.06125e-3" />  
+
+> 19
+
+</ definition >  
+
+> 20
+
+<commands >  
+
+> 21
+
+<mainlist >  
+
+> 22
+
+<setdrawmode mode="full" />  
+
+> 23
+
+<setmkbound mk="3" />  
+
+> 24
+
+<setshapemode > actual </ setshapemode >  
+
+> 25
+
+<drawbox >  
+
+> 26
+
+<boxfill >solid </ boxfill >  
+
+> 27
+
+<point x=" 0.06125e-3" y=" 0.06125e-3" z=" 39.9385e-3" />  
+
+> 28
+
+<size x=" 99.9385e-3" y="0.9385e-3" z="0.125e-3" />  
+
+> 29
+
+</ drawbox >  
+
+> 30
+
+<setmkbound mk="2" />  
+
+> 31
+
+<setshapemode > actual </ setshapemode >  
+
+> 32
+
+<drawbox >  
+
+> 33
+
+<boxfill >solid </ boxfill >  
+
+> 34
+
+<point x=" 0.06125e-3" y=" 0.06125e-3" z=" -0.06125e-3" />  
+
+> 35
+
+<size x=" 99.9385e-3" y="0.9385e-3" z=" 0.06125e-3" />  
+
+> 36
+
+</ drawbox >  
+
+> 37
+
+<setmkbound mk="1" />  
+
+> 38
+
+<setshapemode > actual </ setshapemode >  
+
+> 39
+
+<drawbox >  
+
+> 40
+
+<boxfill >solid </ boxfill >  
+
+> 41
+
+<point x=" 0.06125e-3" y="0.0" z=" 0.06125e-3" />  
+
+> 42
+
+<size x=" 99.9385e-3" y="1.0e-3" z=" 39.9385e-3" />  
+
+> 43
+
+</ drawbox >  
+
+> 44
+
+</ mainlist >  
+
+> 45
+
+</ commands >  
+
+> 46
+
+</ geometry >  
+
+> 47
+
+<motion >  
+
+> 48
+
+<objreal ref="1">  
+
+> 49
+
+<begin mov="1" start="0" />  
+
+> 50
+
+<mvnull id="1" />  
+
+> 51
+
+</ objreal >  
+
+> 52
+
+</ motion >  
+
+> 53
+
+</ casedef >  
+
+> 54
+
+<execution >  
+
+> 55
+
+<special >  
+
+> 56
+
+<deformstrucs >  
+
+> 57
+
+<deformstrucbody mkbound ="1"> 
+
+65 58 <nbsrange value="1"/>  
+
+> 59
+
+<bcforce type="2" mkid="3" z="1.0 e6"/>  
+
+> 60
+
+<bcforce type="2" mkid="2" z=" -1.0e6"/>  
+
+> 61
+
+<notch >  
+
+> 62
+
+<p1 x=" -2.0e-3" y=" -5.0e-3" z="0.02" />  
+
+> 63
+
+<p2 x=" 50.030625e-3" y=" -5.0e-3" z="0.02" />  
+
+> 64
+
+<p3 x=" 50.030625e-3" y="25.0e-3" z="0.02" />  
+
+> 65
+
+<p4 x=" -2.0e-3" y="25.0e-3" z="0.02" />  
+
+> 66
+
+</notch >  
+
+> 67
+
+<density value="2450.0 "/>  
+
+> 68
+
+<youngmod value="32.0 e9" />  
+
+> 69
+
+<poissratio value="0.2" />  
+
+> 70
+
+<constitmodel value="1" />  
+
+> 71
+
+<artvisc factor1 ="0.2" factor2 ="0.0"/>  
+
+> 72
+
+<fracture value="1" />  
+
+> 73
+
+<Gc value="3.0" />  
+
+> 74
+
+<pflim value="0.05" />  
+
+> 75
+
+<pflenscale value=" 0.12501e-3" />  
+
+> 76
+
+<mapfac value="2" />  
+
+> 77
+
+</ deformstrucbody >  
+
+> 78
+
+</ deformstrucs >  
+
+> 79
+
+</ special >  
+
+> 80
+
+<parameters >  
+
+> 81
+
+<parameter key=" StepAlgorithm " value="1" />  
+
+> 82
+
+<parameter key="Kernel " value="2" />  
+
+> 83
+
+<parameter key="Visco" value=" 8.92678034e-7" />  
+
+> 84
+
+<parameter key=" CoefDtMin " value="0.001" />  
+
+> 85
+
+<parameter key=" TimeMax " value="120.0e-6" />  
+
+> 86
+
+<parameter key=" TimeOut " value="1.0e-6" />  
+
+> 87
+
+<simulationdomain >  
+
+> 88
+
+<posmin x="default -10%" y="default - 10%" z=" default - 10%" />  
+
+> 89
+
+<posmax x=" default +10%" y=" default + 10%" z=" default + 10%" />  
+
+> 90
+
+</ simulationdomain >  
+
+> 91
+
+</ parameters >  
+
+> 92
+
+</ execution >  
+
+> 93
+
+</case > 
+
+6. Kaltho ff -Winkler experiment  
+
+> 1
+
+<?xml version ="1.0" encoding ="UTF -8" ?>  
+
+> 2
+
+<case >  
+
+> 3
+
+<casedef >  
+
+> 4
+
+<constantsdef > 
+
+66 5 <gravity x="0" y="0" z="0.0"/>  
+
+> 6
+
+<rhop0 value="997"/>  
+
+> 7
+
+<hswl value="0" auto="true" />  
+
+> 8
+
+<gamma value="7" />  
+
+> 9
+
+<speedsystem value="10" auto="false" />  
+
+> 10
+
+<coefsound value="10" />  
+
+> 11
+
+<coefh value="1.0" />  
+
+> 12
+
+<cflnumber value="0.2"/>  
+
+> 13
+
+</ constantsdef >  
+
+> 14
+
+<mkconfig boundcount ="240" fluidcount ="9" />  
+
+> 15
+
+<geometry >  
+
+> 16
+
+<definition dp="1.0e-3" units_comment ="metres (m)">  
+
+> 17
+
+<pointmin x=" -2.0e-3" y="0.50e-3" z=" -2.0e-3" />  
+
+> 18
+
+<pointmax x="101.0e-3" y="0.50e-3" z="100.0e-3" />  
+
+> 19
+
+</ definition >  
+
+> 20
+
+<commands >  
+
+> 21
+
+<mainlist >  
+
+> 22
+
+<setdrawmode mode="full" />  
+
+> 23
+
+<setmkbound mk="1" />  
+
+> 24
+
+<drawbox >  
+
+> 25
+
+<boxfill >solid </ boxfill >  
+
+> 26
+
+<point x="0.5e-3" y="0.0" z="0.5e-3" />  
+
+> 27
+
+<size x="99.5e-3" y="10.0e-3" z="99.5e-3" />  
+
+> 28
+
+</ drawbox >  
+
+> 29
+
+<setmkbound mk="2" />  
+
+> 30
+
+<drawbox >  
+
+> 31
+
+<boxfill >solid </ boxfill >  
+
+> 32
+
+<point x=" -0.5e-3" y="0.0" z="0.5e-3" />  
+
+> 33
+
+<size x="0.5e-3" y="10.0e-3" z="24.5e-3" />  
+
+> 34
+
+</ drawbox >  
+
+> 35
+
+<setmkbound mk="3" />  
+
+> 36
+
+<drawbox >  
+
+> 37
+
+<boxfill >solid </ boxfill >  
+
+> 38
+
+<point x="0.5e-3" y="0.0" z=" -0.5e-3" />  
+
+> 39
+
+<size x="99.5e-3" y="10.0e-3" z="0.5e-3" />  
+
+> 40
+
+</ drawbox >  
+
+> 41
+
+</ mainlist >  
+
+> 42
+
+</ commands >  
+
+> 43
+
+</ geometry >  
+
+> 44
+
+<motion >  
+
+> 45
+
+<objreal ref="1">  
+
+> 46
+
+<begin mov="1" start="0" />  
+
+> 47
+
+<mvnull id="1" /> 
+
+67 48 </ objreal >  
+
+> 49
+
+</ motion >  
+
+> 50
+
+</ casedef >  
+
+> 51
+
+<execution >  
+
+> 52
+
+<special >  
+
+> 53
+
+<mathexpressions >  
+
+> 54
+
+<userexpression id="2">  
+
+> 55
+
+<locals value="maxv =16.5; ramt =1.0e-6"/>  
+
+> 56
+
+<expression value="if(t>ramt ,maxv ,t/ramt*maxv)"/>  
+
+> 57
+
+</ userexpression >  
+
+> 58
+
+</ mathexpressions >  
+
+> 59
+
+<deformstrucs >  
+
+> 60
+
+<deformstrucbody mkbound ="1">  
+
+> 61
+
+<nbsrange value="1"/>  
+
+> 62
+
+<bcvel mkid="2" xe="2"/>  
+
+> 63
+
+<bcvel mkid="3" z="0.0"/>  
+
+> 64
+
+<density value="8000.0 " />  
+
+> 65
+
+<youngmod value="190.0 e9" />  
+
+> 66
+
+<poissratio value="0.3" />  
+
+> 67
+
+<constitmodel value="1" />  
+
+> 68
+
+<artvisc factor1 ="0.1" />  
+
+> 69
+
+<fracture value="1" />  
+
+> 70
+
+<Gc value="22.13 e3" />  
+
+> 71
+
+<pflim value="0.05" />  
+
+> 72
+
+<pflenscale value="0.15e-3" />  
+
+> 73
+
+<mapfac value="8" />  
+
+> 74
+
+<notch >  
+
+> 75
+
+<p1 x="0.0e-3" y=" -1.0e-3" z="25.6e-3" />  
+
+> 76
+
+<p2 x="50.0e-3" y=" -1.0e-3" z="25.6e-3" />  
+
+> 77
+
+<p3 x="50.0e-3" y="1.0e-3" z="25.6e-3" />  
+
+> 78
+
+<p4 x="0.0e-3" y="1.0e-3" z="25.6e-3" />  
+
+> 79
+
+</notch >  
+
+> 80
+
+</ deformstrucbody >  
+
+> 81
+
+</ deformstrucs >  
+
+> 82
+
+</ special >  
+
+> 83
+
+<parameters >  
+
+> 84
+
+<parameter key=" StepAlgorithm " value="1" />  
+
+> 85
+
+<parameter key="Kernel " value="2" />  
+
+> 86
+
+<parameter key="Visco" value=" 8.92678034e-7" />  
+
+> 87
+
+<parameter key=" CoefDtMin " value="0.001" />  
+
+> 88
+
+<parameter key=" TimeMax " value="120.0e-6" />  
+
+> 89
+
+<parameter key=" TimeOut " value="1.0e-6"/>  
+
+> 90
+
+<simulationdomain > 
+
+68 91 <posmin x="default -10%" y="default - 10%" z=" default - 10%" />  
+
+> 92
+
+<posmax x=" default +10%" y=" default + 10%" z=" default + 10%" />  
+
+> 93
+
+</ simulationdomain >  
+
+> 94
+
+</ parameters >  
+
+> 95
+
+</ execution >  
+
+> 96
+
+</case > 
+
+7. Four point bending  
+
+> 1
+
+<?xml version ="1.0" encoding ="UTF -8" ?>  
+
+> 2
+
+<case >  
+
+> 3
+
+<casedef >  
+
+> 4
+
+<constantsdef >  
+
+> 5
+
+<gravity x="0" y="0" z="0.0" />  
+
+> 6
+
+<rhop0 value="997" />  
+
+> 7
+
+<hswl value="0" auto="true" />  
+
+> 8
+
+<gamma value="7" />  
+
+> 9
+
+<speedsystem value="10" auto="false" />  
+
+> 10
+
+<coefsound value="10" />  
+
+> 11
+
+<coefh value="1.0" />  
+
+> 12
+
+<cflnumber value="0.1" />  
+
+> 13
+
+</ constantsdef >  
+
+> 14
+
+<mkconfig boundcount ="240" fluidcount ="9" />  
+
+> 15
+
+<geometry >  
+
+> 16
+
+<definition dp="0.2e-3" units_comment ="metres (m)">  
+
+> 17
+
+<pointmin x=" -10.0e-3" y=" -10.0e-3" z=" -30.0e-3" />  
+
+> 18
+
+<pointmax x="90.0e-3" y="15.0e-3" z="30.0e-3" />  
+
+> 19
+
+</ definition >  
+
+> 20
+
+<commands >  
+
+> 21
+
+<mainlist >  
+
+> 22
+
+<!-- <xc0 ="40.0e -3" for 90 degree crack /> -->  
+
+> 23
+
+<!-- <xc0 ="34.0e -3" for 60 degree crack /> -->  
+
+> 24
+
+<!-- <xc0 ="30.0e -3" for 45 degree crack /> -->  
+
+> 25
+
+<newvar xc0="40.0e-3"/>  
+
+> 26
+
+<setdrawmode mode="face" />  
+
+> 27
+
+<setshapemode >dp | bound </ setshapemode >  
+
+> 28
+
+<setmkbound mk="1" />  
+
+> 29
+
+<drawfilevtk file=" Shape_90Lambda .vtk" objname ="Beam" autofill ="true "/>  
+
+> 30
+
+<shapeout file=" FourPBend " />  
+
+> 31
+
+</ mainlist >  
+
+> 32
+
+</ commands >  
+
+> 33
+
+</ geometry > 
+
+69 34 <motion >  
+
+> 35
+
+<objreal ref="1">  
+
+> 36
+
+<begin mov="1" start="0" />  
+
+> 37
+
+<mvnull id="1" />  
+
+> 38
+
+</ objreal >  
+
+> 39
+
+</ motion >  
+
+> 40
+
+</ casedef >  
+
+> 41
+
+<execution >  
+
+> 42
+
+<special >  
+
+> 43
+
+<mathexpressions >  
+
+> 44
+
+<userexpression id="1" comment ="phi constrain ">  
+
+> 45
+
+<expression value=" if(z0 <0.00090 and x0 >=0.002525 and x0 <=0.005475 , 0.9999 , if(z0 <0.00090 and x0 >=0.074525 and x0 <=0.077475 , 0.9999 , if(z0 >0.01910 and x0 >=0.018450 and x0 <=0.021400 , 0.9999 , if(z0 >0.01910 and x0 >=0.058600 and x0 <=0.061550 , 0.9999 , skip))))"/>  
+
+> 46
+
+</ userexpression >  
+
+> 47
+
+<userexpression id="2" comment ="z bc">  
+
+> 48
+
+<locals value="Velmax =10.0"/>  
+
+> 49
+
+<expression value="if(z0 <0.00010 and x0 >=0.003825 and x0 <=0.004225 , Velmax , if(z0 <0.00010 and x0 >=0.075625 and x0 <=0.076175 , Velmax , if(z0 >0.01990 and x0 >=0.01970 and x0 <=0.020100 , -Velmax , if(z0 >0.01990 and x0 >=0.059900 and x0 <=0.060250 , -Velmax , skip))))"/>  
+
+> 50
+
+</ userexpression >  
+
+> 51
+
+</ mathexpressions >  
+
+> 52
+
+<deformstrucs >  
+
+> 53
+
+<deformstrucbody mkbound ="1">  
+
+> 54
+
+<bcvel ze="2" />  
+
+> 55
+
+<restrictphi value="1"/>  
+
+> 56
+
+<density value="50.0" />  
+
+> 57
+
+<youngmod value="12.44 e9" />  
+
+> 58
+
+<poissratio value="0.3" />  
+
+> 59
+
+<fracture value="1" />  
+
+> 60
+
+<Gc value="11.8 e3" />  
+
+> 61
+
+<pflenscale value="0.25e-3" />  
+
+> 62
+
+<notch >  
+
+> 63
+
+<p1 x="0.04" y="0.0e-3" z=" -1.0e-3" />  
+
+> 64
+
+<p2 x="0.04" y="0.0e-3" z="0.0056 " />  
+
+> 65
+
+<p3 x="#xc0" y="10.0e-3" z="0.0056 " />  
+
+> 66
+
+<p4 x="#xc0" y="10.0e-3" z=" -1.0e-3" />  
+
+> 67
+
+</notch >  
+
+> 68
+
+</ deformstrucbody > 
+
+70 69 </ deformstrucs >  
+
+> 70
+
+</ special >  
+
+> 71
+
+<parameters >  
+
+> 72
+
+<parameter key=" StepAlgorithm " value="1" />  
+
+> 73
+
+<parameter key="Kernel " value="2" />  
+
+> 74
+
+<parameter key="Visco" value=" 8.92678034e-7" />  
+
+> 75
+
+<parameter key=" CoefDtMin " value="0.0001 " />  
+
+> 76
+
+<parameter key=" TimeMax " value="250.0e-6" />  
+
+> 77
+
+<parameter key=" TimeOut " value="2.0e-6" />  
+
+> 78
+
+<simulationdomain >  
+
+> 79
+
+<posmin x="default -10%" y="default - 10%" z=" default - 10%" />  
+
+> 80
+
+<posmax x=" default +10%" y=" default + 10%" z=" default + 10%" />  
+
+> 81
+
+</ simulationdomain >  
+
+> 82
+
+</ parameters >  
+
+> 83
+
+</ execution >  
+
+> 84
+
+</case > 
+
+8. Flyer plate impact  
+
+> 1
+
+<?xml version ="1.0" encoding ="UTF -8" ?>  
+
+> 2
+
+<case >  
+
+> 3
+
+<casedef >  
+
+> 4
+
+<constantsdef >  
+
+> 5
+
+<gravity x="0" y="0" z="0.0" />  
+
+> 6
+
+<rhop0 value="997" />  
+
+> 7
+
+<hswl value="0" auto="true" />  
+
+> 8
+
+<gamma value="7" />  
+
+> 9
+
+<speedsystem value="10" auto="false" />  
+
+> 10
+
+<coefsound value="10" />  
+
+> 11
+
+<coefh value="1.3" />  
+
+> 12
+
+<cflnumber value="0.01" />  
+
+> 13
+
+</ constantsdef >  
+
+> 14
+
+<mkconfig boundcount ="240" fluidcount ="9" />  
+
+> 15
+
+<geometry >  
+
+> 16
+
+<definition dp="0.01" units_comment ="metres (m)">  
+
+> 17
+
+<pointmin x=" -2.0" y="0" z=" -1.0" />  
+
+> 18
+
+<pointmax x="2.0" y="0" z="5.0" />  
+
+> 19
+
+</ definition >  
+
+> 20
+
+<commands >  
+
+> 21
+
+<mainlist >  
+
+> 22
+
+<newvar Lx="1.0" Ly="1.0" Lz="1.0"/>  
+
+> 23
+
+<setdrawmode mode="full" />  
+
+> 24
+
+<setmkbound mk="1" /> 
+
+71 25 <drawbox >  
+
+> 26
+
+<boxfill >solid </ boxfill >  
+
+> 27
+
+<point x="0.0" y="0.0" z="1.1" />  
+
+> 28
+
+<size x="#Lx" y="#Ly" z="#Lz" />  
+
+> 29
+
+</ drawbox >  
+
+> 30
+
+<setmkbound mk="2" />  
+
+> 31
+
+<drawbox >  
+
+> 32
+
+<boxfill >solid </ boxfill >  
+
+> 33
+
+<point x="0.0" y="0.0" z="0.05" />  
+
+> 34
+
+<size x="#Lx" y="#Ly" z="#Lz" />  
+
+> 35
+
+</ drawbox >  
+
+> 36
+
+</ mainlist >  
+
+> 37
+
+</ commands >  
+
+> 38
+
+</ geometry >  
+
+> 39
+
+<motion >  
+
+> 40
+
+<objreal ref="1">  
+
+> 41
+
+<begin mov="1" start="0" />  
+
+> 42
+
+<mvnull id="1" />  
+
+> 43
+
+</ objreal >  
+
+> 44
+
+<objreal ref="2">  
+
+> 45
+
+<begin mov="2" start="0" />  
+
+> 46
+
+<mvnull id="2" />  
+
+> 47
+
+</ objreal >  
+
+> 48
+
+</ motion >  
+
+> 49
+
+</ casedef >  
+
+> 50
+
+<execution >  
+
+> 51
+
+<special >  
+
+> 52
+
+<deformstrucs >  
+
+> 53
+
+<contcoeff value="5" />  
+
+> 54
+
+<deformstrucbody mkbound ="1">  
+
+> 55
+
+<bcvel z=" -200.0" tend="0.0"/>  
+
+> 56
+
+<density value="7870.0 " />  
+
+> 57
+
+<youngmod value="200.0 e9" />  
+
+> 58
+
+<poissratio value="0.29" />  
+
+> 59
+
+<artvisc factor1 ="0.05" factor2 ="0.0" />  
+
+> 60
+
+<constitmodel value="3" />  
+
+> 61
+
+<restcoef value="0.95" />  
+
+> 62
+
+<yieldstress value="4.0 e8" />  
+
+> 63
+
+<hardening value="1.0 e8" />  
+
+> 64
+
+</ deformstrucbody >  
+
+> 65
+
+<deformstrucbody mkbound ="2">  
+
+> 66
+
+<bcvel z="200.0" tend="0.0"/>  
+
+> 67
+
+<density value="7870.0 " /> 
+
+72 68 <youngmod value="200.0 e9" />  
+
+> 69
+
+<poissratio value="0.29" />  
+
+> 70
+
+<artvisc factor1 ="0.05" factor2 ="0.0" />  
+
+> 71
+
+<constitmodel value="3" />  
+
+> 72
+
+<restcoef value="0.95" />  
+
+> 73
+
+<yieldstress value="4.0 e8" />  
+
+> 74
+
+<hardening value="1.0 e8" />  
+
+> 75
+
+</ deformstrucbody >  
+
+> 76
+
+</ deformstrucs >  
+
+> 77
+
+</ special >  
+
+> 78
+
+<parameters >  
+
+> 79
+
+<parameter key=" StepAlgorithm " value="1" />  
+
+> 80
+
+<parameter key="Kernel " value="2" />  
+
+> 81
+
+<parameter key="Visco" value=" 8.92678034e-7" />  
+
+> 82
+
+<parameter key=" CoefDtMin " value="0.001" />  
+
+> 83
+
+<parameter key=" TimeMax " value="100.0e-4" />  
+
+> 84
+
+<parameter key=" TimeOut " value="0.1e-4" comment ="Time out data" units_comment =" seconds " />  
+
+> 85
+
+<simulationdomain > 
+
+> 86
+
+<posmin x="default -10%" y="default - 10%" z=" default - 10%" />  
+
+> 87
+
+<posmax x=" default +10%" y=" default + 10%" z=" default + 10%" />  
+
+> 88
+
+</ simulationdomain >  
+
+> 89
+
+</ parameters >  
+
+> 90
+
+</ execution >  
+
+> 91
+
+</case > 
+
+9. 3D Taylor bar impact  
+
+> 1
+
+<?xml version ="1.0" encoding ="UTF -8" ?>  
+
+> 2
+
+<case >  
+
+> 3
+
+<casedef >  
+
+> 4
+
+<constantsdef >  
+
+> 5
+
+<gravity x="0" y="0" z="0.0"/>  
+
+> 6
+
+<rhop0 value="997" />  
+
+> 7
+
+<hswl value="0" auto="true" />  
+
+> 8
+
+<gamma value="7" />  
+
+> 9
+
+<speedsystem value="10" auto="false" />  
+
+> 10
+
+<coefsound value="10" />  
+
+> 11
+
+<coefh value="1.0" />  
+
+> 12
+
+<cflnumber value="0.02" />  
+
+> 13
+
+</ constantsdef >  
+
+> 14
+
+<mkconfig boundcount ="240" fluidcount ="9" />  
+
+> 15
+
+<geometry > 
+
+73 16 <definition dp="0.2e-3" units_comment ="metres (m)">  
+
+> 17
+
+<pointmin x=" -10.0e-3" y=" -10.0e-3" z=" -20.0e-3" />  
+
+> 18
+
+<pointmax x="10.0e-3" y="10.0e-3" z="50.0e-3" />  
+
+> 19
+
+</ definition >  
+
+> 20
+
+<commands >  
+
+> 21
+
+<mainlist >  
+
+> 22
+
+<newvar Rd="3.2e-3" Lz="32.4e-3"/>  
+
+> 23
+
+<setdrawmode mode="full" />  
+
+> 24
+
+<setmkbound mk="1" />  
+
+> 25
+
+<setfrdrawmode auto="true"/>  
+
+> 26
+
+<drawcylinder radius ="#Rd">  
+
+> 27
+
+<point x="0.0" y="0.0" z="0.0"/>  
+
+> 28
+
+<point x="0.0" y="0.0" z="#Lz"/>  
+
+> 29
+
+</ drawcylinder >  
+
+> 30
+
+</ mainlist >  
+
+> 31
+
+</ commands >  
+
+> 32
+
+</ geometry >  
+
+> 33
+
+<motion >  
+
+> 34
+
+<objreal ref="1">  
+
+> 35
+
+<begin mov="1" start="0" />  
+
+> 36
+
+<mvnull id="1" />  
+
+> 37
+
+</ objreal >  
+
+> 38
+
+</ motion >  
+
+> 39
+
+</ casedef >  
+
+> 40
+
+<execution >  
+
+> 41
+
+<special >  
+
+> 42
+
+<mathexpressions >  
+
+> 43
+
+<userexpression id="1">  
+
+> 44
+
+<locals value="Vinit = -227;"/>  
+
+> 45
+
+<expression value="if(z <1.0e -12 ,0.0 , if(t <=0.0 , Vinit ,skip))"/>  
+
+> 46
+
+</ userexpression >  
+
+> 47
+
+</ mathexpressions >  
+
+> 48
+
+<deformstrucs >  
+
+> 49
+
+<deformstrucbody mkbound ="1">  
+
+> 50
+
+<bcvel ze="1" />  
+
+> 51
+
+<density value="8930.0 "/>  
+
+> 52
+
+<youngmod value="1.17 e11" />  
+
+> 53
+
+<poissratio value="0.35" />  
+
+> 54
+
+<artvisc factor1 ="0.05" factor2 ="0.0" />  
+
+> 55
+
+<constitmodel value="3"/>  
+
+> 56
+
+<yieldstress value="400.0 e6" />  
+
+> 57
+
+<hardening value="100.0 e6" />  
+
+> 58
+
+</ deformstrucbody > 
+
+74 59 </ deformstrucs >                                                 
+
+> 60 </ special >
+> 61 <parameters >
+> 62 <parameter key=" StepAlgorithm " value="1" />
+> 63 <parameter key="Kernel " value="2" />
+> 64 <parameter key="Visco" value=" 8.92678034e-7" />
+> 65 <parameter key=" CoefDtMin " value="0.001" />
+> 66 <parameter key=" TimeMax " value="2.5e-4" />
+> 67 <parameter key=" TimeOut " value="0.01e-4" />
+> 68 <simulationdomain >
+> 69 <posmin x="default -10%" y="default -10%" z=" default -10%" />
+> 70 <posmax x=" default +10%" y=" default + 10%" z=" default +10%" />
+> 71 </ simulationdomain >
+> 72 </ parameters >
+> 73 </ execution >
+> 74 </case >=
+
+References 
+
+[1] R. A. Gingold and J. J. Monaghan. Smoothed particle hydrodynamics: theory and application to non-spherical stars. Monthly Notices of the Royal Astronomical Society , 181(3):375–389, 1977. [2] L. B. Lucy. A numerical approach to the testing of the fission hypothesis. The Astronomical Journal , 82(12):1013–1024, 1977. [3] J. J. Monaghan. Simulating free surface flows with SPH. Journal of Computational Physics ,110(2):399–406, 1994. [4] J. P. Gray, J. J. Monaghan, and R. Swift. SPH elastic dynamics. Computer Methods in Applied Mechanics and Engineering , 190(49-50):6641–6662, 2001. [5] C. Antoci, M. Gallati, and S. Sibilla. Numerical simulation of fluid–structure interaction by SPH. Computers & Structures , 85(11-14):879–890, 2007. [6] L. Libersky and A. Petschek. Smooth particle hydrodynamics with strength of materials ,volume 395, pages 248–257. 01 2006. [7] M.B. Liu and G.R. Liu. Smoothed Particle Hydrodynamics (SPH): an Overview and Recent Developments. Archives of Computational Methods in Engineering , 17(1):25–76, 2010. 75 [8] J. J Monaghan. Smoothed particle hydrodynamics and its diverse applications. Annual Re-view of Fluid Mechanics , 44(1):323–346, 2012. [9] D. J. Price. Smoothed particle hydrodynamics and magnetohydrodynamics. Journal of Com-putational Physics , 231(3):759–794, 2012. [10] D. Violeau and B. D. Rogers. Smoothed particle hydrodynamics (SPH) for free-surface flows: past, present and future. Journal of Hydraulic Research , 54(1):1–26, 2016. [11] S. J. Lind, B. D. Rogers, and P. K. Stansby. Review of smoothed particle hydrodynam-ics: towards converged lagrangian flow modelling. Proceedings of the Royal Society A ,476(2241):20190801, 2020. [12] H. H. Bui and G. D. Nguyen. Smoothed particle hydrodynamics (SPH) and its applications in geomechanics: From solid fracture to granular behaviour and multiphase flows in porous media. Computers and Geotechnics , 138:104315, 2021. [13] F. Xu, J. Wang, Y. Yang, L. Wang, Z. Dai, and R. Han. On methodology and application of smoothed particle hydrodynamics in fluid, solid and biomechanics. Acta Mechanica Sinica ,39(2):722185, 2023. [14] A. J. C. Crespo. Application of the smoothed particle hydrodynamics model SPHysics to free-surface hydrodynamics . PhD thesis, PhD Thesis, Departamento De Fisica Aplicada, Universidade De Vigo, 2008. [15] A. Hérault, G. Bilotta, and R. A. Dalrymple. Sph on gpu with cuda. Journal of Hydraulic Research , 48(sup1):74–79, 2010. [16] J. L. Cercos-Pita. AQUAgpusph, a new free 3D SPH solver accelerated with OpenCL. Com-puter Physics Communications , 192:295–312, 2015. [17] H. R. Abbasi and R. Lubbad. A numerical model for the simulation of oil–ice interaction. 
+
+Physics of Fluids , 33(10), 2021. [18] R. Akhunov, R. Winchenbach, and A. Kolb. Evaluation of particle-based smoothed particle hydrodynamics boundary handling approaches in computer animation. Computer Animation and Virtual Worlds , 34(6):e2138, 2023. [19] P. Ramachandran, A. Bhosale, K. Puri, P. Negi, A. Muta, A. Dinesh, D. Menon, R. Govind, S. Sanka, A. S. Sebastian, et al. PySPH: a Python-based framework for smoothed particle hydrodynamics. ACM Transactions on Mathematical Software (TOMS) , 47(4):1–38, 2021. 76 [20] C. Zhang, M. Rezavand, Y. Zhu, Y. Yu, D. Wu, W. Zhang, J. Wang, and X. Hu. SPHinXsys: An open-source multi-physics and multi-resolution library based on smoothed particle hy-drodynamics. Computer Physics Communications , 267:108066, 2021. [21] H. Wu, S. Gu, L. Tian, J. Li, C. Chen, and C. Zhang. Modeling structural deformation and failure in fluid-structure interaction with WC-TLSPH. Frontiers in Environmental Science ,10:1024488, 2022. [22] M. Gholami Korzani, S. A. Galindo-Torres, A. Scheuermann, and D. J. Williams. SPH ap-proach for simulating hydro-mechanical processes with large deformations and variable per-meabilities. Acta Geotechnica , 13(2):303–316, 2018. [23] A. Amicarelli, S. Manenti, R. Albano, G. Agate, M. Paggi, L. Longoni, D. Mirauda, L. Ziane, G. Viccione, S. Todeschini, et al. SPHERA v. 9.0. 0: A computational fluid dynamics research code, based on the Smoothed Particle Hydrodynamics mesh-less method. Computer Physics Communications , 250:107157, 2020. [24] A. J. C. Crespo, J. M. Domínguez, B. D. Rogers, M. Gómez-Gesteira, S. Longshaw, R. J. F. B. Canelas, R. Vacondio, A. Barreiro, and O. García-Feal. DualSPHysics: Open-source parallel CFD solver based on smoothed particle hydrodynamics (SPH). Computer Physics Communications , 187:204–216, 2015. [25] J. M. Domínguez, G. Fourtakas, C. Altomare, R. B. Canelas, A. Tafuni, O. García-Feal, I. Martínez-Estévez, A. Mokos, R. Vacondio, A. J. C. Crespo, et al. DualSPHysics: from fluid dynamics to multiphysics problems. Computational Particle Mechanics , 9(5):867–895, 2022. [26] T. Rabczuk and J. Eibl. Simulation of high velocity concrete fragmentation using SPH /ML-SPH. International Journal for Numerical Methods in Engineering , 56(10):1421–1444, 2003. [27] T. Rabczuk and T. Belytschko. Cracking particles: a simplified meshfree method for arbitrary evolving cracks. International Journal for Numerical Methods in Engineering , 61(13):2316– 2343, 2004. [28] N. Moës, J. Dolbow, and T. Belytschko. A finite element method for crack growth without remeshing. International Journal for Numerical Methods in Engineering , 46(1):131–150, 1999. [29] N. Moës and T. Belytschko. Extended finite element method for cohesive crack growth. 
+
+Engineering Fracture Mechanics , 69(7):813–833, 2002. 77 [30] S. Chakraborty and A. Shaw. A pseudo-spring based fracture model for sph simulation of impact dynamics. International Journal of Impact Engineering , 58:84–95, 2013. [31] Md R. I. Islam and C. Peng. A total lagrangian SPH method for modelling damage and failure in solids. International Journal of Mechanical Sciences , 157:498–511, 2019. [32] Md R. I. Islam and A. Shaw. Pseudo-spring SPH simulations on the perforation of metal tar-gets with di ff erent damage models. Engineering Analysis with Boundary Elements , 111:55– 77, 2020. [33] Y. Wang, H. H. Bui, G. D. Nguyen, and P. G. Ranjith. A new SPH-based continuum frame-work with an embedded fracture process zone for modelling rock fracture. International Journal of Solids and Structures , 159:40–57, 2019. [34] Y. Wang, H. T. Tran, G. D. Nguyen, P. G. Ranjith, and H. H. Bui. Simulation of mixed-mode fracture using SPH particles with an embedded fracture process zone. International Journal for Numerical and Analytical Methods in Geomechanics , 44(10):1417–1445, 2020. [35] M. N. Rahimi and G. Moutsanidis. A smoothed particle hydrodynamics approach for phase field modeling of brittle fracture. Computer Methods in Applied Mechanics and Engineering ,398:115191, 2022. [36] M. N. Rahimi and G. Moutsanidis. Modeling dynamic brittle fracture in functionally graded materials using hyperbolic phase field and smoothed particle hydrodynamics. Computer Methods in Applied Mechanics and Engineering , 401:115642, 2022. [37] M. N. Rahimi and G. Moutsanidis. An SPH-based FSI framework for phase-field model-ing of brittle fracture under extreme hydrodynamic events. Engineering with Computers ,39(4):2365–2399, 2023. [38] M. N. Rahimi and G. Moutsanidis. IGA-SPH: coupling isogeometric analysis with smoothed particle hydrodynamics for air-blast–structure interaction. Engineering with Computers ,41(3):1357–1378, 2025. [39] M. J. Borden, C. V. Verhoosel, M. A. Scott, T. J. R. Hughes, and C. M. Landis. A phase-field description of dynamic brittle fracture. Computer Methods in Applied Mechanics and Engineering , 217-220:77–95, 2012. [40] D. Kamensky, G. Moutsanidis, and Y. Bazilevs. Hyperbolic phase field modeling of brittle fracture: Part ITheory and simulations. Journal of the Mechanics and Physics of Solids ,121:81–98, 2018. 78 [41] G. Moutsanidis, D. Kamensky, J. S. Chen, and Y. Bazilevs. Hyperbolic phase field modeling of brittle fracture: Part IIimmersed IGA–RKPM coupling for air-blast–structure interaction. 
+
+Journal of the Mechanics and Physics of Solids , 121:114–132, 2018. [42] E. H. Lee. Elastic-plastic deformation at finite strains. J. Appl. Mech. , 36:1–6, 1969. [43] J. C. Simo and T. J. R. Hughes. Computational Inelasticity . Springer, New York, 1998. [44] C. Suchocki. On finite element implementation of a selected class of hyperelastic-plastic con-stitutive equations. Journal of the Brazilian Society of Mechanical Sciences and Engineering ,2025. [45] B. Eidel and F. Gruttmann. Elastoplastic orthotropy at finite strains: multiplicative formu-lation and numerical implementation. Computational Materials Science , 28(3-4):732–742, 2003. [46] J. Mandel. Thermodynamics and plasticity. In J. J. Delgado Domingos, M. N. R. Nina, and J. H. Whitelaw, editors, Foundations of Continuum Thermodynamics , pages 283–304. Macmillan. [47] G. Weber and L. Anand. Finite deformation constitutive equations and a time integration procedure for isotropic, hyperelastic-viscoplastic solids. Computer Methods in Applied Me-chanics and Engineering , 79(2):173–202, 1990. [48] J. C. Simo. Algorithms for static and dynamic multiplicative plasticity that preserve the classical return mapping schemes of the infinitesimal theory. Computer Methods in Applied Mechanics and Engineering , 99:61–112, 1992. [49] F. Armero and J. C. Simo. A new unconditionally stable fractional step method for non-linear coupled thermomechanical problems. International Journal for Numerical Methods in Engineering , 35(4):737–766, 1992. [50] I. N. Vladimirov, M. P. Pietryga, and S. Reese. On the modelling of non-linear kinematic hardening at finite strains with application to springback. International Journal for Numerical Methods in Engineering , 75:1–28, 2008. [51] T. Belytschko, W. K. Liu, and B. Moran. Nonlinear Finite Elements for Continua and Struc-tures . Wiley, Chichester, 2000. [52] J. Lubliner. Plasticity Theory . Macmillan, New York, 1990. 79 [53] J. Bonet and R. D. Wood. Nonlinear Continuum Mechanics for Finite Element Analysis .Cambridge University Press, Cambridge, 2 edition, 2008. [54] C. Truesdell and W. Noll. The non-linear field theories of mechanics. In S. Flügge, editor, 
+
+Handbuch der Physik , volume III /3. Springer, Berlin, 1960. [55] J. E. Marsden and T. J. R. Hughes. Mathematical Foundations of Elasticity . Prentice-Hall, Englewood Cli ff s, NJ, 1983. [56] P. M. Naghdi. A critical review of the state of finite plasticity. Z. Angew. Math. Phys. ,41:315–394, 1990. [57] H. Xiao, O. T. Bruhns, and A. Meyers. Objective stress rates, path-dependence properties and non-integrability problems. Acta Mechanica , 176:135–151, 1998. [58] J. C. Simo. A framework for finite strain elastoplasticity based on maximum plastic dis-sipation and the multiplicative decomposition: Part I. Continuum formulation. Computer Methods in Applied Mechanics and Engineering , 66:199–219, 1988. [59] C. Miehe. A theory of large-strain isotropic thermoplasticity based on metric transformation tensors. Archive of applied Mechanics , 66(1):45–64, 1995. [60] V. A. Lubarda. Constitutive theories based on the multiplicative decomposition of defor-mation gradient: Thermoelasticity, elastoplasticity, and biomechanics. Applied Mechanics Reviews , 57:95–108, 2004. [61] J. J. Monaghan and R. A. Gingold. Shock simulation by the particle method sph. Journal of Computational Physics , 52(2):374–389, 1983. [62] J. OConnor and B. D. Rogers. A fluid–structure interaction model for free-surface flows and flexible structures using smoothed particle hydrodynamics on a GPU. Journal of Fluids and Structures , 104:103312, 2021. [63] L. D. Landau, L. P. Pitaevskii, A. M. Kosevich, and E. M. Lifshitz. Theory of elasticity: volume 7 , volume 7. Elsevier, 2012. [64] A. Khayyer, H. Gotoh, H. Falahaty, and Y. Shimizu. An enhanced ISPH–SPH coupled method for simulation of incompressible fluid–elastic structure interactions. Computer Physics Communications , 232:139–164, 2018. 80 [65] M. N. Rahimi, D. C. Kolukisa, M. Yildiz, M. Ozbulut, and A. Kefal. A generalized hybrid smoothed particle hydrodynamics–peridynamics algorithm with a novel lagrangian mapping for solution and failure analysis of fluid–structure interaction problems. Computer Methods in Applied Mechanics and Engineering , 389:114370, 2022. [66] J. He, N. Tofighi, M. Yildiz, J. Lei, and A. Suleman. A coupled WC-TL SPH method for sim-ulation of hydroelastic problems. International Journal of Computational Fluid Dynamics ,31(3):174–187, 2017. [67] J. He and J. Lei. A GPU-Accelerated TLSPH Algorithm for 3D Geometrical Nonlinear Struc-tural Analysis. International Journal of Computational Methods , 16(07):1850114, 2019. [68] J.F. Kaltho ff and S. Winkler. Failure mode transition at high rates of shear loading. DGM Informationsgesellschaft mbH, Impact Loading and Dynamic Behavior of Materials , 1:185– 195, 1988. [69] L. Hug, S. Kollmannsberger, Z. Yosibash, and E. Rank. A 3D benchmark problem for crack propagation in brittle fracture. Computer Methods in Applied Mechanics and Engineering ,364:112905, 2020. [70] M. N. Rahimi, A. Kefal, and M. Yildiz. An improved ordinary-state based peridynamic formulation for modeling fgms with sharp interface transitions. International Journal of Mechanical Sciences , 197:106322, 2021. [71] M. N. Rahimi, A. Kefal, M. Yildiz, and E. Oterkus. An ordinary state-based peridynamic model for toughness enhancement of brittle materials through drilling stop-holes. Interna-tional Journal of Mechanical Sciences , 182:105773, 2020. [72] E. Haghighat and D. Santillán. An e ffi cient phase-field model of shear fractures using devia-toric stress split. Computational Mechanics , 72(6):1263–1278, 2023. [73] Y. Chen and B. A. Izzuddin. A simplified finite strain plasticity model for metallic applica-tions. Engineering with Computers , 39(6):3955–3972, 2023. [74] F. J. Montáns and K. J. Bathe. Computational issues in large strain elasto-plasticity: an algorithm for mixed hardening and plastic spin. International Journal for Numerical Methods in Engineering , 63(2):159–196, 2005. 81

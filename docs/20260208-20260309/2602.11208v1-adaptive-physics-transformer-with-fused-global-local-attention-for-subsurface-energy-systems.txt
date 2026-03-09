@@ -1,0 +1,684 @@
+Title: Adaptive Physics Transformer with Fused Global-Local Attention for Subsurface Energy Systems
+
+URL Source: https://arxiv.org/pdf/2602.11208v1
+
+Published Time: Fri, 13 Feb 2026 01:07:55 GMT
+
+Number of Pages: 29
+
+Markdown Content:
+# Adaptive Physics Transformer with Fused Global-Local Attention for Subsurface Energy Systems 
+
+Xin Ju 1 2 Nok Hei (Hadrian) Fung 3 Yuyan Zhang 3 Carl Jacquemyn 3 Matthew Jackson 3
+
+Randolph Settgast 4 2 Sally M. Benson 1 2 Gege Wen 3 2 
+
+# Abstract 
+
+The Earth’s subsurface is a cornerstone of modern society, providing essential energy resources like hydrocarbons, geothermal, and minerals while serving as the primary reservoir for CO 2 seques-tration. However, full physics numerical simula-tions of these systems are notoriously computa-tionally expensive due to geological heterogene-ity, high resolution requirements, and the tight coupling of physical processes with distinct prop-agation time scales. Here we propose the Adap-tive Physics Transformer (APT), a geometry-, mesh-, and physics-agnostic neural operator that explicitly addresses these challenges. APT fuses a graph-based encoder to extract high-resolution local heterogeneous features with a global atten-tion mechanism to resolve long-range physical impacts. Our results demonstrate that APT out-performs state-of-the-art architectures in subsur-face tasks across both regular and irregular grids with robust super-resolution capabilities. No-tably, APT is the first architecture that directly learns from adaptive mesh refinement simulations. We also demonstrate APT’s capability for cross-dataset learning, positioning it as a robust and scalable backbone for large-scale subsurface foun-dation model development. 
+
+# 1. Introduction 
+
+Full physics numerical simulations of flow and transport through heterogeneous geological formations are a funda-mental component for decision-making in subsurface energy processes (Bear & Cheng, 2010), such as geological car-bon storage (GCS) (Strandli et al., 2014; Tang et al., 2021), 
+
+> 1
+
+Department of Energy Science and Engineering, Stanford Uni-versity 2EarthFlow AI, Inc. 3Department of Earth Sciences and Engineering, Imperial College London 4Lawrence Livermore Na-tional Laboratory. Correspondence to: Xin Ju <ju1@stanford.edu, isaacju@earthflow.ai >.
+
+geothermal resource development (Settgast et al., 2017), lithium brine extraction, and petroleum engineering (Aziz, 1979; Christie & Blunt, 2001). However, HF simulation of realistic subsurface projects presents significant computa-tional challenges. The underlying physics involves complex coupled partial differential equations (PDEs) at different spatial and time scale, including multiphase flow dynamics, mutual component solubility, phase transitions, capillary effects, viscous fingering instabilities, gravitational override, and rock matrix interactions (Orr et al., 2007). Each is for-mulated as high-dimensional, nonlinear Partial Differential Equations (PDEs). In addition, subsurface geological forma-tions have highly heterogeneous permeability and porosity that significantly influencing the pressure propagation and fluid flow patterns (Pini et al., 2012). Data driven machine learning (ML) approaches provide a computationally efficient yet accurate alternatives to tra-ditional numerical solvers for subsurface energy systems. Despite significant progress, current ML architectures face fundamental limitations in geometric flexibility and scala-bility (see detailed related works in Appendix A.). Convolu-tional Neural Networks (CNNs), Fourier Neural Operators (FNOs), and vision transformer-based (Mao et al., 2025) architecture are inherently restricted to structured, gridded discretizations (Wen et al., 2022; 2021), making them unsuit-able for the unstructured meshes required to resolve complex geological features like faults or stratigraphic pinch-outs. Hierarchical frameworks such as Nested FNO (Wen et al., 2023b) and Nested Fourier-DeepONet (Lee et al., 2024) attempts to learn large-scale systems with semi-adaptive local grid refinement. However, they require training mul-tiple separate models for a single system, which resulting in computationally intensive training pipelines that cannot generalize across varying semi-adaptive meshes. Graph-based simulators like MeshGraphNet (Pfaff et al., 2020) (MGN) excel at representing irregular geometries but are limited by the local nature of their message-passing kernels, which struggle to capture the long-range global dependen-cies essential for pressure propagation. Moreover, existing architectures lack the capability of learning directly from adaptive mesh simulation datasets. As a result, current ML approaches force each application to be treated as an isolated 1                    
+
+> arXiv:2602.11208v1 [cs.LG] 10 Feb 2026 Adaptive Physics Transformer for Subsurface Energy Systems
+> Figure 1. Architectural Overview. The fused encoder combines a (a) Global Perceiver Encoder that projects input features onto supernode queries via cross-attention with a (b) Local GNO Encoder that aggregates neighborhood information through radius graph pooling. A (c)
+> Gated Fusion Mechanism adaptively combines global ( vattn ) and local ( vgno ) representations via a learned gate G∈[0 ,1] d, followed by DiT blocks and Perceiver pooling to produce fixed-size latent tokens. The overall pipeline (d) APT architecture maps input fields a(x)
+> through the fused encoder E, latent dynamics approximator Awith temporal modulation, and Perceiver decoder Dto generate output fields z(x, t )at arbitrary query locations.
+
+task, precluding the benefits of large-scale pre-training. Motivated by the limitations of previous models, the physics transformer-based (Alkin et al., 2024; Wu et al., 2024) ar-chitectures have emerged as a powerful paradigm that uti-lizes latent representations derived from flexible encoders coupled with attention mechanisms. However, existing ap-proaches in this family overlook a fundamental characteris-tic of subsurface systems: intrinsic spatial heterogeneity . In standard fluid dynamics or solid mechanics problems, the computational domain is typically homogeneous. In these cases, while the boundary geometry influences the field, the underlying medium properties often remain constant throughout the space (Wu et al., 2024; Elrefaie et al., 2024b; Alkin et al., 2024). Even in multi-solid systems, where dif-ferent objects may possess distinct mechanical properties, existing approaches typically assume each individual object to be internally homogeneous (Tao et al., 2025). For subsurface systems, properties such as permeability can vary across several orders of magnitude within a few meters. Existing architectures designed for homogeneous domains are often inefficient to capture these high-frequency local property variations, leading to smoothed prediction of fluid or thermal plumes (Wen et al., 2022). To resolve this issue, we propose the Adaptive Physics Transformer (APT), which introduces a fused mechanism that adaptively utilize local and global information. The architecture concurrently cap-tures local heterogeneity via graph neural operator encoders and long-range dependencies via global perceiver (Figure 1), resolving the disparate propagation scales inherent in subsurface physics. Our contribution highlights include: • Direct Learning from Adaptive Meshes : To our best knowledge, APT is the first neural operator to learn di-rectly from adaptive mesh datasets with dynamic mesh optimization (DMO) algorithms. DMO simulations can significantly reduce computational costs during data generation processes. Directly training with DMO avoids error from interpolation. • Superior performance and Super-Resolution : APT outperforms SOTA neural operators on various bench-mark subsurface tasks. We also showcased the superior super-resolution capability against SOTA models. • Cross-Dataset Training : The APT architecture can serve as a scalable backbone for massive pre-training due to its ability to learn across across subsurface datasets with distinct mesh and distribution. 
+
+# 2. Methodology 
+
+2.1. Learning Task Set Up 
+
+Let a(x) denote the input that specifies a particular in-stance of a subsurface system, such as rock permeabil-2Adaptive Physics Transformer for Subsurface Energy Systems 
+
+ity and initial conditions. The corresponding PDE solu-tion consists of time-dependent physical fields, such as gas saturation Sg (x, t ) and pressure buildup ∆Pg (x, t ) = 
+
+Pg (x, t ) − Pg (x, 0) . We collectively denote these output fields by z(x, t ). We define X as the space of inputs a(x),and Z as the space of solution functions z : D × T → Rdz ,where D ⊂ Rd is the spatial domain and T = [0 , T max ] is the time interval of interest. The spatial-temporal evolution of the system can be de-scribed by a solution operator St : X → Z t, which maps the initial system definition a to the solution z(·, t ) at a specific time t. For time-dependent PDEs, we can define an extended solution operator G† (Li et al., 2020a). This operator G† can map the system definition a and a query time t to the solution at that time, z(·, t ) = G†(a; t).The learning task for the APT model is to learn a neural op-erator Gθ , parameterized by θ, that approximates G†. Given a set of input functions {aj } drawn from a probability mea-sure μ on X , the corresponding true solutions at any time 
+
+t are zj (·, t ) = G†(aj ; t). The APT model Gθ (aj ; t) aims to predict this solution. For numerical implementation, the input functions aj (x) are discretized on a spatial mesh, re-sulting in aj ∈ RNpoints ×da . The output functions zj (x, t ) are represented at discrete spatial locations and sampled time instances, zj (xi, t k) ∈ Rdz .
+
+2.2. Adaptive Physics Transformer Formulation 
+
+We approximate G† with a three-stage mapping: Gθ = D ◦ A ◦ E , as shown in Figure 1. The fused encoder E : X → 
+
+Rdh maps the input function into a finite-dimensional latent vector. The latent dynamics approximator A : Rdh → Rdh
+
+models the action of the solution operator in the latent space. The decoder D : Rdh → Z reconstructs the output function, usually as pointwise values on the target grid or mesh. 
+
+2.3. Input Representations and Fused Encoder 
+
+The goal of the encoder is to map an input field evaluated at Npoints to a fixed-size latent array S, in other words, com-press features into the latent space. Input features a(xv )
+
+(e.g., permeability, porosity) are first projected into a hidden space of width dh through a learnable linear map Wf ∈
+
+Rdh×da . To incorporate spatial context, we compute a po-sitional encoding (PE) p(xv ) as detailed in Appendix B.1. The resulting node embeddings h(0)  
+
+> v
+
+= Wf a(xv ) + p(xv )
+
+are further conditioned by a learnable time embedding 
+
+econd ,t . This initial temporal conditioning ensures the en-coder is aware of the specific timestamp t during the feature extraction phase. 
+
+Fused Encoder and Parallel Local-Global Pathways. Akey architectural contribution of APT is the novel design of the parallel local-global feature extraction. Unlike previous operators that rely on either purely global feature extraction (e.g., FNO (Li et al., 2020a), Transolver (Wu et al., 2024)) or local graph-pooling encoder for feature extraction fol-lowed by self-attention layers to gain global perception (e.g., UPT (Alkin et al., 2024)), APT employs a fused encoder (Figure 1 (c)) designed to simultaneously capture multi-scale physics. This is especially important for subsurface systems where both sharp local interactions (e.g., saturation fronts, thermal fronts, and fault interfaces) and long-range pressure propagation must be resolved accurately. Specifically, the Global Perceiver Branch (Figure 1(a)) uses cross-attention to project Npoints onto Ns learnable supern-ode queries Q = pos (xs), capturing long-range depen-dencies without the quadratic complexity of standard self-attention. Meanwhile, the Local GNO Branch (Figure 1(b)) captures fine-grained spatial heterogeneity using a Graph Neural Operator with radius graph construction and mean aggregation (Li et al., 2020b; Hamilton et al., 2017). 
+
+Gated Fusion and Latent Dynamics. We integrate the global representations vattn and the local representations 
+
+vgno via a Local-Global Gated Fusion mechanism (Fig-ure 1(c)). This design is introduces complementary in-ductive biases: the global branch ( vattn ) mimics integral operator behaviors, while the local branch ( vgno ) adheres to the sparsity inherent in differential operators. While gated fusion has been explored in prior hybrid neu-ral operators (Wen et al., 2022; Liu & Tang, 2025; Liu-Schiaffini et al., 2024), they were often introduced as a decoding mechanism. Instead, APT framework uniquely employs these fused representations to construct the latent token space. To achieve this, we employ a learnable gating parameter G ∈ [0 , 1] dh to adaptively modulate the integra-tion of features at each spatial location: 
+
+vfused = G ⊙ vattn + (1 − G) ⊙ vgno . (1) This mechanism enables APT to flexibly balance the con-tribution of global propagation trends against local conser-vation constraints. The resulting vfused is subsequently pro-jected into latent tokens Ntokens and processed by a sequence of DiT blocks, subject to the temporal and conditional mod-ulation detailed in Section B.1. 
+
+2.4. Approximator 
+
+The latent dynamics approximator A models the system’s temporal evolution in latent space. It takes as input the fixed-size encoded state zenc ∈ RNlat ×dh and a target time 
+
+t (via its embedding econd ,t ), and outputs the time-specific latent representation zlat (t):
+
+zlat (t) = A (zenc ; econd ,t ) (2) 3Adaptive Physics Transformer for Subsurface Energy Systems 
+
+The approximator A consists of a small stack of Trans-former layers that apply self-attention over the Nlat latent tokens. Each latent vector in zenc attends to all others to capture temporal and relational dependencies. The attention is computed using scaled dot-product self-attention: SelfAttend (zenc ) = softmax 
+
+ QK ⊤
+
+√dh
+
+
+
+V ∈ RNlat ×dh (3) where the queries, keys, and values are computed via learned linear projections. 
+
+Q = zenc W Q, K = zenc W K , V = zenc W V , (4) where W Q, W K , W V ∈ Rdh×dh . The time embedding 
+
+econd ,t is injected into the attention block (and subsequent feed-forward sublayers), ensuring that A produces tempo-rally conditioned outputs. Since the attention operates over a fixed number of latent to-kens ( Nlat ), the computational complexity remains bounded at O(N 2 
+
+> lat
+
+· dh) regardless of the input size. 
+
+2.5. Decoder 
+
+The decoder D transforms the time-specific latent state 
+
+zlat (t) ∈ RNlat ×dh into physical output fields ˆz(x, t ) at user-specified spatial query points xquery and time t. To achieve this, we employ a cross-attention operation. Each query location xquery is embedded (e.g., via positional encodings) and combined with the time embedding et to form spatial-temporal query vectors Qout ∈ RNquery ×dh . These queries attend to the latent array zlat (t), which serves as both keys and values: 
+
+ˆz(xquery , t ) = CrossAttend (Qout (xquery , econd ,t ), zlat (t), zlat (t)) 
+
+(5) This set up allows querying at arbitrary spatial locations with computational complexity O(Nquery · Nlat · dh). A small lin-ear layer is then applied to the attention output to produce the final physical predictions. All decoder operations are also conditioned by the time embedding econd ,t . For subsur-face applications with sharp fronts, we found empirically that stacking multiple cross-attention layers also improves the reconstruction of localized features. 
+
+2.6. Loss Functions and Training Strategy 
+
+The APT model is trained in a directly one-step manner from the initial condition to any query time step t. Unlike au-toregressive physics transformers (UPT (Alkin et al., 2024), MGN-LSTM (Ju et al., 2024)) that require uniform tempo-ral discretization for latent rollout, APT’s direct temporal conditioning and training strategy allows native learning from simulations with temporal queries with irregular spac-ing. This is critical for subsurface systems where temporal resolution often varies with solution dynamics. We use a relative lp-loss to train the model. The training ob-jective is to minimize the discrepancy between the model’s predictions ˆz(x, t ) and the ground-truth solutions z(x, t )
+
+over a set of k randomly sampled spatiotemporal query points {(xi, t i)}ki=1 . The loss is defined as follows: 
+
+L =
+
+Pki=1 ∥z(xi, t i) − ˆz(xi, t i)∥p
+
+Pki=1 ∥z(xi, t i)∥p + ϵ (6) where ϵ is a small constant added for numerical stability. 
+
+# 3. Experiments 
+
+We evaluate APT on five subsurface energy benchmarks (Figure 2). This diversity tests APT’s ability to general-ize across mesh types (structured, unstructured, adaptive, nested), scales (thousands to millions of cells), and physics (single-phase, multiphase, compositional flow, and heat transfer). 
+
+3.1. Irregular Grid with Faults - CO 2 storage 
+
+Faulted system is a fundamental challenge for grid-based neural operators. Faults create discontinuities that require unstructured meshes for accurate modeling. We evaluate on a 2D faulted CO 2 storage benchmark with multiphase flow simulations from the GEOS numerical simulator (Settgast et al., 2024), where each case has a unique mesh adapted to varying fault and well configurations. Dataset details, baselines, and training configurations, training costs are pro-vided in Appendix C.1.2. Table 1 compares APT against grid-based methods (U-Net, U-FNO) that require interpo-lation to regular grids, and graph-based methods (MGN, MGN-LSTM) that operate directly on irregular meshes.                                                   
+
+> Table 1. Results on 2D faulted CO 2storage. APT with fused atten-tion achieves the lowest error on both pressure and saturation. Model δP g(%) δS g(%) Params U-Net 0.37 ±0.16 2.87 ±1.08 1.36M U-FNO 0.34 ±0.17 2.4 ±1.10 1.48M MGN 1.00 ±0.40 7.24 ±1.30 1.94M MGN-LSTM 0.20 ±0.15 1.20 ±0.30 1.38M
+> APT variants (ablation)
+> APT (global only) 0.48 ±0.25 1.50 ±0.60 1.36M APT (local only) 0.18 ±0.09 0.36 ±0.17 1.36M
+> APT (fused) 0.11 ±0.07 0.32 ±0.16 1.38M
+
+APT achieves 0.11% pressure error and 0.32% saturation error, outperforming MGN-LSTM by 1.8 × on pressure and 3.75 × on saturation. The ablation (bottom rows) reveals the importance of fusing local and global attention: global-only attention struggles with the permeability heterogeneity at fault interfaces, while local-only message passing misses long-range pressure propagation. Fusing both mechanisms 4Adaptive Physics Transformer for Subsurface Energy Systems            
+
+> Figure 2. Benchmark datasets for evaluating APT across diverse subsurface applications. (a) to (d) each displays input parameter fields (e.g., permeability) alongside the temporal evolution of output fields (e.g., saturation, pressure, temperature). (a) 2D Geologic Carbon Storage (GCS) utilizing an irregular mesh to resolve complex fault geometries. (b) 2D Hydrocarbon extraction on a Cartesian mesh with varying well configurations. (c) 2D Wastewater injection system modeled on a radial mesh. (d) 3D Basin-scale GCS featuring a million-cell nested semi-adaptive mesh with local grid refinement (LGR), supporting both Gaussian and channelized permeability geomodels. (e) 3D Aquifer Thermal Energy Storage (ATES) employing dynamic mesh optimization to track moving thermal fronts.
+
+captures the interplay between local fault geometry and global pressure dynamics. 
+
+3.2. Cartesian Grid - Hydrocarbon Extraction 
+
+We evaluate on the public two-phase oil-water flow bench-mark from Badawi & Gildin (2025), which uses a 40 ×40 Cartesian grid with heterogeneous Gaussian permeability fields. Here APT is trained to generalize across varying permeability fields, well configurations, and operating con-ditions. Notably, models are trained on cases with only 6wells but tested on cases with 3–11 wells, requiring extrapo-lation to unseen well counts. Dataset details and governing equations are provided in Appendix C.1.1. Table 2 presents the performance on this test set. APT demonstrates exceptional efficiency, reducing saturation er-ror ( δS w) by over 50% compared to the strongest baseline (0.30% vs. 0.66% for U-FNO). Moreover, the superior fi-delity of the saturation fronts of APT’s is visually evident in Figure 3(b), where it captures sharp oil-water interfaces that the baseline methods tend to smooth out. Pressure pre-dictions ( δP ) also remain comparable to the strong baseline                 
+
+> Table 2. Results on Cartesian grid hydrocarbon benchmark. APT achieves the best saturation prediction with 2.5 ×fewer parameters than U-FNO. Model δP (%) δS w(%) Params FNO 1.85 ±1.07 1.28 ±0.98 31M U-FNO 0.57 ±0.41 0.66 ±0.53 33M
+> APT (ours) 0.60 ±0.53 0.32 ±0.14 12M
+
+model despite the 2.5 × smaller model size (12M vs. 33M). 
+
+3.3. Adaptive Mesh - Aquifer Thermal Energy Storage 
+
+We then evaluate APT on a challenging dataset generated by Dynamic Mesh Optimization (DMO) (Regnier et al., 2022) for Aquifer Thermal Energy Storage (ATES) (Jack-son et al., 2024). ATES is a shallow geothermal technology that seasonally stores and retrieves thermal energy through paired warm and cold wells to provide heating and cooling for buildings. The dataset comprises 840 scenarios simu-lated over 10-year seasonal injection-extraction cycles (240 5Adaptive Physics Transformer for Subsurface Energy Systems          
+
+> Figure 3. Visualization of prediction error and state evolution across different subsurface applications. Rows compare APT against baseline models (MGN-LSTM, U-FNO, and FNO) at multiple time steps ( t). (a) Saturation error maps ( δS g) for the 2D irregular mesh geologic carbon storage dataset, showing APT’s stability near complex fault geometries. (b) Water saturation error maps ( δS w) for the 2D Cartesian hydrocarbon dataset. (c) Spatiotemporal temperature evolution for the 3D dynamic mesh ATES dataset, where APT maintains higher fidelity to the thermal front compared to FNO. Errors and physical quantities are normalized within each sample for comparative visualization.
+
+timesteps) using numerical simulator IC-FERST. More de-tails on the simulation setup are given in Appendix C.2.1. As illustrated in Figure 2(e), DMO concentrates mesh res-olution near the injection wells and the thermal fronts to maintain high fidelity. This results in meshes with time-varying topology and node counts —a fundamental chal-lenge for standard neural operators that assume fixed spatial discretizations. Grid-based baselines (e.g., U-Net, FNO) are forced to interpolate these adaptive unstructured meshes onto a fixed regular grid, inevitably introducing smoothing artifacts and losing the precise geometric information pre-served by DMO. Graph based methods, such as MGN (Pfaff et al., 2020) and its variants (Ju et al., 2024), also fails to make prediction for this system as they requires the same graph topology for each time step. Here we demonstrate that APT learns continuous field map-pings, allowing it to directly on the raw, time-varying DMO point clouds without interpolation. To handle the extreme sparsity of injection wells ( <0.1% of domain volume), we employ anchor supernodes that deterministically preserve critical boundary regions. More details on the dataset prepro-cessing, as well as APT and other baseline implementations are given in Appendix C.2.1.                    
+
+> Table 3. Results on adaptive mesh ATES benchmark. APT learns directly from DMO without interpolation, achieving 4 ×lower error than grid-based baselines. Model Rel. L2R2(%) Params U-Net (interpolated) 0.084 69.9 77 M FNO (interpolated) 0.046 90.6 21 M
+> APT variants
+> APT (w/o fused) 0.014 ±0.01 98.7 17 M
+> APT (fused) 0.011 ±0.01 99.0 17 M
+
+As shown in Table 3, APT achieves a relative L2 error of 0.011 ( 99 .0% R2), outperforming interpolated baselines by a factor of 4. This performance gap highlights the penalty of mesh-to-grid conversion, which degrades the sharp ther-mal fronts that DMO was designed to capture. In terms of computational efficiency over the numerical simulator, APT reduces the computational cost from ∼7 hours for numerical simulation to ∼5 seconds for a full 240-step forecast. 6Adaptive Physics Transformer for Subsurface Energy Systems                       
+
+> Table 4. Basin-scale CO 2storage with LGR. APT achieves com-petitive pressure accuracy using a single unified model with 97.0% fewer parameters than the rigid Nested FNO cascade. Model δ∆PgδS gParams # of Models FNO-DeepONet 0.56% 1.46% 96.3M 5Nested-FNO 0.47% 1.79% 682.4M 5
+> APT variants
+> APT (GNO only) 0.93% 3.9% 17.7M 1
+> APT (fused) 0.56% 2.5% 17.9M 1
+
+3.4. Basin-Scale CO 2 Storage with LGR 
+
+A essential challenge for CO 2 storage simulation is the multi-scale resolution required to capture basin-scale pres-sure propagation (kilometers) and near-well plume dynam-ics (meters). Numerical simulators address this via Local Grid Refinement (LGR), which concentrates computational resources near injection wells. However, the resulting mesh hierarchies— involving volume contrasts of 60 , 000 × be-tween coarse and fine cells—create severe difficulties for neural surrogates. The benchmark dataset from Wen et al. (2023b) demonstrates this challenge, featuring five nested refinement levels totaling 0.3–1.0 million cells across a 
+
+160 × 160 km 2 domain. More details on the simulation setup are provided in Appendix C.1.3. Prior state-of-the-art methods handle LGR through hierar-chical model cascades . For example, Nested FNO (Wen et al., 2023b) trains a separate neural operator for each re-finement level. This locks the surrogate to a specific mesh hierarchy; changing the LGR configuration requires retrain-ing the entire cascade. However, APT treats the multi-resolution LGR structure as a single heterogeneous point cloud, learning a unified solution operator end-to-end in a single forward pass (see Figure 8). The details on baseline setup, training details and APT implementations are given in Appendix C.1.3. 
+
+Experiment Results As detailed in Table 4, APT achieves a global pressure error of 0.56%, comparable to the special-ized FNO-DeepONet baseline, while utilizing only 17.9M parameters—a 97.0% reduction compared to Nested FNO’s 682.4M. The ablation study on APT variants highlights that the fused gated architecture is particularly effective here. It reduces saturation error from 3.9% to 2.5% and pressure error from 0.93% to 0.56% compared to the non-fused GNO only variant. Although Nested FNO achieves lower saturation error due to its specialized sub-models, APT offers a superior trade-off between accuracy and flexibility. Furthermore, APT delivers a 6, 800 × speedup over the ECLIPSE simulator (Schlum-berger, 2014), completing full-field inference in 1.4 to 8 seconds compared to 2.75 to 15.93 hours for numerical simulation (see Appendix C.1.3 for more details). 
+
+# 4. Discussion 
+
+4.1. Super-Resolution Evaluation 
+
+While mesh convergence is an inherent characteristic of neural operators, recent studies reveal a discrepancy be-tween this promise and practical performance (Bartolucci et al., 2024; Elrefaie et al., 2025). Here we evaluate APT’s super-resolution capabilities on two distinct datasets: Car-Bench (Elrefaie et al., 2025), which represents smooth aero-dynamic pressure fields, and ATES (see Section 3.3). In both cases, models are trained on subsampled data with a fixed node count and subsequently tested on the full-resolution mesh. Detailed experimental set ups, baseline model de-scriptions, and APT implementation specifics for both Car-Bench and ATES are provided in Appendix C.1.4 and C.2.1, respectively.                                
+
+> Table 5. Super-resolution evaluation. Top: On CarBench, APT is the only model to improve at full resolution while baselines degrade; results are reported for a representative unseen test sample (E S WW WM 648 ). Bottom: On the heterogeneous ATES dataset, results are averaged over the entire unseen test set. CarBench (Smooth) Model 10k nodes Full ( ∼500k)
+> Baselines
+> NeuralOperator 83.7 81.3 ( ↓2.4) RegDGCNN 93.5 86.6 ( ↓6.9) PointTransformer 94.6 86.1 ( ↓8.5) TripNet 96.1 86.3 ( ↓9.8) Transolver 96.5 86.6 ( ↓9.9) AB-UPT 97.1 86.9 ( ↓10.2)
+> Ours (Ablation)
+> APT (w/o fused) 95.1 95.2 ( ↑0.1)
+> APT (Fused) 96.0 96.5 (↑0.5) ATES (Heterogeneous) Model 4k nodes Full
+> Ours (Ablation)
+> APT (w/o fused) 98.7 96.5 ( ↓2.2)
+> APT (Fused) 99.0 97.2 (↓1.8)
+
+Table 5 illustrates a contrast in behavior that reveals an im-portant distinction between architectural mesh-invariance and training data fidelity. On CarBench, baseline models consistently degraded when evaluated at full resolution, sug-gesting they overfit to the coarse training grid. In contrast, APT exhibits mesh-convergent behavior : performance ac-tually improves by 0.5% as the query resolution increases, confirming that the architecture has learned a continuous operator rather than a discrete mapping tied to the training 7Adaptive Physics Transformer for Subsurface Energy Systems 
+
+resolution. On the subsurface ATES dataset, however, APT shows a modest degradation (1.8%) when evaluated at full resolu-tion. Importantly, this does not reflect a limitation of the APT architecture. Rather, this outcome highlights a com-mon challenge in subsurface modeling, which requires ex-tremely high domain size to resolution ratio (6,000 × for the ATES dataset (Regnier et al., 2022) and 60,000 × for the Nested FNO benchmark dataset). Consequently, fully mesh-converged training data are rare in practice for subsurface systems, and even an architecturally mesh-invariant model cannot reliably super-resolve beyond the fidelity captured in its training simulations. Super-resolution claims in sub-surface applications should be approached with caution, as performance is ultimately bounded by the mesh convergence of the underlying simulation data. 
+
+4.2. OOD Generalization: Unseen Geostatistical Models 
+
+So far, APT is mainly evaluated under in-distribution geo-model settings, where training and testing data share identi-cal underlying statistical properties. In real-world applica-tions, geological priors are often uncertain or incomplete. To investigate strictly out-of-distribution (OOD) generalization, we test the model on unseen permeability classes. As shown in Figure 13, the training set contains a mixture of contin-uous/discontinuous Gaussian and continuous Von Karman fields, while the test set is designed to exclusively include discontinuous von Karman fields—a geomodel regime never seen during training. Detailed experimental setup and base-line configurations are provided in Appendix C.2.2. Table 14 demonstrates that the APT architecture outper-forms baseline approaches in this OOD regime. While standard FNO and ablated APT variants struggle to extrapo-late to the unseen discontinuous geostatistical models, APT achieves the lowest relative error ( 3.28% ) and highest R2
+
+(0.91 ). This demonstrates APT’s robustness to the distri-bution shifts commonly encountered in subsurface applica-tions. 
+
+4.3. Cross-Dataset Training 
+
+A critical requirement for building foundation models in sub-surface systems is the ability to intake heterogeneous train-ing data across varying geological structures and mesh con-figurations. Traditional grid-based approaches (e.g., Nested FNO) are inherently limited by fixed mesh topologies. Such set up prevents training across datasets with different meshes and lead to massive underutilized of public data repositories. For example, the open source basin-scale CO 2 storage (Wen et al., 2023b) dataset costs 24,000 20-core CPU hours. How-ever, the dataset can not be reused for pre-training if any changed resolution is introduced for a new task. APT’s mesh-agnostic architecture inherently enables direct learn-ing from diverse, unstructured point clouds. Here, we inves-tigate whether this capability facilitates pre-training across physically and geometrically distinct domains.  
+
+> Figure 4. Cross-dataset training setup. (a) Gaussian permeability fields defined on nested grids with 4 levels of LGRs. (b) Channel-ized permeability fields LGR defined with 3 levels of LGRs.
+
+Experiment Set Up. We combine two CO 2 storage datasets with different semi-adaptive resolutions: (1) a sub-set of the open source dataset (Wen et al., 2023b) with 4 levels of nested grids, and (2) our created Channelized dataset featuring complex channelized permeability and 3 levels of LGR (Figure 4). This discrepancy in LGR levels makes joint training impossible for previous baselines. As a result, one has to train only with the limited Channalized dataset without any additional help from previous published datasets. To demonstrate this, we compare APT’s perfor-mance when trained on the Channelized set alone versus a joint multi-dataset configuration.            
+
+> Table 6. Cross-dataset training results. Joint training with the Gaus-sian dataset vs. training only on the Channelized task. Training Data Chan. R2(%) Gauss. R2(%) Chan. only (400) 32.0 –Gauss. + Chan. (1,400) 86.7 98.9
+
+Results and Implications. As shown in Table 6, the abil-ity of joint training dramatically improves the performance on the Channalized task with limited data, boosting R2 from 32.0% to 86.7% with a 2.7 × improvement. This experiment demonstrates APT’s ability to leverage heterogeneous datasets with incompatible mesh structures. APT enables practitioners to combine previously siloed open source simulation datasets, substantially improving perfor-mance on data-limited tasks. This finding suggests a viable path toward pre-training a general-purpose subsurface foun-dation models. 8Adaptive Physics Transformer for Subsurface Energy Systems 
+
+# 5. Conclusion 
+
+The APT architecture is a mesh-agnostic neural operator that fuses a Global Perceiver encoder with a Local GNO encoder to resolve the multi-scale nature of subsurface sys-tems. Our results establish APT as a high-performance, scalable backbone for subsurface modeling, characterized by the superior accuracy, direct learning from adaptive mesh simulations, and robust generalization. 
+
+# Software and Data 
+
+This study utilizes a combination of public and synthetic datasets. The APT model architecture and created datasets will be released upon publication. 
+
+# Impact Statement 
+
+The subsurface is vital for modern society, supplying geothermal energy and minerals while acting as the pri-mary site for carbon sequestration. However, the high cost of traditional simulation hinders effective decision-making. By introducing a model that learns across diverse geolog-ical datasets, this work enables a subsurface foundation model for more efficient resource management. This accel-eration directly supports the energy transition by providing the speed and accuracy needed to scale carbon storage and renewable geothermal projects. 
+
+# References 
+
+Alkin, B., F ¨urst, A., Schmid, S., Gruber, L., Holzleitner, M., and Brandstetter, J. Universal physics transformers. 
+
+arXiv e-prints , pp. arXiv–2402, 2024. Alkin, B., Bleeker, M., Kurle, R., Kronlachner, T., Sonnleit-ner, R., Dorfer, M., and Brandstetter, J. Ab-upt: Scaling neural cfd surrogates for high-fidelity automotive aero-dynamics simulations via anchored-branched universal physics transformers. arXiv preprint arXiv:2502.09692 ,2025. Aziz, K. Petroleum reservoir simulation. Applied Science Publishers , 476, 1979. Badawi, D. and Gildin, E. Neural operator-based proxy for reservoir simulations considering varying well set-tings, locations, and permeability fields. Computers & Geosciences , 196:105826, 2025. Bahlali, M. L., Salinas, P., and Jackson, M. D. Efficient numerical simulation of density-driven flows: Applica-tion to the 2-and 3-d elder problem. Water Resources Research , 58(8):e2022WR032307, 2022. Bartolucci, F., de B ´ezenac, E., Raoni ´c, B., Molinaro, R., Mishra, S., and Alaifari, R. Representation Equivalent Neural Operators: a Framework for Alias-free Operator Learning. Advances in Neural Information Processing Systems , 36(NeurIPS):1–12, 2023. ISSN 10495258. Bartolucci, F., Raonic, B., Molinaro, R., de B ´ezenac, E., Mishra, S., and Alaifari, R. The false promise of zero-shot super-resolution in machine-learned operators. arXiv preprint arXiv:2510.06646 , 2024. Bear, J. and Cheng, A. H.-D. Modeling groundwater flow and contaminant transport , volume 23. Springer, 2010. Bhattacharya, K., Hosseini, B., Kovachki, N. B., and Stuart, A. M. Model reduction and neural networks for paramet-ric pdes. arXiv preprint arXiv:2005.03180 , 2020. Brandstetter, J., Worrall, D., and Welling, M. Message pass-ing neural pde solvers. arXiv preprint arXiv:2202.03376 ,2022. Calvello, E., Kovachki, N. B., Levine, M. E., and Stu-art, A. M. Continuum Attention for Neural Operators. jun 2024a. URL http://arxiv.org/abs/2406. 06486 .Calvello, E., Kovachki, N. B., Levine, M. E., and Stuart, A. M. Continuum attention for neural operators. arXiv preprint arXiv:2406.06486 , 2024b. Chen, Q., Elrefaie, M., Dai, A., and Ahmed, F. Tripnet: Learning large-scale high-fidelity 3d car aerodynamics with triplane networks. arXiv preprint arXiv:2503.17400 ,2025. Chen, X., Liang, C., Huang, D., Real, E., Wang, K., Pham, H., Dong, X., Luong, T., Hsieh, C.-J., Lu, Y., et al. Sym-bolic discovery of optimization algorithms. Advances in neural information processing systems , 36:49205–49233, 2023. Christie, M. A. and Blunt, M. J. Tenth spe comparative solution project: A comparison of upscaling techniques. 
+
+SPE Reservoir Evaluation & Engineering , 4(04):308– 317, 2001. CMG, S. U. G. Computer modeling group ltd. Calgary, Alberta, Canada , 2014. Elrefaie, M., Dai, A., and Ahmed, F. Drivaernet: Aparametric car dataset for data-driven aerodynamic de-sign and graph-based drag prediction. arXiv preprint arXiv:2403.08055 , 2024a. Elrefaie, M., Morar, F., Dai, A., and Ahmed, F. Drivaer-net++: A large-scale multimodal car dataset with com-putational fluid dynamics simulations and deep learning benchmarks. Advances in Neural Information Processing Systems , 37:499–536, 2024b. 9Adaptive Physics Transformer for Subsurface Energy Systems 
+
+Elrefaie, M., Shu, D., Klenk, M., and Ahmed, F. Carbench: A comprehensive benchmark for neural surrogates on high-fidelity 3d car aerodynamics. arXiv preprint , 2025. MIT/Toyota Research Institute. Gao, H., Zahr, M. J., and Wang, J.-X. Physics-informed graph neural galerkin networks: A unified framework for solving pde-governed forward and inverse problems. 
+
+Computer Methods in Applied Mechanics and Engineer-ing , 390:114502, 2022. Geneva, N. and Zabaras, N. Transformers for mod-eling physical systems. Neural Networks , 146:272– 289, 2022. ISSN 18792782. doi: 10.1016/j.neunet. 2021.11.022. URL https://doi.org/10.1016/ j.neunet.2021.11.022 .Hamilton, W., Ying, Z., and Leskovec, J. Inductive repre-sentation learning on large graphs. Advances in Neural Information Processing Systems , 30, 2017. Han, X., Gao, H., Pffaf, T., Wang, J.-X., and Liu, L.-P. Predicting physics in mesh-reduced space with temporal attention. arXiv preprint arXiv:2201.09113 , 2022. Hao, Z., Wang, Z., Su, H., Ying, C., Dong, Y., Liu, S., Cheng, Z., Song, J., and Zhu, J. GNOT: A General Neural Operator Transformer for Operator Learning. Proceed-ings of Machine Learning Research , 202:12556–12569, 2023. ISSN 26403498. Jackson, M. D., Regnier, G., and Staffell, I. Aquifer thermal energy storage for low carbon heating and cooling in the united kingdom: Current status and future prospects. 
+
+Applied energy , 376:124096, 2024. Jaegle, A., Gimeno, F., Brock, A., Zisserman, A., Vinyals, O., and Carreira, J. Perceiver: General Perception with Iterative Attention. Proceedings of Machine Learning Research , 139:4651–4664, 2021. ISSN 26403498. Jiang, J. Simulating multiphase flow in fractured media with graph neural networks. Physics of Fluids , 36(2), 2024. Ju, X., Hamon, F. P., Wen, G., Kanfar, R., Araya-Polo, M., and Tchelepi, H. A. Learning co2 plume migration in faulted reservoirs with graph neural networks. Computers & Geosciences , 193:105711, 2024. Kampitsis, A., Adam, A., Salinas, P., Pain, C., Muggeridge, A., and Jackson, M. Dynamic adaptive mesh optimisa-tion for immiscible viscous fingering. Computational Geosciences , 24(3):1221–1237, 2020. Kochkov, D., Smith, J. A., Alieva, A., Wang, Q., Brenner, M. P., and Hoyer, S. Machine learning–accelerated com-putational fluid dynamics. Proceedings of the National Academy of Sciences , 118(21):e2101784118, 2021. Krizhevsky, A., Sutskever, I., and Hinton, G. E. Imagenet classification with deep convolutional neural networks. 
+
+Advances in neural information processing systems , 25, 2012. Lanthaler, S., Li, Z., and Stuart, A. M. The Nonlocal Neural Operator: Universal Approximation. 2023. URL http: //arxiv.org/abs/2304.13221 .Lee, J. E., Zhu, M., Xi, Z., Wang, K., Yuan, Y. O., and Lu, L. Efficient and generalizable nested fourier-deeponet for three-dimensional geological carbon sequestration. Engi-neering Applications of Computational Fluid Mechanics ,18(1):2435457, 2024. Li, Z., Kovachki, N., Azizzadenesheli, K., Liu, B., Bhat-tacharya, K., Stuart, A., and Anandkumar, A. Fourier neural operator for parametric partial differential equa-tions. arXiv preprint arXiv:2010.08895 , 2020a. Li, Z., Kovachki, N., Azizzadenesheli, K., Liu, B., Bhat-tacharya, K., Stuart, A., and Anandkumar, A. Multipole graph neural operator for parametric partial differential equations. arXiv preprint arXiv:2006.09535 , 2020b. Li, Z., Meidani, K., and Farimani, A. B. Transformer for Partial Differential Equations’ Operator Learning. pp. 1–34, 2022. URL http://arxiv.org/abs/2205. 13671 .Li, Z., Kovachki, N., Choy, C., Li, B., Kossaifi, J., Otta, S., Nabian, M. A., Stadler, M., Hundt, C., Azizzade-nesheli, K., et al. Geometry-informed neural operator for large-scale 3d pdes. Advances in Neural Information Processing Systems , 36:35836–35854, 2023. Lie, K.-A. An introduction to reservoir simulation using matlab: user guide for the matlab reservoir simulation toolbox (mrst). Sintef Ict , 118, 2016. Lippe, P., Veeling, B., Perdikaris, P., Turner, R., and Brand-stetter, J. Pde-refiner: Achieving accurate long rollouts with neural pde solvers. Advances in Neural Information Processing Systems , 36:67398–67433, 2023. Liu, X. and Tang, H. Difffno: Diffusion fourier neural operator. In Proceedings of the Computer Vision and Pattern Recognition Conference , pp. 150–160, 2025. Liu-Schiaffini, M., Berner, J., Bonev, B., Kurth, T., Aziz-zadenesheli, K., and Anandkumar, A. Neural operators with localized integral and differential kernels. arXiv preprint arXiv:2402.16845 , 2024. Lu, L., Jin, P., and Karniadakis, G. E. Deeponet: Learning nonlinear operators for identifying differential equations based on the universal approximation theorem of opera-tors. arXiv preprint arXiv:1910.03193 , 2019. 10 Adaptive Physics Transformer for Subsurface Energy Systems 
+
+Lu, L., Jin, P., Pang, G., Zhang, Z., and Karniadakis, G. E. Learning nonlinear operators via deeponet based on the universal approximation theorem of operators. Nature machine intelligence , 3(3):218–229, 2021. Mallison, B., Sword, C., Viard, T., Milliken, W., and Cheng, A. Unstructured cut-cell grids for modeling complex reservoirs. Spe Journal , 19(02):340–352, 2014. Mao, S., Carbonero, A., and Mehana, M. Deep learning for subsurface flow: A comparative study of u-net, fourier neural operators, and transformers in underground hydro-gen storage. Journal of Geophysical Research: Machine Learning and Computation , 2(1):e2024JH000401, 2025. Mo, S., Zhu, Y., Zabaras, N., Shi, X., and Wu, J. Deep convolutional encoder-decoder networks for uncertainty quantification of dynamic multiphase flow in heteroge-neous media. Water Resources Research , 55(1):703–728, 2019. Orr, F. M. et al. Theory of gas injection processes , volume 5. Tie-Line Publications Copenhagen, 2007. Palagi, C. L. and Aziz, K. Use of Voronoi grid in reservoir simulation. SPE Advanced Technology Series , 2(02):69– 77, 1994. Pang, Y., Wang, W., Tay, F. E., Liu, W., Tian, Y., and Yuan, L. Masked autoencoders for point cloud self-supervised learning. In European Conference on Computer Vision ,pp. 604–621. Springer, 2022. Peebles, W. and Xie, S. Scalable diffusion models with transformers. In Proceedings of the IEEE/CVF interna-tional conference on computer vision , pp. 4195–4205, 2023. Pfaff, T., Fortunato, M., Sanchez-Gonzalez, A., and Battaglia, P. W. Learning mesh-based simulation with graph networks. arXiv preprint arXiv:2010.03409 , 2020. Pini, R., Krevor, S. C., and Benson, S. M. Capillary pressure and heterogeneity for the CO 2/water system in sandstone rocks at reservoir conditions. Advances in Water Re-sources , 38:48–59, 2012. Pruess, K. ECO2N: A TOUGH2 fluid property module for mixtures of water, NaCl, and CO2 , volume 497. Lawrence Berkeley National Laboratory Berkeley, CA, 2005. Qi, C. R., Su, H., Mo, K., and Guibas, L. J. Pointnet: Deep learning on point sets for 3d classification and seg-mentation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , pp. 652–660, 2017. Regnier, G., Salinas, P., Jacquemyn, C., and Jackson, M. Nu-merical simulation of aquifer thermal energy storage us-ing surface-based geologic modelling and dynamic mesh optimisation. Hydrogeology Journal , 30(4):1179–1198, 2022. Ronneberger, O., Fischer, P., and Brox, T. U-net: Con-volutional networks for biomedical image segmentation. In Medical Image Computing and Computer-Assisted Intervention–MICCAI 2015: 18th International Confer-ence, Munich, Germany, October 5-9, 2015, Proceedings, Part III 18 , pp. 234–241. Springer, 2015. Schlumberger. Eclipse reservoir simulation software refer-ence manual, 2014. Settgast, R. R., Fu, P., Walsh, S. D., White, J. A., An-navarapu, C., and Ryerson, F. J. A fully coupled method for massively parallel simulation of hydraulically driven fractures in 3-dimensions. International Journal for Nu-merical and Analytical Methods in Geomechanics , 41(5): 627–653, 2017. Settgast, R. R., Aronson, R. M., Besset, J. R., Borio, A., Bui, Q. M., Byer, T. J., Castelletto, N., Citrain, A., Cor-bett, B. C., Corbett, J., et al. Geos: A performance portable multi-physics simulation framework for subsur-face applications. Journal of Open Source Software , 9 (LLNL-JRNL-864747), 2024. Shukla, K., Xu, M., Trask, N., and Karniadakis, G. E. Scal-able algorithms for physics-informed neural and graph networks. Data-Centric Engineering , 3:e24, 2022. Strandli, C. W., Mehnert, E., and Benson, S. M. Co2 plume tracking and history matching using multilevel pressure monitoring at the illinois basin–decatur project. Energy Procedia , 63:4473–4484, 2014. Suk, J., Imre, B., and Wolterink, J. M. LaB-GATr: geometric algebra transformers for large biomedical surface and volume meshes. m:1–11, 2024. URL http://arxiv. org/abs/2403.07536 .Sun, Z., Yang, Y., and Yoo, S. A neural pde solver with temporal stencil modeling. In International Conference on Machine Learning , pp. 33135–33155. PMLR, 2023. Tang, H., Fu, P., Sherman, C. S., Zhang, J., Ju, X., Ha-mon, F., Azzolina, N. A., Burton-Kelly, M., and Morris, J. P. A deep learning-accelerated data assimilation and forecasting workflow for commercial-scale geologic car-bon storage. International Journal of Greenhouse Gas Control , 112:103488, 2021. Tang, M., Ju, X., and Durlofsky, L. J. Deep-learning-based coupled flow-geomechanics surrogate model for co2 se-questration. International Journal of Greenhouse Gas Control , 118:103692, 2022. 11 Adaptive Physics Transformer for Subsurface Energy Systems 
+
+Tao, S., Feng, Z., Sun, H., Zhu, Z., and Liu, Y. Unisoma: A unified transformer-based solver for multi-solid systems. 
+
+arXiv preprint arXiv:2506.06021 , 2025. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł., and Polosukhin, I. Attention is all you need. Advances in Neural Information Process-ing Systems , 2017-Decem(Nips):5999–6009, 2017. ISSN 10495258. Voskov, D. V. and Tchelepi, H. A. Comparison of nonlinear formulations for two-phase multi-component eos based simulation. Journal of Petroleum Science and Engineer-ing , 82:101–111, 2012. Wang, S., Seidman, J. H., Sankaran, S., Wang, H., Pap-pas, G. J., and Perdikaris, P. CViT: Continuous Vision Transformer for Operator Learning. may 2024. URL 
+
+http://arxiv.org/abs/2405.13998 .Wen, G., Tang, M., and Benson, S. M. Towards a predic-tor for co 2 plume migration using deep neural networks. 
+
+International Journal of Greenhouse Gas Control , 105: 103223, 2021. Wen, G., Li, Z., Azizzadenesheli, K., Anandkumar, A., and Benson, S. M. U-fno—an enhanced fourier neural operator-based deep-learning model for multiphase flow. 
+
+Advances in Water Resources , 163:104180, 2022. Wen, G., Li, Z., Long, Q., Azizzadenesheli, K., Anandku-mar, A., and Benson, S. M. Real-time high-resolution co 2 geological storage prediction using nested fourier neural operators. Energy & Environmental Science , 16 (4):1732–1741, 2023a. Wen, G., Li, Z., Long, Q., Azizzadenesheli, K., Anandku-mar, A., and Benson, S. M. Real-time high-resolution co 2 geological storage prediction using nested fourier neural operators. Energy & Environmental Science , 16 (4):1732–1741, 2023b. Wu, H., Luo, H., Wang, H., Wang, J., and Long, M. Tran-solver: A fast transformer solver for pdes on general geometries. arXiv preprint arXiv:2402.02366 , 2024. Wu, H., Luo, H., Wang, H., Wang, J., and Long, M. Tran-solver++: An accurate neural solver for pdes on million-scale geometries. arXiv preprint arXiv:2502.02414 , 2025. Wu, Q., Yang, K., Zhang, H., Wipf, D., and Yan, J. SGFormer: Single-Layer Graph Transformers with Approximation-Free Linear Complexity. Technical report. URL https://github. 
+
+Wu, T., Wang, Q., Zhang, Y., Ying, R., Cao, K., Sosic, R., Jalali, R., Hamam, H., Maucec, M., and Leskovec, J. Learning large-scale subsurface simulations with a hybrid graph network simulator. In Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining , pp. 4184–4194, 2022. Zhao, H., Jiang, L., Jia, J., Torr, P., and Koltun, V. Point transformer. In Proceedings of the IEEE/CVF Interna-tional Conference on Computer Vision , pp. 16259–16268, 2021. Zhu, Y. and Zabaras, N. Bayesian deep convolutional encoder–decoder networks for surrogate modeling and uncertainty quantification. Journal of Computational Physics , 366:415–447, 2018. 12 Adaptive Physics Transformer for Subsurface Energy Systems 
+
+# A. Related Work 
+
+A.1. Convolutional Neural Network (CNN) 
+
+CNNs, especially U-Net (Krizhevsky et al., 2012; Ronneberger et al., 2015) were among the first types of architectures adapted for flow prediction tasks in the subsurface. Intuitively, CNNs were used for regular Cartesian discretizations (Zhu & Zabaras, 2018; Mo et al., 2019; Wen et al., 2022; Tang et al., 2022; Wen et al., 2023a; 2021). However, CNN’s inherent reliance on fixed computational stencils and structured grid topology restricts their applicability to the unstructured meshes. This is especially problematic for subsurface tasks because it frequently interpolation of complex geological features such as fault discontinuities or stratigraphic pinch-outs (Mallison et al., 2014; Ju et al., 2024). The interpolation of data from unstructured meshes to regular grids for CNN processing can introduce significant discretization errors and potentially miss important physical features resolved by the original computational mesh (Pfaff et al., 2020; Gao et al., 2022; Shukla et al., 2022). 
+
+A.2. Graph Neural Network (GNN) 
+
+GNNs provide a natural computational framework for operating directly on unstructured meshes by representing mesh cells/nodes and their connectivity patterns as graph structures (Pfaff et al., 2020; Han et al., 2022; Wu et al., 2022). MeshGraphNet (MGN) have been successfully adopted to model flow behaviors in geometrically complex, faulted reservoir systems (Ju et al., 2024; Jiang, 2024). However, scalability remains a significant limitation for GNNs, as the computational cost and memory requirements of standard message passing algorithms typically scale with the number of nodes and edges. This could easily become prohibitive for industrial-scale simulations involving millions of cells (Li et al., 2020b; Alkin et al., 2024; Settgast et al., 2024). Moreover, existing GNN models are often trained autoregressively to account for temporal evolution. Such training method can cause temporal error accumulation over extended prediction horizons and requires mitigation strategies such as controlled noise injection or coupling with recurrent architectures, where the recurrent component can further exacerbate the memory challenge (Lippe et al., 2023; Brandstetter et al., 2022; Sun et al., 2023; Kochkov et al., 2021; Ju et al., 2024). 
+
+A.3. Neural Operators 
+
+The neural operator paradigm offers a more theoretically rigorous approach by directly learning the infinite-dimensional-mapping from any functional parametric dependence to the solution (Lu et al., 2019; 2021; Li et al., 2020a;a; Bhattacharya et al., 2020; Calvello et al., 2024b). Fourier Neural Operators (FNOs) (Li et al., 2020a) have demonstrated exceptional performance in GCS modeling applications (Wen et al., 2022; 2023b; Lee et al., 2024). FNOs leverage the computational efficiency of Fast Fourier Transforms (FFTs) to learn global kernel convolutions in the frequency domain, exhibiting robust generalization properties. However, despite the methodological advancement of conducting learning in the function space, standard FNO implementations still assume data defined on regular and pre-defined grids. This leads to complex adaptations for irregular geometries or unstructured meshes. One recent work to mitigate such a limitation is through using a graph-based encoder to map mesh nodes to a latent regular grid (e.g., GINO), where FNO can efficiently operate on (Li et al., 2023). 
+
+A.4. Transformer-based Approaches 
+
+Besides the aforementioned CNN, GNNs, and architectures in the neural operators family, transformer-based architectures are expanding rapidly in predicting numerical simulations in recent years (Geneva & Zabaras, 2022; Calvello et al., 2024b; Bartolucci et al., 2023; Wang et al., 2024; Li et al., 2022; Calvello et al., 2024a; Lanthaler et al., 2023; Hao et al., 2023). Transformer models are highly effective at finding important connections in sequential data, such as words in a sentence. This ability has led to breakthroughs in many areas, most successfully in language-related tasks (Vaswani et al., 2017; Suk et al., 2024; Wu et al.; Jaegle et al., 2021). The attention mechanisms can also be interpreted as learning a global integral operator kernel when applied in predicting spatial and temporal domains (Calvello et al., 2024b). However, the classical attention operation requires the canonical O(N 2) computational complexity, where N represents the number of input points/nodes, which prevents direct application to large-scale physical systems. 13 Adaptive Physics Transformer for Subsurface Energy Systems 
+
+# B. Architectural Details and Evaluation Metrics 
+
+B.1. Unified Modulation for Temporal and Conditional Inputs 
+
+To enable the model to adapt to varying temporal queries and other scalar input conditions and boundary conditions (e.g., CO 2 injection rate), we employ a unified modulation strategy. For any query time t ∈ R, we first generate a multi-dimensional time embedding et ∈ Rde . This can be achieved by multiple encoding methods, and here we use sinusoidal positional encodings, followed by a small multi-layer perceptron (MLP): 
+
+et = MLP time (PE sinusoidal (t)) (7) Similarly, other scalar input parameters, such as the injection rate qinj , are also embedded into a representation of the same dimension de using separate MLPs after appropriate normalization or scaling: 
+
+eq,t = MLP injection (qinj,t ) (8) These individual embedding vectors can then be combined (e.g., by summation or concatenation followed by another MLP) to form a single conditioning vector econd ,t ∈ Rde that encapsulates both temporal and boundary condition information. This combined conditioning embedding econd ,t then modulates all the transformer blocks within the Encoder ( E), Approxi-mator ( A), and Decoder ( D), as discussed above. We adopt a modulation mechanism by following Diffusion Transformers (Peebles & Xie, 2023). 
+
+B.2. Evaluation Metrics 
+
+To rigorously evaluate model performance, we employ a set of well-established metrics that quantify prediction accuracy, error, and generalization capabilities. 
+
+Coefficient of Determination ( R2). The R2 metric quantifies the proportion of variance in the ground truth that is explained by the model’s predictions: 
+
+R2 = 1 −
+
+PNi=1 (zi − ˆzi)2
+
+PNi=1 (zi − ¯z)2 , (9) where zi denotes the ground truth value, ˆzi is the predicted value, ¯z is the mean of the ground truth, and N is the number of samples. 
+
+Relative L2 Error. The relative L2 error evaluates the normalized L2 error between predictions and ground truth: Relative L2 = ∥ˆz − z∥2
+
+∥z∥2
+
+. (10) 
+
+Saturation Plume Error ( δS ). To quantify prediction accuracy for phase saturation, we use the plume saturation error introduced in Wen et al. (2023a). This metric can be computed for any phase (e.g., gas, oil, or water) using the same formulation; here we illustrate with the gas phase ( δS g ): 
+
+δS g = 1
+
+P 
+
+> i,n
+
+IniNTX
+
+> n=1
+> NC
+
+X
+
+> i=1
+
+Ini |Sng,i − ˆSng,i |,Ini = 1 if (Sng,i > 0.01) ∪ ( ˆSng,i > 0.01) ,
+
+(11) where Ini = 1 indicates that a mesh cell has non-zero saturation in either the ground truth or the prediction, Sng,i denotes the ground truth gas saturation, ˆSng,i is the predicted gas saturation, NT is the number of temporal snapshots, and NC is the number of mesh cells. This metric focuses on accuracy within the plume region. 
+
+Relative Pressure Error ( δP ). The relative pressure error quantifies the normalized pressure prediction error. This metric can be computed for any phase; here we illustrate with the gas phase ( δP g ): 
+
+δP g = 1
+
+NC NTNTX
+
+> n=1
+> NC
+
+X
+
+> i=1
+
+|P ng,i − ˆP ng,i |
+
+Pg, init 
+
+, (12) 14 Adaptive Physics Transformer for Subsurface Energy Systems 
+
+where P ng,i is the ground truth pore pressure, ˆP ng,i is the predicted pressure, and Pg, init is the initial reservoir pressure. 
+
+Pressure Buildup Error ( δ∆P ). For benchmarks predicting pressure buildup ( ∆P ) directly, the error metric follows the same phase-agnostic formulation. Using gas phase as an example: 
+
+δ∆Pg = 1
+
+NC NTNTX
+
+> n=1
+> NC
+
+X
+
+> i=1
+
+|∆P ng,i − ∆ ˆP ng,i |
+
+∆Pg, max 
+
+, (13) where ∆Pg, max is the maximum ground truth pressure buildup over all cells and time steps. This metric is commonly used for evaluating reservoir pressure buildup (Tang et al., 2022; Wen et al., 2022). 
+
+B.3. Training Cost Summary 
+
+The primary drivers of GPU memory consumption for APT are: (1) the number of input points sampled per training step, (2) the number of supernodes used for global attention, and (3) the latent dimension. As summarized in Table 7, per-epoch training time scales with both dataset size and mesh complexity. Table 8 provides additional efficiency metrics including throughput and memory utilization per million parameters. 
+
+Table 7. APT Training System Performance Summary. Memory/GPU shows per-device memory usage with utilization percentage in parentheses.                                                  
+
+> Dataset Model Size Input Cells Batch Size GPU Setup Memory/GPU Total Memory Time/Epoch Samples/Epoch Faulted 1.2 M 1,024 32 1×40GB a2.8 GB (7%) 2.8 GB ∼23 sec 8,544 Hydrocarbon 12 M 32,768 32 1×80GB b43.8 GB (55%) 43.8 GB ∼10.5 min 13,984 Car Bench 6.70 M 10,000 88×40GB a16.8 GB (42%) 134.4 GB ∼20 sec 728 ATES 17 M 8,192 16 8×40GB a5.6 GB (14%) 44.8 GB ∼27 min 20,160 Basin-scale GCS 17.9 M 262,144 48×80GB b23.8 GB (30%) 190 GB ∼55 min 7,224
+> aNVIDIA A100 40GB SXM bNVIDIA A100 80GB SXM
+
+Table 8. APT Training Efficiency Metrics.                               
+
+> Dataset Model Size Input Cells Throughput (samples/sec) Effective Batch Memory/M Params (GB) Faulted 1.38 M 1,024 ∼371 32 2.33 Hydrocarbon 12 M 32,768 ∼22 32 3.65 Car Bench 6.70 M 10,000 ∼36 64 2.51 ATES 17 M 8,192 ∼12 128 0.33 Basin-scale GCS 17.9 M 262,144 ∼2.2 32 1.33
+
+# C. Benchmark Datasets 
+
+We evaluate APT on seven benchmark datasets spanning structured grids, unstructured meshes, and adaptive meshes. The first four are published datasets that enable direct comparison with prior work; the remaining three are newly created to evaluate APT on adaptive meshes, out-of-distribution generalization, and multi-dataset training. 
+
+C.1. Published Datasets 
+
+C.1.1. C ARTESIAN GRID HYDROCARBON EXTRACTION 
+
+Hydrocarbon extraction is a subsurface engineering process focused on the recovery of oil and gas resources from porous geological formations to meet global energy demands (Badawi & Gildin, 2025; Aziz, 1979). The operation relies on complex multiphase fluid dynamics governed by Darcy’s law, where injected fluids are often used to displace hydrocarbons through heterogeneous media. Accurate reservoir management requires extensive numerical simulation for history matching and production optimization to mitigate high geological uncertainty. However, given the large scale of reservoir models and the need for thousands of realizations, conventional high-fidelity simulators often become computationally prohibitive for multi-scenario studies. 15 Adaptive Physics Transformer for Subsurface Energy Systems 
+
+Governing Equations. Two-phase oil-water flow in porous media is governed by the mass balance equation combined with Darcy’s law: 
+
+∂(ϕρ j Sj )
+
+∂t − ∇ · [ρj λj K(∇pj − ρj g∇D)] + qss j = 0 , (14) where subscript j ∈ { w, o } denotes the phase (water or oil), ρj is phase density, ϕ is porosity, K is the permeability tensor, and λj = krj /μ j is phase mobility with relative permeability krj and viscosity μj . The term qss j represents sources/sinks (wells). The system is closed with saturation constraint Sw + So = 1 and capillary pressure pc(Sw) = po − pw.
+
+Dataset Description. The dataset from Badawi & Gildin (2025) simulates two-phase flow on a 40 × 40 Cartesian grid using the CMG IMEX simulator (CMG, 2014). Each sample has a unique heterogeneous Gaussian permeability field. The simulation spans 10 years with 10-day timesteps (366 snapshots total). Training samples contain 6 wells (4 producers, 2 injectors) with random locations and controls; test samples vary from 3 to 11 wells. Following (Badawi & Gildin, 2025), we adapt the data split ratio as follows. Training: 3,600 samples (augmented to 14,400 via flipping); Validation: 400 samples; Testing: 200 samples (varying well count: 3–11 wells). 
+
+Learning Problem. Given input a(x) = [ K(x), well locations , well controls , P 0(x), S w, 0(x)] , the model predicts pres-sure P (x, t ) and water saturation Sw(x, t ) for 40 consecutive timesteps (400 days) starting from any initial condition. Training uses timesteps [0 , 2390] days; testing extends to [0 , 3650] days to evaluate temporal extrapolation. 
+
+APT Implementation and Training Details. At each training step, input grids are sampled with a fixed size of 32,768 cells, around 50% of the original cell counts. We employ a multi-branch APT architecture to jointly predict pressure and saturation fields. Each branch contains a fused encoder combining local message-passing pooling with global cross-attention pooling, followed by four self-attention blocks and a perceiver module that compresses to 512 latent tokens. The two branch representations are fused via a two-layer transformer before being processed by separate approximators and decoders. The model uses a hidden dimension of 192, 4 attention heads, and an MLP expansion ratio of 4, totaling 12.7M parameters. The model is trained for 600 epochs with a batch size of 32, corresponding to 13,984 samples per epoch. We use the AdamW optimizer with a learning rate of 1 × 10 −4 and weight decay of 10 −4. A cosine learning rate schedule is employed with a warmup phase of 20 epochs. Training is conducted on a single NVIDIA A100 80GB SXM GPU, utilizing approximately 43.8 GB of memory (55% utilization) with ∼10.5 minutes per epoch. The more complete training cost of this dataset is summarized in Table 7. 
+
+Baselines. FNO and U-FNO results are from Badawi & Gildin (2025). Both baselines use width 64, 10 Fourier modes, and are trained with relative L2 loss including gradient terms. C.1.2. I RREGULAR GRID CO 2 STORAGE 
+
+Governing Equations. We consider a multi-phase flow problem with CO 2 and water in the context of geological storage of CO 2. The system’s dynamics are described by miscible two-phase (gas and aqueous) two-component (H 2O and CO 2)flow in a compressible porous medium. The general forms of mass accumulations for component η = CO 2 or water are written as (Pruess, 2005): 
+
+∂∂t 
+
+
+
+φX
+
+> p
+
+SpρpXCO 2
+
+> p
+
+
+
+= −∇· FCO 2 
+
+> adv
+
++ qCO 2 , (15) 
+
+∂∂t 
+
+
+
+φX
+
+> p
+
+SpρpXwater 
+
+> p
+
+
+
+= −∇· Fwater adv . (16) Here p ∈ { a, g } indexes the aqueous ( g) and gas ( g) phases; in this work, the aqueous phase is water while the gas phase is CO 2 (Pini et al., 2012). The symbols φ, Sp, ρp and Xηp denote, respectively, porosity, phase saturation, mass density, and mass fraction of component η in phase p; qCO 2 represents external sources or sinks of CO 2. For either component, the advective flux equals the phase-weighted sum 
+
+Fη 
+
+> adv
+
+= X
+
+> p
+
+Xηp Fp, Fp = −k kr,p ρp
+
+μp
+
+ ∇Pp − ρpg,
+
+16 Adaptive Physics Transformer for Subsurface Energy Systems 
+
+where Fp follows the multiphase extension of Darcy’s law. Absolute permeability k is a rock property, while relative permeability kr,p (Sp) and viscosity μp(Pp) are highly non -linear phase functions. Gravitational effects are captured by g.Capillarity introduces a pressure offset between phases, 
+
+Pg = Pa + Pc(Sp), Pa = Pa,
+
+with Pc(Sp) a saturation -dependent capillary pressure function. Consequently φ, ρp, and the solubility terms Xηp in Eqs. (15)–(16) are implicit functions of the phase pressures Pp.
+
+Finite-Volume Discretization. The governing equations (15) – (16) are discretized with a cell-centered, fully implicit (backward-Euler) finite-volume scheme based on a two-point flux approximation (TPFA) and single-point upstream weighting. The primary variables are chosen to be the gas-phase pressure Pg and the overall component densities ρH2O and 
+
+ρCO 2 , where an overall component density represents the mass of a given component per unit volume of mixture (Voskov & Tchelepi, 2012). At each time step, the nonlinear system of discretized equations is solved with Newton’s method with damping to update all primary variables in a fully coupled fashion. 
+
+PEBI Mesh Generation. Unstructured polygonal meshes are well suited to represent complex faults and to perform local spatial refinement around injection wells. We use perpendicular bisector (PEBI) grids (Palagi & Aziz, 1994; Lie, 2016) generated with the MATLAB Reservoir Simulation Toolbox (MRST) to mesh a 1 km × 1 km × 1 m domain containing an injector well and two straight impermeable faults that are conformal with the grid. Since PEBI meshes are orthogonal by construction, the flow simulations can be performed with a TPFA-based finite-volume scheme without compromising solution accuracy. All simulations are performed with GEOS (Settgast et al., 2024), an open-source multiphysics simulator for geological carbon storage. The domain is initially saturated with brine at 10 MPa and 143.76 ◦C. Supercritical CO 2 is injected at 0.058 kg/s for 950 days, with analytical (Carter-Tracy) aquifer boundary conditions. 
+
+Dataset Details. All input and output fields are normalized using z-score scaling, and simulation timesteps are scaled to 
+
+[0 , 1] . The z-score normalization is defined as: 
+
+˜xni = xni − mean   xn 
+
+> 1
+
+, . . . , xnnS
+
+ 
+
+std   xn 
+
+> 1
+
+, . . . , xnnS
+
+ , i = 1 , . . . , n S , n = 1 , . . . , n T (17) The input and output features for all machine learning models are summarized in Table 9. Figure 5 illustrates three randomly selected geomodel realizations, showing the heterogeneous permeability fields with two fixed impermeable faults and varying injection well locations.  
+
+> Figure 5. Heterogeneous permeability realizations with two fixed impermeable faults and one injection well for three cases. The well coordinates for each case are shown at the top, with insets displaying an enlarged view of the well vicinity.
+
+APT Implementation and Training Details During each training step, input grids are sampled with a fixed size of 1024 cells. The APT model has a total of 1.38M parameters. The architecture consists of an encoder, an approximator, and a decoder, each containing four perceiver-style attention layers, resulting in twelve blocks for the core transformer. The model uses a hidden dimension of 48, 128 latent tokens, and 3 attention heads per block. A hybrid positional encoding strategy is employed: sinusoidal encoding is used for time and scalar inputs, whereas learnable embedding tables with interpolation are used for spatial coordinates. All spatial coordinates are rescaled to the range [0 , 200] 
+
+to facilitate the positional encoding computation. For fused encoder, the model constructs 256 supernodes for each case 17 Adaptive Physics Transformer for Subsurface Energy Systems        
+
+> Table 9. Input and output of the ML model: sng,i , V i, k i,ni,xidenote gas saturation, cell volume, scalar permeability, cell type, cell center, respectively, for a given cell. Here, niis a one-hot vector of size 4, encoding whether a cell is an internal cell, injector, cell along fault lines, and boundary cell.
+
+Case Node input Edge input Node output Baseline sng,i , V i, k i, ni, xi
+
+xi − xj ,
+
+∥xi − xj ∥ sn+1 
+
+> g,i
+
+using both a graph pooling with a radius of 20.0 (a quarter of the scaled simulation domain) and a perceiver layer for global pooling. The perceiver module in the encoder compresses the encoded features to 128 latent tokens. The model uses a hidden dimension of 48, and a conditioning dimension of 192. The model is trained for 200 epochs with a batch size of 64. We use the Lion optimizer (Chen et al., 2023) with a learning rate of 1 × 10 −4 and a weight decay of 0.5. A cyclic learning rate schedule is employed, with a warmup fraction of 0.2, where the learning rate is annealed over the training duration. We train all DL models using an Nvidia A100-SXM GPU. 
+
+Baselines. We compare APT against graph-based and grid-based baselines. For graph-based baselines, we adopt Mesh-GraphNet (MGN) and MGN-LSTM (Ju et al., 2024) (previously SOTA on this dataest) to operate directly on the unstructured mesh without interpolation. MGN-LSTM is trained autoregressively on 19-step sequences, while MGN is trained for single-step prediction; both generate the full 950-day sequence via autoregressive rollout at inference. We use the checkpoints and noise injection strategy from Ju et al. (2024). U-Net (Ronneberger et al., 2015) and U-FNO (Wen et al., 2022), however, require structured grid inputs. Since the PEBI mesh is unstructured with varying topology across cases, the simulation data must be interpolated onto a regular grid before training. As the average cell number of this dataset is around 1600, we use a resolution of 40 × 40 to interpolate the field using linear interpolation with nearest-neighbor filling at boundaries. However, this interpolation introduces approximation error at cell boundaries and near faults where the mesh is locally refined. Both models are trained as direct predictors in a fashion similar to how APT is trained to ensure fairness. Namely, the model takes the initial state concatenated with a normalized time encoding to directly predict the output state at the target time, rather than using autoregressive rollout. The U-Net uses 4 encoder and 4 decoder blocks with skip connections and a base channel width of 18. U-FNO employs four Fourier layers with 12 modes in each spatial dimension, a hidden dimension of 32, and incorporates U-Net blocks in the third and fourth layers for multi-scale feature extraction. Both models have comparable parameter counts ( ∼1.4M) for fair comparison: U-FNO with 1.48M parameters and U-Net with 1.36M parameters. All grid-based models are trained with batch size 16 for 100 epochs using AdamW optimizer with cosine learning rate scheduling. 
+
+Additional Results. Here, we consider 5 representative meshes from the test set to demonstrate that APT generalizes well for different meshes, boundary conditions (well locations), and permeability fields that are not included in the training set. The predicted results after 950 days are presented in Figure 6 for saturation and Figure 7 for pressure, respectively. Due to the complex interplay between the injection front and the faults, the differences in initial setup yield very different outcomes. Across all five cases, APT’s predictions (third row) for both saturation and pressure match greatly with the ground truth simulations (second row). The corresponding prediction errors (fourth row) are consistently low for both fields. This observation confirms that APT generalizes effectively to new geological realizations and well locations, greatly outperforming the MGN-LSTM model (bottom row) in both prediction tasks. Table 10 presents the inference time required for a 19-step prediction (equivalent to 950 simulation days). The high-fidelity simulator, GEOS, takes 49.02 seconds on a single-core CPU. In comparison, MGN-LSTM and standard MGN complete the prediction in 0.31 and 0.07 seconds, respectively, on an NVIDIA A100 GPU. APT achieves the fastest performance, taking only 0.05 seconds—resulting in a 4902 × speedup over GEOS. 18 Adaptive Physics Transformer for Subsurface Energy Systems 
+
+Figure 6. Comparison of model generalizability for gas saturation predictions. Predictions at 950 days are shown across five distinct test meshes with varied permeability fields and well locations. The rows, from top to bottom, display: (1) reservoir permeability, (2) the high-fidelity (HF) simulation ground truth, (3) the APT prediction, (4) the APT prediction error, and (5) the MGN-LSTM prediction error. 
+
+Table 10. Inference time and relative speedup for a 19-step rollout (950 days). 
+
+Model Time (s) Speedup GEOS a 49.02 1×
+
+MGN-LSTM b 0.31 158 ×
+
+Standard MGN b 0.07 700 ×
+
+APT b 0.017 4902 × 
+
+> a
+
+Intel Xeon E5-2695 v4, single-core serial run. b NVIDIA A100 GPU... 
+
+19 Adaptive Physics Transformer for Subsurface Energy Systems  
+
+> Figure 7. Comparison of model generalizability for pore pressure predictions. Predictions at 950 days are shown across five distinct test meshes with varied permeability fields and well locations. The rows, from top to bottom, display: (1) reservoir permeability, (2) the high-fidelity (HF) simulation ground truth, (3) the APT prediction, (4) the APT prediction error, and (5) the MGN-LSTM prediction error.
+
+C.1.3. 3D N ESTED LOCAL GRID REFINED (LGR) D ATASET 
+
+Dataset Details. The dataset comprises 3,011 ECLIPSE (e300) simulations (Schlumberger, 2014) of CO 2 injection over 30 years into dipped 3D reservoirs. Each simulation covers a domain of 160 km × 160 km × 100 m and includes one to four injection wells. A key characteristic is its hierarchical multiresolution meshing, where Local Grid Refinements (LGRs) are applied around injection wells to capture high-gradient dynamics, while coarser grids model far-field regions. The grid structure features five refinement levels, from a coarse global mesh (Level 0, 50,000 cells) to the finest mesh near wells (Level 4, 80,000 cells). This results in total mesh sizes ranging from approximately 0.3 to 1.0 million cells per simulation. The dataset also covers a broad range of physical and operational parameters, including reservoir depth (800–4500m), dip angle (0–2°), and diverse injection schemes and permeability structures. Full sampling distributions are provided in Table 11. 20 Adaptive Physics Transformer for Subsurface Energy Systems 
+
+Each of the 3,011 simulations includes 24 irregularly spaced time snapshots, yielding 72,264 total space-time instances. Following Wen et al. (Wen et al., 2023a), the data is randomly split into training, validation, and test sets using an 8:1:1 ratio. Training proceeds for up to 300 epochs with early stopping based on validation error.    
+
+> Figure 8. APT framework for multiresolution CO 2storage modeling. (a) Input fields include heterogeneous permeability, spatial coordinates, injection conditions (e.g., Well 4), and cell volumes across LGR levels. (b) A single, unified APT model processes all multiscale fields and scalar parameters end-to-end. (c) The model outputs predictions, such as the gas saturation field at year 30, visualized across all refinement levels. Adapted from Wen et al. (Wen et al., 2023b).
+
+The sampling parameters and distributions for the reservoir simulation variables are detailed in Table 11, following the dataset description in (Wen et al., 2023a). For a comprehensive overview of the simulation setup, please refer to (Wen et al., 2023b).  
+
+> Table 11. Sampling parameters and distributions for reservoir simulation variables (adapted from Wen et al. (Wen et al., 2023b))
+
+Variable type Sampling parameter Distribution Unit Permeability map 
+
+x-axis correlation X ∼ U [800 , 4000] m
+
+y-axis correlation X ∼ U [800 , 4000] m
+
+z-axis correlation X ∼ U [4 , 20] mReservoir permeability mean X ∼ U [4 .09 , 5.01] ln mD Reservoir permeability std X ∼ U [0 .25 , 1] ln mD Reservoir conditions Reservoir center depth X ∼ U [800 , 4500] mGeothermal gradient X ∼ U [15 , 35] ◦C/km Dip angle X ∼ U [0 , 2] ◦
+
+Injection design Number of wells n ∈ { 1, 2, 3, 4} –Injection rate X ∼ U [0 .5, 2] MT/y Perforation thickness X ∼ U [20 , 100] mPerforation location Randomly placed –
+
+APT Implementation. At each training step, input grids are sampled with a fixed size of 262,144 cells. Although the number of cells varies across simulation cases in the Nested LGR dataset, using a fixed sample size ensures stable memory usage. The APT model has a total of 17.9M parameters. Its architecture includes an encoder, an approximator, and a decoder, each with four perceiver-style attention layers, totaling twelve blocks. The model uses a hidden dimension of 192, 8192 supernodes, 1024 latent tokens, and 4 attention heads per block to balance accuracy and efficiency. 21 Adaptive Physics Transformer for Subsurface Energy Systems 
+
+Similar to the 2D experiments in Section C.1.2, we use sinusoidal embedding for time and scalar inputs and learnable embeddings for spatial coordinates. For information aggregation, the model constructs 4096 supernodes for each case using a fixed-radius sampling strategy with a radius of 20.0 (one-tenth of the scaled simulation domain). The maximum number of neighboring cells in each graph pooling operation is capped at 128. 
+
+Hyperparameters. We train the model for 300 epochs with a batch size of 8, including a warmup phase of 60 epochs. Hyperparameters were selected via a small grid search on the validation set. Importantly, we found that a relatively small number of supernodes (8192 for this dataset) suffices to achieve good performance. We train both APT and baseline models using an Nvidia A100-SXM GPU. For APT, each epoch takes roughly 55 minutes. For optimization, we use the Lion optimizer (Chen et al., 2023) with a learning rate of 1 × 10 −4 and a weight decay of 0.05. 
+
+Baselines. The Nested FNO model from (Wen et al., 2023a) is used as a baseline. For the comparisons, we utilize the checkpoints provided by the authors. For further details, please refer to the original paper (Wen et al., 2023a). 
+
+Computational Efficiency. To further assess runtime scalability, Table 12 compares the end-to-end runtime for APT and ECLIPSE simulations under different injection well configurations. ECLIPSE simulations are executed using 20-core Intel Xeon E5-2640 CPUs, while APT and Nested FNO are evaluated on Nvidia A100-SXM GPUs. APT consistently achieves more than 6,800 × speed-up relative to ECLIPSE across all tested scenarios.  
+
+> Table 12. Runtime comparison between ECLIPSE simulator (HF) and APT across different well configurations. Speed-up is computed as the ratio of ECLIPSE runtime to APT runtime.
+
+# Wells # Cells ECLIPSE a (hr) APT b (s) APT Speedup 1 296,300 2.75 1.44 6,875 2 542,600 6.43 3.40 6,808 3 788,900 11.00 5.48 7,226 4 1,035,200 15.93 8.00 7,168    
+
+> aIntel Xeon E5-2640 CPUs. bNVIDIA A100 GPU.
+
+Additional Results. As shown in Figure 9, the model accurately captures the overall plume evolution patterns across the three wells with different injection rates (1.19, 1.87, and 2.20 MT/y) after injecting for 30 years. The predictions show good agreement with the reference solutions, with some localized errors observed at plume boundaries and high-gradient regions where saturation transitions occur rapidly. The temporal predictions for Well 2 shown in Figure 10 further reveal important insights into the model’s performance across different time scales and spatial resolutions. During the earlier stages (1-10 years), the plume saturation error remains well constrained, with the CO 2 plume primarily contained within the first two local grid refinements (LGRs). However, plume prediction errors begin to exacerbate as the plume migrates into the outer LGR 3 region by 30 years, where the mesh resolution is significantly coarser. C.1.4. C AR BENCH : 3D C AR AERODYNAMICS BENCHMARK 
+
+Dataset description. CarBench (Elrefaie et al., 2025) is a large-scale benchmark for neural surrogate modeling of 3D car aerodynamics, built on the DrivAerNet++ dataset (Elrefaie et al., 2024b). The dataset comprises 8,150 parametrically generated car configurations across three body types (Fastback, Estateback, Notchback), each simulated using steady-state Reynolds-Averaged Navier-Stokes (RANS) equations with OpenFOAM. Surface meshes contain approximately 500,000 points per car, with the task being to predict surface pressure fields from geometry alone. 
+
+Training and evaluation protocol. Following the CarBench protocol, all models are trained on 10,000 uniformly sampled surface points per geometry. Evaluation is conducted at both the subsampled resolution (10k points) and full mesh resolution (∼500k points). This dual evaluation reveals whether models learn resolution-invariant representations or suffer from aliasing artifacts when queried at higher resolutions. 
+
+Implementation details. We utilize the same APT architecture described in Appendix C.1.3, omitting the temporal modulation component to align with the steady-state nature of the Carbench dataset. Specifically, we set the latent dimension 22 Adaptive Physics Transformer for Subsurface Energy Systems 
+
+Figure 9. APT model’s predictions for gas saturation fields at year 30 from a 3-well setting. Each row corresponds to a different LGR resolution level, and each column shows a different test case. From top to bottom: (1) Permeability fields and LGR meshes, (2) APT-predicted gas saturation ( Sg ), (3) Ground truth saturation from ECLIPSE simulations, and (4) prediction errors. 
+
+Figure 10. Temporal evolution of the gas saturation plume for Well 2. The first and second rows respectively show the gas saturation ( Sg )fields predicted by APT and the ECLIPSE simulations (HF) for Well 2 at five different times. The third row shows the saturation error (δs g ) between APT and HF. 
+
+23 Adaptive Physics Transformer for Subsurface Energy Systems 
+
+Table 13. Quantitative comparison on the CarBench’s full test set across various neural surrogate models. All models are evaluated with batch size 1 on an NVIDIA A100-SXM4-80GB GPU under identical inference settings. Following the measurement recommended in (Elrefaie et al., 2025), uncertainties are rounded to two significant digits and central values are rounded to the same decimal place; precision is standardized per column using the largest uncertainty in that column ( R2
+
+> test
+
+: 10 −2%, Rel L2: 10 −4). Modified from (Elrefaie et al., 2025). 
+
+Model Parameters (M) Peak Memory (GB) Mean Latency (ms) R2 
+
+> test
+
+(%) Rel L2 PointNet (Qi et al., 2017) 1.67 0.29 1.54 76.39 ± 0.27 0.3803 ± 0.0020 NeuralOperator (Li et al., 2020a) 2.10 0.04 2.14 85.03 ± 0.26 0.3016 ± 0.0019 PointMAE (Pang et al., 2022) 1.67 0.39 3.11 87.91 ± 0.23 0.2713 ± 0.0016 PointNetLarge (Qi et al., 2017) 32.58 1.50 8.29 90.25 ± 0.22 0.2436 ± 0.0013 RegDGCNN (Elrefaie et al., 2024a) 1.44 27.11 231.98 93.27 ± 0.33 0.2006 ± 0.0016 PointTransformer (Zhao et al., 2021) 3.05 6.65 95.68 93.59 ± 0.54 0.1909 ± 0.0024 TripNet (Chen et al., 2025) 24.10 2.94 15.49 95.90 ± 0.67 0.1608 ± 0.0024 Transolver++ (Wu et al., 2025) 1.81 1.30 28.47 95.43 ± 0.66 0.1573 ± 0.0023 Transolver (Wu et al., 2024) 2.47 1.51 29.84 95.77 ± 0.67 0.1503 ± 0.0024 TransolverLarge (Wu et al., 2024) 7.58 1.68 28.41 95.95 ± 0.69 0.1457 ± 0.0025 AB-UPT (Alkin et al., 2025) 6.01 0.27 30.65 96.75 ± 0.19 0.1358 ± 0.0024 APT (ours) 6.70 0.51 35.00 96.00 ± 3.1 0.1535 ± 0.038 
+
+to dh = 192 . The network depth is configured with 2 transformer blocks in the encoder, 2 blocks in the approximator, and 4 blocks in the decoder (each containing paired self-attention and cross-attention mechanisms). We found that using only 1024 supernodes for this dataset suffices to achieve good performance. The input projection layer maps din = 3 features (corresponding to 3D surface coordinates) to the latent space. The model is trained for 200 epochs using the AdamW optimizer (learning rate 10 −4, weight decay 10 −4) and a relative Lp loss function (Equation 6). 
+
+Baselines. We compare against eleven models spanning neural operators (NeuralOperator/FNO (Li et al., 2020a)), point cloud architectures (PointNet (Qi et al., 2017), PointNetLarge (Qi et al., 2017), PointMAE (Pang et al., 2022), RegDGCNN (Elrefaie et al., 2024a), PointTransformer (Zhao et al., 2021)), implicit representations (TripNet (Chen et al., 2025)), and physics transformers (Transolver (Wu et al., 2024), Transolver++ (Wu et al., 2025), AB-UPT (Alkin et al., 2025)). All baseline results are from Elrefaie et al. (2025) under identical training and evaluation protocols. 
+
+Additional Results. Table C.1.4 provides a comprehensive quantitative comparison of eleven state-of-the-art machine learning models evaluated on the kinematic surface pressure fields of the CarBench test dataset. Although APT does not achieve the best performance, it ranks second among all models in terms of mean R2 scores. We note that both metrics exhibit larger standard deviations compared to other models. This is attributed to differences in our experimental setup: we reproduced the testing protocol based on the paper description rather than the official codebase, which had not been released at the time of our experiments. Additionally, the sampling script was not provided, so we presampled the data using our own random seed while following the described training protocol. We also observed three missing cases in the online dataset. These factors might contribute to edge cases that result in more spread in our results. We made our best effort to match the described protocol to ensure a fair comparison. Figures 11 and 12 provide a qualitative comparison of surface pressure predictions for the representative design 
+
+E S WW WM 648 from the unseen test set, corresponding to an Estateback configuration with a smooth underbody and open wheels. Visually, APT produces the smoothest and most accurate pressure field among all models, with minimal error concentrated only at geometric discontinuities such as wheel wells and panel edges. This observation is consistent with the quantitative super-resolution results reported in Table 5, which demonstrate APT’s superior generalization capability. Note that the baseline results are reproduced from (Elrefaie et al., 2025), whereas APT’s visualization uses the same colorbar limits but with a standard jet colormap; we attempted to match the visualization style as closely as possible. 
+
+C.2. Created Datasets 
+
+The following datasets were generated specifically for this work to evaluate APT on adaptive meshes and out-of-distribution generalization scenarios. 24 Adaptive Physics Transformer for Subsurface Energy Systems  
+
+> Figure 11. Qualitative comparison of surface pressure predictions for design E S WW WM 648 from the unseen test set of the DrivAer-Net++ dataset (isometric view). Each row compares predicted pressure fields (top) and absolute error maps (bottom) against the CFD ground truth. APT produces visually smooth predictions across the surface. Note that the baseline results are reproduced from (Elrefaie et al., 2025), whereas APT’s result is generated using the same colorbar limits but with a jet colormap; we attempted to match the visualization as closely as possible. Modified from (Elrefaie et al., 2025).
+
+C.2.1. A DAPTIVE MESH AQUIFER THERMAL ENERGY STORAGE 
+
+Aquifer Thermal Energy Storage (ATES) is a shallow geothermal technology that operates on seasonal capture, storage and re-use of excess thermal energy (heat / cool) in shallow subsurface aquifers, providing heating and cooling to the built environment. (Jackson et al., 2024). ATES operates on storing thermal energy seasonally by injecting/extracting groundwater through warm–cold well doublets. Accurate design and operation require numerical simulation of coupled groundwater flow and heat transport, but high spatial resolution is needed near wells and at advancing thermal fronts, making conventional fixed-grid simulations computationally expensive for multi-scenario studies (Regnier et al., 2022)(Jackson et al., 2024). 
+
+Numerical simulator and Dynamic Mesh Optimization (DMO) We generate the ATES dataset using the open-source 
+
+Imperial College Finite Element Reservoir Simulator (IC-FERST), which solves flow and heat transport on unstructured tetrahedral meshes with a mesh-adaptive DCVFEM discretisation (Regnier et al., 2022). IC-FERST employs Dynamic Mesh Optimization (DMO) to reduce computational cost while maintaining user-specified accuracy. DMO is an anisotropic hr -adaptivity procedure that refines, coarsens, and repositions the unstructured tetrahedral mesh to minimise a mesh-quality functional derived from an interpolation-error estimate based on the Hessian of selected solution fields and a user-prescribed target precision (Regnier et al., 2022; Kampitsis et al., 2020; Bahlali et al., 2022). The Optimization proceeds via local mesh operations including node movement, element splitting by node insertion, coarsening by node deletion, and face-edge swapping, and the mesh is updated only when these operations reduce the estimated error subject to constraints such as minimum/maximum edge length, maximum aspect ratio and maximum node count (Regnier et al., 2022; Kampitsis et al., 2020). After each mesh update, solution fields are transferred from the old mesh to the new mesh using a supermesh-based remapping with conservative, bounded interpolation (Regnier et al., 2022). In our ATES simulations, the mesh is optimised throughout the transient cycle using pressure and temperature as adaptation fields, yielding trajectories with time-varying mesh topology, with node density concentrated near wells and along evolving thermal plumes (Regnier et al., 2022). 
+
+Governing Equations The dataset is generated by solving single-phase groundwater flow coupled with heat transport in a porous medium. Following prior ATES modelling with IC-FERST, we assume small temperature-induced density variations 25 Adaptive Physics Transformer for Subsurface Energy Systems  
+
+> Figure 12. Qualitative comparison of surface pressure predictions for design E S WW WM 648 from the unseen test set of the DrivAer-Net++ dataset (side view). Each row compares predicted pressure fields (top) and absolute error maps (bottom) against the CFD ground truth. APT produces visually smooth predictions across the surface. Note that the baseline results are reproduced from (Elrefaie et al., 2025), whereas APT’s result is generated using the same colorbar limits but with a jet colormap; we attempted to match the visualization as closely as possible. Modified from (Elrefaie et al., 2025).
+
+and neglect thermal dispersion. Flow is described by Darcy’s law 
+
+u = − K
+
+μ (∇p − ρf g) , (18) together with mass conservation (constant ρf )
+
+∇ · u = sc
+
+ρf
+
+, (19) where u is Darcy velocity, p pressure, K permeability tensor, μ viscosity, ρf fluid density, g gravity, and sc is a source/sink term coupling the reservoir and wells. Heat transport is modelled by an advection–diffusion equation in thermal equilibrium between fluid and porous medium, 
+
+ξ ∂T ∂t + ∇ · (ρf CP,f uT − κ∇T ) = st, (20) with effective volumetric heat capacity and conductivity 
+
+ξ = (1 − ϕ)ρpCP,p + ϕρ f CP,f , κ = (1 − ϕ)κp + ϕκ f , (21) where T is temperature, ϕ porosity, and subscripts p, f denote porous medium and fluid, respectively; st represents well–reservoir heat exchange. 
+
+Dataset generation and splits. We simulate cyclic seasonal operation over 10 years with 240 timesteps (2 timesteps per month). Each annual cycle consists of winter operation (cold well injection / warm well extraction), transitional resting periods (no injection/extraction in both well), summer operation (warm well injection / cold well extraction), and another resting period. The synthetic dataset contains 840 scenarios with varied well configurations and vertical heterogeneity. Key scenario variables are sampled within the following ranges: well spacing [12 .5, 500] m; well depth (warm/cold) [−150 , −60] 
+
+m; screen length [10 , 100] m; screen separation [0 , 90] m; and vertical permeability Kz ∈ [1 , 1000] (units as in the simulator setup). We split scenarios into 80% training, 10% validation, and 10% test. 
+
+Learning task (direct one-step). Our benchmark focuses on predicting temperature as a node attribute on the adaptive mesh. In contrast to autoregressive rollout, we use a direct one-step setting: given the initial condition at t=0 (and static properties / controls) plus a query time t, the model predicts T (x, t ) on the target adaptive mesh without iterative stepping through intermediate states. This evaluates the learned solution operator while avoiding temporal error accumulation, and directly reflects the challenges posed by DMO-driven changing node distributions. 26 Adaptive Physics Transformer for Subsurface Energy Systems 
+
+Fixed-grid baselines (U-Net/FNO). To benchmark against standard operator baselines that require structured inputs, we construct a fixed Cartesian grid representation of each ATES state by interpolating the adaptive-mesh solution fields onto a regular voxel grid. For each timestep, the adaptive mesh node coordinates and temperatures are mapped to the fixed grid using pointwise interpolation. The resulting tensor has four input channels, where the first channel is the current temperature field and the remaining channels encode time-invariant geological properties and/or operational controls used by the baseline models. This produces paired training samples (xt, yt) on the fixed grid, where xt ∈ R4×Nx×Ny ×Nz and 
+
+yt ∈ R1×Nx×Ny ×Nz represents the next-step temperature. We adopt a 3D U-Net with residual bottleneck blocks. The network follows a four-level encoder-decoder hierarchy with channel widths C → 2C → 4C → 8C and skip connections, and applies nres residual blocks at the bottleneck. The best model uses C=48 and nres =8 , with residual scaling 0.1 and a zero-initialized output head. We also implement a 3D Fourier Neural Operator (FNO) (Li et al., 2020a) as a baseline model. The FNO uses 4 input channels, 1 output channel, a hidden width of 48, and 4 Fourier layers with mode truncations of (16 , 16 , 16) along the three spatial dimensions. 
+
+Inference and evaluation on adaptive meshes. At test time, U-Net/FNO predictions are rolled out autoregressively on the fixed grid: starting from the initial fixed-grid state, the predicted temperature at step t is fed back as the temperature input channel for step t+1 , while the remaining input channels remain unchanged. To compare fairly against APT (which predicts directly on the adaptive meshes), we evaluate the fixed-grid rollouts on the original adaptive-mesh nodes by interpolating (sampling) the fixed-grid prediction back to the adaptive coordinates at each timestep using trilinear sampling. Metrics (e.g., 
+
+R2) are then computed on the adaptive-mesh nodes in physical temperature units. 
+
+APT implementation. The APT architecture for ATES follows the same design principles as the Nested LGR implemen-tation (Section C.1.3), with modifications to accommodate the dataset’s characteristics. At each training step, input grids are randomly sampled with a fixed size of 8,192 cells. Key architectural differences include: (1) the conditioner processes 7 input field features (compared to 3 in Nested LGR) with a correspondingly adjusted input projection, and (2) the perceiver module compresses to 512 latent tokens (half of Nested LGR’s 1,024 tokens). The model uses a hidden dimension of 192, a conditioning dimension of 768, and an MLP expansion ratio of 4, totaling 17.5M parameters. C.2.2. W ASTEWATER INJECTION 
+
+In industries such as oil and gas, geothermal, and chemical engineering, large volumes of wastewater are generated and are difficult to treat at the surface. These fluids are commonly injected into deep subsurface formations, such as deep saline aquifers or depleted hydrocarbon reservoirs, to achieve long-term isolation. Under such conditions, the associated increase in pore pressure may trigger fault slip, potentially inducing seismic events. Therefore, effective estimation of the reservoir pressure field prior to wastewater injection is of critical importance for safe and reliable operation. 
+
+Dataset Generation. We utilize the numerical simulator ECLIPSE (Schlumberger, 2014) to develop the wastewater injection dataset. A vertical injection well with a radius of 0.1 m delivers wastewater at a constant rate into a radially symmetric system x(r, z ). The well completion may span the full reservoir thickness or be restricted to a selected depth interval. Here, the reservoir thickness ranges from 125 to 500 m, with no-flow boundary conditions imposed at the top and bottom. The radius of the reservoir is set as 100,000 m, resolved with 200 gradually coarsened grid cells. Simulated pressure buildup ( dP ) fields at 24 time snapshots are used to train the model, spanning prediction horizons from short term (30 days) to long term (30 years). For each snapshot, the field variable include the horizontal permeability map ( kr ), vertical permeability map ( kz ), porosity map ( ϕ), and the injection perforation map ( perf ). All simulation scenarios follow the heterogeneous setup introduced in (Wen et al., 2022). The scalar inputs include injection rate and initial field pressure, which are uniformly sampled from [5434, 27170] STB/day and [250, 450] bar to increase the data distribution complexity. Overall, we generated 4000 cases, of which 3000 are used for training, 500 for validation, and 500 for testing. It should be noted that in this dataset we consider a structure-aware out-of-distribution generalization setting. Specifically, the training set spans only a subset of permeability field configurations, namely continuous Gaussian, continuous von Karman, and discontinuous Gaussian fields. The test set, however, consists solely of discontinuous von Karman permeability fields. Figure 13 shows this distribution shift: three randomly selected permeability maps from the training set (continuous Gaussian, continuous von K ´arm ´an, and discontinuous Gaussian) are shown alongside a representative discontinuous von K´ arm´ an case from the out-of-distribution test set. 27 Adaptive Physics Transformer for Subsurface Energy Systems                               
+
+> Figure 13. OOD evaluation setup. The model is trained on a mixture of continuous/discontinuous Gaussian and continuous von Karman fields, but tested on a held-out class of discontinuous von Karman fields, requiring generalization to unseen geological structures.
+> Table 14. OOD Generalization Results. Quantitative comparison on the held-out discontinuous von Karman test set. The APT (fused)
+> variant achieves the highest accuracy, outperforming both pure spectral baselines (FNO, TFNO) and single-branch ablations. Test (OOD) Train Model R2Rel. Err R2Rel. Err FNO 0.9052 0.0376 0.9306 0.0297 TFNO 0.9079 0.0362 0.9241 0.0291
+> APT variants (ablation)
+> APT (local only) 0.8629 0.0404 0.8707 0.0354 APT (global only) 0.8917 0.0355 0.8970 0.0341
+> APT (fused) 0.9107 0.0328 0.9351 0.0280
+
+C.2.3. N ESTED GRID CHANNELIZED RESERVOIR CO 2 STORAGE 
+
+Dataset Configuration. To rigorously evaluate the model’s capability in learning from multiple large-scale datasets, we create the Channelized Reservoir dataset via following the basic simulation setup of LGR dataset, detailed in Section C.1.3. Similarly, the simulation encompasses variable injection scenarios ranging from one to four active wells, testing the surrogate model’s adaptability to varying source terms. However, we design two important variations when generating the simulation data, namely geomodel parameterization and mesh topology. 
+
+Geomodel Parameterization. The dataset adapts a geologically realistic, channelized facies architecture. As illustrated in Figure 14, the permeability field is characterized by a strongly bimodal distribution. This binary system comprises a back-ground mudstone facies (dominant mode at ln( k) ≈ 3.5, ∼33 mD) and high-permeability channel sand bodies (secondary mode at ln( k) ≈ 6.5, ∼665 mD). This bimodal structure introduces sharp permeability contrasts and discontinuous channel geometries, thereby imposing significant complexity on the flow dynamics and presenting a more challenging learning task for the neural operator compared to smooth Gaussian media. 
+
+Nested Grid Topology. We employ a modified hierarchical LGR structure to capture the multi-scale flux interactions induced by the channelized permeability. The refinement strategy, detailed in Table 15, differs substantially from the baseline LGR dataset. We prioritize finer discretization in the near-well regions (LGR3–LGR5) with a 20 × 20 × 2 m cell resolution to resolve high-velocity flow and pressure gradients. This results in highly variable mesh topologies across samples, with total grid counts scaling between 0.5 and 0.8 million cells depending on the active refinement levels.  
+
+> Table 15. Mesh refinement hierarchy for the channelized reservoir dataset. The configuration emphasizes high-resolution local grids (LGR3–5) to resolve sharp flow gradients within channel facies.
+
+Refinement Level Grid Dimensions Resolution (m) Cell Count Global 100 × 100 × 5 1600 × 1600 × 20 49,200 LGR1 40 × 64 × 50 400 × 400 × 2 108,000 LGR2 40 × 40 × 50 200 × 200 × 2 74,600 LGR3–LGR5 60 × 60 × 50 20 × 20 × 2 180,000 (each) 28 Adaptive Physics Transformer for Subsurface Energy Systems 
+
+Figure 14. Permeability distribution of the channelized reservoir model. The histogram reveals a distinct bimodal signature: a low-permeability background facies ( ln( k) ≈ 3.5) and high-permeability channel sands ( ln( k) ≈ 6.5). This sharp contrast approximates binary geological media, testing the model’s ability to preserve discontinuous interfaces. 
+
+APT implementation. To facilitate the multi-dataset training, we use the same APT architecture and training protocol, as described in Section C.1.3. 29

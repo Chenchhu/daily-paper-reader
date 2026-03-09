@@ -1,0 +1,3303 @@
+Title: Eigenfracture approximation of quasi-static crack growth in brittle materials
+
+URL Source: https://arxiv.org/pdf/2602.11915v1
+
+Published Time: Fri, 13 Feb 2026 02:27:10 GMT
+
+Number of Pages: 32
+
+Markdown Content:
+EIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH IN BRITTLE MATERIALS        
+
+> BA DUC DUONG AND MANUEL FRIEDRICH
+> Abstract. We study an approximation scheme for a variational theory of quasi-static crack growth based on an eigendeformation approach. Following [42], we consider a family of energy functionals depending on a small parameter εand on two fields, the displacement field and an eigendeformation field that approximates the crack in the material. By imposing a suitable irreversibility condition and adopting an incremental minimization scheme, we define a notion of quasi-static evolution for this model. We then show that, as ε→0, these evolutions converge to a quasi-static crack evolution for the Griffith energy of brittle fracture [24], characterized by irreversibility, global stability, and an energy balance.
+
+1. Introduction 
+
+The last two decades have seen tremendous progress in the understanding of free-discontinuity prob-lems and their application to fracture mechanics. In their seminal work [25], Francfort and Marigo 
+
+proposed an evolutionary model based on the global minimization of so-called Griffith energies, which feature a competition of bulk elastic contributions and an energy needed to increase the area of the cracked surface. Their model, formulated in the framework of rate-independent processes, is based on three fundamental principles: a no-healing irreversibility constraint on the crack, static equilibrium at every time, and an energy balance that ensures that the process is non-dissipative. The derivation of existence results for this model was initiated in [21] for a 2 d-antiplane model with restrictive assumptions on the topology of the crack set. The theory has then been further developed by removing such topo-logical restrictions and adopting a weak formulation in the functional framework of SBV -functions [1] or generalizations thereof. Among the vast body of literature, we only mention results in the antiplane setting [24], nonlinear elasticity [18, 19, 20], and 2 d-linearized elasticity [27], and we refer the reader to [8, 23] for an overview. The goal of the present paper is to derive an approximation result of the above-mentioned crack evolution based on an eigendeformation approach to fracture [42]. Several methods of approximating free-discontinuity problems with numerically more tractable models have been proposed over the years, see [9], and their relation to Griffith energies has been analyzed by means of Γ-convergence [17]. One of the most popular computational methods are phase-field approximations [2, 22, 12], where the sharp discontinuity is smoothed into a diffuse crack in terms of an auxiliary phase-field variable. Without being exhaustive, we further mention some rigorous approximation results on finite-difference or finite-element schemes [5, 6, 16], nonlocal approximations [35, 37, 43, 34, 10, 14], problems. or discrete finite-element approximations that make use of adaptive mesh refinements [13, 7, 36, 4]. Another kind of approximation was proposed by Schmidt, Fraternali, and Ortiz [42], namely an eigendeformation approach to fracture which, similar to phase-field methods, is a two-field approximation     
+
+> 2020 Mathematics Subject Classification. 49J45, 70G75, 74B10, 74G65, 74R10.
+> Key words and phrases. Brittle materials, variational fracture, eigenfracture, free discontinuity problem, quasi-static fracture evolution.
+> 1
+> arXiv:2602.11915v1 [math.AP] 12 Feb 2026 2B. DUONG AND M. FRIEDRICH
+
+scheme. Given a small parameter ε > 0, they consider an energy functional of the form 
+
+Eε(u, γ ) = 
+
+ˆ
+
+> Ω
+
+|∇ u − γ|2 dx + κ
+
+2ε Ld(Uε({γ̸ = 0 })) , (1.1) where Ω ⊂ Rd is the reference domain, u : Ω → R represents the displacement field, and γ : Ω → Rd an eigendeformation field approximating the crack. The eigendeformation allows the displacement field u
+
+to develop jumps at no cost in the elastic energy, which comes at the expense of a certain amount of fracture energy measured in terms of the ε-neighborhood Uε(·) of the support of γ. In [42] it is shown that the Γ-limit as ε → 0 is given by the Griffith energy in the antiplane shear setting, namely 
+
+E(u) = 
+
+ˆ
+
+> Ω
+
+|∇ u|2 dx + κHd−1(Ju) (1.2) for u ∈ SBV 2(Ω), where Ju denotes the jump set of the function. (Strictly speaking, [42] treats the vectorial case of linearized elasticity; we present a simpler case by restricting to scalar-valued displace-ments.) The model has also been implemented for a time-evolution scheme in [42], and was later further considered and developed in, e.g., [3, 39, 38, 44, 41, 40]. Yet, we highlight that so far no rigorous connection between the approximation (1.1) and the Griffith model (1.2) for the quasi-static evolutionary framework proposed in [25] is available. Indeed, the literature on static approximation results for the Griffith functional has largely overshad-owed the analysis of evolutionary counterparts, and rigorous results in this direction are relatively scarce. We mention the phase-field approximation of quasi-static fracture evolution by Giacomini [29], discon-tinuous finite-element approximations [31, 33], as well as a discrete-to-continuous passage for an adaptive finite-element model [15]. We also recall related works where crack evolutions have been identified as effective variational limits of sequences of problems, such as atomistic models [26], homogenization [32], linearization [28], or a cohesive-to-brittle passage [30]. The goal of the present paper is to show that such a rigorous approximation result can also be obtained for the eigenfracture approach. Let us now describe our results in more detail. We follow the usual approach of a time-discretized incremental minimization scheme with time-step size δ > 0. An important aspect is the implementation of a suitable irreversibility condition for the energy (1.1), which gives rise to a notion of an increasing crack set on the time-discrete level. In the present setting, this is achieved by requiring that the support of the eigendeformation field increases in time. Passing to the time-continuous limit δ → 0, we then show that there exists a quasi-static eigenfracture evolution for the energy (1.1) for fixed ε > 0, see Theorem 2.1. (Strictly speaking, due to compactness issues for γ in (1.1), we additionally consider a finite-element discretization, see also Theorem 2.5 for a variant without such regularization.) Afterwards, we pass to the limit ε → 0 and show that the quasi-static eigenfracture evolutions converge to an irreversible quasi-static crack evolution in the sense of [25], see Theorem 2.3. More precisely, we obtain a pair ( u(t), Γ( t)) of displacement fields and crack sets for t ∈ [0 , 1] satisfying (a) an irreversibility condition, (b) global stability at all times (sometimes referred to as unilateral minimality), and (c) an energy balance law, see Definition 2.2 for details. Moreover, we show convergence of the energies from (1.1) to (1.2) along the evolution at all times. As a byproduct, closer to the numerical implementation in [42] we also show that the limiting evolution can be achieved from the time-discretized scheme of (1.1) by a simultaneous limit δ → 0, ε → 0, see Theorem 2.4. Let us highlight that in [42] the model was analyzed in the vectorial setting, whereas we reduce to the antiplane framework for the sake of simplicity. The vectorial version, corresponding to the approximation of the evolution derived in [27], is subject of a future work. Our results are in spirit close to the important work by Giacomini [29] on the Ambrosio–Tortorelli approximation of quasi-static crack evolution in the antiplane setting. The purpose of this paper is not to discuss the relevance of the eigenfracture approach compared to phase-field methods but rather to show EIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH 3
+
+that the variational approach to fracture is flexible enough to deal with various kinds of approximation schemes. The novelty of our work lies in developing techniques that allow us to adapt the by-now classical strategy [24] for proving existence of crack evolutions to the setting of eigenfracture. The most delicate and original part of the work consists in proving that, in the limiting passage 
+
+ε → 0, the static equilibrium property is preserved at all times. This calls for a suitable adaptation of the jump-transfer construction of [24], which consists in ‘transferring’ the jump of any competitor to that of a minimizing sequence. A fundamental role in this context is played by the BV coarea formula, which allows to fill potential small holes in the jump set to obtain, roughly speaking, a jump set locally separating the domain into two parts. (We will refer to this construction as a separating extension of the crack set.) In [29] this construction is adapted to the phase-field setting by cleverly using the interplay of both variables, the displacement and the phase-field variable, to obtain a separating extension. This technique, however, is finely tailored to the Ambrosio–Tortorelli functional and it seems that it cannot be transferred neither to the two-field approximation (1.1) nor to phase-field models in linear elasticity. We follow a strategy which is closer to the original proof in [24] by using directly the coarea formula to construct separating extensions. The fundamental additional difficulty stems from the fact that the crack set in (1.1) is not given by a surface, but rather by a neighborhood of a surface, described in terms of Uε({γ̸ = 0 }). In other words, even if the additional separating surface has small Hd−1-measure, it is generally not guaranteed that the corresponding neighborhood contributes only a small amount. In this sense, our construction is related to recent adaptations of the jump transfer in spatially discrete settings, in particular concerning the definition of discrete interpolations. However, in contrast to the 2d-results in [26, 15], we address the problem in arbitrary space dimensions, which requires significantly more delicate arguments to control the size of the neighborhoods appearing in (1.1). In particular, one cannot use an arbitrary separating extension with small additional surface, as provided by the coarea formula. Instead, a minimal one is required, in connection with a lower density bound for this extension, see Lemma 5.3, and suitable covering arguments. We believe that the techniques developed in this paper may also be useful for addressing other relevant approximation schemes in the future, in particular for extending the phase-field evolution [29] to linear elasticity. Let us highlight two further relevant differences compared to [29]. First, in [29, Theorem 3.2] separate convergence of elastic and surface energies is established only for almost all times. This is due to an a priori choice of a countable subset of times I∞ from which the evolution is extended to all times. However, such procedures generally fail to capture the behavior at times at which the surface energy exhibits discontinuities. We instead implement a variant of this approach that allows us to prove convergence of both the elastic and the surface energy at all times . In this sense, our evolution is related to those obtained by σp-convergence [18] or σ-convergence [32]. Secondly, in [29, Theorem 3.2] only convergence of strains, but not of the displacements is proved, which is related to a compactness issue. Indeed, on components that are completely disconnected by the crack set the behavior of displacements cannot be controlled. We adapt methods developed in [28] to obtain convergence of displacements on those components of the domain which are connected to the Dirichlet boundary. Our paper is organized as follows. In Section 2 we introduce the model and present our results. In addition to our two main results (Theorems 2.1 and 2.3), we also discuss some possible variants in Subsection 2.4. Section 3 is devoted to the existence of a quasi-static evolution for the eigenfracture energy (1.1) for fixed ε. In Section 4 we then perform the limit ε → 0. The most delicate part of the proof, namely the stability of unilateral minimizers, is deferred to Section 5. Finally, in Section 6 we sketch the proofs for the variants of our main results. Since many steps of the proof follow a by-now classical strategy, not all arguments are presented in full detail. For the reader’s convenience, additional details on selected proof steps are collected in Appendix A. 4 B. DUONG AND M. FRIEDRICH 
+
+2. The setting and main results 
+
+This section is devoted to the presentation of the model and the main results. 2.1. The eigenfracture model. We let Ω ⊂ Rd be a bounded Lipschitz domain. We assume that (Th)h> 0 is a family of triangulations of Rd such that T is closed for all T ∈ T h and sup {diam T : T ∈ T h} ≤ h. (2.1) By Vh(Ω) and Wh(Ω) we denote the corresponding finite element spaces consisting of continuous piecewise affine and of piecewise constant functions, respectively, defined on all simplices of Th intersecting Ω. Let 
+
+ε > 0 be a small parameter representing the size of the nonlocality of the eigenstrain field. Given sets 
+
+A ⊂ Ω, we define Uε(A) as the closed ε-neighborhood of A and U T
+
+> ε,h
+
+(A) as the union of all simplices intersecting Uε(A). We consider the energy 
+
+Eε,h (u, γ ) := 
+
+ˆ
+
+> Ω
+
+Q ∇u − γ dx + κ
+
+2ε Ld(U T
+
+> ε,h
+
+({γ̸ = 0 })) , (2.2) where u ∈ W 1,1(Ω) denotes the elastic displacement and γ ∈ L1(Ω; Rd) denotes the eigendeformation field. The first part of the energy corresponds to the elastic part of the energy, with Q : Rd → R being a quadratic form Q(F ) = F T CF for all F ∈ Rd and some C ∈ Rd×d such that Q(F ) > 0 for all F̸ = 0. The second part represents the fracture energy, where κ > 0 denotes the fracture toughness and {γ̸ = 0 } is the complement of the zero-set of the precise representative of γ. The functional (2.2) is a simplification of the model analyzed in [42], by restricting to scalar-valued displacements. In [42, Theorem 5.1] it is shown that, under the assumption h = h(ε) and 
+
+h(ε)/ε → 0 as ε → 0, (2.3) the Γ-limit of Eε,h as ε → 0 (with respect to the L1-topology for u) is given by the Griffith energy in the antiplane setting, namely 
+
+E(u) = 
+
+ˆ
+
+> Ω
+
+Q(∇u) d x + κHd−1(Ju) (2.4) for u ∈ SBV 2(Ω), where Ju is the jump set of u. As a byproduct, limits of the eigendeformation field 
+
+γ can be identified with the singular part Dsu of the distributional derivative. In the sequel, we always assume that h depends on ε and that (2.3) holds. We often drop the explicit dependence on h in the notation, e.g., we write Eε in place of Eε,h or U T 
+
+> ε
+
+in place of U T
+
+> ε,h
+
+.We also mention that the Γ-convergence result can be complemented with boundary conditions. As is typically done for fracture problems, we impose displacement boundary conditions by considering a larger set Ω ′ containing Ω such that Ω ′ \ Ω is also a Lipschitz set, and ∂D Ω := ∂Ω ∩ Ω′ denotes the Dirichlet boundary. Given g ∈ W 2,∞(Rd), we denote by gh the continuous, piecewise affine interpolation of g on the triangulation Th. Then, requiring u = gh, γ = 0 on Ω ′ \ Ω for admissible functions u ∈ Vh(Ω ′), γ ∈ Wh(Ω ′)in (2.2), the corresponding Γ-limit is again of the form (2.4), but only finite if u ∈ SBV 2(Ω ′) satisfies 
+
+u = g on Ω ′ \ Ω. Here, we highlight that the elastic energy is still defined on Ω although the functions are defined on the larger set Ω ′. Moreover, for functions u ∈ SBV 2(Ω ′) satisfying u = g on Ω ′ \ Ω, the jump set satisfies Ju ⊂ Ω ∪ ∂D Ω, i.e., jump along the Dirichlet boundary is in principle possible and accounted for in the surface part of (2.4). We mention that in this paper we consider a finite-element discretization of the eigendeformation approximation although the theoretical Γ-convergence results in [42] primarily deal with a version of the functional without additional spatial discretization. The reason for this is the missing compactness for the functional (2.2). For more details we refer to Subsection 2.4 below, where we also suggest a variant of the approach which allows us to drop the finite-element discretization. EIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH 5
+
+2.2. Quasi-static evolution of the eigenfracture approximation. In the spirit of [25, 24], we start by introducing a time-discrete evolution which is driven by time-dependent boundary conditions g ∈
+
+W 1,1([0 , 1]; W 2,∞(Rd)). Let I∞ be a dense subset of [0 , 1] with 0 ∈ I∞ as well as Im = {0 = tm 
+
+> 0
+
+< t m 
+
+> 1
+
+<. . . t mm} ⊂ I∞ be a finite subset of I∞ such that lim m→∞ max mi=1 (tmi − tmi−1) = 0. We additionally assume that the sets are nested, i.e., Im ⊂ Im+1 , and that S 
+
+> m
+
+Im = I∞. For convenience, we introduce the shorthand notation 
+
+Itm := {τ ∈ Im : τ ≤ t} .
+
+We set up a quasi-static evolutionary problem for fixed ε, h, and m, similar to the one addressed in [42, Section 5.2]. Recalling that gh denotes the interpolation of g with respect to Th, we define gmh,k := gh(tmk ) as a shorthand notation. We suppose that the initial pair (um 
+
+> 0
+
+, γ m 
+
+> 0
+
+) is a solution of the minimization problem min Eε(u, γ ) : ( u, γ ) ∈ Vh(Ω ′) × Wh(Ω ′), u = gmh, 0, γ = 0 on Ω ′ \ Ω , (2.5) where Eε denotes the energy given in (2.2). Clearly, this solution can be chosen independently of m. The subsequent steps are obtained iteratively by taking the ‘crack set’ of the previous time steps into account. To this end, we introduce the energy 
+
+Eε
+
+ u, γ, Ψ := 
+
+ˆ
+
+> Ω
+
+Q ∇u − γ dx + κ
+
+2ε Ld U T 
+
+> ε
+
+(Ψ ∪ { γ̸ = 0 }) (2.6) for u ∈ Vh(Ω ′) and γ ∈ Wh(Ω ′), where Ψ ⊂ Ω′ represents the already existing support of the eigenstrain field from previous time steps. Then, given the pairs ( umj , γ mj )0≤j≤i and defining the notation Γmε (t) := [  
+
+> k∈{ 0,...m }:tmk∈Itm
+
+{γmk̸ = 0 } for all t ∈ [0 , 1] , (2.7) we choose the pair ( umi+1 , γ mi+1 ) in the next time step as minimizer of the problem min Eε
+
+ u, γ, Γmε (tmi ) : ( u, γ ) ∈ Vh(Ω ′) × Wh(Ω ′), u = gmh,i +1 , γ = 0 on Ω ′ \ Ω . (2.8) Proof of existence of minimizers for (2.5) and (2.8) is rather straightforward as we briefly elaborate at the beginning of Section 3. Denoting the characteristic function of Γ mε (t) by 1Γmε (t), given the pairs ( umk , γ mk )for 0 ≤ k ≤ i, minimality implies the identity 
+
+γmi = ∇umi 1Γmε (tmi ), (2.9) since by this choice of γmi the elastic energy is clearly minimized. As m → ∞ , the time-discrete solutions (umk )0≤k≤m converge to a quasi-static evolution for the eigenfracture approximation. To formulate the statement, we define admissible triples: we say that (¯ u, ¯γ, ¯Γ) ∈ AD ε(¯ g) if (¯ u, ¯γ) ∈ Vh(Ω ′) × Wh(Ω ′), ¯Γ is a union of simplices of Th, and ¯u = ¯ g on Ω ′ \ Ω, ¯γ = 0 on Ω ′ \ Ω, and {¯γ̸ = 0 } ⊂ ¯Γ.
+
+Theorem 2.1 (Quasi-static eigenfracture evolution) . Let g ∈ W 1,1([0 , 1]; W 2,∞(Rd)) and let gh ∈
+
+W 1,1([0 , 1]; Vh(Ω ′)) be its interpolation on Th. For all ε > 0 there exists an irreversible quasi-static evolution for the eigenfracture approximation, i.e., a mapping t 7 → (uε(t), γ ε(t), Γε(t)) for t ∈ [0 , 1] satis-fying (uε(t), γ ε(t), Γε(t)) ∈ AD ε(gh(t)) for all t ∈ [0 , 1] such that the following properties hold: 
+
+(a) Initial condition: ( uε(0) , γ ε(0) , ∅) minimizes (2.6) among all (¯ u, ¯γ) ∈ Vh(Ω ′) × Wh(Ω ′) with ¯u =
+
+gh(0) and ¯γ = 0 on Ω′ \ Ω.
+
+(b) Irreversibility: We have Γε(s) ⊂ Γε(t) for all 0 ≤ s ≤ t ≤ 1.
+
+(c) Global stability: For all t ∈ (0 , 1] and for all (¯ u, ¯γ) ∈ Vh(Ω ′) × Wh(Ω ′) with ¯u = gh(t) and ¯γ = 0 
+
+on Ω′ \ Ω we have 
+
+Eε(uε(t), γ ε(t), Γε(t)) ≤ E ε(¯ u, ¯γ, Γε(t)) . (2.10) 6 B. DUONG AND M. FRIEDRICH 
+
+(d) Energy balance: The function t → E ε(uε(t), γ ε(t), Γε(t)) is absolutely continuous and 
+
+Eε(uε(t), γ ε(t), Γε(t)) = Eε(uε(0) , γ ε(0) , ∅) + 2 
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Ω
+
+(∇uε(s) − γε(s)) · C∂t∇gh(s) d x ds (2.11) 
+
+for all t ∈ [0 , 1] , where ∂t denotes the time derivative. Moreover, this evolution is given as the limit of the time-discrete solutions (umk , γ mk )0≤k≤m for m ∈ N
+
+defined in (2.5) and (2.8) in the sense that, up to a subsequence (not relabeled), it holds that, as m → ∞ ,
+
+Eε(umk(m,t ), γ mk(m,t ), Γmk(m,t )) → E ε(uε(t), γ ε(t), Γε(t)) ,umk(m,t ) → uε(t) in L1(Gε(t)) , ∇umk(m,t )1(Γ mk(m,t ))c → ∇ uε(t) − γε(t) in L2(Ω ′), (2.12) 
+
+for all t ∈ [0 , 1] , where k(m, t ) is chosen such that tmk(m,t ) ≤ t < t mk(m,t )+1 , and Gε(t) ⊂ Ω′ denotes the largest open set with Ω′ \ Ω ⊂ Gε(t) and U T 
+
+> ε
+
+(Γ ε(t)) ∩ Gε(t) = ∅.
+
+We mention that in general the convergence of displacements in (2.12) cannot be guaranteed outside of Gε(t) as Ω ′ \ Gε(t) corresponds to the parts of the domain which are ‘broken off’ by the crack set, see [28, Subsection 2.4] for details. 2.3. Passage to a quasi-static crack evolution for a Griffith model in the antiplane setting. 
+
+Recall the Griffith-type energy introduced in (2.4). Given a rectifiable set Γ ⊂ Ω ∪ ∂D Ω, we define the energy 
+
+E(u, Γ) := 
+
+ˆ
+
+> Ω
+
+Q(∇u) d x + κHd−1(Γ) , (2.13) for each u ∈ SBV 2(Ω ′), where the corresponding jump set Ju is subject to the constraint Ju ˜⊂ Γ. (Here and in the following, ˜⊂ stands for inclusions up to Hd−1-negligible sets.) By AD (¯ g, ¯Γ) we denote all functions ¯ u ∈ SBV 2(Ω ′) such that ¯u = ¯ g on Ω ′ \ Ω, J¯u ˜⊂ ¯Γ.
+
+Definition 2.2. We define an irreversible quasi-static crack evolution with respect to the boundary condition g ∈ W 1,1([0 , 1]; W 2,∞(Rd)) as any mapping t → (u(t), Γ( t)) with Γ( t) ⊂ Ω ∪ ∂D Ω rectifiable and 
+
+u(t) ∈ AD (g(t), Γ( t)) for all t ∈ [0 , 1] such that the following four conditions hold: 
+
+(a) Initial condition : u(0) minimizes E(u, J u) given in (2.13) among all v ∈ SBV 2(Ω ′) with v = g(0) 
+
+on Ω′ \ Ω.
+
+(b) Irreversibility : Γ( t1) ˜ ⊂ Γ( t2) for all 0 ≤ t1 ≤ t2 ≤ 1.
+
+(c) Global stability : For every t ∈ (0 , 1] , for every Φ with Γ( t) ˜ ⊂ Φ, and for every v ∈ AD (g(t), Φ) it holds that 
+
+E(u(t), Γ( t)) ≤ E (v, Φ) .
+
+(d) Energy balance : The function t 7 → E (u(t), Γ( t)) is absolutely continuous and it holds that 
+
+ddt E(u(t), Γ( t)) = 2 
+
+ˆ
+
+> Ω
+
+∇u(t) · C∇∂tg(t) d x for a.e. t ∈ [0 , 1] . (2.14) The existence of such an evolution has been proven in the groundbreaking work by Francfort and Larsen [24] by means of time-discrete approximations, analogous to (2.8). Our second theorem consti-tutes the main result of the paper showing that the evolutionary eigenfracture approximation converges to an evolution in the sense of Definition 2.2. As a final preparation for its formulation, we define sets on which convergence of displacement fields can be guaranteed. For a crack set Γ( t) ⊂ Ω ∪ ∂D Ω with H1(Γ( t)) < ∞, by B(t) ⊂ Ω we denote the largest set of finite perimeter (with respect to set inclusion) which satisfies ∂∗B(t) ∩ Ω′ ˜⊂ Γ( t). This set represents the ‘broken off pieces’, and by G(t) := Ω ′ \ B(t) instead we denote the ‘good set’, which in EIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH 7
+
+particular satisfies Ω ′ \ Ω ⊂ G(t). Note that convergence of the displacements can only be expected on 
+
+G(t), see [28, Subsection 2.4] for details. 
+
+Theorem 2.3 (Approximation of quasi-static crack growth) . For all ε > 0 with associated h = h(ε) > 0,we let t → (uε(t), γ ε(t), Γε(t)) be the eigenfracture evolutions with boundary data gh given by Theorem 2.1, where gh ∈ W 1,1([0 , 1]; Vh(Ω ′)) denotes the interpolation on Th of some g ∈ W 1,1([0 , 1]; W 2,∞(Rd)) .Then, there exists a quasi-static evolution t → (u(t), Γ( t)) with boundary condition g in the sense of Definition 2.2 and a sequence εn → 0 with corresponding sequence hn := h(εn) → 0 such that, setting 
+
+un := uεn , γn := γεn , and Γn := Γ εn , the following holds: 
+
+(i) Convergence of displacements: For all t ∈ [0 , 1] we have un(t)1G(t) → u(t)1G(t) in L1(Ω ′).
+
+(ii) Energy convergence: For all t ∈ [0 , 1] we have 
+
+Eεn (un(t), γ n(t), Γn(t)) → E (u(t), Γ( t)) .
+
+(iii) Convergence of bulk and surface energy: For all t ∈ [0 , 1] we have 
+
+∇un(t) − γn(t) → ∇ u(t) strongly in L2(Ω; Rd)
+
+and 
+
+lim 
+
+> n→∞
+
+κ
+
+2εn
+
+Ld  U T 
+
+> εn
+
+(Γ n(t))  = κHd−1(Γ( t)) .
+
+(iv) Convergence of crack sets: We have 12εn 1Γεn (t) ⇀∗ Hd−1|Γ( t) in the sense of measures for all 
+
+t ∈ [0 , 1] .
+
+From the result in [42], we get that γn(t) → Dsu(t) in the flat norm for all t ∈ [0 , 1]. Item (iv) can be understood as the evolutionary counterpart taking the union of all cracks up to time t into account. Theorem 2.1 and Theorem 2.3 will be proven in Sections 3–4. In the proofs, we will simply assume that Q(F ) = |F |2 and κ = 1 for notational convenience, as the adaptations for the general case are straightforward. 2.4. Further results. In this subsection, we present two further results which represent variants of the statements given in Subsections 2.2–2.3. 
+
+Simultaneous limit. In the previous two subsections, we derived a quasi-static crack evolution for the energy (2.4) by subsequently passing to a time-continuous limit ( m → ∞ ) and afterwards to the limit of vanishing eigenstrain-approximation ( ε → 0). We now discuss a simultaneous limit in the time discretization and space approximation. Considering simultaneous space-time discretizations is not only relevant for numerical implementation (see e.g. [42, Section 6]), but is an approach which has recently been adopted in analytical results for the approximation of crack growth [26, 32, 28, 15]. We consider a sequence εn → 0 and the corresponding sequence hn := h(εn) → 0 as in (2.3). We consider the time-discretized setting introduced in Subsection 2.2, where the time discretization is now denoted by In = {0 = tn 
+
+> 0
+
+< t n 
+
+> 1
+
+< . . . t nn} ⊂ I∞ with lim n→∞ max ni=1 (tni − tni−1) = 0. We consider the sequence of minimization problems (2.5) and (2.8) (with tni in place of tmi ), and denote by ( uni , γ ni ) the solutions for the respective problems. We extend to functions (ˆ un(t), ˆγn(t)) on the entire time interval [0 , 1] via a piecewise constant interpolation in time, i.e., ˆ un(t) = uni and ˆ γn(t) = γni for tni ≤ t < t ni+1 . We define ˆΓn(t) := S 
+
+> τ∈Itn
+
+{ˆγn(τ )̸ = 0 }.
+
+Theorem 2.4 (Simultaneous limit) . Consider a sequence εn → 0, the corresponding sequence hn := 
+
+h(εn) → 0, and a time discretization In = {0 = tn 
+
+> 0
+
+< t n 
+
+> 1
+
+< . . . t nn} ⊂ I∞ with lim n→∞ max ni=1 (tni − tni−1) = 0. Let t 7 → (ˆ un(t), ˆγn(t)) be the time-discrete evolution given by (2.5) and (2.8) .Then, there exists a subsequence of (εn)n (not relabeled) and a quasi-static evolution t → (u(t), Γ( t)) 
+
+with boundary condition g in the sense of Definition 2.2 such that items (i) –(iv) of Theorem 2.3 hold with 
+
+(ˆ un, ˆγn, ˆΓn) in place of (un, γ n, Γn).8 B. DUONG AND M. FRIEDRICH 
+
+Continuous eigenfracture approximation. Besides its potential relevance for numerical approxima-tion schemes (see [42, Section 5]), we have adopted a finite-element discretization of the eigendeformation approximation also for analytical reasons. Indeed, without spatial discretization, compactness for the variables ( u, γ ) in (2.2) is not guaranteed which in turn impedes the derivation of an existence result as in Theorem 2.1 (actually, already in a static setting). Yet, we can also work with the ‘standard’ eigenfracture approximation 
+
+Fε(u, γ, Ψ) = 
+
+ˆ
+
+> Ω′
+
+Q(∇u − γ) d x + κ
+
+2ε Ld Uε(Ψ ∪ { γ̸ = 0 })
+
+for ( u, γ ) ∈ W 1,1(Ω ′) × L1(Ω ′) without finite-element discretization if we relax the formulation to almost minimizers .We start with a time discretization Im = {0 = tm 
+
+> 0
+
+< t m 
+
+> 1
+
+< . . . t mm}. Let us also define a sequence 
+
+ε = ε(m) with ε → 0 for m → ∞ . First, the analog of (2.5) is inf Fε(u, γ, ∅) : ( u, γ ) ∈ W 1,1(Ω ′) × L1(Ω ′), u = g(0) , γ = 0 on Ω ′ \ Ω .
+
+Since we do not have the necessary compactness for γ in this setting, we will set ( u′
+
+> 0,m
+
+, γ ′
+
+> 0,m
+
+) ∈ W 1,1(Ω ′)×
+
+L1(Ω ′) to be a almost minimizer , i.e., a pair that satisfies 
+
+Fε(u′
+
+> 0,m
+
+, γ ′
+
+> 0,m
+
+, ∅) ≤ inf {F ε(u, γ, ∅) : ( u, γ ) ∈ W 1,1(Ω ′) × L1(Ω ′), u = g(0) , γ = 0 on Ω ′ \ Ω} + εm .
+
+With this, we can repeat the iteration argument for the problem inf Fε
+
+ u, γ, [
+
+> 0≤k≤i
+
+{γ′
+
+> k,m
+
+̸ = 0 } : ( u, γ ) ∈ W 1,1(Ω ′) × L1(Ω ′), u = g(tmi+1 ), γ = 0 on Ω ′ \ Ω ,
+
+and choose ( u′
+
+> i+1 ,m
+
+, γ ′
+
+> i+1 ,m
+
+) whose energy is εm close to the infimum. Then, we extend to functions on the entire time interval [0 , 1] through a piecewise constant interpolation in time as before, such that we get u′
+
+> m
+
+(t) and γ′
+
+> m
+
+(t). We also define Γ ′
+
+> m
+
+(t) := S 
+
+> τ∈Itm
+
+{γ′
+
+> m
+
+(τ )̸ = 0 }.In this setting, we then have the following result. 
+
+Theorem 2.5 (A version of Theorem 2.3 for the continuous eigenfracture approximation) . For all 
+
+ε > 0, we let t → (u′
+
+> ε
+
+(t), γ ′
+
+> ε
+
+(t), Γ′
+
+> ε
+
+(t)) be the evolutions with boundary data g given above, where g ∈
+
+W 1,1([0 , 1]; W 2,∞(Rd)) . Then there exists a quasi-static evolution t 7 → (u(t), Γ( t)) with boundary data g
+
+in the sense of Definition 2.2 and a (not relabeled) subsequence εm → 0 such that, setting u′ 
+
+> m
+
+:= u′ 
+
+> εm
+
+,
+
+γ′ 
+
+> m
+
+:= γ′ 
+
+> εm
+
+, and Γ′ 
+
+> m
+
+:= Γ ′ 
+
+> εm
+
+, items (i) –(iv) of Theorem 2.3 hold with (u′
+
+> m
+
+, γ ′
+
+> m
+
+, Γ′
+
+> m
+
+) in place of (un, γ n, Γn).
+
+3. Existence of the quasi-static eigenfracture approximation 
+
+This section is devoted to the proof of Theorem 2.1. Fix some ε > 0 with its associated h = h(ε) > 0and the mesh Th. Recall that gh denotes the continuous, piecewise affine interpolation of g on the triangulation Th. Moreover, we introduce the notation gmh (t) := gmh,i = gh(tmi ) for all tmi ≤ t < t mi+1 .With this, we have gmh (t) → gh(t) strongly in H1(Ω ′) for all t ∈ [0 , 1] and, due to construction of the 
+
+Im, even gmh (t) = gh(t) for t ∈ I∞ and m large enough. Further, we recall the time-discrete evolution (umi , γ mi )0≤i≤m as given in (2.5) and (2.8). 
+
+Existence of minimizers: Let us first observe that the existence of minimizers for the problems (2.5) and (2.8) is standard since the problem is posed on a finite-dimensional space and for minimizers we can assume the bounds 
+
+∥umi ∥L∞(Ω ′) ≤ ∥ gh∥L∞(Ω ′), ∥∇ umi ∥L∞(Ω ′) ≤ Ch∥umi ∥L∞(Ω ′). (3.1) Indeed, the first estimate follows by a standard truncation argument, and the second follows from the fundamental theorem of calculus, where Ch depends on the minimal size of simplices in the triangulation EIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH 9
+
+Th. This yields compactness for the displacement, and compactness for the eigenstrain field immediately follows from (2.9). We introduce an interpolation in time by defining the piecewise constant function 
+
+umε (t) = umi , γmε (t) = γni for tmi ≤ t < t mi+1 .
+
+Discrete energy estimate: Recall the definition of Γ mε (t) in (2.7) and the definition of the neighbor-hood U T 
+
+> ε
+
+introduced before (2.2). Following the reasoning in [24, Section 3.2], we derive a discrete energy estimate. Testing (2.8) at fixed time tmi+1 ∈ Im with the admissible competitor ( umi + gmh,i +1 − gmh,i , γ mi ), we get 
+
+Eε
+
+ umi+1 , γ mi+1 , Γmε (tmi ) ≤ E ε
+
+ umi + gmh,i +1 − gmh,i , γ mi , Γ( tmi )
+
+=
+
+ˆ
+
+> Ω
+
+|∇ umi + ∇gmh,i +1 − ∇ gmh,i − γmi |2 dx + 12ε Ld U T
+
+> ε
+
+ Γ( tmi ) ∪ { γmi̸ = 0 } 
+
+≤ E ε(umi , γ mi , Γ( tmi )) + 2 
+
+ˆ tmi+1 
+
+> tmi
+
+ˆ
+
+> Ω
+
+(∇umi − γmi ) · ∂t∇gh(s) d x ds
+
++ e(m)
+
+ˆ tmi+1 
+
+> tmi
+
+∥∂t∇gh(s)∥L2(Ω) ds, 
+
+with e(m) := max tmi ∈Im
+
+´ tmi+1 
+
+> tmi
+
+∥∂t∇gh(s)∥L2(Ω) ds being monotonously decreasing and vanishing for m →∞ due to the regularity of g. Note that in the last step we have used the fundamental theorem of calculus and Minkowski’s integral inequality. Exploiting Eε(umi+1 , γ mi+1 , Γmε (tmi )) = Eε(umi+1 , γ mi+1 , Γmε (tmi+1 )) (see (2.7)) and iterating this estimate in time leads to the following inequality for arbitrary times 0 ≤ t1 ≤
+
+t2 ≤ 1: 
+
+Eε
+
+ umε (t2), γ mε (t2), Γmε (t2) ≤ E ε
+
+ umε (t1), γ mε (t1), Γmε (t1) + 2 
+
+ˆ tmi2
+
+> tmi1
+
+ˆ
+
+> Ω
+
+(∇umε (s) − γmε (s)) · ∂t∇gh(s) d x ds
+
++ e(m)
+
+ˆ tmi2
+
+> tmi1
+
+∥∂t∇gh(s)∥L2(Ω) ds, (3.2) with i1 and i2 chosen such that tmi1 ≤ t1 < t mi1+1 and tmi2 ≤ t2 < t mi2+1 .
+
+Limiting passage m → ∞ : By means of Helly’s theorem, up to passing to a subsequence (not relabeled), we can ensure that λmε (t) := 12ε Ld  U T 
+
+> ε
+
+(Γ mε (t) converges to some increasing limiting function 
+
+λε for all t ∈ [0 , 1]. We denote the discontinuity points of λε by Nε and note that Nε is at most countable. (Actually, Nε is even finite since the mappings λmε satisfy λmε ([0 , 1]) ⊂ Dε,h for some finite set Dε,h ⊂ R
+
+independent of m. Yet, this will not be needed in the following.) For brevity, we introduce 
+
+I∞,ε := I∞ ∪ N ε, It 
+
+> ∞,ε
+
+:= {τ ∈ I∞,ε : τ ≤ t} . (3.3) With the same arguments as for the existence of time-discrete solutions, see (3.1), we obtain compact-ness for the sequences ( umε (t), γ mε (t)) m for each t ∈ I∞,ε , up to passing to a further subsequence (not relabeled). Therefore, by a diagonal argument, we obtain a single subsequence (not relabeled) and limits (uε(t), γ ε(t)) ∈ Vh(Ω ′) × Wh(Ω ′) satisfying uε(t) = gh(t), γε(t) = 0 on Ω ′ \ Ω for t ∈ I∞,ε such that 
+
+umε (t) → uε(t) in H1(Ω ′) and γmε (t) → γε(t) in L1(Ω ′) for all t ∈ I∞,ε . Note that, due to the definition of Vh(Ω ′) and Wh(Ω ′), the convergence also holds pointwise. From now on, if not stated otherwise, all convergences are intended with respect to this subsequence. To extend the notion to the entire time interval [0 , 1], let t / ∈ I∞,ε and tk ↗ t with tk ∈ I∞,ε for every 
+
+k ∈ N. Then, with the same arguments as above, we find a subsequence of ( tk)k (not relabeled) such that ( uε(tk), γ ε(tk)) converges in the H1(Ω ′) × L1(Ω ′)-sense to a limit, denoted by ( uε(t), γ ε(t)). Later we will see that this limit coincides with the limit of ( umε (t), γ mε (t)) as m → ∞ for all t ∈ [0 , 1]. 10 B. DUONG AND M. FRIEDRICH 
+
+Defining Γ ε(t) := S 
+
+> τ∈It
+> ∞,ε
+
+{γε(τ )̸ = 0 } for all t ∈ [0 , 1], we have the following property on the supports of the eigenstrain fields. 
+
+Lemma 3.1 (Eigenstrain supports) . For every t ∈ [0 , 1] , we find m0 ∈ N depending on t such that 
+
+Γε(t) ⊂ Γmε (t) for all m ≥ m0.Proof. We first observe that we have a finite amount of simplices in Γ ε(·) by construction. Fix a time step 
+
+t ∈ [0 , 1] and let us consider a simplex T with γε(t)̸ = 0 on T . Then there exists a time s ∈ It 
+
+> ∞,ε
+
+such that 
+
+γε(r) = 0 on T for r < s and γε(s)̸ = 0 on T . By pointwise convergence there exists m0 = m0(T ) ∈ N
+
+such that γmε (s)̸ = 0 on T for all m ≥ m0 and therefore T ⊂ Γmε (t) for all m ≥ m0. Repeating this procedure for every T ⊂ Γε(t), we can find a joint m0 depending only on t such that γmε (t)̸ = 0 on Γ ε(t)for m ≥ m0. □
+
+Note that, at this stage, equality of Γ ε(t) and Γ mε (t) for large m cannot guaranteed as possibly γmε (t) →
+
+0 on some T ∈ T h. Next, we address the convergence of the strains for all t ∈ [0 , 1]. 
+
+Lemma 3.2 (Convergence of strains) . For all t ∈ [0 , 1] it holds that ∇umε (t)1(Γ mε (t)) c → ∇ uε(t) − γε(t)
+
+in L2(Ω ′) as m → ∞ .
+
+For t ∈ I∞,ε the proof follows directly by the convergence obtained below (3.3) and identity (2.9). In the general case, the proof follows a standard argument which we present in the appendix. With the preceding results, we are now able to obtain the minimality for the limit. 
+
+Lemma 3.3 (Stability) . For every t ∈ (0 , 1] and every (¯ u, ¯γ) ∈ Vh(Ω ′) × Wh(Ω ′) such that ¯u = gh(t) and 
+
+¯γ = 0 on Ω′ \ Ω, we have 
+
+Eε(uε(t), γ ε(t), Γε(t)) ≤ E ε(¯ u, ¯γ, Γε(t)) . (3.4) 
+
+Additionally, for t = 0 , for every (¯ u, ¯γ) ∈ Vh(Ω ′) × Wh(Ω ′) with ¯u = gh(0) and ¯γ = 0 on Ω′ \ Ω we have 
+
+Eε(uε(0) , γ ε(0) , ∅) ≤ E ε(¯ u, ¯γ, ∅). (3.5) Here, we note that Eε(·, ·, ∅) coincides with the energy defined in (2.2). 
+
+Proof. We define ¯ um := ¯ u + gmh (t) − gh(t). With the regularity properties of gh, we obtain ¯ um → ¯u in 
+
+H1(Ω ′) for m → ∞ . Since (¯ um, ¯γ) is admissible, we get by the minimality in (2.8) 
+
+Eε(umε (t), γ mε (t), Γmε (t)) ≤ E ε(¯ um, ¯γ, Γmε (t)) .
+
+Then, subtracting the surface energy in (2.6) and taking the limit in m, by (2.9) and Lemma 3.2, this shows ˆ
+
+> Ω
+
+|∇ uε(t) − γε(t)|2 dx ≤
+
+ˆ
+
+> Ω
+
+|∇ ¯u − ¯γ|2 dx + lim sup 
+
+> m→∞
+
+12ε Ld  U T 
+
+> ε
+
+({¯γ̸ = 0 }) \ U T 
+
+> ε
+
+(Γ mε (t))  .
+
+Using Lemma 3.1 we find 
+
+ˆ
+
+> Ω
+
+|∇ uε(t) − γε(t)|2 dx ≤
+
+ˆ
+
+> Ω
+
+|∇ ¯u(t) − ¯γ|2 dx + 12ε Ld  U T 
+
+> ε
+
+({¯γ̸ = 0 }) \ U T 
+
+> ε
+
+(Γ ε(t))  .
+
+Adding 12ε Ld(U T 
+
+> ε
+
+(Γ ε(t))) on both sides we obtain (3.4). Property (3.5) is easier and follows directly from minimality (see (2.5)) and Lemma 3.2. □
+
+With this minimality, for all t ∈ [0 , 1] we obtain 
+
+γε(t) = ∇uε(t)1Γε(t). (3.6) Indeed, from the definition of Γ ε and the definition of γε(s) for s / ∈ I∞,ε we get {γε(t)̸ = 0 } ⊂ Γε(t). This along with minimality yields (3.6) with the same argument as in (2.9). Therefore, we can also write ´ 
+
+> Ω
+
+|∇ uε(t) − γε(t)|2 dx = ´ 
+
+> Ω\Γε(t)
+
+|∇ uε(t)|2 dx. Based on Lemmas 3.1–3.3 we can now derive an energy balance. EIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH 11 
+
+Lemma 3.4 (Energy balance) . The limit (uε(t), γ ε(t)) satisfies the energy equality 
+
+Eε(uε(t), γ ε(t), Γε(t)) = Eε(uε(0) , γ ε(0) , Γε(0)) + 2 
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Ω
+
+(∇uε(s) − γε(s)) · ∂t∇gh(s) d x ds. (3.7) The proof is conceptually very similar to [24, Section 3.2]. We only present one inequality here and defer the proof of the other inequality to the appendix. We use (3.2) with the time steps tmi1 = 0 and 
+
+tmi2 ∈ Im such that tmi2 ≤ t < t mi2+1 . Then, we get 
+
+Eε(umε (t), γ mε (t), Γmε (t)) ≤ E ε(umε (0) , γ mε (0) , Γmε (0)) + 2 
+
+ˆ tmi2
+
+> 0
+
+ˆ
+
+> Ω
+
+(∇umε (s) − γmε (s)) · ∂t∇gh(s) d x ds
+
++ e (m)
+
+ˆ t
+
+> 0
+
+∥∂t∇gh(s)∥L2(Ω) ds. 
+
+Taking the limit m → ∞ we find lim inf  
+
+> m→∞
+
+Eε(umε (t), γ mε (t), Γmε (t)) ≤ E ε(uε(0) , γ ε(0) , Γε(0)) + 2 
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Ω
+
+(∇uε(s) − γε(s)) · ∂t∇gh(s) d x ds. 
+
+(3.8) Indeed, we can pass to the limit in the integral on the right-hand side by Lemma 3.2, (2.9), (3.1), and dominated convergence. Moreover, we have Eε(umε (0) , γ mε (0) , Γmε (0)) = Eε(uε(0) , γ ε(0) , Γε(0)) for all 
+
+m ∈ N as the solution of (2.5) is independent of m. For the left-hand side of the previous equation, we use Lemma 3.2, (2.9), and Lemma 3.1 to get lim inf  
+
+> m→∞
+
+Eε(umε (t), γ mε (t), Γmε (t)) ≥ lim inf 
+
+> m→∞
+
+ ˆ
+
+> Ω
+
+|∇ umε (t) − γmε (t)|2 dx + 12ε Ld U T 
+
+> ε
+
+(Γ mε (t)) 
+
+≥
+
+ˆ
+
+> Ω
+
+|∇ uε(t) − γε(t)|2 dx dx + 12ε Ld U T 
+
+> ε
+
+(Γ ε(t)) . (3.9) In view of (2.6) and the fact that {γε(t)̸ = 0 } ⊂ Γε(t) (see (3.6)), this shows lim inf  
+
+> m→∞
+
+Eε(umε (t), γ mε (t), Γmε (t)) ≥ E ε(uε(t), γ ε(t), Γε(t)) . (3.10) This shows the first inequality in (3.7). The second inequality in (3.7) will be discussed in the appendix. With the preliminary results, we are now ready to prove Theorem 2.1. 
+
+Proof of Theorem 2.1. First, conditions (a) and (c) follow from Lemma 3.3 and (b) is a direct consequence of the definition of Γ ε(t). The energy balance (d) is stated in Lemma 3.4. The fact that uε(t) = gh(t), 
+
+γε(t) = 0 on Ω ′ \ Ω for all t ∈ [0 , 1] follows directly from the construction of the limits. Moreover, (3.6) implies {γε(t)̸ = 0 } ⊂ Γε(t), which shows ( uε(t), γ ε(t), Γε(t)) ∈ AD ε(gh(t)) for all t ∈ [0 , 1]. Combining (3.8)–(3.10) and the energy balance (3.7), we obtain convergence of energies at all times t ∈ [0 , 1], i.e., the first item in (2.12) holds. In view of Lemma 3.2, to conclude (2.12), it suffices to show umε (t) → uε(t)in L1(Gε(t)). To this end, we start by observing that both the elastic and the surface energy are lower semicontinuous, see the argument in (3.9). This indeed shows 
+
+λε(t) = lim  
+
+> m→∞
+
+Ld(U T 
+
+> ε
+
+(Γ mε (t))) = Ld(U T 
+
+> ε
+
+(Γ ε(t))) (3.11) for all t ∈ [0 , 1]. From this we deduce that U T 
+
+> ε
+
+(Γ mε (t)) is constant equal to U T 
+
+> ε
+
+(Γ ε(t)) for m large enough depending on t ∈ [0 , 1]. Indeed, by Lemma 3.1 we have U T 
+
+> ε
+
+(Γ ε(t)) ⊂ U T 
+
+> ε
+
+(Γ mε (t)) for m large enough. This along with (3.11) and the discrete nature of the problem induced by the triangulation Th shows the property. Then, by Lemma 3.2 and (3.6) we get ∇umε (t) → ∇ uε(t) in L2(Ω ′ \ U T 
+
+> ε
+
+(Γ ε(t))). Recall that Gε(t) ⊂ Ω′ denotes the largest open set with Ω ′ \ Ω ⊂ Gε(t) and Γ ε(t) ∩ U T 
+
+> ε
+
+(Γ ε(t)) = ∅.Now, by the fundamental theorem of calculus applied successively on the simplices of Th along with the 12 B. DUONG AND M. FRIEDRICH 
+
+fact that umε (t) − uε(t) = gmh (t) − gh(t) → 0 on Ω ′ \ Ω as m → ∞ , we also get umε (t) → uε(t) in L1(Gε(t)). This concludes the proof. □
+
+4. Passage to quasi-static crack growth 
+
+This section is devoted to the proof of Theorem 2.3. We start by stating an energy bound for ε > 0. Then, we proceed with compactness and stability properties on a countable subset of times. Afterwards, we extend the limiting evolution to all times and give the proof of the main result. For every ε > 0, we denote the triple given by Theorem 2.1 by t 7 → (uε(t), γ ε(t), Γε(t)). By a truncation argument, the minimality properties (i) and (iii) along with g ∈ L∞([0 , 1] × Ω′) imply that 
+
+∥uε(t)∥L∞(Ω ′) ≤ C
+
+for some C > 0 independent of ε and t. Recalling the notation in (2.6), we obtain the following uniform bound on the energy. 
+
+Lemma 4.1 (Energy bound) . There exists a constant C1 ≥ 0 depending only on g such that for all 
+
+t ∈ [0 , 1] and ε > 0 it holds that 
+
+Eε(uε(t), γ ε(t), Γε(t)) + ∥uε(t)∥L∞(Ω ′) ≤ C1. (4.1) 
+
+Proof. Given the energy balance stated in Lemma 3.4, it suffices to estimate Eε(uε(0) , γ ε(0) , Γε(0)) and 2 ´ t
+
+> 0
+
+´
+
+> Ω
+
+(∇uε(t) − γε(t)) · ∂t∇gh(s) d x ds. First, due to minimality (see (i) in Theorem 2.1), we have 
+
+Eε(uε(0) , γ ε(0) , Γε(0)) ≤ ´ 
+
+> Ω
+
+|∇ gh(0) |2 dx ≤ C∥g(0) ∥2 
+
+> W2,∞(Ω ′)
+
+. For the second term, for every 0 ≤ s ≤ 1, we can estimate 
+
+ˆ
+
+> Ω
+
+(∇uε(s) − γε(s)) · ∂t∇gh(s) d x ≤ ∥∇ uε(s) − γε(s)∥L2(Ω) ∥∂t∇gh(s)∥L2(Ω) (4.2) by H¨ older’s inequality. Using the admissible competitor ( gh(s), 0) in the minimality property (iii) of Theorem 2.1, we obtain the inequality 
+
+ˆ
+
+> Ω
+
+|∇ uε(s) − γε(s)|2 dx + 12ε Ld U T 
+
+> ε
+
+(Γ ε(s))  ≤
+
+ˆ
+
+> Ω
+
+|∇ gh(s)|2 dx + 12ε Ld U T 
+
+> ε
+
+(Γ ε(s)) ,
+
+Subtracting 12ε Ld U T 
+
+> ε
+
+(Γ ε(s))  then yields 
+
+ˆ
+
+> Ω
+
+|∇ uε(s) − γε(s)|2 dx ≤
+
+ˆ
+
+> Ω
+
+|∇ gh(s)|2 dx ≤ C∥g(s)∥2 
+
+> W2,∞(Ω ′)
+
+.
+
+Inserting this into (4.2), the proof is concluded. □
+
+Next, we address compactness of the pairs ( uε(t), γ ε(t)). We will employ multiple times the compact-ness result in SBV , due to Ambrosio [1, Theorem 4.8] which we recall in the appendix, see Theorem A.1. In particular, the convergence in (A.1) will be called SBV 2-convergence .To apply Theorem A.1, we need a bound on ∇uε(t). This, however, is not available due to the presence of the eigenstrain γε(t) in the elastic energy. As a workaround, following the ideas in [42], we will cut off the function approximately at the places where γε(t) has its support. A first attempt could be to simply cut off at either Γ ε(t) or at the neighborhood U T 
+
+> ε
+
+(Γ ε(t)), i.e., we could consider uε(t)1Ω′\Γεn (t) or 
+
+uε(t)1Ω′\U T 
+
+> ε(Γ ε(t))
+
+. However, to apply Ambrosio’s compactness result, we need to control the jump set, and bounds on ∂Γεn (t) or ∂U T 
+
+> ε
+
+(Γ ε(t)) are not immediately available. Therefore, we need to work with a related, but geometrically simpler object. For that matter, using the grid ε√d Zd we cover the reference configuration Ω ′ with sets of the form 
+
+Qyε = ε√d (y + (0 , 1) d), y ∈ Zd. For any t ∈ [0 , 1], we define Qε(t) := {Q ∈ Qyε : Γ ε(t) ∩ Q̸ = ∅ or Q̸ ⊂ Ω′}
+
+as the collection of cubes that intersect the ‘broken simplices’ or the boundary. Let Qε(t) := S 
+
+> Q∈Q ε(t)
+
+Q.EIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH 13 
+
+Note that by construction we have Γ ε(t) ⊂ Qε(t) ⊂ U T 
+
+> ε
+
+(Γ ε(t) ∪ ∂Ω′) and γε(τ ) ≡ 0 in ( Qε(t)) c for every 0 ≤ τ ≤ t, see (3.6). Moreover, we get # Qε(t) ≤ Ld(U T  
+
+> ε(Γ ε(t))) (ε/ √d)d
+
++ CΩ′ 
+
+> εd−1
+
+≤ 2C1d d 
+
+> 2
+> Gε d−1
+
++ CΩ′ 
+
+> εd−1
+
+due to the control on U T 
+
+> ε
+
+(Γ ε(t)) given by (4.1) and the fact that Ω ′ is a Lipschitz set. We can then estimate 
+
+Hd−1(∂Q ε(t)) ≤ 4C1d√dG + 2 dC Ω′ , (4.3) which is independent of h, ε and t. For later purposes, let us remark that the energy bound in Lemma 4.1 and the control on # Qε(t) obtained above imply 
+
+Ld U T 
+
+> ε
+
+(Γ ε(t))  → 0, Ld(Qε(t)) → 0 as ε → 0 for every t ∈ [0 , 1] . (4.4) Let us now consider an arbitrary sequence εn → 0 with corresponding sequence hn := h(εn) → 0. From now on, with abuse of notation, we will write un(t) := uεn (t), γn(t) := γεn (t), Qn(t) := Qεn (t), and Γn(t) := Γ εn (t). We also use Un(·) := Uεn (·), U T 
+
+> n
+
+(·) = U T 
+
+> εn
+
+(·), En(·) := Eεn (·), and gn := ghn .By means of Helly’s theorem and Theorem 2.1(b), up to passing to a subsequence (not relabeled), we can assume that 
+
+λn(t) := 12εn
+
+Ld  U T 
+
+> n
+
+(Γ n(t))  (4.5) converges to some increasing limiting function λ0 for all t ∈ [0 , 1]. We denote the discontinuity points of 
+
+λ0 by N0 and note that N0 is at most countable. For brevity, we define I∞,0 := I∞ ∪ N 0.With these preparations, we are now able to obtain a compactness result for the modifications 
+
+zn(t) := un(t)1(Qn(t)) c , t ∈ [0 , 1] , (4.6) when restricting to times in I∞,0.
+
+Lemma 4.2 (Compactness on I∞,0). There exists a subsequence of (εn)n (not relabeled) such that for all t ∈ I∞,0 there exists u(t) ∈ SBV 2(Ω ′), satisfying u(t) = g(t) on Ω′ \ Ω, with 
+
+un(t) → u(t) in L1(Ω ′), zn(t) → u(t) in SBV 2(Ω ′). (4.7) 
+
+In particular, for all t ∈ I∞,0, we have 
+
+ˆ
+
+> Ω
+
+|∇ u(t)|2 dx + GHd−1(Ju(t)) + ∥u(t)∥L∞(Ω ′) ≤ C1. (4.8) 
+
+Proof. Fix t ∈ I∞,0. This sequence ( zn(t)) n inherits the L∞-bound of un(t) given by (4.1). Concerning the gradient, by using Γ n(t) ⊂ Qn(t) and (2.9) we can estimate 
+
+ˆ
+
+> Ω
+
+|∇ zn(t)|2 dx ≤
+
+ˆ
+
+> Ω\Γn(t)
+
+|∇ un(t)|2 dx =
+
+ˆ
+
+> Ω
+
+|∇ un(t) − γn(t)|2 dx ≤ C1.
+
+Moreover, since un(t) is continuous for every εn, jumps of zn(t) can only occur along ∂Q n(t). Thus, in view of (4.3), we obtain Hd−1(Jzn(t)) ≤ C for a constant independent of t and n. By Theorem A.1 we thus find u(t) ∈ SBV 2(Ω ′) such that zn(t) → u(t) in SBV 2(Ω ′) along a not relabeled subsequence. With a diagonal argument, we are then able to find a joint subsequence for all t ∈ I∞,0 such that we have 
+
+zn(t) → u(t) in SBV 2(Ω ′) for all t ∈ I∞,0. The uniform bound on ( un(t)) n along with (4.4) also yields 
+
+un(t) → u(t) in L1(Ω ′). This also shows that the boundary values are still satisfied. Finally, we have 
+
+ˆ
+
+> Ω
+
+|∇ u(t)|2 dx + GHd−1(Ju(t)) + ∥u(t)∥L∞(Ω ′)
+
+≤ lim inf 
+
+> n→∞
+
+ˆ
+
+> Ω
+
+|∇ un(t) − γn(t)|2 dx + 12εn
+
+Ld U T 
+
+> n
+
+(Γ n(t))  + ∥un(t)∥L∞(Ω ′) ≤ C1,
+
+due to the Γ-liminf-inequality of [42, Theorem 5.1]. This concludes the proof. □14 B. DUONG AND M. FRIEDRICH 
+
+In Lemma 4.2 we have found limits for t ∈ I∞,0 for suitable modifications. Next, we discuss that the cut-off can be also done with the union of cubes Qn(t) at some later time t.
+
+Lemma 4.3. Let s ∈ I∞,0 and t ∈ [0 , 1] with s ≤ t. Then, it holds that 
+
+un(s)1(Qn(t)) c → u(s) in SBV 2(Ω ′).
+
+Proof. The function un(s)1(Qn(t)) c has the same bounds as in Lemma 4.2 which means that 
+
+un(s)1(Qn(t)) c → z (4.9) for some z ∈ SBV 2(Ω ′) and a not relabeled subsequence. Now, we can estimate 
+
+∥un(s)1(Qn(s)) c − un(s)1(Qn(t)) c ∥L2(Ω ′) ≤ ∥ un(s)∥L∞(Ω ′)Ld(Qn(t)) 12 ≤ C1Ld(Qn(t)) 12
+
+and with (4.4) we get that z − un(s)1(Qn(s)) c → 0 in L2(Ω ′). This along with (4.7) and (4.9) yields the result. □
+
+The next result addresses the unilateral stability property of the limiting evolution at times t ∈ I∞,0.For convenience, we introduce the notation Γ( t) := [ 
+
+> τ∈It
+> ∞,0
+
+Ju(τ ), (4.10) where It 
+
+> ∞,0
+
+:= {τ ∈ I∞,0 : τ ≤ t}.
+
+Theorem 4.4 (Stability result) . Let t ∈ I∞,0. Then for every ϕ ∈ SBV 2(Ω ′) with ϕ = g(t) on Ω′ \ Ω it holds that ˆ
+
+> Ω
+
+|∇ u(t)|2 dx ≤
+
+ˆ
+
+> Ω
+
+|∇ ϕ|2 dx + Hd−1 (Jϕ \ Γ( t)) . (4.11) The proof is delicate and the most original part of the paper. It is deferred to Section 5 below. We now summarize the results already found and derive a limit for the broken simplices. We recall the functions 
+
+λn defined in (4.5) as well as their pointwise limit λ0 obtained by Helly’s theorem. 
+
+Lemma 4.5. It holds that 
+
+λ0(t) ≥ H d−1 (Γ( t)) for all t ∈ [0 , 1] .Proof. We start with a preliminary observation. Given any open set V ⊂ Ω′, the Γ-liminf inequality of [42, Theorem 5.1] along with (4.7) implies that 
+
+Hd−1(Ju(s) ∩ V ) ≤ lim inf 
+
+> n→∞
+
+12εn
+
+Ld U T 
+
+> n
+
+({γn(s)̸ = 0 }) ∩ V  for all s ∈ I∞,0. (4.12) Therefore, given any number of points ( si)Ni ⊂ It 
+
+> ∞,0
+
+and μ > 0 arbitrary, we can apply [28, Lemma A.3] to find open, pairwise disjoint sets ( Vi)Ni=1 in Ω ′ such that 
+
+Hd−1 N[
+
+> i=1
+
+Ju(si)
+
+
+
+− μ ≤
+
+> N
+
+X
+
+> i=1
+
+Hd−1 Ju(si) ∩ Vi
+
+ ≤
+
+> N
+
+X
+
+> i=1
+
+lim inf 
+
+> n→∞
+
+12εn
+
+Ld U T 
+
+> n
+
+({γn(si)̸ = 0 }) ∩ Vi
+
+.
+
+Then, recalling that {γn(τ )̸ = 0 } ⊂ Γn(t) for all τ ≤ t, see (3.6), and using (4.5), we derive 
+
+Hd−1 N[
+
+> i=1
+
+Ju(si)
+
+
+
+− μ ≤ lim inf 
+
+> n→∞
+
+12εn
+
+Ld U T 
+
+> n
+
+(Γ n(t))  = λ0(t).
+
+Exhausting It 
+
+> ∞,0
+
+by sending N → ∞ and recalling that μ > 0 was arbitrary, the proof is concluded. □EIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH 15 
+
+Next, we concern ourselves with the extension of the displacement fields onto the entire time interval. This is achieved by a limit from below, namely for each t / ∈ I∞,0 we choose a sequence ( tn)n ⊂ I∞,0 with 
+
+tn ↗ t, and we define 
+
+u(t) := lim  
+
+> n→∞
+
+u(tn),
+
+where the limit has to be understood in the SBV 2-sense. For this type of extension, in [24, Lemma 3.8] it has been shown that the following properties hold. 
+
+Theorem 4.6. For every t ∈ [0 , 1] , we have u(t) ∈ SBV 2(Ω ′) with u(t) = g(t) on Ω′ \ Ω such that 
+
+∇u ∈ L∞([0 , 1]; L2(Ω ′; Rd)) and ∇u is left continuous in [0 , 1] \ I∞,0 with respect to the strong L2(Ω ′; Rd)-topology. Additionally, with Γ as defined as in (4.10), the following properties hold: 
+
+(i) for all t ∈ [0 , 1] ,
+
+Ju(t) ˜⊂ Γ( t) (4.13) 
+
+and for λ0 as in Lemma 4.5 we have 
+
+λ0(t) ≥ GHd−1(Γ( t)) . (4.14) (ii) for all ¯u ∈ SBV 2(Ω ′) with ¯u = g(0) on Ω′ \ Ω
+
+ˆ
+
+> Ω
+
+|∇ u(0) |2 dx + Hd−1(Ju(0) ) ≤
+
+ˆ
+
+> Ω
+
+|∇ ¯u|2 dx + Hd−1(J¯u). (4.15) (iii) for all t ∈ (0 , 1] and for all ¯u ∈ SBV 2(Ω ′) with z = g(t) on Ω′ \ Ω
+
+ˆ
+
+> Ω
+
+|∇ u(t)|2 dx ≤
+
+ˆ
+
+> Ω
+
+|∇ ¯u|2 dx + Hd−1(J¯u \ Γ( t)) . (4.16) 
+
+Finally, 
+
+E(t) ≥ E (0) + 2 
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Ω
+
+∇u(s) · ∂t∇g(s) d x ds, (4.17) 
+
+where 
+
+E(t) := 
+
+ˆ
+
+> Ω
+
+|∇ u(t)|2 dx + Hd−1(Γ( t)) . (4.18) The proof is similar to the one in [29, Propostion 5.9], fundamentally based on the stability result in Theorem 4.4. We sketch it in Appendix A. We come to a final preliminary result before proving Theorem 2.3. It extends the compactness result of displacements given in Lemma 4.2 to general times. 
+
+Lemma 4.7 (Compactness of displacements) . For every t ∈ [0 , 1] , we have that 
+
+∇zn(t) ⇀ ∇u(t) weakly in L2(Ω; Rd).
+
+The proof essentially follows the lines of the proof in [29, Proposition 5.10], by combining the minimality property in Theorem 4.4 with Lemma 4.3 and Theorem 4.6. We defer it to Appendix A. We are now able to conclude the proof of Theorem 2.3. 
+
+Proof of Theorem 2.3. Let εn → 0 be the sequence given by Lemma 4.2, and define the corresponding sequence hn := h(εn) → 0. In view of the results given in Lemma 4.5 and Theorem 4.6, we see that 
+
+t 7 → (u(t), Γ( t)) is a quasi-static crack evolution in the sense of Definition 2.2, except for one inequality in the energy balance. Thus, to conclude it remains to prove 
+
+E(t) ≤ E (0) + 2 
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Ω
+
+∇u(s) · ∂t∇g(s) d x ds, (4.19) and the convergence properties stated in Theorem 2.3. 16 B. DUONG AND M. FRIEDRICH 
+
+We defer the proof of (i) to the end and start with (4.19) and (ii). As En(·, ·, ∅) defined in (2.6) Γ-converges to E defined in (2.4), see [42, Theorem 5.1] and the subsequent remark therein on the incorporation of boundary conditions, the minimality properties given in Theorem 2.1(i) and Definition 2.2(i) imply that lim n→∞ En(un(0) , γ n(0) , ∅) = E(u(0)). Using the definition of Γ n(0), Γ(0), and E(0) in (4.18), this yields lim  
+
+> n→∞
+
+En(un(0) , γ n(0) , Γn(0)) = E(0) . (4.20) For s ∈ [0 , 1], since γn(s) ≡ 0 on Ω \ Γn(s) and γn(s) = ∇un(s) on Γ n(s), see (3.6), we can split the energy into the two parts 
+
+ˆ
+
+> Ω
+
+(∇un(s) − γn(s)) · ∂t∇gn(s) d x
+
+=
+
+ˆ
+
+> Ω\Qn(s)
+
+(∇un(s) − γn(s)) · ∂t∇gn(s) d x +
+
+ˆ
+
+> Qn(s)
+
+(∇un(s) − γn(s)) · ∂t∇gn(s) d x
+
+=
+
+ˆ
+
+> Ω\Qn(s)
+
+∇un(s) · ∂t∇gn(s) d x +
+
+ˆ
+
+> Qn(s)\Γn(s)
+
+∇un(s) · ∂t∇gn(s) d x, 
+
+(4.21) where we used that Γ n(s) ⊂ Qn(s). We want to show that the second term vanishes for n → ∞ . By H¨ older’s inequality and (4.1) it holds that 
+
+ˆ
+
+> Qn(s)\Γn(s)
+
+∇un(s) · ∂t∇gn(s) d x ≤ C 12
+
+> 1
+
+ˆ
+
+> Qn(s)\Γn(s)
+
+|∂t∇gn(s)|2 dx
+
+! 12
+
+.
+
+After taking the integral in time, we see that 
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Qn(s)\Γn(s)
+
+∇un(s) · ∂t∇gn(s) d x ds ≤ C
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Qn(s)
+
+|∂t∇gn(s)|2 dx
+
+! 
+
+> 12
+
+ds
+
+vanishes for n → ∞ due to the regularity properties of g and Ld(Qn(s)) → 0, see (4.4). Recall the definition in (4.6). As ∇zn(s) ⇀ ∇u(s) weakly in L2(Ω; Rd) for s ∈ [0 , 1] by Lemma 4.7, and ∂t∇gn(s) → ∂t∇g(s) strongly in L2(Ω; Rd) for a.e. s ∈ [0 , 1], we deduce by (4.4) lim 
+
+> n→∞
+
+ˆ
+
+> Ω\Qn(s)
+
+∇un(s) · ∂t∇gn(s) d x =
+
+ˆ
+
+> Ω
+
+∇u(s) · ∂t∇g(s) d x
+
+for a.e. s ∈ [0 , 1]. By (4.21), (4.1), and the dominated convergence theorem we thus get, for all t ∈ [0 , 1], lim 
+
+> n→∞
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Ω
+
+(∇un(s) − γn(s)) · ∂t∇gn(s) d x ds =
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Ω
+
+∇u(s) · ∂t∇g(s) d x ds. (4.22) This combined with Lemma 3.4 and (4.20) implies lim  
+
+> n→∞
+
+En(un(t), γ n(t), Γn(t)) = E(0) + 2 
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Ω
+
+∇u(s) · ∂t∇g(s) d x ds for all t ∈ [0 , 1]. (4.23) Then, using ∇zn(t) ⇀ ∇u(t) weakly in L2(Ω; Rd) for every t ∈ [0 , 1] (see Lemma 4.7) and Lemma 4.5 we get 
+
+E(t) ≤ lim inf  
+
+> n→∞
+
+En(un(t), γ n(t), Γn(t)) = E(0) + 2 
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Ω
+
+∇u(s) · ∂t∇g(s) d x ds for all t ∈ [0 , 1]. (4.24) This shows (4.19). Now, (2.14) along with (4.23) shows the energy convergence stated in (ii). Concerning (iii), with (4.6) and Lemma 4.7 we get lim inf 
+
+> n→∞
+
+ˆ
+
+> Ω
+
+|∇ un(s) − γn(s)|2 dx ≥ lim inf 
+
+> n→∞
+
+ˆ
+
+> Ω
+
+|∇ zn(s)|2 dx ≥
+
+ˆ
+
+> Ω
+
+|∇ u(s)|2 dxEIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH 17 
+
+for every s ∈ [0 , 1] by a lower-semicontinuity argument. Additionally, (4.14) and the definition in (4.5) give lim inf 
+
+> n→∞
+
+12εn
+
+Ld U T 
+
+> n
+
+(Γ n(s))  ≥ H d−1(Γ( s)) .
+
+As the sum of the left-hand sides is equal to the sum of the right-hand sides by (ii), both inequalities are actually equalities. Thus, the statement of (iii) holds for all s ∈ [0 , 1]. We continue with proving (iv). Considering any open set V ⊂ Ω′ and s ∈ [0 , 1], and repeating the reasoning in the proof of Lemma 4.5 (see (4.12)) on V , we get lim inf 
+
+> n→∞
+
+12εn
+
+Ld U T 
+
+> n
+
+(Γ n(t)) ∩ V  ≥ H d−1(Γ( s) ∩ V ). (4.25) Given any A ⊂ Ω′ with Hd−1(∂A ∩ Γ( s)) = 0, by applying (4.25) for V = A and V = Ω ′ \ A and using the convergence of the surface energy given in (iii) we conclude 12εn
+
+Ld U T 
+
+> n
+
+(Γ n(t)) ∩ A = Hd−1(Γ( s) ∩ A).
+
+The fact that this holds for all A with Hd−1(∂A ∩ Γ( s)) = 0 shows (iv). It remains to prove (i). For that matter, we first note that by definition Hd−1(Γ( t)) can only be discontinuous for t ∈ I∞,0. Now we repeat the proof of Lemma 4.2 for given t ∈ [0 , 1] \ I∞,0 to find ˆu(t) ∈ SBV 2(Ω ′) such that un(t) → ˆu(t) in L1(Ω ′) and zn(t) → ˆu(t) in SBV 2(Ω ′) along a not relabeled subsequence depending on t. Note that ˆ u(t) = g(t) on Ω ′ \ Ω. Additionally, for τ ∈ I∞,0, τ < t , repeating the lower-semicontinuity argument in the proof of Lemma 4.5, we get 
+
+Hd−1(Jˆu(t) ∪ Γ( τ )) ≤ lim inf 
+
+> n→∞
+
+12εn
+
+Ld U T 
+
+> n
+
+({γn(t)̸ = 0 } ∪ Γn(τ ))  ≤ 12εn
+
+lim inf  
+
+> n→∞
+
+Ld U T 
+
+> n
+
+(Γ n(t)) ,
+
+where we used {γn(t)̸ = 0 } ∪ Γn(τ ) ⊂ Γn(t). Then, continuity of Hd−1(Γ( ·)) at t leads to 
+
+Hd−1(Jˆu(t) ∪ Γ( t)) ≤ 12εn
+
+lim inf  
+
+> n→∞
+
+Ld U T 
+
+> n
+
+(Γ n(t)) .
+
+This together with (iii) yields Jˆu(t) ⊂ Γ( t) up to a Hd−1-null set. It suffices to show that u(t) = ˆ u(t) on 
+
+G(t) as then the statement follows from Urysohn’s principle. To see this, we observe that by Lemma 4.7 we have ∇zn(t) ⇀ ∇u(t) weakly in L2(Ω; Rd) which along with zn(t) → ˆu(t) in SBV 2(Ω ′) shows that 
+
+∇u(t) = ∇ˆu(t) on Ω ′. This yields that u(t) − ˆu(t) is a piecewise constant function whose jump set is contained in Γ( t). As u(t) − ˆu(t) = 0 on Ω ′ \ Ω, we get u(t) − ˆu(t) = 0 on G(t) by the definition of G(t), see [28, Proof of Theorem 2.2, Step 2] for the precise argument. □
+
+5. The stability result 
+
+This section is devoted to the proof of Theorem 4.4. The key method is a jump set transfer in the spirit of [24]. 
+
+A density result . We start by observing that it suffices to prove the statement for functions ϕ with more regularity, employing a suitable density argument. Let W(Ω ′) ⊂ SBV (Ω ′) be the set of functions v with closed jump set Jv , which is included in a finite union of closed and connected pieces of C1-hypersurfaces, and with v ∈ W 2,∞(Ω ′ \ Jv ). For each v ∈ SBV 2(Ω ′) with v = g(t) on Ω ′ \ Ω we can choose a sequence (vk)k ⊂ W (Ω ′) with vk = g(t) on Ω ′ \ Ω such that 
+
+vk → v strongly in L1(Ω) ,
+
+∇vk → ∇ v strongly in L2(Ω; Rd),
+
+lim sup 
+
+> k→∞
+
+Hd−1(Jvk △Jv ) = 0 . (5.1) 18 B. DUONG AND M. FRIEDRICH 
+
+This follows as explained in [26, Beginning of Section 5], see also [28, Theorem 3.2] for an analogous statement and proof for GSBD -functions. Equipped with this result, it suffices to construct a recovery sequence for ϕ ∈ W (Ω ′) with ϕ = g(t) on Ω′ \ Ω. Furthermore, fixing θ > 0, we only need to find a sequence of pairs ( ϕn, γ ϕn ) ∈ Vhn (Ω ′) × Whn (Ω ′)with ϕn = gn(t) and γϕn = 0 on Ω ′ \ Ω such that lim  
+
+> n→∞
+
+∥(∇ϕn − γϕn ) − ∇ ϕ∥L2(Ω) ≤ Cθ, 
+
+lim sup 
+
+> n→∞
+
+12εn
+
+Ld  U T 
+
+> n
+
+({γϕn̸ = 0 }) \ U T 
+
+> n
+
+(Γ n(t))  ≤ H d−1(Jϕ \ Ju(t)) + Cθ. (5.2) Then, the statement in (4.11) follows by a suitable diagonal argument, sending k → ∞ (for a sequence as in (5.1)) and θ → 0, by using also the minimality (2.10) in the time-discrete problems. More precisely, subtracting the surface term, (2.10) implies 
+
+ˆ
+
+> Ω
+
+|∇ un(t) − γn(t)|2 dx ≤
+
+ˆ
+
+> Ω
+
+|∇ ϕn − γϕn |2 dx + 12εn
+
+Ld  U T 
+
+> n
+
+({γϕn̸ = 0 }) \ U T 
+
+> n
+
+(Γ n(t))  ,
+
+and then we also use lower semicontinuity for the elastic energy based on (4.7). From now on, fix ϕ ∈ W (Ω ′) with ϕ = g(t) on Ω ′ \ Ω. For simplicity we only treat the case that 
+
+H1(Jϕ ∩ ∂D Ω) = 0 (no jump along the boundary), for the general case follows by minor adaptations of the construction at the boundary (see [24]) which would merely overburden notation in the sequel. 
+
+Besicovitch covering . For the construction of ( ϕn)n, the idea is to transfer the jump set of ϕ onto the one of un(t)1Γn(t). The first step is to cover the jump set of ϕ with by following the procedure in [24, Section 2]. We define Et to be the set of all Lebesgue-density 1 points for {x ∈ Ω : u(x) > t } with u := u(t) and 
+
+Ent to be the set of all Lebesgue-density 1 points for {x ∈ Ω : yn(x) > t }, where yn := un(t)1(Γ n(t)) c . We can choose a subset Gj ⊂ Ju like in [24, Equation (2.2)], consisting of the points with jump height larger than 1 /j , such that 
+
+Hd−1(Ju \ Gj ) ≤ θ. 
+
+For every x ∈ Gj ∩ Jϕ, we consider closed cubes Qr (x) with sidelength 2 r and two faces normal to the unit normal vector νϕ(x) at Jϕ. For Hd−1-a.e. x ∈ Jϕ \ Ju, we also consider such cubes Qr (x), for r
+
+sufficiently small such that 
+
+Hd−1(Ju ∩ Qr (x)) ≤ θr d−1. (5.3) Here we use that Ju has Hd−1-density zero Hd−1-a.e. in Jϕ \ Ju. Since Jϕ is contained in a finite union of closed C1-hypersurfaces, for Hd−1-a.e. x ∈ Jϕ we can choose the above cubes such that, possibly upon passing to a smaller r, we have 
+
+rd−1 ≤ 2Hd−1(Jϕ ∩ Qr (x)) (5.4) 
+
+Jϕ ∩ Qr (x) ⊂ { y ∈ Rd : |(y − x) · νϕ(x)| ≤ θr }. (5.5) With this construction, we obtain a fine cover of Ξ := ( Gj ∩ Jϕ) ∪ (Jϕ \ Ju), to which we can apply the Besicovitch covering theorem with respect to the Radon measure Ld + Hd−1|Ju . For θ > 0, we can therefore find a finite and disjoint subcollection B := ( Qri (xi)) i, or short ( Qi)i, such that the cubes satisfy the above conditions, as well as 
+
+Ld [ 
+
+> B
+
+Qi
+
+
+
+≤ θ2, Hd−1 Ξ \ [
+
+> B
+
+Qi
+
+ ≤ θ. (5.6) EIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH 19 
+
+Here and in the following, we use S 
+
+> B
+
+Qi as a shorthand notation for S  
+
+> Qri(xi)∈B
+
+Qri (xi). By H¨ older’s inequality and (5.3) this implies 
+
+ˆ 
+
+> S
+> BQi
+
+|∇ u| dx ≤ Cθ, Hd−1 Jϕ \ [
+
+> B
+
+Qi
+
+ ≤ 2θ. (5.7) Without further notice, we will frequently use the fact that the cubes are pairwise disjoint. By Bgood ⊂ B 
+
+we denote the collection of cubes Qi with xi ∈ Jϕ \ Ju and similarly we let Bbad ⊂ B be the collection of all cubes Qi with xi ∈ Jϕ ∩ Gj . We have B = Bgood ∪ B bad , and we also define the set 
+
+Bbad = [
+
+> Bbad
+
+Qi.
+
+Good cubes . On the good cubes, by (5.3)–(5.4) we get 
+
+[
+
+> Qi∈Q good
+
+Hd−1(Ju ∩ Qi) ≤ θHd−1(Jϕ) ≤ Cθ. (5.8) For convenience but with a slight abuse of notation, from now on we will only consider bad cubes whenever taking sums or unions. In particular, we write S 
+
+> i
+
+Qi = Bbad .
+
+Bad cubes: jump transfer . Recall that Jyn ⊂ ∂Γn(t). Using the methods in [24, Proof of Theorem 2.1], we can choose ti ∈ R (depending on n) such that 
+
+X 
+
+> i
+
+Hd−1 (∂∗Enti ∩ Qi) \ Jyn
+
+ ≤ θd+1 (5.9) for all n ∈ N, see [24, Equation (2.7)] for details. This can be done in such a way that (up to a sign) 
+
+ν(xi) := νϕ(xi) is the outward normal of ∂∗Eti at x. Setting Hi(s) := {y ∈ Qi : ( y − xi) · ν(xi) = s}, one can choose s± 
+
+> n,i
+
+such that H± 
+
+> n,i
+
+:= Hi(s±
+
+> n,i
+
+) satisfies 
+
+
+
+Hd−1(H− 
+
+> n,i
+
+\ Enti ) + Hd−1(H− 
+
+> n,i
+
+\ Eti ) ≤ 8θd+1 (2 ri)d−1
+
+Hd−1(H+ 
+
+> n,i
+
+∩ Enti ) + Hd−1(H+ 
+
+> n,i
+
+∩ Eti ) ≤ 8θd+1 (2 ri)d−1
+
+dist( H±
+
+> n,i
+
+, H i) ∈ [ θ 
+
+> 2
+
+ri, θr i],
+
+(5.10) see [24, Equation (2.10)–(2.11)] for details. (± stands as a placeholder for + and −.) We denote the rectangle between H− 
+
+> n,i
+
+and H+ 
+
+> n,i
+
+inside of Qi by Rn,i .Note that by (5.5) we get 
+
+Hd−1(Gj \ Rn,i ) = 0 . (5.11) The basic idea in [24] consists in transferring the jump of ϕ onto ∂∗Enti , which by (5.9) lies almost entirely in Jyn . It also cuts off ∂∗Enti at Rn,i , such that the only jump within Qi occurs in Rn,i . We will alter some arguments in their produce to suitable adapt to the eigenfracture setting. The first aspect in this direction is that, although Hd−1(S 
+
+> i
+
+∂∗Enti ∩ Qi \ Jyn ) is small thanks to (5.9), its neighborhood, being a relevant quantity in the energy (2.6), could be large. To solve this problem, we introduce a suitable notion of separation. For a fixed cube Qi, we define the precrack Ψni, pre := Jyn ∩ Qi.Let D+ 
+
+> n,i
+
+and D− 
+
+> n,i
+
+be the two connected components of Qi \ Rn,i . We say that a closed set Φ ⊂ Qi with 
+
+Hd−1(Φ) < +∞ is separating if D+ 
+
+> n,i
+
+and D− 
+
+> n,i
+
+are contained in two different connected components of 
+
+Qi \ Φ. Let Φ ni ⊂ Qi be such that Φ ni ∪ Ψni, pre is separating. We suppose that Φ ni is chosen minimal in the sense that 
+
+Hd−1(Φ ni ) ≤ H d−1(Φ ′) for all Φ ′ ⊂ Qi such that Φ ′ ∪ Ψni, pre is separating . (5.12) See Figure 1 for an illustration in 2d and Figure 3 for an explanation why we consider a separation in this sense. Note that ∂∗(( Enti ∪ D−
+
+> n,i
+
+) \ D+
+
+> n,i
+
+) is separating with 
+
+Hd−1 ∂∗(( Enti ∪ D−
+
+> n,i
+
+) \ D+
+
+> n,i
+
+) \ Jyn
+
+ ≤ H d−1(( ∂∗Enti ∩ Qi) \ Jyn ) + Hd−1(H− 
+
+> i
+
+\ Enti ) + Hd−1(H+ 
+
+> i
+
+∩ Enti ).20 B. DUONG AND M. FRIEDRICH 
+
+Rni
+
+∂∗Enti ∩ Jyn
+
+∂∗Enti \ Jyn
+
+Rni
+
+∂∗Enti ∩ Jyn
+
+Φni
+
+Figure 1. First Picture: Qi with the blue triangles belonging to Γ n(t). Second picture: a possible ∂∗Enti . Third picture: the resulting Φ ni .Thus, in view of (5.12), by summing over all i (meaning all bad cubes) we get 
+
+X
+
+> i
+
+Hd−1(Φ ni ) ≤ X
+
+> i
+
+Hd−1 (∂∗(( Enti ∪ D+
+
+> n,i
+
+) \ D−
+
+> n,i
+
+)) \ Jyn
+
+ ≤ Cθ d+1 , (5.13) where we have used (5.4), (5.9), and the first and second inequality in (5.10). Here, the constant C
+
+depends also on Hd−1(Ju). 
+
+Definition of the competitors. For every cube Qi ∈ Q bad , we now define Ψ ni := Ψ ni, pre ∪ Φni , with Φ ni
+
+chosen minimally as above. As Ψ ni splits Qi into two parts, let us denote the part that contains D± 
+
+> n,i
+
+by 
+
+L±
+
+> n,i
+
+. Then, we can define the function ϕ′ 
+
+> n,i
+
+which inside of Qi exhibits discontinuities only on Ψ ni . This is achieved by employing the reflection argument in [24], see particularly [24, below Equation (2.14)]. We first define ϕ− 
+
+> n,i
+
+:= ϕχ Q−  
+
+> i\Rn,i
+
+, extended to Rn,i by reflection, where Q− 
+
+> i
+
+= {y ∈ Qi : ( y − xi) · ν(xi) ≤ 0}.We proceed similarly for ϕ+
+
+> n,i
+
+. Now, we define 
+
+ϕ′ 
+
+> n,i
+
+:= 
+
+(
+
+ϕ− 
+
+> n,i
+
+on L−
+
+> n,i
+
+,ϕ+ 
+
+> n,i
+
+on L+
+
+> n,i
+
+. (5.14) By this construction we particularly get, for all Qi ∈ Q bad ,
+
+∥∇ ϕ′
+
+> n,i
+
+∥L∞(Qi) ≤ C∥∇ ϕ∥L∞(Ω ′), (5.15) 
+
+Jϕ′ 
+
+> n,i
+
+⊂ Ψni ∪ (∂Q i ∩ Rn,i ), (5.16) where for (5.16) we used (5.11). We are now ready to define the sequence ϕn appearing in (5.2). First, we define an auxiliary function ϕ′ 
+
+> n
+
+which is defined as ϕ′ 
+
+> n
+
+= ϕ′ 
+
+> n,i
+
+in each bad cube Qi ∈ Q bad and ϕ′ 
+
+> n
+
+= ϕ
+
+everywhere else. Then, the function ϕn ∈ Vhn (Ω ′) denotes the continuous, piecewise affine interpolation of ϕ′ 
+
+> n
+
+with respect to Thn . By construction, we have Jϕ′ 
+
+> n
+
+= Jϕ outside of Bbad , whereas inside Bbad we have Jϕ′ 
+
+> n
+
+⊂ S 
+
+> i
+
+Ψni ∪ (∂Q i ∩ Rn,i ). Our next task is to define a suitable γϕn with the following properties: The support of γϕn should cover the simplices with high strain induced by the interpolation of ϕn but, at the same time, the volume of these simplices should asymptotically still have the same size as Γ n(t) in the limit n → ∞ .Let us collect all such simplices. In the bad cubes Qi, all simplices intersecting Ψ ni are collected in 
+
+△n, bad  
+
+> i
+
+, and further we collect all simplices intersecting ∂Q i ∩ Rn,i (which are two ( d − 1)-dimensional cuboids in ∂Q i) by △n, lat  
+
+> i
+
+. We also define △n, bad = S 
+
+> i
+
+△n, bad  
+
+> i
+
+and △n, lat = S 
+
+> i
+
+△n, lat  
+
+> i
+
+. All simplices intersecting Jϕ which are not contained in △n, bad ∪ △ n, lat are collected in the set △n, good . Therefore, we EIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH 21 
+
+have 
+
+△n, good ∩ Bbad = ∅. (5.17) The challenge is that we have no immediate control on the simplices △n, bad , but some delicate covering arguments are necessary to bound their number. Since our construction also introduces jumps along a part of the lateral boundary ∂Q i ∩ Rn,i , we will also need a control on # △n, lat  
+
+> i
+
+to estimate their contribution. We further define △ni := △n, bad  
+
+> i
+
+∪ △ n, lat  
+
+> i
+
+as well as △n := △n, bad ∪ △ n, lat ∪ △ n, good and set 
+
+γϕn := ∇ϕn1△n . (5.18) Taking (5.16) into account, this construction ensures 
+
+Jϕ′ 
+
+> n
+
+⊂ △ n. (5.19) We now separately control the three collections of simplices △n, good , △n, lat , and △n, bad .
+
+Lateral simplices. Note that, by (5.4) and (5.10), it holds that 
+
+Ld [ 
+
+> i
+
+U2εn (Rn,i ∩ ∂Q i)
+
+
+
+≤ Cθε n. (5.20) 
+
+Good simplices. Recall that we assumed that Jϕ consists of finitely many C1-hypersurfaces. Thus, recalling (2.3), we get 12εn
+
+Ld (Uεn+hn (Jϕ \ Bbad )) → H d−1 (Jϕ \ Bbad ) , (5.21) where we exploit that the ( d − 1)-dimensional Minkowski content of regular sets coincides with their 
+
+Hd−1-measure. 
+
+Bad simplices. Observe that all simplices that are included in Γ n(t) do not increase the surface energy of the competitor at all, cf. (2.10). Below in Corollary 5.2 we will see that one can actually replace Γ n(t)by Uln (Γ n(t)), ln := θε n + hn, without significantly increasing the energy. Recalling that in every bad cube Qi we have the curve Ψ ni = Ψ ni, pre ∪Φni with Ψ ni, pre = Jyn ∩Qi ⊂ Γn(t)∩Qi, it is therefore meaningful to split the curve Ψ ni into the parts Φ n, new  
+
+> i
+
+:= Φ ni \ Uln (Γ n(t)) and Ψ n, cur  
+
+> i
+
+:= Ψ ni ∩ Uln (Γ n(t)). We also let Φ n, new = S 
+
+> i
+
+Φn, new  
+
+> i
+
+and Φ n, cur = S 
+
+> i
+
+Φn, cur  
+
+> i
+
+. Additionally, we split the set △n, bad  
+
+> i
+
+into the sets △n, cur  
+
+> i
+
+and △n, new  
+
+> i
+
+, where △n, cur  
+
+> i
+
+denotes all simplices △n, cur  
+
+> i
+
+⊂ △ n, bad  
+
+> i
+
+intersecting Uln (Γ n(t)) and △n, new  
+
+> i
+
+=: △n, bad  
+
+> i
+
+\ △ n, cur  
+
+> i
+
+. As △n, bad  
+
+> i
+
+was defined as all the triangles intersecting Ψ ni , we know by construction that for every simplex T ⊂ △ n, new 
+
+> i
+
+̸ = ∅, we have T ∩ Φn, new 
+
+> i
+
+̸ = ∅. We also set △n, new := S 
+
+> i
+
+△n, new  
+
+> i
+
+and △n, cur := S 
+
+> i
+
+△n, cur  
+
+> i
+
+. In Figure 2, we illustrate Uln (Γ n(t)) as well as △n, cur and △n, new .We begin with a lemma that controls the passage to larger neighborhoods. This will allow us to control 
+
+Uεn+2 θε n (Γ n(t)). In the sequel, by Br (x) we denote the closed ball with center x and radius r.
+
+Lemma 5.1 (Increasing the neighborhood) . Given some set V ⊂ Rd and r > 0, we suppose that the 
+
+r-neighborhood Ur (V ) of V satisfies Ld(Ur (V )) < ∞. Then, we find a constant C > 0 only depending on the dimension d such that for arbitrary r′ > 0 the r + r′-neighborhood satisfies 
+
+Ld(Ur+r′ (V )) ≤ CLd(Ur (V )) 
+
+ r + r′
+
+r
+
+d
+
+. (5.22) 
+
+We also have 
+
+Ld Ur+r′ (V ) \ Ur (V ) ≤ CLd(Ur (V )) (r + r′)d − rd
+
+rd . (5.23) 
+
+Proof. Define B := {Br (x) : x ∈ V }. It holds that S  
+
+> Br(x)∈B
+
+Br (x) = Ur (V ). With the Besicov-itch covering theorem, we can find D = D(d) ∈ N countable and disjoint subsets Ci ⊂ B such that 22 B. DUONG AND M. FRIEDRICH 
+
+Figure 2. For both figures: blue curve Ψ ni, pre , magenta curve Φ ni , blue triangles △ni ∩
+
+Γn(t), orange triangles △ni \Γn(t), and green zones Uln (Γ n(t)). First figure: continuation of Figure 1, where Uln (Γ n(t)) completely covers △ni , i.e., △ni = △n, cur  
+
+> i
+
+. Second figure: there are orange triangles that are not covered by Uln (Γ n(t)), i.e., △n, new 
+
+> i
+
+̸ = ∅.
+
+SDi=1 
+
+S  
+
+> Br(x)∈C i
+
+Br (x) = Ur (V ). We also define the sets of centers Mi := {x : Br (x) ∈ C i}, as well as 
+
+S := ( r+r′ 
+
+> r
+
+)d and Sadd := (r+r′)d−rd 
+
+> rd
+
+.We fix i = 1 , . . . , D . First, we note that # Ci ≤ Ld(Ur (V ))   
+
+> Ld(Br(0))
+
+. By scaling we have the relation Ld(Br (x)) = 
+
+S−1Ld(Br+r′ (x)) for all x ∈ Rd. Since the subcollection Ci is disjoint, we can estimate 
+
+Ld(B′
+
+> i
+
+) = Ld [ 
+
+> x∈Mi
+
+Br+r′ (x)
+
+
+
+≤ X
+
+> x∈Mi
+
+Ld(Br+r′ (x)) = SLd [ 
+
+> x∈Mi
+
+Br (x)
+
+
+
+= SLd(Bi),
+
+where we define Bi := S 
+
+> x∈Mi
+
+Br (x) and B′ 
+
+> i
+
+:= S 
+
+> x∈Mi
+
+Br+r′ (x). Letting also Badd  
+
+> i
+
+:= B′ 
+
+> i
+
+\ Bi, we can estimate 
+
+Ld(Badd  
+
+> i
+
+) ≤ #Ci
+
+ Ld(Br+r′ (0)) − L d(Br (0))  ≤ Sadd Ld(Bi),
+
+where we used that Bi ⊂ B′
+
+> i
+
+. Then, summing over i = 1 , . . . , D we derive 
+
+Ld
+
+> D
+
+[
+
+> i=1
+
+B′
+
+> i
+
+!
+
+≤ DS Ld(Ur (V )) ,
+
+as well as 
+
+Ld
+
+> D
+
+[
+
+> i=1
+
+B′ 
+
+> i
+
+\ Ur (V )
+
+!
+
+≤ L d
+
+> D
+
+[
+
+> i=1
+
+B′ 
+
+> i
+
+\ Bi
+
+!
+
+= Ld
+
+> D
+
+[
+
+> i=1
+
+Badd 
+
+> i
+
+!
+
+≤ DS add Ld(Ur (V )) .
+
+Now, to conclude, it suffices to show that SDi=1 B′ 
+
+> i
+
+⊃ Ur+r′ (V ). For this matter, fix an arbitrary point 
+
+x ∈ Ur+r′ (V ). By definition, there has to be a point y ∈ V such that |y − x| ≤ r + r′. We define l to be the line connecting x and y and define x′ := l ∩ ∂U r (V ) as the crossing point of l and ∂U r (V ). As dist( x′, V ) = r, we note that |x − x′| ≤ r′. Since x′ ∈ Ur (V ), there exists z ∈ V and a collection Ci
+
+such that Br (z) ∈ C i and x′ ∈ Br (z). Then, with the triangle inequality we can deduce that |x − z| ≤ |x − x′| + |x′ − z| ≤ r + r′, which means that x ∈ Br+r′ (z) and therefore x ∈ SDi=1 B′
+
+> i
+
+. This concludes the proof. □
+
+Recall the neighborhood U T 
+
+> n
+
+(·) = U T 
+
+> εn,h n
+
+(·) introduced before (2.2). EIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH 23         
+
+> ΨniΦni
+> ∂∗Enti\Jyn
+> UT
+> n(∂∗Enti\Jyn)
+
+Figure 3. An example in d = 3, where (5.26) does not hold for ∂∗Enti \ Jyn in place of Φ ni since ∂∗Enti \ Jyn (in green) has a small surface. Yet, the set has big diameter, and therefore the volume of U T 
+
+> n
+
+(∂∗Enti \ Jyn ) (in orange) is of order εn. Consequently, in order to guarantee the estimate in Corollary 5.4, we need to replace ∂∗Enti \ Jyn by Φ ni
+
+(in red), as defined in (5.12). 
+
+Corollary 5.2. There exists a constant C > 0 only depending on g and d such that, for all t ∈ [0 , 1] and 
+
+n ∈ N, it holds that 
+
+Ld  Uεn+2 θε n (Γ n(t)) \ U T 
+
+> n
+
+(Γ n(t))  ≤ Cθε n. (5.24) 
+
+Additionally, for n large enough, we have 
+
+U T 
+
+> n
+
+(Uln+hn (Γ n(t))) ⊂ Uεn+2 θε n (Γ n(t)) (5.25) 
+
+with ln = θε n + hn.Proof. The fact that the neighborhood Uεn+2 θε n (Γ n(t)) is bigger than U T 
+
+> n
+
+(Uln+hn (Γ n(t))) stems from the fact that, for n large enough, θε n is much bigger than the diameter of every simplex in Thn , which is bounded by hn, see (2.1) and (2.3). Concerning estimate (5.24), we use (5.23) with V = Γ n(t), r = εn, and r′ = εn + 2 θε n. The statement then follows from the fact that Un(Γ n(t)) ⊂ U T 
+
+> n
+
+(Γ n(t)) and U T 
+
+> n
+
+(Γ n(t)) ≤ Cε n due to (4.1). □
+
+Using the bigger neighborhood will therefore only increase the energy functional by an infinitesimal amount which will vanish for θ → 0. This motivates the choice of Ψ n, cur  
+
+> i
+
+and △n, cur  
+
+> i
+
+. As by definition we have Ψ n, cur  
+
+> i
+
+⊂ Uln (Γ n(t)) and △n, cur  
+
+> i
+
+⊂ Uhn (Ψ n, cur  
+
+> i
+
+) ⊂ Uln+hn (Γ n(t)), we thus get U T 
+
+> n
+
+(△n, cur  
+
+> i
+
+) ⊂
+
+Uεn+2 θε n (Γ n(t)) by (5.25). Now we deal with Φ n, new  
+
+> i
+
+= Φ ni \ Uln (Γ n(t)), where Φ ni still denotes the minimal separating set from (5.12). Defining ¯ εn := θε n for convenience, we proceed with a lemma concerning the covering of Φ ni .Recall the definition of the precrack Ψ ni, pre = Jyn ∩ Qi.
+
+Lemma 5.3 (Lower density bound for Φ ni ). There exists a dimensional constant c > 0 such that for each 
+
+x ∈ Φni with B¯εn (x) ⊂ Qi and B¯εn (x) ∩ Ψni, pre = ∅ it holds that 
+
+Hd−1 B¯εn (x) ∩ Φni
+
+ ≥ c¯εd−1 
+
+> n
+
+. (5.26) 24 B. DUONG AND M. FRIEDRICH 
+
+Proof. Fix x ∈ Φni , and for simplicity write B = B¯εn (x) and Bs = Bs(x) for s > 0. Denote the connected component of Qi \ (Ψ ni, pre ∪ Φni ) which contains D+ 
+
+> n,i
+
+by E. Note that ∂E ∩ B ⊂ Φni since B ⊂ Qi and Γni, pre ∩ B = ∅. Define f (s) = Hd−2(∂B s ∩ Φni ). By the isoperimetric inequality on the sphere (c.f. [11, Chapter 2]) we have min Hd−1(E ∩ ∂B s), Hd−1(∂B s \ E) ≤ cd
+
+ Hd−2(∂B s ∩ ∂E ) d−1 
+
+> d−2
+
+≤ cd(f (s)) d−1 
+
+> d−2
+
+for s ≤ ¯εn (5.27) for some constant cd > 0 only depending on the dimension. Let us now assume that (5.26) is violated, in the sense that 
+
+Hd−1 B ∩ Φni
+
+ < 12( cd−2 
+
+> d
+
+(d − 1) d−1) ¯εd−1 
+
+> n
+
+. (5.28) We will show that this leads to a contradiction, which then implies the statement of the lemma. The proof relies on showing that there exists σ ∈ (0 , ¯εn) such that Hd−1(∂E ∩ ∂B σ ) = 0 and 
+
+ˆ σ
+
+> 0
+
+f (s) d s > c d(f (σ)) d−1 
+
+> d−2
+
+. (5.29) We defer the verification of (5.29) to the end and first proceed with the proof. Without restriction we assume that Hd−1(E ∩ ∂B σ ) ≤ H d−1(∂B σ \ E) as otherwise we simply replace 
+
+E by the connected component of Qi \ (Ψ ni, pre ∪ Φni ) which contains D−
+
+> n,i
+
+. Then, (5.27) gives 
+
+Hd−1(E ∩ ∂B σ ) ≤ cd(f (σ)) d−1 
+
+> d−2
+
+.
+
+We replace Φ ni by the set ˜Φni := Φ ni ∩ (Qi \ Bσ ) ∪ (E ∩ ∂B σ ). By Fubini’s theorem, (5.29), and Hd−1(∂E ∩
+
+∂B σ ) = 0 we estimate 
+
+Hd−1( ˜Φni ) = Hd−1(Φ ni ) − H d−1(Φ ni ∩ Bσ ) + Hd−1(E ∩ ∂B σ )
+
+≤ H d−1(Φ ni ) −
+
+ˆ σ
+
+> 0
+
+f (s) d s + cd(f (σ)) d−1 
+
+> d−2
+
+< Hd−1(Φ ni ).
+
+This will give a contradiction to the choice of Φ ni in (5.12) once we have proven that also the set Ψ ni, pre ∪ ˜Φni
+
+is separating. Assuming by contradiction that Ψ ni, pre ∪ ˜Φni is not separating, we find p± ∈ D± and a curve γ : [0 , 1] →
+
+Qi \ (Ψ ni, pre ∪ ˜Φni ) with γ(0) = p+ and γ(1) = p−. Since Φ ni \ ˜Φni ⊂ Bσ and Ψ ni, pre ∪ Φni separates, γ
+
+necessarily intersects Φ ni ∩ Bσ and we have γ([0 , 1]) ∩ Φni ⊂ Bσ . Thus, recalling γ(0) ∈ E, denoting by τ
+
+the first time such that γ(τ ) ∈ ∂B σ , we get γ(τ ) ∈ E. However, this shows γ(τ ) ∈ E ∩ ∂B σ ⊂ ˜Φni which contradicts the fact that the curve γ does not meet Ψ ni, pre ∪ ˜Φni .It remains to show (5.29). This will again be achieved by contradiction. If the statement was wrong, we would have ´ t 
+
+> 0
+
+g(s) d−2 
+
+> d−1
+
+ds ≤ cdg(t) for a.e. t ∈ (0 , ¯εn), , where we set g(t) := f (t) d−1 
+
+> d−2
+
+. Here we use that 
+
+Hd−1(∂E ∩ ∂B t) = 0 holds for a.e. t ∈ (0 , ¯εn). It is elementary to check that the solution of the integral equation 
+
+ˆ t
+
+> 0
+
+h(s) d−2 
+
+> d−1
+
+ds = cdh(t) for all t ∈ (0 , ¯εn)is given by h(t) = 1(cd(d−1)) d−1 td−1. Then, the nonlinear Gr¨ onwall inequality implies g(t) ≥ h(t) for all 
+
+t ∈ (0 , ¯εn) and thus f (t) ≥ 1(cd(d−1)) d−2 td−2. Again using Fubini’s theorem this yields 
+
+Hd−1(B ∩ Φni ) = 
+
+ˆ ¯εn
+
+> 0
+
+f (s) d s ≥
+
+ˆ ¯εn
+
+> 0
+
+1(cd(d − 1)) d−2 sd−2 ds = 1(cd−2 
+
+> d
+
+(d − 1) d−1) ¯εd−1 
+
+> n
+
+.
+
+This contradicts (5.28) and concludes the proof. □EIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH 25 
+
+Corollary 5.4. For Φn, new  
+
+> i
+
+= Φ ni \ Uln (Γ n(t)) it holds that 
+
+Ld [ 
+
+> i
+
+U2εn (Φ n, new  
+
+> i
+
+)
+
+
+
+≤ Cθε n. (5.30) 
+
+Proof. Define ˆΦn, new  
+
+> i
+
+= Φ n, new  
+
+> i
+
+\ U¯εn (∂Q i ∩ Rn,i ). The first step is to cover S 
+
+> i
+
+Uθε n ( ˆΦn, new  
+
+> i
+
+) with balls having centers x ∈ S 
+
+> i
+
+ˆΦn, new  
+
+> i
+
+and radius θε n. Then Besicovitch’s covering theorem allows us to find 
+
+D ∈ N disjoint subcollections Cj such that 
+
+> D
+
+[
+
+> j=1
+
+[ 
+
+> Bθεn (x)∈C j
+
+Bθε n (x) ⊃ [
+
+> i
+
+Uθε n ( ˆΦn, new  
+
+> i
+
+).
+
+Estimate (5.13) together with (5.26) shows that the maximum amount of balls in each Cj can be at most Cθ 2
+
+> εd−1
+> n
+
+. This means that Ld
+
+S 
+
+> i
+
+Uθε n ( ˆΦn, new  
+
+> i
+
+)
+
+
+
+≤ Cθ d+2 εn. With (5.22) applied to V = S 
+
+> i
+
+ˆΦn, new  
+
+> i
+
+,
+
+r = θε n, and r′ = 2 εn, we then find Ld(U2εn (S 
+
+> i
+
+ˆΦn, new  
+
+> i
+
+)) ≤ Cθ 2εn. Using (5.4) and (5.10) it is elementary to check that Ld(U2εn+¯ εn (S
+
+> i
+
+∂Q i ∩ Rn,i )) ≤ Cθε n. This concludes the proof. □
+
+Proof of Theorem 4.4. We are now in the position to prove Theorem 4.4. Recall the definition of 
+
+ϕn and γϕn below (5.16) and in (5.18), as well as the definitions and properties of the simplices △n =
+
+△n, bad ∪ △ n, lat ∪ △ n, good .
+
+Proof of Theorem 4.4. As observed at the beginning of the section, it suffices to check (5.2). We start by estimating the surface energy. In view of (5.18), we obtain 12εn
+
+Ld  U T 
+
+> n
+
+({γϕn̸ = 0 }) \ U T 
+
+> n
+
+(Γ n(t))  = 12εn
+
+Ld  U T 
+
+> n
+
+(△n) \ U T 
+
+> n
+
+(Γ n(t)) 
+
+≤ 12εn
+
+ Ld  U T 
+
+> n
+
+(△n, bad ) \ U T 
+
+> n
+
+(Γ n(t))  + Ld  U T 
+
+> n
+
+(△n, lat ) + Ld(U T 
+
+> n
+
+(△n, good ))  . (5.31) As observed preceding Lemma 5.3, we have △n, cur ⊂ Uln+hn (Γ n(t)). For this part, we can apply Corol-lary 5.2. Additionally, since S 
+
+> i
+
+U2εn (Φ n, new  
+
+> i
+
+) ⊃ U T 
+
+> n
+
+(△n, new ) for n large enough, we can apply (5.30) for △n, new . Since by definition we have the identity △n, bad = △n, cur ∪ △ n, new , this suffices to estimate 
+
+Ld(U T 
+
+> n
+
+(△n, bad ) \ U T 
+
+> n
+
+(Γ n(t))). Since U T 
+
+> n
+
+(△n, good ) ⊂ Uεn+hn (Jϕ \ Bbad ) (recall sup {diam T : T ∈ T hn } ≤ 
+
+hn by (2.1) and use (5.17)), we can deduce with (5.24)–(5.25), (5.30), (5.20), and (5.21) that lim sup 
+
+> n→∞
+
+12εn
+
+ Ld  U T 
+
+> n
+
+(△n, bad ) \ U T 
+
+> n
+
+(Γ n(t))  + Ld  U T 
+
+> n
+
+(△n. lat ) + Ld(U T 
+
+> n
+
+(△n, good )
+
+≤ lim sup 
+
+> n→∞
+
+12εn
+
+
+
+Ld(Uεn+2 θε n (Γ n(t)) \ U T 
+
+> n
+
+(Γ n(t))) + Ld [ 
+
+> i
+
+U2εn (Φ n, new  
+
+> i
+
+)
+
+
+
++ Ld [ 
+
+> i
+
+U2εn (∂Q i ∩ Rn,i )
+
+
+
++ Ld (Uεn+hn (Jϕ \ Bbad )) 
+
+
+
+≤ lim sup 
+
+> n→∞
+
+12εn
+
+ Cθε n + Cθε n + Cθε n + Ld (Uεn+hn (Jϕ \ Bbad ))  ≤ H d−1 (Jϕ \ Bbad ) + Cθ. 
+
+Now, as Hd−1(( Ju ∩ Jϕ) \ Bbad ) ≤ Cθ by (5.7) and (5.8), we can conclude by (5.31) lim sup 
+
+> n→∞
+
+12εn
+
+Ld  U T 
+
+> n
+
+({γϕn̸ = 0 }) \ U T 
+
+> n
+
+(Γ n(t))  ≤ H d−1 (Jϕ \ Bbad ) + Cθ ≤ H d−1(Jϕ \ Ju) + Cθ. 
+
+This shows the second part of (5.2), where we recall that u = u(t). Concerning the elastic part of the energy, we first observe that the estimates above lead to Ld(△n) ≤
+
+Cε n. We have ∇ϕn − γϕn = 0 on △n, see (5.18), ϕ′ 
+
+> n
+
+= ϕ′ 
+
+> n,i
+
+in each bad cube Qi ∈ Q bad , and ϕ′ 
+
+> n
+
+= ϕ
+
+everywhere else. As outside of the triangles △n the function ϕ′ 
+
+> n
+
+has no jump, see (5.19), and ϕn is the linear interpolation of ϕ′ 
+
+> n
+
+with respect to Thn (Ω ′), we know that ∥∇ ϕn∥L∞(Ω ′\△ n) can be estimated by 26 B. DUONG AND M. FRIEDRICH 
+
+C∥∇ ϕ′
+
+> n
+
+∥L∞(Ω ′). In view of (5.15), ∥∇ ϕn∥L∞(Ω ′\△ n) can thus be controlled by C∥∇ ϕ∥L∞(Ω ′). Since we have ϕ ∈ W 2,∞(Ω ′ \ Jϕ), it can be further shown that ∥∇ ϕn − ∇ ϕ∥L∞(Ω ′\(Bbad ∪△ n)) ≤ Ch n. Thus, we get lim sup 
+
+> n→∞
+
+ˆ
+
+> Ω
+
+|∇ ϕn − γϕn − ∇ ϕ|2 dx = lim sup 
+
+> n→∞
+
+ ˆ
+
+> △n
+
+|∇ ϕ|2 dx +
+
+ˆ
+
+> Ω\(Bbad ∪△ n)
+
+|∇ ϕn − ∇ ϕ|2 dx +
+
+ˆ
+
+> Bbad \△ n
+
+|∇ ϕn − ∇ ϕ|2 dx
+
+
+
+≤ Cε n + Ch 2 
+
+> n
+
++ Cθ ≤ Cθ, 
+
+where for the second step we used Ld(Bbad ) ≤ Cθ (see (5.6)), the fact that ( ∇ϕn)n are bounded in 
+
+L∞(Ω ′ \ △ n; Rd), ∇ϕ ∈ L∞(Ω ′; Rd), as well as Ld(△n) ≤ Cε n. This shows the first part of (5.2) and concludes the proof. □
+
+6. Proof of further results 
+
+In this section we explain the adaptations which are necessary to obtain the results announced in Subsection 2.4. 
+
+Sketch of the proof of Theorem 2.4. With the notation introduced in Subsection 2.4, the bound in (3.2) reads as 
+
+En(ˆ un(t), ˆγn(t), ˆΓn(t)) ≤ E n(ˆ un(0) , ˆγn(0) , ∅) + 2 
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Ω
+
+(∇ˆun(s) − ˆγn(s)) · ∂t∇gn(s) d x ds + e(n), (6.1) with e(n) → 0 as n → ∞ . We note that the calculation is done with the integral from 0 to tni with 
+
+tni ≤ t < t ni+1 for tni , t ni+1 ∈ In instead of 0 to t, but due to the regularity of gn and the bounds on ˆ un and ˆγn, we can absorb this error in the e(n)-term. With the same argument as in (4.1) one can also show 
+
+En(ˆ un(t), ˆγn(t), ˆΓn(t)) + ∥ˆun(t)∥L∞(Ω ′) ≤ C2
+
+with C2 being independent of t and n. With these estimates, we can follow closely the lines of the proof in Section 4. The Lemmas 4.2–4.3, 4.5 remain unchanged while in the proof of the stability result Theorem 4.4 we employ (2.8) in place of (2.10). (The construction in Section 5 yields a sequence ( ϕn)n
+
+with boundary conditions g(t) and not with g(sn), where sn ∈ In is the largest time with sn ≤ t.Therefore, strictly speaking, we need to replace the sequence ( ϕn)n by ϕn − g(t) + g(sn), which causes no problems due to the regularity of g.) Also Theorem 4.6 and Lemma 4.7 can be derived in the exactly same way. Finally, for the analog of the proof of Theorem 2.3, the only difference lies in the derivation of the energy balance and the energy convergence since instead of an energy balance along the sequence (cf. (2.11)) we only have the energy estimate (6.1). For this reason, in place of the equality in (4.23), we only get the inequality lim  
+
+> n→∞
+
+En(ˆ un(t), ˆγn(t), ˆΓn(t)) ≤ E (0) + 2 
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Ω
+
+∇u(s) · ∂t∇g(s) d x ds for all t ∈ [0 , 1], where we employed (the analogous versions of) (4.20) and (4.22). By lower semicontinuity (see Lemma 4.5 and Lemma 4.7) this implies 
+
+E(t) ≤ lim inf  
+
+> n→∞
+
+En(ˆ un(t), ˆγn(t), ˆΓn(t)) ≤ E (0) + 2 
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Ω
+
+∇u(s) · ∂t∇g(s) d x ds
+
+for all t ∈ [0 , 1], i.e., the same estimate as in (4.24). From this point on, we can follow the proof of Theorem 2.3 to conclude. □EIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH 27 
+
+Sketch of the proof of Theorem 2.5. Concerning the proof of Theorem 2.5, we can almost verbatim repeat the proof of Theorem 2.4 as both cases are conceptually the same, just in different function spaces. In fact, the proof for the stability result (see Theorem 4.4 for the analog) is even easier as we do not have to deal with the neighborhoods U T
+
+> εm,h
+
+(·) but only with neighborhoods Uεm (·), i.e., the additional simplices added due to the triangulation are not needed. □
+
+Acknowledgements 
+
+This research was funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Founda-tion) - 377472739/GRK 2423/2-2023. The authors are very grateful for this support. 
+
+Appendix A. Remaining proofs 
+
+In this appendix, we present the remaining proofs that have been omitted in the paper. 
+
+Theorem A.1 (SBV -compactness) . Let (uk)k∈N be a sequence in SBV 2(Ω ′) such that there exists c > 0
+
+with ˆ
+
+> Ω′
+
+|∇ uk|2 dx + Hd−1(Juk ) + ∥uk∥L∞(Ω ′) ≤ c
+
+for every k ∈ N. Then, there exists a subsequence (ukl )l and a function u ∈ SBV 2(Ω ′) such that, as 
+
+l → ∞ ,
+
+ukl → u strongly in L1(Ω ′),
+
+∇ukl ⇀ ∇u weakly in L2(Ω; Rd),
+
+Hd−1(Ju) ≤ lim inf  
+
+> l→∞
+
+Hd−1(Jukl ).
+
+(A.1) The convergence in (A.1) is called SBV 2-convergence . We begin with the proof of Lemma 3.4, and postpone the proof of Lemma 3.2 to the end of the section. 
+
+Proof of Lemma 3.4. The first inequality has already been addressed in (3.10), so we focus on the other inequality. For fixed t ∈ (0 , 1], given η > 0, we apply [18, Lemma 4.12, Remark 4.13] to find a finite partition ( si)ki=0 of [0 , t ] satisfying |si+1 − si| ≤ η for all i = 0 , . . . , k − 1 such that (i) 
+
+> k−1
+
+X
+
+> i=0
+
+ˆ si+1 
+
+> si
+
+∥ ∇uε(si+1 ) − γε(si+1 ) · ∂t∇gh(si+1 ) −  ∇uε(τ ) − γε(τ ) · ∂t∇gh(τ )∥L2(Ω) dτ ≤ η, 
+
+(ii) 
+
+> k−1
+
+X
+
+> i=0
+
+ˆ si+1 
+
+> si
+
+∥∂t∇gh(si+1 ) − ∂t∇gh(τ )∥L2(Ω) dτ ≤ η. (A.2) Using Lemma 3.3 with the competitor ( uε(si+1 ) − gh(si+1 ) + gh(si), γ ε(si+1 )) for i ∈ { 0, . . . , k − 1}, we obtain 
+
+Eε(uε(si), γ ε(si), Γε(si)) ≤ E ε
+
+
+
+uε(si+1 ) − gh(si+1 ) + gh(si), γ ε(si+1 ), Γε(si) ∪ { γε(si+1 )̸ = 0 }
+
+
+
+.
+
+Using Γ ε(si) ∪ { γε(si+1 )̸ = 0 } ⊂ Γε(si+1 ), expanding the elastic energy, rearranging the terms, and employing Minkowski’s integral inequality we find 
+
+Eε(uε(si+1 ), γ ε(si+1 ), Γε(si+1 )) − E ε(uε(si), γ ε(si), Γε(si)) 
+
+≥ 2
+
+ˆ
+
+> Ω
+
+(∇uε(si+1 ) − γε(si+1 )) · (∇gh(si+1 ) − ∇ gh(si)) d x −
+
+ˆ
+
+> Ω
+
+|∇ gh(si+1 ) − ∇ gh(si)|2 dx
+
+≥ 2
+
+ˆ
+
+> Ω
+
+(∇uε(si+1 ) − γε(si)) · (∇gh(si+1 ) − ∇ gh(si+1 )) d x − σ(η)
+
+ˆ si+1 
+
+> si
+
+∥∂t∇gh(s)∥L2(Ω) ds28 B. DUONG AND M. FRIEDRICH 
+
+with σ(r) := sup t2−t1=r
+
+´ t2 
+
+> t1
+
+∥∂t∇gh(s)∥L2(Ω) ds, where in the last step we used |si+1 − si| ≤ η. Summing over i ∈ { 0, . . . , k − 1} we deduce 
+
+Eε(uε(t), γ ε(t), Γε(t)) ≥ E ε(uε(0) , γ ε(0) , Γε(0)) + Π − σ (η)
+
+ˆ t
+
+> 0
+
+∥∇ ∂tgh(s)∥L2(Ω) ds. (A.3) where for shorthand we define Π := 
+
+> k−1
+
+X
+
+> i=0
+
+2
+
+ˆ
+
+> Ω
+
+(∇uε(si+1 ) − γε(si+1 )) ·
+
+ˆ si+1 
+
+> si
+
+∇∂tgh(s) d s dx. 
+
+For the integral Π, using first (A.2)(ii) along with the fact that ∥∇ uε(si+1 ) − γε(si+1 )∥L2(Ω) ≤ C for some 
+
+C depending only on g, h, and ε (by passing to the limit in (3.1) and using (2.9)), and then (A.2)(i) we get Π ≥
+
+> k−1
+
+X
+
+> i=0
+
+2
+
+ˆ
+
+> Ω
+
+ˆ si+1 
+
+> si
+
+(∇uε(si+1 ) − γε(si+1 )) · ∇ ∂tgh(si+1 ) d s dx − Cη 
+
+≥ 2
+
+ˆ t
+
+> 0
+
+ˆ
+
+> Ω
+
+(∇uε(s) − γε(s)) · ∇ ∂tgh(s) d x ds − η − Cη. 
+
+Plugging this into (A.3) and using that σ (η) → 0 for η → 0, the desired statement follows in the limit 
+
+η → 0. □
+
+We proceed with the proofs of Theorem 4.6 and Lemma 4.7. 
+
+Proof of Theorem 4.6. First, the fact that u(t) ∈ SBV 2(Ω ′) with u(t) = g(t) on Ω ′ \ Ω follows from the compactness result in Theorem A.1 along with the uniform bound (4.8) at each time s ∈ I∞,0. Properties (4.13) and (4.16) follow as in the proof of [24, Lemma 3.8], where we particularly employ [24, Corollary 2.10] along with Theorem 4.4, as well as Theorem A.1. Then, ∇u ∈ L∞([0 , 1]; L2(Ω ′; Rd)), the fact that ∇u is left continuous in [0 , 1] \ I∞,0 with respect to the strong L2(Ω ′; Rd)-topology, and the energy inequality (4.17) follow exactly as in the proof of [29, Propostion 5.9], by exploiting (4.16). Indeed, we note that all properties stated so far exclusively rely on the limiting problem, and are completely independent of the ε-problem, whence we can follow the proof in [29]. Next, (4.15) is a consequence of the Γ-convergence result in [42, Theorem 5.1] and Theorem 2.1(i). Finally, (4.14) follows from Lemma 4.5. □
+
+Proof of Lemma 4.7. As the statement has been proven already for t ∈ I∞,0 in Lemma 4.2, we only consider t ∈ [0 , 1] \ I∞,0. Consider s ∈ I∞,0 with s < t . (Eventually, we will send s ↗ t.) We recall the definition Γ n(t) := S 
+
+> τ∈It
+> ∞,εn
+
+{γn(τ )̸ = 0 } preceding Lemma 3.1. We define the minimum problem 
+
+J := inf 
+
+(ˆ
+
+> Ω\Γn(t)
+
+|∇ z|2 dx : z ∈ Vhn (Ω ′), z = gn(s) on Ω ′ \ Ω
+
+)
+
+and denote the (unique) minimizer of this problem by wn(s, t ). We observe that un(t) − wn(s, t ) is the unique minimizer of 
+
+L := inf 
+
+(ˆ
+
+> Ω\Γn(t)
+
+|∇ z|2 dx : z ∈ Vhn (Ω ′), z = gn(t) − gn(s) on Ω ′ \ Ω
+
+)
+
+,EIGENFRACTURE APPROXIMATION OF QUASI-STATIC CRACK GROWTH 29 
+
+due to minimality in the separate problems. (Use (2.10) at time t for ¯ γ = γn(t).) As gn(t) − gn(s) is admissible for L, we have 
+
+ˆ
+
+> Ω\Γn(t)
+
+|∇ un(t) − ∇ wn(s, t )|2 dx ≤
+
+ˆ
+
+> Ω\Γn(t)
+
+|∇ gn(t) − ∇ gn(s)|2 dx. (A.4) We find ´ 
+
+> Ω\Γn(t)
+
+∇wn(s, t ) · ∇ (un(s) − wn(s, t )) d x = 0 since un(s) − wn(s, t ) is an admissible test function for J. Thus, ˆ
+
+> Ω\Γn(t)
+
+|∇ un(s) − ∇ wn(s, t )|2 dx =
+
+ˆ
+
+> Ω\Γn(t)
+
+ |∇ un(s)|2 − |∇ wn(s, t )|2 dx. (A.5) Now, let us note that  wn(s, t ), ∇wn(s, t )1Γn(t)
+
+ is an admissible competitor in (2.10) at time s ∈ I∞,0.Therefore, recalling (4.5), 
+
+ˆ
+
+> Ω\Γn(s)
+
+|∇ un(s)|2 dx + λn(s) ≤
+
+ˆ
+
+> Ω\Γn(t)
+
+|∇ wn(s, t )|2 dx + λn(t). (A.6) Since Γ n(s) ⊂ Γn(t) by Theorem 2.1(ii), we clearly have 
+
+ˆ
+
+> Ω\Γn(t)
+
+|∇ un(s)|2 dx ≤
+
+ˆ
+
+> Ω\Γn(s)
+
+|∇ un(s)|2 dx. (A.7) Taking (A.6) and (A.7), subtracting ´ 
+
+> Ω\Γn(t)
+
+|∇ wn(s, t )|2 dx + λn(s), and using the identity (A.5), we obtain ˆ
+
+> Ω\Γn(t)
+
+|∇ un(s) − ∇ wn(s, t )|2 dx ≤ λn(t) − λn(s). (A.8) Putting (A.4) and (A.8) together, we discover 
+
+ˆ
+
+> Ω\Γn(t)
+
+|∇ un(t) − ∇ un(s)|2 dx ≤ C ∥∇ gn(t) − ∇ gn(s)∥2 
+
+> L2(Ω)
+
++ C(λn(t) − λn(s)) .
+
+Recalling the definition of Qn(t) preceding (4.3), in particular Qn(t) ⊃ Γn(t), we conclude that 
+
+∥∇ un(t)1(Qn(t)) c − ∇ un(s)1(Qn(t)) c ∥L2(Ω) ≤
+
+ˆ
+
+> Ω\Γn(t)
+
+|∇ un(t) − ∇ un(s)|2 dx
+
+≤ C ∥∇ gn(t) − ∇ gn(s)∥2 
+
+> L2(Ω)
+
++ C(λn(t) − λn(s)) .
+
+Consequently, the right-hand side converges to zero for s → t, since gn is absolutely continuous and 
+
+λ0, being the pointwise limit of λn, has a continuity point in t by assumption. This means that lim  
+
+> s→t
+
+lim sup 
+
+> n→∞
+
+∥∇ un(t)1(Qn(t)) c − ∇ un(s)1(Qn(t)) c ∥L2(Ω) = 0 . (A.9) We also recall that, by Lemma 4.3, 
+
+∇un(s)1(Qn(t)) c ⇀ ∇u(s) weakly in L2(Ω; Rd). (A.10) We write 
+
+∇un(t)1(Qn(t)) c − ∇ u(t) =  ∇un(t)1(Qn(t)) c − ∇ un(s)1(Qn(t)) c
+
+ +  ∇un(s)1(Qn(t)) c − ∇ u(s)
+
++  ∇u(s) − ∇ u(t).
+
+Combining (A.9), (A.10), and the left continuity of {τ 7 → ∇ u(τ )} at [0 , 1] \I∞,0 with respect to the strong topology in L2(Ω; Rd) (see Theorem 4.6) this shows ∇un(t)1(Qn(t)) c ⇀ ∇u(t) weakly in L2(Ω; Rd). This concludes the proof. □
+
+We close with the proof of Lemma 3.2. 30 B. DUONG AND M. FRIEDRICH 
+
+Proof of Lemma 3.2. As explained below Lemma 3.2, ∇umε (s)1(Γ mε (s)) c → ∇ uε(s) − γε(s) holds already for s ∈ I∞,ε . Therefore, we only have to prove the statement for t / ∈ I∞,ε . Consider t / ∈ I∞,ε and s ∈ I∞,ε 
+
+with s ↗ t. We define the minimization problem 
+
+J := inf 
+
+(ˆ 
+
+> Ω\Γmε(t)
+
+|∇ z|2 dx : z ∈ Vh(Ω ′), z = gmε (s) on Ω ′ \ Ω
+
+)
+
+and denote its unique minimizer by wm(s, t ). We observe that umε (t) − wm(s, t ) is the minimizer of 
+
+L := inf 
+
+(ˆ 
+
+> Ω\Γmε(t)
+
+|∇ z|2 dx : z ∈ Vh(Ω ′), z = gmε (t) − gmε (s) on Ω ′ \ Ω
+
+)
+
+due to minimality in the separate problems. Then, we can repeat the reasoning used in the proof of Lemma 4.7 to obtain 
+
+ˆ 
+
+> Ω\Γmε(t)
+
+|∇ umε (t) − ∇ umε (s)|2 dx ≤ C∥∇ gmε (t) − ∇ gmε (s)∥2 
+
+> L2(Ω)
+
++ C(λmε (t) − λmε (s)) ,
+
+where λmε was defined preceding (3.3). Recall that ∥∇ gmε (t) − ∇ gmε (s)∥2 
+
+> L2(Ω)
+
+→ 0 for s ↗ t due to the regularity properties of g. Additionally, at each t / ∈ I∞,ε , the function λε = lim m→∞ λmε is continuous by construction. Therefore, we have lim  
+
+> s→t
+
+lim sup 
+
+> m→∞
+
+∥∇ umε (t)1(Γ mε (t)) c − ∇ umε (s)1(Γ mε (t)) c ∥L2(Ω) = 0 . (A.11) Let tk ↗ t be the sequence in the definition of uε(t) and γε(t). Using the relation ∇umε (tk)1(Γ mε (t)) c =(∇umε (tk) − γmε (tk)) by (2.9), we can write 
+
+∇umε (t)1(Γ mε (t)) c − (∇uε(t) − γε(t)) = ∇umε (t)1(Γ mε (t)) c − ∇ umε (tk)1(Γ mε (t)) c
+
++ ( ∇umε (tk) − γmε (tk)) − (∇uε(tk) − γε(tk)) + ( ∇uε(tk) − γε(tk)) − (∇uε(t) − γε(t)) .
+
+Letting first m → ∞ and afterwards k → ∞ , we observe that all three addends on the right-hand side converge to zero in L2(Ω ′) by (A.11), the convergence of ( umε (tk), γ mε (tk)) as m → ∞ , and the definition of the pair ( uε(t), γ ε(t)). This concludes the proof. □
+
+References 
+
+[1] Luigi Ambrosio, Nicola Fusco, and Diego Pallara. Functions of Bounded Variation and Free Dis-continuity Problems . Oxford University Press, 2000. [2] Luigi Ambrosio and Vincenzo Tortorelli. “On the approximation of functionals depending on jumps by elliptic functionals via Γ-convergence”. Communications on Pure and Applied Mathematics 43 (1990), pp. 999–1036. [3] Veronika Auer-Volkmann, Lisa Beck, and Bernd Schmidt. “Eigendamage: an eigendeformation model for the variational approximation of cohesive fracture—a one-dimensional case study”. Annali di Matematica 201 (2022), pp. 2161–2195. [4] Jean-Francois Babadjian and Elise Bonhomme. “Discrete Approximation of the Griffith Functional by Adaptive Finite Elements”. SIAM Journal on Mathematical Analysis 55.6 (2023), pp. 6778– 6837. [5] Annika Bach, Andrea Braides, and Caterina Zeppieri. “Quantitative analysis of finite-difference ap-proximations of free-discontinuity problems”. Interfaces and Free Boundaries, Mathematical Anal-ysis, Computation and Applications 22 (2020), pp. 317–381. [6] Giovanni Bellettini and Alessandra Coscia. “Discrete approximation of a free discontinuity prob-lem”. Numerical Functional Analysis and Optimization 15 (1994), pp. 201–224. REFERENCES 31 
+
+[7] Blaise Bourdin and Antonin Chambolle. “Implementation of an adaptive finite-element approxima-tion of the Mumford-Shah functional”. Numerische Mathematik 85 (2000), pp. 609–646. [8] Blaise Bourdin, Gilles Francfort, and Jean-Jacques Marigo. “The Variational Approach to Frac-ture”. Journal of Elasticity 91 (2008). [9] Andrea Braides. Approximation of free-discontinuity problems . Springer Berlin, Heidelberg, 1998. [10] Andrea Braides and Gianni Dal Maso. “Non-local approximation of the Mumford-Shah functional”. 
+
+Calculus of Variations and Partial Differential Equations 5 (1997), pp. 293–3220. [11] Yuri˘ ı Dmitrievich Burago and Viktor Abramovich Zalgaller. Geometric Inequalities . Springer Berlin, Heidelberg, 1988. [12] Antonin Chambolle and Vito Crismale. “A Density Result in GSBD p with Applications to the Approximation of Brittle Fracture Energies”. Archive for Rational Mechanics and Analysis 232 (2019), pp. 1329–1378. [13] Antonin Chambolle and Gianni Dal Maso. “Discrete approximation of the Mumford-Shah functional in dimension two”. ESAIM: Mathematical Modelling and Numerical Analysis 33.4 (1999), pp. 651– 672. [14] Guido Cortesani and Rodica Toader. “Nonlocal Approximation of Nonisotropic Free-Discontinuity Problems”. SIAM Journal on Applied Mathematics 59.4 (1999), pp. 1507–1519. [15] Vito Crismale, Manuel Friedrich, and Joscha Seutter. Adaptive finite element approximation for quasi-static crack growth . preprint, arXiv: 2503.18664. 2025. [16] Vito Crismale, Giovanni Scilla, and Francesco Solombrino. “A derivation of Griffith functionals from discrete finite-difference models”. Calculus of Variations and Partial Differential Equations 
+
+59 (2020), Art. no. 193. [17] Gianni Dal Maso. An Introduction to Γ-convergence . Boston, Basel, Berlin: Birkh¨ auser, 1993. [18] Gianni Dal Maso, Gilles Francfort, and Rodica Toader. “Quasistatic crack growth in nonlinear elasticity”. Archive for Rational Mechanics and Analysis 176 (2005), pp. 165–225. [19] Gianni Dal Maso, Allessandro Giacomini, and Marcello Ponsiglione. “A variational model for qua-sistatic crack growth in nonlinear elasticity: qualitative properties of the solutions”. Bollettino dell’Unione Matematica Italiana 2 (2009), pp. 371–390. [20] Gianni Dal Maso and Giuliano Lazzaroni. “Quasistatic crack growth in finite elasticity with non-interpenetration”. Annales de l’Institut Henri Poincar´ e C, Analyse non lin´ eaire 27 (2010), pp. 257– 290. [21] Gianni Dal Maso and Rodica Toader. “A Model for the Quasi-Static Growth of Brittle Fractures: Existence and Approximation Results”. Archive for Rational Mechanics and Analysis 162 (2002), pp. 101–135. [22] Matteo Focardi. “On the Variational Approximation of Free-Discontinuity Problems in the Vectorial Case”. Mathematical Models and Methods in Applied Sciences 11.04 (2001), pp. 663–684. [23] Gilles Francfort. “Variational fracture: twenty years after”. International Journal of Fracture 237 (2022), pp. 3–13. [24] Gilles Francfort and Christopher Larsen. “Existence and Convergence for Quasi-Static Evolution in Brittle Fracture”. Communications on Pure and Applied Mathematics 56 (2003), pp. 1465–1500. [25] Gilles Francfort and Jean-Jacques Marigo. “Revisiting brittle fracture as an energy minimization problem”. Journal of The Mechanics and Physics of Solids 46 (1998). [26] Manuel Friedrich and Joscha Seutter. “Atomistic-to-continuum convergence for quasi-static crack growth in brittle materials”. Mathematical Models and Methods in Applied Sciences 35 (2025), pp. 1325–1384. [27] Manuel Friedrich and Francesco Solombrino. “Quasistatic crack growth in 2d-linearized elasticity”. 
+
+Annales de l’Institut Henri Poincar´ e C, Analyse non lin´ eaire 35.1 (2018), pp. 27–64. 32 REFERENCES 
+
+[28] Manuel Friedrich, Pascal Steinke, and Kerrek Stinson. “Linearization of quasistatic fracture evolu-tion in brittle materials”. Annales de l’Institut Henri Poincar´ e C, Analyse non lin´ eaire (2025). [29] Alessandro Giacomini. “Ambrosio-Tortorelli Approximation of Quasi-Static Evolution of Brittle Fractures”. Calculus of Variations and Partial Differential Equations 22 (2005), pp. 129–172. [30] Alessandro Giacomini. “Size Effects on Quasi-Static Growth of Cracks”. SIAM Journal on Mathe-matical Analysis 36.6 (2005), pp. 1887–1928. [31] Alessandro Giacomini and Marcello Ponsiglione. “A Discontinuous Finite Element Approximation of Quasi-static Growth of Brittle Fractures”. Numerical Functional Analysis and Optimization 24.7-8 (2003), pp. 813–850. [32] Alessandro Giacomini and Marcello Ponsiglione. “A Γ-convergence approach to stability of unilat-eral minimality properties in fracture mechanics and applications”. Archive for Rational Mechanics and Analysis 180 (2006), pp. 399–447. [33] Alessandro Giacomini and Marcello Ponsiglione. “Discontinuous finite element approximation of quasistatic crack growth in finite elasticity”. Mathematical Models and Methods in Applied Sciences 
+
+16.01 (2006), pp. 77–118. [34] Luca Lussardi and Matteo Negri. “Convergence of Nonlocal Finite Element Energies for Fracture Mechanics”. Numerical Functional Analysis and Optimization 28.1-2 (2007), pp. 83–109. [35] Roberta Marziani and Francesco Solombrino. “Non-local approximation of free-discontinuity prob-lems in linear elasticity and application to stochastic homogenisation”. Proceedings of the Royal Society of Edinburgh: Section A Mathematics 154.4 (2024), pp. 1060–1094. [36] Matteo Negri. “A finite element approximation of the Griffith’s model in fracture mechanics”. 
+
+Numerische Mathematik 95 (2003), pp. 653–687. [37] Matteo Negri. “A non-local approximation of free discontinuity problems in SBV and SBD”. Cal-culus of Variations and Partial Differential Equations 25 (2006), pp. 33–62. [38] Anna Pandolfi, Bo Li, and Michael Ortiz. “Modeling fracture by material-point erosion”. In: Frac-ture Phenomena in Nature and Technology . Cham: Springer International Publishing, 2014, pp. 3– 16. [39] Anna Pandolfi and Michael Ortiz. “An Eigenerosion Approach to Brittle Fracture”. International Journal for Numerical Methods in Engineering 92 (2012), pp. 694–714. [40] Anna Pandolfi, Kerstin Weinberg, and Michael Ortiz. “A comparative accuracy and convergence study of eigenerosion and phase-field models of fracture”. Computer Methods in Applied Mechanics and Engineering 386 (2021), p. 114078. [41] Aurel Qinami, Anna Pandolfi, and Michael Kaliske. “Variational eigenerosion for rate-dependent plasticity in concrete modeling at small strain”. International Journal for Numerical Methods in Engineering 121.7 (2020), pp. 1388–1409. [42] Bernd Schmidt, Fernando Fraternali, and Michael Ortiz. “Eigenfracture: An Eigendeformation Ap-proach to Variational Fracture”. Multiscale Modeling & Simulation 7.3 (2009), pp. 1237–1266. [43] Giovanni Scilla and Francesco Solombrino. “Non-local approximation of the Griffith functional”. 
+
+Nonlinear Differential Equations and Applications 28 (2021), Art. No. 17. [44] Flavio Stochino, Aurel Qinami, and Michael Kaliske. “Eigenerosion for static and dynamic brittle fracture”. Engineering Fracture Mechanics 182 (2017), pp. 537–551.

@@ -1,0 +1,1578 @@
+Title: A physics-informed data-driven framework for modeling hyperelastic materials with progressive damage and failure
+
+URL Source: https://arxiv.org/pdf/2602.11414v1
+
+Published Time: Fri, 13 Feb 2026 01:22:03 GMT
+
+Number of Pages: 37
+
+Markdown Content:
+# A physics-informed data-driven framework for modeling hyperelastic materials with progressive damage and failure 
+
+Kshitiz Upadhyay ∗
+
+> Department of Aerospace Engineering and Mechanics, University of Minnesota, Minneapolis, MN 55455, USA
+
+Abstract 
+
+This work presents a two-stage physics-informed, data-driven constitutive modeling framework for hy-perelastic soft materials undergoing progressive damage and failure. The framework is grounded in the concept of hyperelasticity with energy limiters and employs Gaussian Process Regression (GPR) to sep-arately learn the intact (undamaged) elastic response and damage evolution directly from data. In Stage I, GPR models learn the intact hyperelastic response through volumetric and isochoric response func-tions (or only the isochoric response under incompressibility), ensuring energetic consistency of the intact response and satisfaction of fundamental principles such as material frame indifference and balance of angular momentum. In Stage II, damage is modeled via a separate GPR model that learns the mapping between the intact strain energy density predicted by Stage I models and a stress-reduction factor gov-erning damage and failure, with monotonicity, non-negativity, and complete-failure constraints enforced through penalty-based optimization to ensure thermodynamic admissibility. Validation on synthetic datasets, including benchmarking against analytical constitutive models and competing data-driven ap-proaches, demonstrates high in-distribution accuracy under uniaxial tension and robust generalization from limited training data to compression and shear modes not used during training. Application to experimental brain tissue data demonstrates the practical applicability of the framework and enables inference of damage evolution and critical failure energy. Overall, the proposed framework combines the physical consistency, interpretability, and generalizability of analytical models with the flexibility, pre-dictive accuracy, and automation of machine learning, offering a powerful approach for modeling failure in soft materials under limited experimental data. 
+
+Keywords: Data-driven constitutive models, Hyperelasticity, Damage and failure, Physics-informed machine learning, Gaussian process regression, Soft materials, Brain tissue mechanics 
+
+1. Introduction 
+
+Hyperelastic materials, such as elastomers, hydrogels, rubbers, and foams, are widely utilized in diverse applications ranging from biomedical devices and soft robotics to automotive components and protective equipment. These soft materials typically exhibit nonlinear stress–strain responses and un-dergo large deformations, complicating the modeling of their mechanical behavior [1, 2]. Moreover, soft materials often experience progressive damage leading to eventual failure under significant deformation, an aspect not captured by conventional hyperelastic models [3, 4, 5]. Accurately representing both hy-perelastic and damage behaviors in constitutive models is thus crucial for reliable predictive simulations of real-world mechanical responses [5, 6, 7, 8]. Traditional constitutive models, rooted in continuum thermodynamics, have effectively described the mechanical responses of various hyperelastic materials. Prominent examples include neo-Hookean [9, 10], Mooney–Rivlin [11, 12], Ogden [13], and Gent models [14], appreciated for their physical interpretability and mathematical simplicity. These traditional models inherently satisfy fundamental physical con-straints such as objectivity (i.e., material frame indifference), material symmetry, and thermodynamic consistency [15, 16]. However, their fixed mathematical forms constrain their flexibility, rendering them insufficient for accurately capturing highly complex and varied responses [17]. Additionally, these mod-els often require expert-driven selection tailored to specific stress–strain data, creating a significant bottleneck for automated and high-throughput material characterization and discovery [18, 19, 20, 21].  
+
+> ∗Corresponding author. Email: kshitizu@umn.edu
+> Preprint submitted to Elsevier February 13, 2026
+> arXiv:2602.11414v1 [cs.CE] 11 Feb 2026
+
+Consequently, there is an urgent need for flexible data-driven constitutive modeling methods that can autonomously discover relationships directly from data with minimal expert intervention. Data-driven constitutive modeling has emerged as a powerful alternative, overcoming many limita-tions inherent in traditional approaches [22, 23]. These methods autonomously identify flexible consti-tutive models directly from experimental or numerical data, significantly reducing dependence on expert input [24, 25, 26, 27, 28, 29]. Moreover, data-driven approaches can effectively generalize across di-verse material responses, providing universally applicable solutions ideal for automated characterization pipelines [30, 31, 32, 33, 34]. Concurrently, advancements in experimental techniques, including digital image correlation (DIC), digital volume correlation (DVC), and magnetic resonance elastography (MRE), have significantly enriched the available strain data, further enhancing the efficacy of data-driven meth-ods [35, 36, 37, 38, 39, 40, 41]. These techniques facilitate higher accuracy, improved generalizability, and reduced reliance on restrictive assumptions. Data-driven constitutive modeling approaches can broadly be classified into purely data-driven (black-box) methods and physics-informed data-driven frameworks (for details, refer to a recent review by Fuhg et al. [22]). Purely data-driven methods, such as standard artificial neural networks (ANNs), provide considerable flexibility and predictive accuracy within training datasets. However, their practical engineering utility is often limited by poor generalizability and insufficient compliance with fundamental physical constraints. In contrast, physics-informed data-driven models explicitly incorporate essential physical principles, ensuring adherence to critical constraints such as objectivity, material symmetry, polyconvexity, and thermodynamic consistency. Recent research on mechanics of soft materials has highlighted various physics-informed machine learning (ML) approaches, including physics-informed neural networks (PINNs), Gaussian Process Re-gression (GPR)-based surrogate models, and Input Convex Neural Networks (ICNNs) [42, 43, 44, 45, 46, 47, 48, 49, 50]. For instance, studies by Frankel et al. [47] and Fuhg et al. [46] represented the total stress in a generalized hyperelastic constitutive framework as a weighted sum of components from an irreducible tensor basis and employed GPR to map strain invariants to the corresponding coefficients of these basis components—referred to as response functions. This simple mapping between invariants and response functions inherently enforces key physical constraints on the predicted mechanical responses, including material frame indifference, material symmetry, thermodynamic consistency, and the local balance of angular momentum. Furthermore, unlike other regression methods (e.g., ANNs), GPR offers the benefit of enforcing a stress-free reference configuration through its exact inference property [45]. Extending this line of work, Upadhyay et al. [51] recently applied a constrained GPR framework to visco-hyperelastic materials, explicitly integrating entropy inequality constraints into GPR hyperparameter optimization. This work highlighted several additional benefits of GPR-based data-driven models: compatibility with limited training data, generalizability across a wide range of deformation modes, robustness to noise, and enhanced interpretability owing to their rigorous statistical foundation, which also facilitates seamless integration with uncertainty quantification pipelines. Despite substantial advancements, a critical gap remains in capturing progressive damage and fail-ure behaviors within hyperelastic modeling frameworks, both in traditional and data-driven modeling. Conventional hyperelastic theories inherently fail to represent material failure adequately, as their strain energy density functions typically grow without bound, thereby limiting realistic predictions of material performance. Addressing this limitation, Volokh introduced the concept of energy limiters, which em-beds a saturation limit into the strain energy density function, inherently enabling the representation of material failure at large deformations [52]. This energy-limiting concept has effectively modeled various phenomena, including rubber failure under diverse loading conditions, crack initiation and propagation, cavitation instabilities, and membrane rupture [53, 54, 55, 56]. However, as described earlier, such clas-sical analytical approaches heavily depend on carefully chosen functional forms and expert assumptions, constraining their flexibility and generalization capabilities. Efforts to integrate data-driven methods with damage mechanics have mainly focused on neural-network-based architectures. For example, Tac et al. [57] employed neural ordinary differential equations (NODEs) to model hyperelastic materials and extended this approach to capture damage in a thermo-dynamically consistent manner by introducing monotonic yield functions. Their approach demonstrated the ability to rediscover classical damage evolution laws from synthetic data and to describe soft-tissue responses under large deformations. Beyond NODE-based approaches, several studies have explored neural networks to learn latent or anisotropic damage representations. Gaetano et al. [58] used deep neural networks to infer a fourth-order anisotropic damage surface tensor in fiber-reinforced compos-ites from RVE simulations, linking macroscopic damage evolution to applied macrostrains and secant stiffness degradation. Liu et al. [59] trained ANNs to construct damage-form yield functions for plate 2and shell fracture using invariants of the effective active stress. Rojas et al. [60] investigated neural architectures—including PINNs—to infer parameters in phase-field damage PDEs. Parallel to these neural-network-based constitutive approaches, other recent studies have begun to explore alternative data-driven tools: Ostadrahimi et al. [50] combined GPR and recurrent neural networks to character-ize Mullins-type discontinuous softening in elastomers, while Abdusalamov et al. [61] used symbolic regression to model this stress-softening phenomenon. Yet another class of studies has employed ML primarily as a high-dimensional black-box representation or as a computational surrogate for fracture and damage simulations [62, 49]. These contributions collectively underscore a broader research trend toward learning damage evolution laws directly from data; however, most existing frameworks either rely on high-capacity neural architectures that may limit interpretability and generalizability across varied deformation scenarios, focus on accelerating fracture simulations rather than learning local constitutive laws, or target discontinuous softening phenomena (e.g., Mullins effect, hysteresis, residual strain) rather than continuous stiffness degradation along the loading path leading to mechanical failure. Motivated by these gaps and opportunities, the present work introduces a novel physics-informed data-driven framework for modeling continuous, mechanically driven damage of hyperelastic materials leading to failure, characterized by progressive stiffness reduction along the primary loading path and culminating in material rupture. Building upon Volokh’s robust physical foundations of hyperelasticity with energy limiters [52, 63], our approach employs a generalized functional form that expresses stress through irreducible tensor basis components weighted by hyperelastic response functions and modulated by a stress-reduction factor dependent on intact (i.e., undamaged) strain energy density. In contrast to prior neural-network-based constitutive approaches, the present work adopts a GPR-based two-stage supervised learning strategy, initially capturing undamaged hyperelastic response functions, followed by learning damage response through a strain-energy-density-dependent stress-reduction factor. Crucially, the second stage enforces physically motivated constraints, including monotonic, non-negative damage accumulation and complete failure at large strains. The proposed model is comprehensively validated using numerically generated stress-strain datasets. Predictions are benchmarked against traditional phenomenological models, black-box ML (i.e., purely data-driven) models, and direct one-step GPR mappings across diverse deformation modes, including uniaxial and shear responses extending beyond the training regime. As part of this evaluation, we also applied our framework to experimentally observed stress–strain data of brain tissue exhibiting progressive damage, further demonstrating the model’s applicability to complex biological materials. Results indicate substantial improvements in accuracy, predictive robustness, and generalizability. The remainder of this paper is structured as follows: Section 2 outlines the theoretical foundations, including the generalized energy-limited hyperelastic model and its irreducible tensor basis decompo-sition. Section 3 details the proposed data-driven constitutive modeling framework and our two-stage constrained training approach. Section 4 describes model evaluation methodology and the numerical and experimental datasets used to that end. Section 5 presents and analyzes model performance and evaluation results, and Section 6 summarizes key findings and suggests future research directions. 
+
+2. Theoretical Foundations 
+
+2.1. Energy Limiters Approach to Modeling Failure in Hyperelastic Materials 
+
+Traditional hyperelastic material models employ strain energy density functions that continuously increase without bound as deformation grows. Although these classical models effectively capture non-linear elasticity and large deformation behaviors, they inherently cannot represent material failure, as real materials eventually rupture when strain energy accumulation approaches a finite limit. Addressing this limitation, Volokh introduced the concept of energy limiters to explicitly model progressive damage and failure within hyperelastic frameworks [52, 5]. The central idea of the energy limiters approach is to constrain the maximum strain energy density a material element can store, reflecting the physical mechanism of microstructural bond rupture [63, 8]. Specifically, a critical failure energy ψf (also called saturation energy) is introduced to characterize material toughness, representing the upper bound of strain energy density sustainable by the material before failure occurs. Mathematically, this energy limitation implies that the total strain energy density 
+
+ψ asymptotically approaches ψf :lim   
+
+> W→∞
+
+ψ(W ) = ψf , (1) where W is the intact (undamaged) hyperelastic strain energy density, a function of applied deformation. 3For small-to-moderate deformations, when W ≪ ψf , the strain energy density function converges to standard hyperelastic behavior: 
+
+ψ(W ) ≈ W, as W → 0, (2) indicating an initially undamaged response. Conversely, with increasing deformation, the strain energy density approaches the critical failure energy ψf :
+
+ψ(W ) → ψf , as W → ∞ , (3) clearly signifying complete material damage. 
+
+2.2. The Irreducible Tensor Basis Decomposition of Stress in Energy-Limited Hyperelasticity 
+
+The second Piola–Kirchhoff stress tensor S is derived by differentiating the strain energy density function ψ with respect to the right Cauchy–Green deformation tensor C [15]: 
+
+S = 2 ∂ψ (W )
+
+∂C . (4) Using the chain rule, the expression becomes: 
+
+S = 2 dψ 
+
+dW ∂W 
+
+∂C , (5) where the stress-reduction factor dψ  
+
+> dW
+
+∈ [0 , 1] reflects progressive material degradation, decreasing mono-tonically from one (undamaged) to zero (fully damaged) [8]. Assuming isotropic material behavior, the stress tensor can be expressed in terms of scalar invariants of C:
+
+S = 2 dψ 
+
+dW ∂W (J, I 1, I 2)
+
+∂C , (6) with the invariants defined as: 
+
+J = √det C, I1 = tr C, I2 = 1
+
+2
+
+[(tr C)2 − tr( C2)] . (7) These invariants fully characterize the deformation state for isotropic hyperelastic materials. From a physical perspective, J measures the relative volume change of a material element during deformation (i.e., volumetric dilatation or compression), I1 represents the sum of the squared stretches of an infinites-imal segment averaged over all possible orientations within the material, and I2 is three times the square of the stretch ratio of an infinitesimal area element averaged over all possible orientations, capturing the extent of shear deformation [64, 65, 66]. Without loss of generality, W can be decomposed into volumetric and isochoric contributions [15]: 
+
+W = U (J) + ¯Wiso 
+
+( ¯I1, ¯I2
+
+) , (8) where U (J) describes the volumetric energy density function, and ¯Wiso characterizes the isochoric strain energy density via invariants of the distortional right Cauchy-Green deformation tensor ¯C = J−2/3C,ensuring volume preservation (det ¯C = 1): ¯I1 = tr ¯C, ¯I2 = 1
+
+2
+
+[(tr ¯C)2 − tr( ¯C2)] . (9) Substituting Eq. (8) in Eq. (6), the total stress can be additively decomposed into volumetric ( Svol )and isochoric ( Siso ) stress components, 
+
+S = Svol + Siso = dψ 
+
+dW 
+
+(
+
+2 ∂U (J)
+
+∂C + 2 ∂ ¯Wiso 
+
+( ¯I1, ¯I2
+
+)
+
+∂C
+
+)
+
+. (10) The partial derivatives in Eq. (10) can be expanded via the chain rule using standard results from isotropic hyperelasticity [15, 51], leading to the following Rivlin–Ericksen representation of the total second Piola–Kirchhoff stress: 
+
+S = Svol + Siso = dψ 
+
+dW 
+
+[
+
+J dU 
+
+dJ C−1 + 2 J−2/3
+
+( ∂ ¯Wiso 
+
+∂ ¯I1
+
++ ¯I1
+
+∂ ¯Wiso 
+
+∂ ¯I2
+
+)
+
+Dev( I) − 2J−2/3 ∂ ¯Wiso 
+
+∂ ¯I2
+
+Dev ¯C
+
+]
+
+, (11) 4where Dev ( ·) = ( ·) − 1 
+
+> 3
+
+(( ·) : C) C−1 is the deviatoric operator in the Lagrangian description, and I is the identity tensor. Equation (11) is the generalized stress description of the energy-limited hyperelastic constitutive modeling framework. Several phenomenological models, with specific mathematical equations for ψ(W ), 
+
+U (J), and ¯Wiso ( ¯I1, ¯I2) are available in the literature and have been employed to describe the damage responses of various soft materials, including rubber [67, 68, 69, 56], skin tissue [70, 71], and artery wall [72, 73]. Regardless of the choice of these specific constitutive equations, Eq. (11) can be rewritten in an alternative form as an additive decomposition of the components of an irreducible tensor bases weighted by certain response functions and modulated by the stress-reduction factor: 
+
+S = Svol + Siso = χ (W )
+
+[
+
+ζ(J)G1 + J−2/3Γ1( ¯I1, ¯I2)G2 + J−2/3Γ2( ¯I1, ¯I2)G3
+
+]
+
+, (12) where the tensor basis components are 
+
+G1 = C−1, G2 = Dev( I), G3 = Dev( ¯C), (13) the scalar response functions are 
+
+ζ(J) = J dU (J)
+
+dJ ,
+
+Γ1( ¯I1, ¯I2) = 2 
+
+( ∂ ¯Wiso ( ¯I1, ¯I2)
+
+∂ ¯I1
+
++ ¯I1
+
+∂ ¯Wiso ( ¯I1, ¯I2)
+
+∂ ¯I2
+
+)
+
+, Γ2( ¯I1, ¯I2) = −2 ∂ ¯Wiso ( ¯I1, ¯I2)
+
+∂ ¯I2
+
+,
+
+(14) and χ(W ) = dψ (W ) 
+
+> dW
+
+is the stress-reduction factor. The generalized stress representation in Eq. (12) serves as the foundation for the data-driven consti-tutive modeling framework proposed in this study. In traditional energy-limited hyperelasticity, response functions (Eq. (14)) and the stress-reduction factor assume fixed mathematical expressions based on the choices of constitutive equations for ψ(W ), U (J), and W ( ¯I1, ¯I2) (see Tables 1–3 in Appendix A for some examples). Unlike these phenomenological models, the data-driven framework proposed in the present study will explicitly learn the χ versus W , ζ versus J, and {Γ1, Γ2} versus { ¯I1, ¯I2} relationships directly from the experimental stress versus strain data using GPR models, as detailed in the next section. 
+
+3. Proposed Data-Driven Constitutive Modeling Framework 
+
+3.1. Overview of the Proposed Framework 
+
+The proposed constitutive modeling framework is based on a two-stage GPR approach designed to discover physically interpretable constitutive laws for hyperelastic soft materials undergoing progressive damage. A detailed schematic of this two-stage framework is illustrated in Fig. 1, which outlines the sequence of steps involved in model construction, from data preprocessing to GPR training and final model compilation. In the first stage, the goal is to characterize the material response in the undamaged regime. This stage operates under the assumption that the mechanical response up to a small-to-intermediate strain level—typically taken to be around 50% of the maximum strain at complete failure—corresponds to the behavior of the intact material. The exact cutoff is user-defined and can be tuned based on experimental observations. Stress–strain data from this undamaged regime (i.e., when χ = 1) are used to compute the scalar response functions ζ(J), Γ 1( ¯I1, ¯I2), and Γ 2( ¯I1, ¯I2) through inversion of the linearized tensor basis representation of the second Piola–Kirchhoff stress tensor (details in Section 3.2). Two GPR models are then trained: one to learn the mapping between the volumetric strain invariant J and the volumetric response function ζ, and another to learn the mapping between the isochoric invariants { ¯I1, ¯I2} and the corresponding isochoric response functions {Γ1, Γ2}. Mathematically, these mappings can be expressed as: 
+
+Mvol :
+
+[
+
+J
+
+]
+
+7→
+
+[
+
+ζ
+
+]
+
+, (15) 
+
+Miso :
+
+[ ¯I1
+
+¯I2
+
+]
+
+7→
+
+[Γ1
+
+Γ2
+
+]
+
+. (16) In the second stage, the GPR models obtained from Stage I are used to compute the predicted intact (i.e., undamaged) stress response and the corresponding intact hyperelastic strain energy density W
+
+5Figure 1: Schematic of the proposed physics-informed data-driven constitutive modeling framework. The complete material response dataset (stress versus strain) comprises both undamaged (intact) and damaged regimes. In Stage I (Section 3.2), the intact portion of the response is processed to compute strain invariants ( J, ¯I1, ¯I2) and corresponding response functions (ζ, Γ1, Γ2). These quantities serve as the input–output training data for two GPR models that separately characterize the volumetric and isochoric hyperelastic responses, denoted by Mvol and Miso , respectively. In Stage II (Section 3.3), the trained Stage I GPR models are used to predict the intact (i.e., undamaged) stress response and the associated intact hyperelastic strain energy density W over the full loading history. A stress-reduction factor χ(W ), representing progressive damage and failure, is then inferred and used to train a third, constrained GPR model Mdam . Together, the three GPR models Mvol , Miso , and Mdam constitute the proposed two-stage physics-informed GPR-based model , enabling physically consistent stress prediction under arbitrary deformation paths. 
+
+across the full deformation range, including the damaged regime. The stress-reduction factor χ(W ) is estimated pointwise from the ratio of the experimental stress to the predicted intact stress using a linear least squares approach (details in Section 3.3). A third GPR model is then trained to learn the mapping from W to χ, with physics-based constraints enforcing non-negativity, monotonic decay (i.e., damage can accumulate but not reverse), and an asymptotic behavior (i.e., χ → 0 as W → ∞ ). Mathematically, this mapping is given as: 
+
+Mdam :
+
+[
+
+W
+
+]
+
+7→
+
+[χ]
+
+. (17) 
+
+Together, the three GPR models, Mvol , Miso , and Mdam , form a physics-informed data-driven constitutive framework. Hereafter, we refer to this framework as the two-stage physics-informed GPR-based model . Once trained, the complete model can be used to compute the total stress S for any given input deformation tensor C as: 
+
+˜S = ˜χ [˜ζG1 + J−2/3 ˜Γ1G2 + J−2/3 ˜Γ2G3
+
+]
+
+, (18) where the accent symbols ( ˜· ) over the stress, response functions, and stress-reduction factor denote quantities predicted by the constituent GPR models. 63.2. Stage I: Modeling Undamaged Hyperelastic Response 3.2.1. Input–output dataset generation 
+
+In Stage I, an experimental dataset D = {Ci, Si}Ni=1 , which may include both intact and damaged responses, is first collected. Here, superscript i denotes a particular data point in the dataset, N being the total number of data points. To isolate the intact (undamaged) material response, a user-defined strain (or stretch) cut-off—typically set around 50% of the maximum strain (or maximum stretch) at failure—is applied. This results in a reduced intact subset Dintact = {Cj , Sj }Nintact  
+
+> j=1
+
+, where Nintact < N 
+
+and Dintact ⊂ D .From this intact material response subset, an alternative dataset, 
+
+D∗ 
+
+> intact
+
+= {[Jj , ¯Ij 
+
+> 1
+
+, ¯Ij 
+
+> 2
+
+], [ζj , Γj
+
+> 1
+
+, Γj
+
+> 2
+
+]}Nintact  
+
+> j=1
+
+, (19) is generated to facilitate training data-driven mappings. The alternative dataset is created by solving the tensorial linear relationship between the intact stress and tensor basis components (cf. Eq. (12)), 
+
+Sintact = ζG1 + J−2/3Γ1G2 + J−2/3Γ2G3, (20) which is expressed in the general linear algebra form ( Ax = b): 
+
+[vec( G1) J−2/3vec( G2) J−2/3vec( G3)]︸ ︷︷ ︸
+
+> A
+
+
+
+ζ
+
+Γ1
+
+Γ2
+
+︸ ︷︷ ︸
+
+> x
+
+= vec( Sintact )
+
+︸ ︷︷ ︸
+
+> b
+
+, (21) where vec( ·) ∈ R9×1 denotes the vectorization of tensors. This equation is solved at each experimental data point in Dintact —with known values of Sintact , J, G1, G2, and G3 (latter four computed from 
+
+C using Eqs. (7) and (13))—to calculate the three response functions by minimizing the residual: min ζ, Γ1,Γ2 ∥Ax − b∥2. Note that the known values of Sintact correspond to the stress measurements contained in the reduced intact dataset Dintact .Alternatively, if elastic volumetric and isochoric responses are available separately (e.g., from indepen-dent volumetric compression and isochoric deformation tests), the response functions may be obtained by solving two decoupled linear systems of the form Ax = b. In this case, the volumetric response function ζ can be extracted by solving an equation involving vec( Sintact ,vol ) and the vectorized tensor basis vec( G1), while the isochoric response functions Γ 1 and Γ 2 can be obtained from vec( Sintact ,iso ) and 
+
+(J−2/3vec( G2), J −2/3vec( G3)). This alternative procedure yields the same sets of data points {ζj , Γj
+
+> 1
+
+, Γj
+
+> 2
+
+}
+
+used to construct the dataset D∗
+
+> intact
+
+.Once the dataset D∗ 
+
+> intact
+
+is created, the two GPR models Mvol : J 7 → ζ (Eq. (15)) and Miso :( ¯I1, ¯I2) 7 → (Γ 1, Γ2) (Eq. (16)) are trained separately. This completes Stage I, establishing a robust, physically consistent baseline model for undamaged hyperelastic response predictions. 
+
+3.2.2. Gaussian process regression implementation 
+
+In this work, GPR is employed as a nonparametric Bayesian regression framework to learn functional relationships directly from data [74]. Given input–output pairs {zj , yj }nj=1 , the outputs are modeled as realizations of a zero-mean Gaussian process: 
+
+y(z) ∼ GP (0 , k (z, z′)) , (22) where z ∈ Rdin denotes the input vector (e.g., J and [ ¯I1, ¯I2]T), and y(z) ∈ Rdout is the corresponding vector-valued output (e.g., ζ or [Γ 1, Γ2]T). For the volumetric GPR model Mvol , din = dout = 1, whereas for the isochoric GPR model Miso , din = dout = 2. The covariance kernel k(z, z′) encodes prior assumptions regarding the smoothness, correlation length, and regularity of the underlying function being learned. In essence, the kernel determines how outputs at two different input locations are statistically correlated, thereby governing the functional class that the GPR model can represent. We employ the Mat´ ern 5/2 covariance kernel [75, 76], augmented with a nugget term for numerical stability: 
+
+k(z, z′) = σ2
+
+> f
+
+(
+
+1 + 
+
+√5r
+
+ℓ + 5r2
+
+3ℓ2
+
+)
+
+exp 
+
+(
+
+−√5r
+
+ℓ
+
+)
+
++ αδ zz ′ , (23) 7where r = ∥z − z′∥ is the Euclidean distance, σ2 
+
+> f
+
+is the signal variance, l is the characteristic length scale, 
+
+α is the nugget parameter, and δ′ 
+
+> zz
+
+is the Kronecker delta. The Mat´ ern 5/2 kernel is chosen based on the comparative study by Laurent et al. [77], which demon-strated its robustness for computer experiments when little prior information is available about the un-derlying functional form. Importantly, this kernel offers a controlled level of smoothness—corresponding to twice mean-square differentiability—making it sufficiently flexible for constitutive modeling while avoiding the overly smooth behavior associated with squared-exponential kernels [78, 79]. Note, kernel differentiability will be particularly critical for the Stage II damage model (Section 3.3), where constraints are imposed directly on the derivative of the learned function with respect to the strain energy density. The optimal kernel hyperparameters θ = [ σf , l ] that best describe the training dataset are obtained by minimizing the negative marginal log-likelihood [80]: 
+
+˜θ = arg min 
+
+> θ⋆
+
+[− log p(Y|Z, θ)] = arg min 
+
+> θ⋆
+
+[ 1
+
+2 YTK(Z, Z)−1Y + 1
+
+2 log(det( K(Z, Z))) + n
+
+2 log(2 π)
+
+]
+
+, (24) where the matrix Z ∈ Rn×din denotes the full set of input training data, with each row representing a sample data point; similarly, Y ∈ Rn×dout contains all vector-valued outputs in the training dataset. 
+
+K(Z, Z) is the Gram matrix assembled using the kernel k(·, ·). After finding the best parameters, a GPR regression model is fully defined. Given a new input data point z⋆, the predicted output ˜y of the Gaussian process regressor reads 
+
+˜y(z⋆) = K(Z, z⋆)T K(Z, Z)−1 Y, (25) with predictive variance 
+
+˜σ2(z⋆) = k(z⋆, z⋆) − K(Z, z⋆)T K(Z, Z)−1 K(Z, z⋆). (26) As α → 0 in Eq. (23), the GPR predictor exhibits the exact inference property, i.e., ˜y(zj ) = yj at all training points j = 1 , . . . , n . This property is exploited to enforce the stress-free reference state by explicitly including the data point {C = I, S = 0} in the training set. In terms of invariants, C = I
+
+corresponds to J = 1 and ¯I1 = ¯I2 = 3, while S = 0 translates to ζ = Γ 1 = Γ 2 = 0. Hyperparameter optimization is performed using the Limited-memory Broyden–Fletcher–Goldfarb– Shanno (L-BFGS-B) algorithm in the SciPy library for Python [81]. 
+
+3.3. Stage II: Incorporating Progressive Damage and Failure with Constrained GPR 3.3.1. Input–output dataset generation 
+
+In Stage II, the stress-reduction factor χ, which characterizes material degradation, is modeled ex-plicitly. Using the GPR models Mvol and Miso trained in Stage I, the intact stress ˜Sintact is predicted across the entire deformation range in the training dataset D (including the damaged region) as 
+
+˜Sintact = ˜ζG1 + J−2/3 ˜Γ1G2 + J−2/3 ˜Γ2G3, (27) where the accent symbols ( ˜· ) denote predicted values from Stage I GPR models. The corresponding intact hyperelastic strain energy density W at each data point is calculated using 
+
+W =
+
+∫ CI
+
+˜Sintact : 1
+
+2 dC. (28) Numerically, this integration is performed using the trapezoidal rule, which balances simplicity and accuracy and is particularly suitable when the stress and deformation tensors are available at finely sampled intervals. Using Eq. (28), a W (i.e., W i for i ∈ [1 , N ]) is computed for each Ci in D, creating the input dataset for the Stage II model. Each computation of integral utilizes the full discrete sequence of deformation states from C1 = I to Ci.The stress-reduction factor at each data point is then determined by solving the linear relationship (see Eq. (12)): 
+
+S = χ˜Sintact , (29) which, when expressed in vectorized form, leads to the following linear system: vec( ˜Sintact )
+
+︸ ︷︷ ︸
+
+> A
+
+χ
+
+︸︷︷︸ 
+
+> x
+
+= vec( S)
+
+︸ ︷︷ ︸
+
+> b
+
+. (30) 8This equation is solved via least squares minimization: min χ ∥Ax − b∥2.Using W and χ calculated at each training data point, an alternative training dataset, 
+
+D∗ 
+
+> dam
+
+= {W i, χ i}Ni=1 , (31) is thereby constructed to train a third GPR model Mdam : W 7 → χ (Eq. (17)). Unlike the Stage I GPR models, the Stage II model is a constrained GPR regressor that explicitly incorporates physics-based constraints to ensure realistic damage evolution behavior. 
+
+3.3.2. Constrained Gaussian process regression for damage modeling 
+
+To ensure physically admissible damage evolution, the GPR model for the stress-reduction factor, 
+
+Mdam , is trained using a constrained hyperparameter optimization strategy that enforces three essential physical requirements: (i) non-negativity of the stress-reduction factor, (ii) monotonic damage accumula-tion, and (iii) complete material failure at large strains (i.e, at large W ). Unlike the Stage I models, which are trained using standard minimum negative marginal log-likelihood estimation, the Stage II model in-corporates these constraints through penalty-based regularization of the negative marginal log-likelihood, evaluated at selected constraint points. 1. Non-negativity of the stress-reduction factor: Physical admissibility requires the stress-reduction factor to satisfy χ(W ) ≥ 0 ∀W. (32) To enforce this condition, a non-negativity penalty is introduced at a set of constraint inputs, i.e., selected values of the intact strain energy density used exclusively for constraint enforcement: 
+
+Dcons = {W pc }Nc
+
+> p=1
+
+. (33) Violations of non-negativity are penalized through the following quadratic penalty term: 
+
+Pnn (θ) = Λ nn 
+
+> Nc
+
+∑
+
+> p=1
+
+[min (0 , E [χ(W pc )])] 2, (34) where E [χ(W pc )] denotes the posterior mean of the GPR prediction evaluated at constraint points, and Λ nn is a user-defined penalty weight. 2. Monotonicity of the stress-reduction factor: To enforce irreversible damage accumulation, the stress-reduction factor must be a monotonically decreasing (i.e., non-increasing) function of the intact hyperelastic strain energy density: 
+
+dχ 
+
+dW ≤ 0. (35) Since derivatives of a Gaussian process are themselves Gaussian processes, the derivative dχ 
+
+> dW
+
+can be evaluated analytically through derivatives of the covariance kernel. Specifically, for the zero-mean GPR model Mdam , we have [82] 
+
+χ(W ) ∼ GP (0 , k (W, W ′)) = ⇒ dχ 
+
+dW ∼ GP 
+
+(
+
+0, ∂2k(W, W ′)
+
+∂W ∂W ′
+
+)
+
+. (36) The posterior mean of the derivative at a constraint point W pc is given by [82]: 
+
+E
+
+[
+
+∂χ 
+
+∂W 
+
+∣∣∣∣W =W pc
+
+]
+
+= ∂K(W , W pc )
+
+∂W ′
+
+> T
+
+K(W , W )−1χ, (37) where W = [ W 1, . . . , W N ]T denotes the vector of all Stage II training inputs from the dataset 
+
+D∗
+
+> dam
+
+, and χ = [ χ(W 1), . . . , χ (W N )] T = [ χ1, . . . , χ N ]T are the corresponding training outputs. Here, k(·, ·) denotes the scalar covariance kernel and K(·, ·) the associated Gram matrix. For the Mat´ ern 5/2 kernel k(W, W ′) used in this work (Eq. (23)), the kernel derivative is: 
+
+∂k (W, W ′)
+
+∂W ′ = σ2
+
+> f
+
+( 5( W − W ′)
+
+3ℓ2
+
+) (
+
+1 + 
+
+√5r
+
+ℓ
+
+)
+
+exp 
+
+(
+
+−√5r
+
+ℓ
+
+)
+
+, (38) 9with r = |W − W ′|.To discourage violations of monotonicity, a quadratic penalty is imposed on positive derivative values (evaluated at data points in Dcons ): 
+
+Pmono (θ) = Λ mono 
+
+> Nc
+
+∑
+
+> p=1
+
+[
+
+min 
+
+(
+
+0, −E
+
+[
+
+∂χ 
+
+∂W 
+
+∣∣∣∣W =W pc
+
+])] 2
+
+, (39) where Λ mono is a user-defined penalty weight. This formulation enforces monotonic decay of the expected damage evolution, while retaining numerical robustness and compatibility with standard optimization algorithms. 3. Complete failure at very large strains: To represent material failure, the stress-reduction factor must asymptotically approach zero as the intact hyperelastic strain energy density becomes large: lim  
+
+> W→∞
+
+χ(W ) = 0 . (40) Rather than enforcing this behavior analytically, it is incorporated through data augmentation. Specifically, additional artificial points are introduced in the training dataset D∗ 
+
+> dam
+
+in the range 
+
+W ∈ [aW peak , bW peak ], where a and b (b > a > 1) are adjustable constants and Wpeak is the maximum intact hyperelastic strain energy density value in the original dataset D∗ 
+
+> dam
+
+prior to data augmentation. At these artificial points, χ(W ) = 0 is prescribed. Combining the likelihood term with the penalty-based constraints, the final optimization problem for the Stage II GPR hyperparameters θ is formulated as: 
+
+˜θ = arg min 
+
+> θ⋆
+
+[− log p(χ|W , θ) + Pnn (θ) + Pmono (θ)] , (41) where the augmented dataset implicitly enforces the complete failure constraint. The constrained opti-mization problem is solved using the L-BFGS-B algorithm in the SciPy library [81]. Once trained, the three GPR models— Mvol , Miso , and Mdam —constitute the complete two-stage physics-informed GPR-based model. For an arbitrary deformation tensor C, the Stage I models Mvol 
+
+and Miso predict the volumetric and isochoric hyperelastic response functions, ˜ζ, ˜Γ1 and ˜Γ2, which are used to reconstruct the intact stress response and the corresponding intact hyperelastic strain energy density. The Stage II model Mdam then predicts the evolution of the stress-reduction factor ˜χ, capturing progressive material degradation and failure. The combination of predicted response functions and stress-reduction factor evolution enables prediction of the complete stress–strain response using Eq. (18). 
+
+3.4. Physics-Based Constraints Satisfied by the Proposed Framework 
+
+The proposed two-stage physics-informed GPR-based model inherently satisfies several fundamental physical principles required of continuum constitutive models, as discussed comprehensively in Tadmor et al. [83]. These constraints are summarized below: 
+
+• Principle of Determinism: The model establishes a deterministic mapping between the input de-formation tensor C and the output stress tensor S. For any given C, the model predicts a unique, reproducible stress response through Eq. (18). 
+
+• Principle of Local Action: The model uses strain invariants J, ¯I1, and ¯I2 derived from the local deformation tensor C. Consequently, the stress at a material point (Eq. (18)) depends only on the local deformation, not on neighboring points. 
+
+• Balance of Angular Momentum: Since the tensor basis components (Eq. (13)) are symmetric and the stress tensor is expressed as their linear combination (Eq. (18)), the symmetry of the second Piola–Kirchhoff stress tensor S is automatically satisfied, i.e., S = ST, thereby fulfilling the local balance of angular momentum. 
+
+• Material Frame-Indifference (Objectivity): Material frame-indifference is ensured because S and C
+
+are both objective tensors associated with the reference configuration and thus remain unaffected under superimposed rigid body motions. In other words, S(C) = RT S(RCR T )R ∀R ∈ SO (3), where SO (3) denotes the special orthogonal group of proper rotations in three dimensions.. 
+
+• Isotropic Material Symmetry: Isotropy follows directly from the generalized constitutive formula-tion in Eq. (6), which depends solely on the isotropic invariants of C: J, ¯I1, and ¯I2.10 • Stress-Free Reference State (Normalization Condition): As described in Stage I (Section 3.2), the stress-free undeformed configuration is enforced by explicitly including the data point corresponding to zero strain and zero stress ( C = I, S = 0) in the training dataset. Owing to the exact inference property of GPR with a small nugget value, the trained model recovers zero stress at the reference state exactly. 
+
+• Thermodynamic Consistency: The intact (undamaged) stress response learned in Stage I is in-herently thermodynamically consistent, as it is derived from the intact hyperelastic strain energy density W via differentiation with respect to C (Eq. (5)), consistent with the Coleman–Noll pro-cedure [84]. As enforced in Stage II (Section 3.3), the stress-reduction factor χ(W ) is further constrained to be a non-negative, monotonically decreasing function of W , i.e., χ ≥ 0 and dχ 
+
+> dW
+
+≤ 0. This ensures that the mechanical work supplied to the system is either stored elastically (up to a saturation limit) or dissipated through internal damage, and never leads to spontaneous en-ergy creation. Additional synthetic data points beyond the maximum observed W further enforce the asymptotic condition lim W →∞ χ(W ) = 0, representing complete material failure and maximal internal degradation. The monotonic decay of χ(W ) induces progressive material softening with increasing deformation, manifested as a reduction in the material tangent stiffness. Beyond peak load, the stress–strain response may exhibit a negative slope, reflecting material instability and the onset of failure. In this regime, localized stiffness degradation can result in loss of ellipticity, characterized by negative eigenvalues of the 
+
+acoustic tensor , which is a second-order tensor derived from the fourth-order tangent stiffness tensor. Such behavior is physically consistent with the breakdown of material integrity in energy-limited hyper-elastic models (see Volokh [53]). A complete derivation of the tangent stiffness tensor, which is essential for numerical implementation (e.g., finite element formulations), is provided in Appendix B. 
+
+4. Model Evaluation Methodology 
+
+This section outlines the datasets and evaluation procedures used to assess the predictive performance of the proposed two-stage physics-informed GPR-based model. Two studies are performed: (i) validation against numerically generated synthetic datasets with known ground-truth constitutive behavior, and (ii) application to modeling experimental uniaxial tension data of a real soft biological tissue. Unless stated otherwise, model comparisons are carried out using the stress-based relative error metric defined in Section 4.3. To maintain focus on dataset design and evaluation protocol, implementation-specific choices used in GPR training (e.g., nugget values, stretch cutoffs for isolating intact response, constraint point selection, penalty weights, and the range/number of artificially augmented failure points) are not enumerated here; these settings are instead reported alongside the corresponding fits and predictions in the Results and Discussion section (Section 5). 
+
+4.1. Validation Using Synthetic Data 
+
+To systematically assess accuracy and out-of-sample generalizability, synthetic datasets are generated by combining the Simo–Miehe volumetric energy density function [85] and the Mooney–Rivlin isochoric strain energy density function [11, 12] with Volokh’s universal energy-limiter damage formulation [5]. The total strain energy density is given by 
+
+ψ = Φ
+
+m
+
+{
+
+Γ ∗
+
+( 1
+
+m , 0
+
+)
+
+− Γ ∗
+
+( 1
+
+m ,
+
+( W
+
+Φ
+
+)m)} 
+
+, (42) where 
+
+W = U (J) + ¯Wiso ( ¯I1, ¯I2) = κ
+
+2
+
+( J2 − 1
+
+2 − ln J
+
+)
+
++ A10 ( ¯I1 − 3) + A01 ( ¯I2 − 3) , (43) and the upper incomplete gamma function is 
+
+Γ ∗(s, x ) = 
+
+∫ ∞
+
+> x
+
+ts−1 exp( −t)dt. (44) Here, Φ is the pseudo-failure energy, m is the softening sharpness parameter, κ is the bulk modulus, and A10 , A01 are Mooney–Rivlin material parameters. The corresponding critical failure energy is 
+
+ψf = Φ 
+
+> m
+
+Γ ∗ ( 1 
+
+> m
+
+, 0) [5]. 11 Figure 2: (a) Second Piola–Kirchhoff stress components S11 and S22 versus stretch λ for the synthetic uniaxial tension dataset used in numerical validation. Inset shows a schematic illustration of the uniaxial tension deformation, highlighting the reference and deformed states and the 11-loading direction. (b) Axial second Piola–Kirchhoff stress S11 versus λ for brain tissue specimens reported by Franceschini et al. [86] and used to demonstrate model application to real experimental data. Solid curves denote gray matter (GM) of thalamus; dashed curves correspond to white matter from the occipital (WM-o) and parietal (WM-p) lobes. 
+
+The training dataset D = {Ci, Si}Ni=1 (with N = 51) is generated by simulating uniaxial tensile deformations using the following deformation gradient tensor: 
+
+F = diag (λ, λ −ν , λ −ν ) , λ ∈ [1 , 1.5] , (45) where λ is the axial stretch and ν is the Poisson’s ratio. The corresponding right Cauchy–Green tensor is 
+
+C = FTF = diag (λ2, λ −2ν , λ −2ν ) . (46) In this study, a nearly incompressible response is approximated using ν = 0 .49. The second Piola– Kirchhoff stress tensor S at each deformation state is computed using Eq. (11) as 
+
+S = exp 
+
+(
+
+−
+
+( W
+
+Φ
+
+)m) [ κ
+
+2
+
+(J2 − 1) C−1 + J−2/3 [2( A10 + ¯I1A01 )Dev I − 2A01 Dev ¯C]]
+
+, (47) using parameter values Φ = 0 .75, m = 10, κ = 100, A10 = 1, and A01 = 0 .5. Figure 2(a) shows the resulting uniaxial tension responses in terms of the nonzero stress components S11 and S22 (with 
+
+S22 = S33 ). After training the proposed data-driven model on uniaxial tension data, out-of-sample generalization is evaluated under deformation modes not included in the training set: (i) uniaxial compression with 
+
+λ ∈ [0 .5, 1], and (ii) simple shear, characterized by 
+
+F =
+
+1 γ 00 1 00 0 1
+
+ , (48) where γ ∈ [0 , 0.8] is the shear strain magnitude. The predictive performance of the proposed model is benchmarked against: 
+
+• A theory-based analytical constitutive model fit to the training data, combining a neo-Hookean volumetric energy density [87] and a two-parameter Yeoh isochoric strain energy density [88, 89] with Volokh’s one-parameter reduced damage formulation [52]: 
+
+ψ = Φ − Φ exp 
+
+(
+
+− W
+
+Φ
+
+)
+
+, with W = κ
+
+2 (J − 1) 2 + C1( ¯I1 − 3) + C2( ¯I1 − 3) 2. (49) The calibrated model parameters are κ = 99 .28, C1 = 1 .73, C2 = −0.55, and Φ = 3 .05. 
+
+• A black-box GPR model directly mapping components of C to components of S:
+
+Mblack −box :
+
+[
+
+vec( C)
+
+]
+
+7→
+
+[
+
+vec( S)
+
+]
+
+. (50) 12 • A single-stage (direct) GPR-based model mapping invariants ( J, ¯I1, ¯I2) to scaled response functions that appear in the stress decomposition (Eq. (12)): 
+
+Mdirect,vol :
+
+[
+
+J
+
+]
+
+7→
+
+[χζ 
+
+]
+
+, (51) 
+
+Mdirect,iso :
+
+[ ¯I1
+
+¯I2
+
+]
+
+7→
+
+[χΓ1
+
+χΓ2
+
+]
+
+. (52) Scaled response functions are obtained by applying the same invariant computation and tensor basis stress decomposition used in the proposed framework (Eq. (12)), but fitting GPR mappings directly to the combined (intact + damaged) data in a single step so that the learned targets are the multiplicative coefficients appearing in the stress representation, i.e., χζ (J) and χΓ1,2( ¯I1, ¯I2). Quantitative comparisons are performed using the relative error metric detailed in Section 4.3. 
+
+4.2. Application to Soft Tissue Mechanical Response 
+
+To assess applicability to experimental soft-tissue behavior, the proposed model is applied to capturing uniaxial tension data of brain tissue gray and white matter reported by Franceschini et al. [86]. The original dataset comprises nominal (first Piola–Kirchhoff) stress P11 versus stretch λ measurements under monotonic tension to very large stretches (exceeding 2), exhibiting progressive softening and eventual failure. Figure 2(b) shows the corresponding axial second Piola–Kirchhoff stress component versus stretch responses, computed using S11 = P11 /(1 + λ). 
+
+Training with uniaxial-only data under incompressibility constraint . Unlike the synthetic vali-dation, the experimental dataset does not include volumetric or hydrostatic loading information. There-fore, consistent with common practice for many soft materials, the material response is assumed incom-pressible ( J = 1) [90, 91, 92, 93, 94, 95]. Under incompressibility, the volumetric contribution is replaced by a Lagrange multiplier p enforcing the constraint, and the stress decomposition no longer involves an independently modeled volumetric response function ζ(J). Consequently, the Stage I training procedure is modified: only the isochoric response functions are extracted and learned (i.e., only Miso is trained in Stage I), followed by Stage II damage learning as in the general framework. Under incompressibility, the second Piola–Kirchhoff stress tensor takes the form (cf. Eq. (12)) 
+
+S = −p G1 + χ (W ) [Γ1( ¯I1, ¯I2)G2 + Γ 2( ¯I1, ¯I2)G3
+
+] , (53) where p is the Lagrange multiplier. For incompressible uniaxial tension, 
+
+F = diag 
+
+(
+
+λ, λ −1/2, λ −1/2)
+
+, C = FTF = diag (λ2, λ −1, λ −1) . (54) Imposing traction-free lateral conditions ( S22 = S33 = 0) yields an analytic expression for p in terms of Γ 1 and Γ 2:
+
+p = χ (W )
+
+( Γ1( ¯I1, ¯I2) ( G2)22 + Γ 2( ¯I1, ¯I2) ( G3)22 
+
+(G1)22 
+
+)
+
+. (55) Substituting back into Eq. (53) eliminates p and leads to 
+
+S = χ (W ) Sintact 
+
+= χ (W )
+
+[
+
+Γ1( ¯I1, ¯I2)
+
+(
+
+G2 − (G2)22 
+
+(G1)22 
+
+G1
+
+)
+
++ Γ 2( ¯I1, ¯I2)
+
+(
+
+G3 − (G3)22 
+
+(G1)22 
+
+G1
+
+) ]
+
+. (56) In Stage I, the intact portion of the axial response is isolated from the experimental stress–stretch pairs using a user-defined stretch cutoff. Using Eq. (56), the isochoric response functions are extracted via linear least squares at each data point by solving 
+
+[
+
+vec 
+
+(
+
+G2 − (G2)22 
+
+> (G1)22
+
+G1
+
+)
+
+vec 
+
+(
+
+G3 − (G3)22 
+
+> (G1)22
+
+G1
+
+)] ︸ ︷︷ ︸
+
+> A
+
+[Γ1
+
+Γ2
+
+]︸ ︷︷ ︸
+
+> x
+
+= vec( Sintact )
+
+︸ ︷︷ ︸
+
+> b
+
+. (57) 13 The isochoric GPR model Miso : ( ¯I1, ¯I2) 7 → (Γ 1, Γ2) is trained using the intact dataset. The intact strain energy density is then computed over the full stretch history (cf. Eq. (28)) as 
+
+W =
+
+∫ λ
+
+> 1
+
+(˜Sintact 
+
+)
+
+> 11
+
+dλ, (58) where ˜(·) denotes predictions from the Stage I model. The damage factor χ(W ) is subsequently obtained from the proportionality relation between measured and intact stresses (Eq. (30)), and Stage II trains the constrained GPR model Mdam : W 7 → χ following the general procedure described in Section 3.3. The predictive performance of the proposed two-stage physics-informed GPR-based model is evalu-ated by directly comparing model predictions with the experimental stress–stretch data using the relative error metric defined in Section 4.3. In contrast to the synthetic data validation study presented earlier, which provides systematic comparative benchmarking against other models across a range of deforma-tion modes, the objective of this section is not comparative benchmarking but rather to demonstrate the practical applicability of the proposed framework to real, noisy, and biologically heterogeneous soft-tissue data. The model is trained and evaluated using only the available uniaxial tension measurements, and the resulting predictions are interpreted in terms of both fitting accuracy and the physical relevance and interpretability of the inferred elastic–damage decomposition. 
+
+4.3. Model Evaluation Metric 
+
+To quantitatively assess model performance, the percentage relative error at each data point is com-puted using the Frobenius norm of the predicted and reference second Piola–Kirchhoff stress tensors: 
+
+ei = 100 × ∥˜Si − Strue  
+
+> i
+
+∥F
+
+∥Strue  
+
+> i
+
+∥F
+
+, (59) where ∥·∥ F denotes the Frobenius norm, ˜Si is the model prediction, and Strue  
+
+> i
+
+is the reference stress tensor (synthetic ground truth or experimentally derived stress). For synthetic datasets, errors are reported separately for the training deformation mode (uniaxial tension) and the out-of-sample deformation modes (uniaxial compression and simple shear). For experimental datasets, evaluation is restricted to the available uniaxial tension regime. 
+
+5. Results and Discussion 
+
+5.1. Model Performance with Synthetic Mechanical Test Data 5.1.1. In-distribution accuracy: Uniaxial tension 
+
+We first examine the in-distribution predictive performance of the proposed two-stage physics-informed GPR-based model using the synthetic uniaxial tension dataset described in Section 4.1. Since the un-derlying constitutive response is known exactly, this benchmark enables a rigorous comparison between model predictions and the ground-truth behavior in both the intact and damage-dominated regimes. 
+
+Training setup and implementation choices . The synthetic training dataset consists of N = 51 deformation states uniformly sampled over the stretch range λ ∈ [1 , 1.5]. As described in Section 3.2, the intact (undamaged) portion of the response required for Stage I training is isolated using a stretch cutoff of λ = 1 .25. This choice ensures that the volumetric and isochoric response functions are learned exclusively from the undamaged regime, while still spanning a sufficiently rich range of deformation states. Stage II damage learning follows the constrained GPR framework detailed in Section 3.3. Monotonic-ity and non-negativity constraints on the stress-reduction factor χ(W ) are enforced at a set of Nc = 30 constraint points selected over the strain-energy range W ∈ [0 .6, 1.25] (see Eq. (33)), corresponding ap-proximately to 0 .8Wpeak ≤ W ≤ 1.7Wpeak . This interval spans the region where χ(W ) transitions rapidly from unity toward zero and is therefore critical for stabilizing the damage evolution. Without these con-straints, the inferred χ(W ) may exhibit non-physical behavior, such as becoming negative or locally increasing before approaching zero. The role of these constraints is further examined in Section 5.1.4. Both the non-negativity and monotonicity penalties use weights of Λ nn = Λ mono = 10 3 (Eqs. (34) and (39)). Complete failure at large intact strain energy densities is enforced via data augmentation by introducing artificial points with χ = 0 in the range W ∈ [1 .3Wpeak , 2.6Wpeak ] (i.e., a = 1 .3 and b = 2 .6in the notation of Section 3.3.2). 14 Figure 3: In-distribution model performance under uniaxial tension using synthetic data. (a) Axial and lateral second Piola–Kirchhoff stress components, S11 and S22 , versus stretch λ in the training regime, comparing the proposed two-stage physics-informed GPR-based model with the analytical constitutive model, a black-box GPR model, and a single-stage (direct) GPR-based model. (b) Corresponding percentage relative error versus stretch, computed using the Frobenius norm of the stress tensor. 
+
+Finally, the nugget parameter α (Eq. (23)) is chosen separately for each GPR model to balance numerical conditioning and fidelity. For the volumetric model Mvol , α = 10 −5 is assigned at the stress-free reference state, while α = 10 −2 is used for the remaining training points. For the isochoric model 
+
+Miso , a larger nugget α = 10 0 is used at all training points to enhance numerical stability and mitigate overfitting in the two-output regression. For the damage model Mdam , α = 10 −4 is used at all training points. For consistency across model comparisons, nugget parameters are also specified for the baseline data-driven models. The black-box GPR model Mblack -box employs a uniform nugget value of α = 10 −2 at all training points. For the single-stage (direct) GPR-based model, the volumetric and isochoric mappings, 
+
+Mdirect,vol and Mdirect,iso , use the same nugget values as their corresponding Stage I counterparts in the proposed framework, i.e., α = 10 −5 at the stress-free reference state and α = 10 −2 elsewhere for 
+
+Mdirect,vol , and α = 10 0 at all training points for Mdirect,iso . This choice ensures a fair and consistent comparison of model performance. 
+
+Stress–stretch predictions and error analysis . Figures 3(a–b) jointly compare the predicted axial and lateral second Piola–Kirchhoff stress components and the corresponding pointwise percentage relative errors (Eq. (59)) as functions of stretch within the training regime for four models: (i) the proposed two-stage physics-informed GPR-based model, (ii) the analytical constitutive model in Eq. (49), (iii) the black-box GPR model mapping in Eq. (50), and (iv) the single-stage (direct) GPR-based model in Eqs. (51) and (52), which maps invariants directly to scaled response functions. In the intact regime ( λ ≲ 1.25), all data-driven models reproduce the ground-truth stress–stretch response with small errors, as evidenced by the close overlap of curves in Fig. 3(a) and the uniformly low relative errors in Fig. 3(b). As the response transitions into the damage-dominated regime, clear distinc-tions emerge. The black-box GPR model continues to interpolate the stress–stretch data almost exactly across the entire stretch range, resulting in the smallest pointwise errors overall. This behavior is re-flected in Fig. 3(b), where the black-box model consistently exhibits near-zero relative error except in the immediate vicinity of the reference state. This high fitting accuracy is expected, as the black-box model directly maps deformation tensor components to stress components without intermediate representations such as response functions or damage variables. Under uniaxial tension, the effective dimensionality of both the input and output spaces is low (two unique deformation and stress components), and thus the advantages of dimensionality reduction and physics-based decomposition in the proposed framework do not translate into superior interpolation accuracy in this specific in-distribution setting. By contrast, the proposed two-stage model introduces an intermediate decomposition into intact hy-perelastic response and damage evolution. While this structure slightly limits pure interpolation accuracy relative to the black-box approach, it yields a physically interpretable and thermodynamically admissible representation of the material response. As seen in Fig. 3(a), this manifests as small deviations from the ground-truth stress response, which are mirrored by modest increases in relative error in Fig. 3(b). Nevertheless, the proposed model captures both the nonlinear elasticity and softening behavior with high fidelity. Importantly, the proposed model substantially outperforms the analytical constitutive model, whose fixed functional form limits its ability to capture the nonlinear transition from intact behavior to pro-15 gressive softening. The single-stage GPR-based model also exhibits noticeable deviations near the peak and post-peak regions, where the response becomes highly nonlinear and damage-dominated, and thus, a direct mapping struggles to represent the evolving constitutive behavior. These discrepancies are evident in Fig. 3(a) as underprediction or over-smoothing of the stress response and are directly reflected in the large relative error spikes in Fig. 3(b). Table 1 summarizes the mean and maximum percentage relative errors over the training regime. While the black-box GPR model yields the smallest mean error, its comparatively high maximum error is not indicative of poor performance in the damage regime; rather, it is concentrated near the stress-free reference configuration, where the denominator in the relative error metric becomes very small and even minor absolute deviations are amplified. Overall, the proposed two-stage model maintains consistently low errors across both intact and damage-dominated portions of the response, substantially outper-forming the analytical and single-stage GPR-based models while retaining a physically interpretable structure. Although it does not surpass the black-box GPR in pure interpolation accuracy under uni-axial tension, it achieves a more favorable balance between flexibility and physical structure. As shown next in Section 5.1.3, this balance is critical for achieving robust and physically meaningful predictions in out-of-sample deformation modes, where purely data-driven black-box models fail to generalize. 
+
+5.1.2. Process-level interpretation of the proposed two-stage model 
+
+Beyond predictive accuracy, a key objective of the proposed framework is to provide a physically interpretable description of material behavior by explicitly separating elastic response from progressive damage. Figure 4 illustrates this process-level decomposition for the synthetic uniaxial tension dataset and highlights how the two-stage physics-informed GPR-based model recovers meaningful internal vari-ables that are absent in competing data-driven approaches. 
+
+Separation of intact elasticity and damage effects . Figure 4(a) compares the axial and lateral components of the predicted intact (undamaged) second Piola–Kirchhoff stress ˜Sintact obtained from the trained Stage I GPR models Mvol and Miso (Eq. (27)) with the total stress produced by the full two-stage model (Eq. (18)). In the intact regime ( λ ≲ 1.25), the intact stress closely follows the training data, confirming that the Stage I GPR models accurately learn the underlying hyperelastic response. As deformation proceeds into the damage-dominated regime, the intact stress continues to increase smoothly, reflecting the extrapolated elastic response that would be obtained in the absence of damage. The final stress response, by contrast, deviates from this intact trajectory and exhibits progressive softening and eventual failure due to the multiplicative action of the stress-reduction factor learned in Stage II. This clear divergence between intact and total stress responses demonstrates that the proposed frame-work achieves a clean and explicit separation between elasticity and damage. Importantly, this separation is not imposed through a prescribed analytical form but is learned directly from data while respecting fundamental physical constraints. 
+
+Damage evolution through a physically meaningful internal variable . The evolution of the stress-reduction factor χ predicted by the trained Stage II constrained GPR model Mdam is shown in Fig. 4(b). The inferred χ versus λ response exhibits a monotonic, non-negative decay from values close to unity toward zero as deformation increases. This behavior is consistent with the physical interpretation of χ as a scalar measure of material integrity. Although χ is not exactly equal to unity in the intact regime, owing to small prediction errors in the Stage I GPR models used to compute ˜Sintact , it remains within approximately 10% of unity prior to damage onset (i.e., prior to λ ≈ 1.4, which corresponds to the peak axial stress). Crucially, χ never becomes negative, nor does it exhibit any increase in the post-peak region, which would indicate non-physical material healing.               
+
+> Table 1: Mean (¯ e) and maximum ( emax ) percentage relative errors in the uniaxial tension training regime for the synthetic dataset, comparing the proposed two-stage physics-informed GPR-based model with an analytical constitutive model, a black-box GPR model, and the single-stage (direct) GPR-based model. Errors are computed using the relative metric defined in Eq. (59).
+> Model Mean error, ¯ e(%) Maximum error, emax (%)
+> Two-stage physics-informed GPR-based model (this work) 4.52 8.92 Analytical constitutive model (Eq. (49)) 21.65 276.71 Black-box GPR model (Eq. (50)) 1.62 32.44 Single-stage (direct) GPR-based model (Eq. (51)) 18.20 283.04
+
+16 Figure 4: Process-level interpretation of the two-stage physics-informed GPR-based constitutive model under uniaxial tension (synthetic data). (a) Axial (11) and lateral (22) components of the predicted intact stress ˜Sintact from the Stage I GPR models and the total stress ˜S from the full two-stage model, compared with training data. (b) Stress-reduction factor      
+
+> χpredicted by the proposed two-stage model as a function of stretch λ, showing monotonic, non-negative decay toward zero. (c) Predicted intact hyperelastic strain energy density W(from Stage I GPR models) and total strain energy density
+> ψ(from the complete model) versus stretch, illustrating energy saturation in the damage regime while the intact energy continues to increase.
+
+The smooth decay of χ toward zero reflects progressive damage accumulation and eventual failure, without spurious oscillations or reversals. As discussed briefly in Section 5.1.1 and examined in detail in Section 5.1.4, this physically admissible evolution is a direct consequence of the monotonicity and non-negativity constraints imposed during Stage II training. Without these constraints, the learned damage evolution can become non-physical, highlighting the necessity of the physics-informed penalty formulation. 
+
+Energy-based interpretation of damage and failure . Figure 4(c) provides an energy-based per-spective on the two-stage decomposition by comparing the predicted intact hyperelastic strain energy density W (Eq. (28)) with the total strain energy density ψ, computed using the same integral defini-tion as Eq. (28) but with the intact stress ˜Sintact replaced by the total predicted stress ˜S from the full two-stage model. In the intact regime, the two energy measures are nearly identical and both exhibit convex growth with stretch, indicating that damage effects are negligible and the response is dominated by elastic energy storage. As deformation increases beyond the onset of damage, the two curves begin to diverge. The intact strain energy density continues to increase in a convex manner, reflecting the underlying hyperelastic response. In contrast, the total strain energy density saturates and approaches an asymptotic limit, as clearly illustrated in the inset of Fig. 4(c). This saturation behavior is a hallmark of energy-limited hyperelastic models and provides a physically meaningful description of material failure: additional mechanical work beyond a critical threshold is dissipated into damage rather than stored elastically. The fact that the proposed two-stage physics-informed GPR-based model reproduces this behavior directly from data—without prescribing an explicit analytical damage law—underscores its ability to discover physically consistent constitutive structure. 
+
+Comparison with competing data-driven models . The process-level interpretability demonstrated in Fig. 4 is absent in competing data-driven approaches. Black-box GPR models provide no explicit in-ternal damage variable and therefore cannot distinguish between elastic response and damage-induced softening. Similarly, the single-stage (direct) GPR-based model entangles elasticity and damage within a single mapping, making it impossible to isolate damage onset, progression, or failure in a physically meaningful way. In contrast, the proposed two-stage model introduces a clear and interpretable internal variable, χ, which governs damage evolution in a manner consistent with the energy-limited hyperelas-ticity framework. In this sense, the proposed framework combines the strengths of both analytical and data-driven constitutive modeling. Like classical hyperelasticity models with energy limiters, it provides a structured, interpretable description of elasticity and damage. At the same time, it retains the flexibility, automation, and high fitting accuracy of ML-based approaches, without requiring expert intervention or manual model selection. As shown next in Section 5.1.3, these advantages extend beyond the training regime and enable robust, physically meaningful generalization to deformation modes not included during training, further reinforcing the ability of the proposed model to unify interpretability and generalizability within a single data-driven constitutive framework. 17 Figure 5: Out-of-sample generalization under uniaxial compression using synthetic data. (a) Axial second Piola–Kirchhoff stress component S11 and (b) lateral stress component S22 versus stretch λ ∈ [1 , 0.5], comparing predictions of the proposed two-stage physics-informed GPR-based model with the analytical constitutive model, black-box GPR model, and single-stage (direct) GPR-based model against the ground-truth response. (c) Corresponding pointwise percentage relative error as a function of stretch, computed using the Frobenius norm of the stress tensor. 
+
+5.1.3. Out-of-sample generalization: Compression and shear 
+
+We next assess the out-of-sample generalization capability of the proposed two-stage physics-informed GPR-based model by evaluating its predictions under deformation modes not used during training, namely uniaxial compression and simple shear (Eq. (48)). The purpose of this study is not to demonstrate numerical accuracy per se, but to examine whether the learned constitutive structure extrapolates in a physically meaningful manner beyond the calibration regime. All reference responses shown in this section are generated using the same underlying constitutive model employed for synthetic data generation (i.e., Eq. (47)) and are therefore treated as ground truth. 
+
+Performance in uniaxial compression . Figures 5(a–b) show the predicted axial and lateral second Piola–Kirchhoff stress components, S11 and S22 , for all four models under comparison, as functions of stretch λ ∈ [1 , 0.5] in uniaxial compression. Figure 5(c) reports the corresponding pointwise percentage relative errors. The ground-truth response exhibits an initially nonlinear elastic regime from λ = 1 down to approximately λ ≈ 0.7, followed by progressive softening and complete stress collapse near λ ≈ 0.64, reflecting compressive failure. Notably, the elastic portion of the response is stiffer in compression than in tension (cf. Fig. 3), illustrating tension–compression asymmetry, a common feature of many soft materials arising from microstructural constraints and volumetric resistance under compressive loading [96]. The proposed model accurately reproduces this qualitative behavior. As seen in Figs. 5(a–b), both axial and lateral stress components rise nonlinearly in compression, followed by a smooth decay to zero stress, after which the stresses remain identically zero. This behavior is consistent with the expected evolution of a damage-governed material and reflects the combined effect of the intact elastic response learned in Stage I and the monotonic, non-negative stress-reduction factor learned in Stage II. The model also captures the tension–compression asymmetry observed in the elastic regime, despite being trained exclusively on tensile data. Notably, these predictions are obtained using only N = 51 training data points from uniaxial tension. The analytical constitutive model also predicts a rising-and-falling response under compression; how-ever, its lateral stress component S22 changes sign near λ ≈ 0.64. Although the magnitude of S22 is small relative to S11 , this sign reversal is physically questionable and indicates a limitation of the fixed functional form in capturing multiaxial damage effects. The single-stage (direct) GPR-based model exhibits more severe deficiencies. While its predicted stresses initially rise and begin to soften, the response subsequently stiffens again at larger compressive strains, leading to a non-monotonic stress evolution. This behavior is unphysical and directly reflects the absence of an explicit damage variable and monotonicity constraints in the single-stage mapping. The black-box GPR model performs the poorest in compression. Both S11 and S22 predicted by this model change sign, and most notably, the model predicts tensile axial stress under compressive defor-mation. Furthermore, no failure is predicted, and stresses remain nonzero at large compressive strains. These results highlight the fundamental limitation of purely data-driven mappings when extrapolated beyond the training regime. 18 Figure 6: Out-of-sample generalization under simple shear using synthetic data. (a) Predicted shear stress component S12   
+
+> versus shear strain γ, and (b) corresponding pointwise percentage relative error versus γ, comparing the proposed two-stage physics-informed GPR-based model with the analytical constitutive model, black-box GPR model, and single-stage (direct) GPR-based model against the ground-truth response.
+
+The percentage relative error plot in Fig. 5(c) confirms these trends: although absolute error mag-nitudes are not emphasized here—given that the model was calibrated using tensile data only—the proposed model consistently exhibits the lowest errors among all models. Error spikes near the failure point are observed for all models and are expected, as the denominator in the relative error metric approaches zero when stresses vanish (see Eq. (59)). Although strain energy density evolution is not shown explicitly in this section, the stress–stretch responses in Figs. 5(a–b) implicitly reveal important energetic differences between the models. Both the proposed model and the analytical constitutive model exhibit clear saturation of the total strain energy density as deformation progresses, consistent with their explicit energy-limiting formulations. In contrast, neither the black-box GPR model nor the single-stage GPR model enforces such energetic bounds, leading to non-physical stress persistence or re-stiffening at large compressive strains. Importantly, the proposed model is the only data-driven approach that simultaneously reproduces the correct stress trends and the expected energy-limited failure behavior. 
+
+Performance in simple shear . Figure 6(a) shows the predicted shear stress component S12 for all four models under comparison as a function of shear strain γ, while Fig. 6(b) reports the corresponding percentage relative error. Simple shear represents a particularly stringent generalization test, as it involves off-diagonal components of the deformation gradient that are entirely absent from the uniaxial tension training data ( N = 51 data points). Despite this, the proposed model accurately captures the ground-truth response. The predicted shear stress exhibits a nonlinear elastic rise followed by softening and eventual stress collapse, in close agreement with the reference solution. This behavior translates to low relative errors across most of the deformation range, with elevated errors confined to the post-peak regime where stresses decrease rapidly. As in compression, this stress evolution implies a bounded and saturating total strain energy density under shear for the proposed model, whereas such energetic consistency is absent in the black-box GPR and single-stage GPR-based models. The analytical constitutive model and the single-stage GPR-based model both predict a qualitatively reasonable rise-and-fall response under shear, indicating physically admissible elastic loading followed by softening and failure. While their peak magnitudes and softening rates differ from the ground-truth response, these deviations are less critical here, as the objective of this investigation is not quantitative accuracy but physical plausibility under unseen deformation modes. In contrast, the black-box GPR model exhibits a striking failure mode: it predicts S12 = 0 for all values of γ. This result is a direct consequence of its construction. Because the model is trained exclusively on uniaxial tension data, where both the deformation tensor C and the stress tensor S are diagonal, it has no information about how off-diagonal components should influence the stress response. As a result, the model defaults to zero shear stress, yielding extremely large relative errors in Fig. 6(b). Notably, this same model was the most accurate interpolator in the training regime (Section 5.1.1), underscoring the disconnect between interpolation accuracy and physical generalizability. 
+
+Assessment of out-of-sample model performance . Taken together, the compression and shear re-sults demonstrate that the proposed two-stage physics-informed GPR-based model generalizes robustly to deformation modes not used for training. Unlike black-box models, which learn a high-dimensional 19 Figure 7: Role of penalty-based constrained optimization during Stage II damage learning. (a) Learned stress-reduction factor χ(W ) as a function of intact hyperelastic strain energy density W , comparing the proposed framework with con-strained Stage II training against an otherwise identical framework trained without constraints. Black markers denote processed Stage I outputs ( D∗             
+
+> dam prior to augmentation), cyan markers indicate constraint points Dcons , and artificial complete-failure points ( χ= 0) are added at large W. The constrained Stage II training enforces monotonicity and non-negativity of χ(W), while unconstrained training leads to non-physical behavior (Inset A). (b) Axial second Piola–Kirchhoff stress S11 versus compressive stretch λ, and (c) shear stress component S12 versus shear strain γ, comparing full two-stage model predictions obtained with constrained and unconstrained Stage II training.
+
+but fragile mapping between tensor components, the proposed framework operates in a reduced invari-ant space and reconstructs stress through a physically motivated tensor basis. The explicit two-stage decomposition further enables direct enforcement of physically admissible damage evolution through monotonicity, non-negativity, and complete-failure constraints. As a result, the proposed model reproduces correct qualitative trends—elastic loading, damage onset, softening, and failure—across both compression and shear, even though these deformation modes are entirely absent from the training data. Importantly, this robust generalization is achieved using a very small training dataset ( N = 51), demonstrating that the proposed model is highly data-efficient despite being ML-based, and is therefore well suited for solid mechanics and materials applications where large, diverse datasets are rarely available. The next subsection, Section 5.1.4, further examines the role of constrained optimization and penalty-based learning in achieving this robustness. 
+
+5.1.4. Role of penalty-based constrained optimization in Stage II learning 
+
+This subsection examines the role of penalty-based constrained optimization during Stage II training of the damage model Mdam (Section 3.3). In particular, we compare the proposed two-stage frame-work—where Stage II training enforces monotonicity and non-negativity of the stress-reduction factor 
+
+χ(W )—with an otherwise identical variant in which Stage II is trained without such constraints. This comparison isolates the effect of constraint enforcement on damage evolution and its consequences for stress prediction, both within and beyond the training regime. 
+
+Effect of constraints on the learned damage law . Figure 7(a) illustrates the learning process and resulting predictions of the Stage II damage model. The black circular markers correspond to the processed Stage I outputs used to construct the initial damage dataset D∗ 
+
+> dam
+
+(Eq. (31)), where the intact strain energy density W is computed from intact stress predictions of Stage I models using Eq. (28), and the corresponding χ values are obtained by solving Eq. (30). The maximum value of W in this dataset is denoted by Wpeak . Also shown are the artificial complete-failure points with χ = 0, introduced over the range W ∈ [1 .3Wpeak , 2.6Wpeak ] to enforce asymptotic failure. Together, the processed Stage I outputs and these artificial points form the augmented dataset used for Stage II training. As mentioned previously, monotonicity and non-negativity constraints are enforced during Stage II training through penalty-based optimization (Eq. (41)) at a discrete set of constraint points Dcons 
+
+20 (Eq. (33)), shown by cyan markers in Fig. 7(a), spanning the range W ∈ [0 .8Wpeak , 1.3Wpeak ]. This interval corresponds to the critical damage transition region where χ(W ) rapidly decreases from near unity toward zero. The red solid curve in Fig. 7(a) shows the prediction obtained using the constrained Stage II model (proposed framework). The stress-reduction factor decreases monotonically, remains non-negative, and asymptotically approaches zero, representing progressive damage accumulation followed by complete fail-ure. This behavior is highlighted in the zoomed Inset A. In contrast, the purple dashed curve corresponds to the same Stage II model trained without penalty-based constraints (i.e., standard GPR optimization as in Eq. (24)). Despite access to identical data, the unconstrained training produces a non-physical evolution in which χ(W ) becomes negative and locally increases before eventually returning to zero. Such behavior violates thermodynamic consistency and cannot be prevented without explicit constraint enforcement. 
+
+Impact on out-of-sample stress predictions . Figures 7(b) and 7(c) show the corresponding stress predictions under uniaxial compression and simple shear, respectively, comparing the proposed frame-work (with constrained Stage II training) against the otherwise identical framework with unconstrained Stage II training. Importantly, neither compression nor shear data are used during training. In both deformation modes, the two frameworks produce nearly identical stress responses throughout the elastic regime and early stages of softening. However, pronounced differences emerge as deformation approaches failure. The proposed framework predicts a smooth and monotonic decay of stress to zero, consistent with complete material failure. In contrast, unconstrained Stage II training leads to stress sign reversals and partial stress recovery near failure, indicative of spurious healing behavior. These non-physical responses directly reflect the unconstrained evolution of χ(W ) observed in Fig. 7(a). Crucially, although the monotonicity and non-negativity constraints are enforced using tensile data alone, their formulation in terms of the scalar intact strain energy density W ensures that they remain active across all deformation modes. This highlights a key advantage of the proposed framework: dam-age evolution is governed by an invariant-based internal variable rather than deformation-path-specific quantities, enabling consistent extrapolation to unseen loading conditions. 
+
+Choice of constraint range and implications . The results in Fig. 7 also justify the selected range of constraint points Dcons . By concentrating constraint enforcement in the vicinity of the damage transition region ( W ∈ [0 .8Wpeak , 1.3Wpeak ]), the proposed approach ensures physically admissible behavior where it is most critical, while avoiding unnecessary over-constraining of the regression problem. Enforcing con-straints over a much wider range could lead to increased computational cost, numerical ill-conditioning, or over-regularization without providing additional physical benefit. Overall, these results demonstrate that penalty-based constrained optimization during Stage II GPR training is essential for achieving thermodynamically consistent damage evolution and physically mean-ingful stress predictions in both training and out-of-sample regimes. The constrained formulation allows the proposed two-stage physics-informed GPR-based model to retain the flexibility of data-driven learn-ing while enforcing fundamental physical principles, thereby playing a central role in the robustness and generalizability of the framework. 
+
+5.2. Application to Brain Tissue Mechanics 
+
+We next apply the proposed two-stage physics-informed GPR-based model to uniaxial tension data of brain tissue reported by Franceschini et al. [86] (Fig. 2(b)). This application demonstrates the practical utility of the framework for real, highly nonlinear soft-tissue data and assesses its ability to extract physically meaningful elastic and damage characteristics from limited experimental measurements. As detailed in Section 4.2, owing to the lack of volumetric response data in this case (a common limitation in soft tissue mechanics), the Stage I protocol is modified to explicitly enforce incompressibility: only the isochoric model Miso is learned via GPR, while the volumetric contribution is replaced by a deterministic Lagrange multiplier enforcing J = 1. Stage II damage modeling and constrained GPR learning of the stress-reduction factor remain unchanged. 
+
+Training setup and implementation choices . Four experimental datasets are considered: two gray matter (GM) specimens from the thalamus region, and two white matter specimens obtained from distinct brain substructures—the occipital (WM-o) and parietal (WM-p) lobes. Each experimental stress–stretch curve is interpolated to N = 101 uniformly spaced deformation states. A higher resolution than that used in synthetic validation ( N = 51) is adopted here to better capture local features present in the measured responses. 21 Figure 8: Application of the proposed two-stage physics-informed GPR-based model to experimental uniaxial tension data of brain tissue (from [86]). (a–c) Axial second Piola–Kirchhoff stress S11 versus stretch λ for gray matter (GM) from the thalamus, white matter from the occipital lobe (WM-o), and white matter from the parietal lobe (WM-p), comparing experimental measurements with model predictions. (d–f) Corresponding pointwise percentage relative error as a function of stretch. (g–i) Predicted stress-reduction factor χ as a function of stretch for the three brain tissue substructures. 
+
+Owing to substantial variability in elastic stiffness and damage onset across these datasets, the Stage I stretch cutoff used to isolate the intact response is selected individually for each case based on visual inspection of the stress–stretch curves. Specifically, the cutoffs are λ = 1 .89 and 1 .38 for the two GM datasets, and λ = 1 .37 and 1 .80 for WM-o and WM-p, respectively. All remaining implementation choices are consistent across datasets. In Stage II, monotonicity and non-negativity constraints on the stress-reduction factor are enforced at Nc = 30 constraint points span-ning the strain-energy range W ∈ [6 , 15] kPa (equivalently, kJ/m 3), with penalty weights Λ nn = Λ mono =10 3. Complete failure is imposed through data augmentation in the range W ∈ [1 .3Wpeak , 2.6Wpeak ], mirroring the synthetic validation protocol. For the GPR nugget parameters, α = 0 .5 is used for the isochoric model Miso at all training points, while α = 2 .5 × 10 −3 is used for the damage model Mdam . These values are selected to balance fitting accuracy with numerical stability and to mitigate overfitting in the presence of highly nonlinear data. 
+
+Stress–stretch fitting performance . Figure 8 evaluates the ability of the proposed model to repro-duce experimental stress–stretch behavior across brain tissue substructures. The first row (Figs. 8(a–c)) compares the experimentally measured axial stress S11 with the model predictions for GM, WM-o, and WM-p, while the second row (Figs. 8(d–f)) reports the corresponding percentage relative error as a function of stretch. Across all datasets, the proposed model reproduces the overall elastic response and progressive soft-22 Figure 9: Predicted total strain energy density ψ versus stretch λ for brain tissue under uniaxial tension, shown for two gray matter (GM) datasets and two white matter substructures (WM-o and WM-p). Predictions are obtained by extrapolating the trained two-stage physics-informed GPR-based model beyond the experimental range. In all cases, ψ(λ) asymptotically approaches a saturation value, identifying the critical failure energy ψf associated with complete material failure due to energy-limited damage evolution. 
+
+ening leading to failure with high fidelity. Nevertheless, a systematic deviation is observed in the early portion of the stress–stretch response. Specifically, the model overpredicts the experimental stress in the vicinity of a pronounced stress jump that appears across all datasets, where the response exhibits a very high initial stiffness followed by a rapid reduction in slope and a more gradual stress increase. This yield-like transition leads to a localized amplification of relative error in this region, as seen in Figs. 8(d–f). Although this behavior can be mitigated by selecting a smaller nugget parameter in Stage I, doing so was found to induce overfitting in the intact regime and physically inadmissible behavior in the learned stress response near the intact stretch cutoff. In particular, excessively small nugget values lead to a spurious stress discontinuity at the cutoff stretch in the predicted intact response, which propagates into the total stress prediction and can lead to elevated errors and potential numerical issues in simulations (e.g., through the associated stiffness tensor). A sensitivity study illustrating this tradeoff between local interpolation accuracy in the intact regime and global physical robustness is presented in Supplementary Section S1, where intact and total stress–stretch predictions are compared for different choices of the nugget parameter in the Miso model using a representative brain tissue dataset. For the nugget values adopted in the present study (with α = 0 .5 for Miso ), the mean percentage relative errors are low across all tissue types: 2.93% (GM, averaged across two datasets), 4.06% (WM-o), and 5.11% (WM-p). The corresponding maximum errors—33.21% (GM, averaged), 49.34% (WM-o), and 29.77% (WM-p)—are concentrated near the reference state and therefore correspond to small absolute stress discrepancies. 
+
+Damage evolution and internal variable interpretation . Figures 8(g–i) show the stress-reduction factor χ inferred by the proposed model as a function of stretch for GM, WM-o, and WM-p, respectively. In all cases, χ decreases gradually from values near unity toward zero as deformation increases, reflecting progressive damage accumulation. Unlike the synthetic examples, where a relatively sharp transition from intact behavior to failure is observed (see Fig. 4(b)), the χ(λ) curves in this case are smoother and more gradual. This behavior is consistent with the experimental stress–stretch responses, in which the purely elastic regime occupies a small portion of the deformation range and damage accumulates progressively over large stretches before complete failure occurs at extreme stretches ( λ ≈ 2.25–2 .8). Such gradual degradation contrasts with the behavior of many synthetic elastomers, where damage initiates near a critical stretch and progresses rapidly to failure [97]. The proposed two-stage framework naturally captures this distinction, discovering the gradual evolution of an internal damage variable directly from experimental data without prescribing its functional form. 
+
+Prediction of strain energy density saturation and critical failure energy . Beyond stress pre-diction, the proposed model enables estimation of the total strain energy density ψ and, crucially, the critical failure energy ψf —the energetic limit beyond which the tissue can no longer store mechanical energy. Using the trained models for each dataset, ψ is predicted over an extended stretch range up to 
+
+λ = 3 .5, exceeding the experimental domain to ensure that complete failure is captured. Figure 9 presents the resulting ψ–λ curves for the two GM datasets and the two WM substructures. In all cases, ψ(λ) increases initially and then asymptotically approaches a constant value, i.e., ψf , at large 23 Table 2: Predicted critical failure energy ψf for brain tissue substructures obtained from the proposed two-stage physics-informed GPR-based model. Gray matter (GM) results are reported for two independent specimens, along with their average value. White matter (WM) results correspond to occipital (WM-o) and parietal (WM-p) lobes.          
+
+> Tissue type / dataset Critical failure energy, ψf(kPa)
+> Gray matter (GM–1) 4.22 Gray matter (GM–2) 4.28
+> Gray matter (GM, average) 4.25
+> White matter (WM-o) 2.53 White matter (WM-p) 3.15
+> White matter (WM, average) 2.84
+
+stretches, signifying complete failure and energy saturation. This asymptotic behavior arises directly from the constrained GPR learning of the stress-reduction factor χ(W ) in Stage II, which enforces monotonicity, non-negativity, and complete failure. The corresponding ψf values are summarized in Table 2. Notably, despite exhibiting markedly different stress–stretch responses, the two GM datasets converge to nearly identical failure energies (4.22 and 4.28 kPa), yielding an average GM failure energy of 4.25 kPa. By contrast, the average failure energy of WM (WM-o and WM-p) is approximately 2.84 kPa—about 66.8% of the GM value. This observation suggests a substantially greater resistance of gray matter to mechanical failure compared to white matter, likely stemming from the known structural and compositional differences between these brain substructures [90]. While additional experimental data are needed to establish robust statistical trends, these results highlight the potential of the proposed framework to uncover meaningful energetic metrics of tissue failure directly from mechanical testing data. 
+
+6. Summary and Conclusions 
+
+This work introduced a physics-informed, data-driven constitutive modeling framework for hypere-lastic soft materials undergoing progressive damage and failure, with the central objective of reconciling the competing demands of physical interpretability, automation, and predictive accuracy. Motivated by the limitations of classical theory-driven analytical models—whose fixed functional forms restrict flex-ibility—and purely data-driven black-box models—whose lack of structure undermines generalizability and physical consistency—we developed a two-stage physics-informed GPR-based model that explicitly separates intact elasticity from damage evolution, enforces physics-based constraints, and learns both components directly from data. The proposed formulation is grounded in the energy-limited hyperelasticity framework, where mate-rial failure is characterized by saturation of the strain energy density at a finite critical value. Leveraging the irreducible tensor basis decomposition of stress, the framework expresses the constitutive response in terms of scalar hyperelastic response functions and a stress-reduction factor that governs damage. In Stage I, GPR models are trained to learn the volumetric and isochoric response functions (or only the isochoric response under incompressibility), ensuring exact satisfaction of the principles of determinism and local action, material frame indifference, isotropy, balance of angular momentum, a stress-free refer-ence state, and thermodynamic admissibility through derivation of the intact stress from a scalar strain energy density via the Coleman–Noll procedure. In Stage II, a separate GPR model learns the evolu-tion of the stress-reduction factor as a function of intact strain energy density, with additional physical constraints—non-negativity, monotonic decay, and complete failure at large deformations—implemented through penalty-based constrained optimization to ensure thermodynamic consistency. Comprehensive validation using synthetic datasets with known ground-truth constitutive behavior demonstrated that the proposed model achieves high in-distribution accuracy under uniaxial tension while substantially outperforming analytical and single-stage GPR-based models in capturing nonlinear softening and failure. Although black-box GPR models achieved the smallest interpolation errors in the training regime, they failed catastrophically when extrapolated to unseen deformation modes. By contrast, the proposed framework exhibited robust out-of-sample generalization to uniaxial compression and simple shear—deformation modes not used during training—successfully reproducing physically ex-pected stress trends, energy saturation, and complete failure. These results highlight a key outcome of the two-stage construction: by operating in a reduced invariant and response-function space and enforcing admissible damage evolution through energetic considerations, the framework generalizes meaningfully 24 beyond the calibration regime, unlike purely data-driven mappings. Notably, this level of accuracy and generalization is achieved using relatively small training datasets consistent with practical experimen-tal availability, underscoring the data efficiency of the proposed framework, an attribute traditionally associated with theory-driven constitutive models. Beyond predictive accuracy, the framework provides process-level interpretability that is absent in competing ML approaches. The explicit recovery of intact stress, damage evolution, and strain energy density enables a clear physical interpretation of progressive stiffness degradation and failure. In partic-ular, the learned stress-reduction factor exhibits smooth, monotonic decay without spurious oscillations, and the predicted total strain energy density asymptotically approaches a finite saturation value, con-sistent with energy-limited failure theories. A dedicated investigation of the role of constrained GPR optimization further demonstrated that monotonicity and non-negativity constraints are essential not only for thermodynamic consistency but also for stable and physically meaningful predictions under both training and testing deformation modes. The practical utility of the framework was demonstrated through its application to experimental uni-axial tension data of brain tissue, a representative soft biological material characterized by noise, high nonlinearity, and limited deformation modes. Under an incompressibility assumption, the model accu-rately reproduced both elastic and damage-dominated responses across gray and white matter datasets. Importantly, the framework enabled inference of internal damage evolution and prediction of critical failure energy, revealing that gray matter exhibits significantly higher failure energy than white mat-ter—an energetically meaningful distinction that is difficult to extract using conventional constitutive fitting alone. These results underscore the framework’s ability to extract physically relevant material metrics from limited experimental data without prescribing analytical damage laws. Taken together, this study demonstrates that the proposed two-stage physics-informed GPR-based model combines the best attributes of analytical and data-driven constitutive modeling. Like classical energy-limited hyperelastic formulations, it provides a structured, interpretable, and thermodynamically consistent description of elasticity and damage. At the same time, it retains the automation, flexi-bility, and high fidelity of modern ML approaches, enabling accurate modeling without expert-driven selection of constitutive forms. As such, the framework represents a significant advancement in the data-driven modeling of failure in soft materials and offers a promising pathway toward automated, physics-consistent constitutive discovery within emerging Material Testing 2.0 and data-centric materi-als discovery paradigms. Consistent with classical energy-limited hyperelastic formulations, irreversibility under unloading can be incorporated through a history-dependent switch parameter once a critical energy threshold is reached [98]; such an extension is straightforward within the present two-stage framework but is not considered here, as the focus is on monotonic loading to failure. 
+
+Limitations and future work . Despite its advantages, the proposed framework has several limitations that motivate future research. First, although the model is data-driven, it still requires selection of several tunable modeling choices, including the GPR nugget parameter, kernel type, and the cutoff used to isolate the intact response. As demonstrated in the brain tissue application (and further illustrated in Supplementary Section S1), these choices influence both fitting accuracy and physical interpretability: excessively small nugget values can lead to overfitting and physically inadmissible behavior near the intact stretch cutoff, whereas overly large values may result in excessive smoothing and loss of fidelity in the learned intact response and damage evolution. Developing systematic strategies for automated selection of these modeling choices, sensitivity analysis, and adaptive regularization therefore remains an important direction for future work. Second, while the two-stage construction and use of GPR provide a degree of interpretability, the physical meaning of GPR parameters—such as kernel structure and characteristic length scales—within the context of solid mechanics is not yet well understood. Establishing clearer connections between these statistical quantities and underlying material behavior would further enhance the interpretability and robustness of the framework. Finally, classical energy-limited hyperelastic formulations, including those considered here, predict a critical failure energy that is invariant with respect to deformation mode. Our recent work [8] has shown that this limitation can be overcome by incorporating deformation-mode dependence through Lode-invariant–based strain energy density formulations. Because the proposed two-stage framework learns the damage evolution law directly from data as a function of a scalar energetic measure, it can be naturally extended to such formulations. More broadly, extending the framework to account for anisotropy, rate dependence, cyclic damage, and thermo-mechanical coupling represents a natural and 25 promising avenue for future research. In addition, building on prior developments within energy-limited hyperelasticity, the present framework can be incorporated into numerical simulations of failure and localization, which is not considered here and will be pursued in future research. 
+
+Acknowledgments 
+
+This material is based upon work supported by the National Science Foundation under Grant No. 2331294. 
+
+Appendix A. Examples of hyperelastic response functions and stress-reduction factors in energy-limited hyperelasticity 
+
+The generalized stress representation introduced in Section 2 expresses the second Piola–Kirchhoff stress as a weighted sum of irreducible tensor basis components (Eq. (12)), where the scalar response functions ζ(J), Γ 1( ¯I1, ¯I2), and Γ 2( ¯I1, ¯I2) encode the volumetric and isochoric elastic behavior, and the stress-reduction factor χ(W ) governs damage and failure. In traditional phenomenological constitutive models, both the response functions and the stress-reduction factor assume explicit analytical forms dictated by the chosen constitutive equations for ψ(W ), 
+
+U (J), and ¯Wiso ( ¯I1, ¯I2). Tables A.1 and A.2 summarize the resulting response functions for several com-monly used volumetric and isochoric hyperelastic models, while Table A.3 lists representative analytical expressions for stress-reduction factors employed in energy-limited damage formulations. Together, these examples illustrate how classical constitutive laws fit naturally within the generalized irreducible tensor basis framework adopted in this work. Importantly, the proposed physics-informed data-driven framework is not restricted to these fixed functional forms. Instead, it learns the mappings ζ(J), Γ 1( ¯I1, ¯I2), Γ 2( ¯I1, ¯I2), and χ(W ) directly from data using GPR, thereby overcoming the limited flexibility of explicit analytical expressions while preserving physical structure, thermodynamic consistency, and interpretability.   
+
+> Table A.1: Response function ζ(J) for commonly employed volumetric energy density functions ( U(J)): the Simo–Miehe model [85], the volumetric neo-Hookean model [87], and the volumetric Ogden model [99].
+
+Model U ζ
+
+Simo–Miehe model κ
+
+> 2
+
+( J2−1 
+
+> 2
+
+− ln J
+
+) κ
+
+> 2
+
+(J2 − 1)
+
+Volumetric neo-Hookean model κ 
+
+> 2
+
+(J − 1) 2 κJ (J − 1) Volumetric Ogden model κ
+
+> β2
+
+( 1 
+
+> Jβ
+
+− 1 + β ln J) κ
+
+> β
+
+(1 − 1
+
+> Jβ
+
+)   
+
+> Table A.2: Response functions Γ 1( ¯I1,¯I2) and Γ 2( ¯I1,¯I2) for commonly employed isochoric hyperelastic strain energy density functions ( ¯Wiso ( ¯I1,¯I2)): the neo-Hookean model [9, 10], the Mooney–Rivlin model [11, 12], the Yeoh model [89], the Gent model [14], and the Gent–Gent model [100].
+
+Model ¯Wiso Γ1 Γ2
+
+Neo-Hookean model A10 
+
+( ¯I1 − 3) 2A10 0Mooney–Rivlin model A10 
+
+( ¯I1 − 3) + A01 
+
+( ¯I2 − 3) 2 (A10 + ¯I1A01 
+
+) −2A01 
+
+Yeoh model C1
+
+( ¯I1 − 3) + C2
+
+( ¯I1 − 3)2 2C1 + 4 C2
+
+( ¯I1 − 3) 0Gent model − μJ m 
+
+> 2
+
+ln 
+
+(
+
+1 − ¯I1−3
+
+> Jm
+
+) μ 
+
+> 1−¯I1−3
+> Jm
+
+0Gent–Gent model − μJ m 
+
+> 2
+
+ln 
+
+(
+
+1 − ¯I1−3
+
+> Jm
+
+)
+
++ 3C2 
+
+> 2
+
+ln 
+
+( ¯I2
+
+> 3
+
+) μ 
+
+> 1−¯I1−3
+> Jm
+
++ 3 C2¯I1 
+
+> ¯I2
+
+−3 C2
+
+> ¯I2
+
+Appendix B. Tangent stiffness tensor for energy-limited hyperelasticity 
+
+In this appendix, we derive the fourth-order material tangent stiffness tensor (also referred to as the elasticity tensor in the material description), denoted by C, for the general class of energy-limited hyperelastic constitutive models considered in this work. The resulting expression is independent of the specific functional forms adopted for the hyperelastic response functions and stress-reduction factor, 26 Table A.3: Stress-reduction factor χ(W ) for available energy-limited hyperelastic models ( ψ(W )): the Volokh reduced damage model [52], the Volokh universal damage model [5], and the Chandrashekar–Upadhyay model [8]. 
+
+Model ψ χ
+
+Volokh reduced damage model Φ − Φexp (− W
+
+> Φ
+
+) exp (− W
+
+> Φ
+
+)
+
+Volokh universal damage model 
+
+> Φ
+> m
+
+{Γ ∗ ( 1 
+
+> m
+
+, 0) − Γ ∗ ( 1 
+
+> m
+
+, ( W
+
+> Φ
+
+)m)} exp (− ( W
+
+> Φ
+
+)m)
+
+Chandrashekar– Upadhyay model † 
+
+> Φ−
+> m−
+
+Γ ∗( 1 
+
+> m−
+
+, 0) +
+
+β
+
+[ Φ+ 
+
+> m+
+
+Γ ∗( 1 
+
+> m+
+
+, 0) − Φ− 
+
+> m−
+
+Γ ∗( 1 
+
+> m−
+
+, 0)]
+
+− 
+
+> Φ−
+> m−
+
+Γ ∗
+
+( 1 
+
+> m−
+
+, ( W
+
+> Φ−
+
+)m− )
+
+−
+
+β
+
+[ Φ+ 
+
+> m+
+
+Γ ∗
+
+( 1 
+
+> m+
+
+, ( W
+
+> Φ+
+
+)m+ )
+
+− Φ− 
+
+> m−
+
+Γ ∗
+
+( 1 
+
+> m−
+
+, ( W
+
+> Φ−
+
+)m− )] 
+
+βexp 
+
+(
+
+− ( W
+
+> Φ+
+
+)m+ )
+
++(1 − β)exp 
+
+(
+
+− ( W
+
+> Φ−
+
+)m− )             
+
+> †In the Chandrashekar–Upadhyay model, βis aLode-angle-dependent weighting function introduced to capture deformation-mode dependence (e.g., tension-, compression-, and shear-dominated loading) of damage and failure.
+
+and is therefore applicable to both analytical and data-driven formulations within the energy-limited hyperelasticity framework. Within the energy-limited hyperelasticity framework, the second Piola–Kirchhoff stress tensor admits the generalized representation (same as Eq. (12)): 
+
+S = χ(W )
+
+(
+
+ζ(J)G1 + J−2/3Γ1( ¯I1, ¯I2)G2 + J−2/3Γ2( ¯I1, ¯I2)G3
+
+)
+
+, (A.1) where G1 = C−1, G2 = Dev( I), and G3 = Dev( ¯C), with the deviatoric operator defined as: Dev( A) = A − 1
+
+3 (A : C)C−1. (A.2) The fourth-order material tangent stiffness tensor is defined as [15] 
+
+C = 2 ∂S
+
+∂C . (A.3) Substituting the generalized stress representation into this definition yields 
+
+C = 2 ∂
+
+∂C
+
+(
+
+χ
+
+(
+
+ζG1 + J−2/3Γ1G2 + J−2/3Γ2G3
+
+)) 
+
+. (A.4) For notational simplicity, the explicit functional dependence of the scalar response functions and the stress-reduction factor on their respective arguments (i.e., invariants and strain energy density) is omitted in the remainder of this appendix. Further, we introduce the intact (undamaged) stress tensor, defined as the derivative of the intact strain energy density (same as Eq. (20)), 
+
+Sintact := 2 ∂W 
+
+∂C = ζG1 + J−2/3Γ1G2 + J−2/3Γ2G3. (A.5) Applying the chain rule to Eq. (A.4) and using Eq. (A.5), the tangent stiffness tensor can be expanded as 
+
+C = dχ 
+
+dW Sintact ⊗ Sintact 
+
++ 2 χ
+
+[
+
+G1 ⊗ dζ 
+
+dJ ∂J 
+
+∂C + ζ ∂G1
+
+∂C + Γ 1G2 ⊗
+
+(
+
+− 2
+
+3 J−5/3 ∂J 
+
+∂C
+
+)
+
++ J−2/3G2 ⊗
+
+( ∂Γ1
+
+∂ ¯I1
+
+∂ ¯I1
+
+∂C + ∂Γ1
+
+∂ ¯I2
+
+∂ ¯I2
+
+∂C
+
+)
+
++ J−2/3Γ1
+
+∂G2
+
+∂C
+
++ Γ 2G3 ⊗
+
+(
+
+− 2
+
+3 J−5/3 ∂J 
+
+∂C
+
+)
+
++ J−2/3G3 ⊗
+
+( ∂Γ2
+
+∂ ¯I1
+
+∂ ¯I1
+
+∂C + ∂Γ2
+
+∂ ¯I2
+
+∂ ¯I2
+
+∂C
+
+)
+
++ J−2/3Γ2
+
+∂G3
+
+∂C
+
+]
+
+,
+
+(A.6) 27 where the standard dyadic product ⊗ is defined as ( A ⊗ B)ijkl = Aij Bkl . The first term in the above expression arises from the dependence of the stress-reduction factor χ(W ) on the intact strain energy density W . Since Sintact = 2 ∂W/∂ C, this contribution represents the energetic coupling between damage evolution and elastic deformation. The explicit expressions for the derivative terms in Eq. (A.6) needed to compute C are provided below: 
+
+• Derivative of J with respect to C: ∂J 
+
+∂C = 1
+
+2 JC−1. (A.7) 
+
+• Derivative of G1 with respect to C:
+
+∂G1
+
+∂C = −C−1 ⊙ C−1, (A.8) where the symbol ⊙ denotes tensor product following the rule ( A ⊙ B)ijkl = 1 
+
+> 2
+
+(Aik Bjl + Ail Bjk )[15]. 
+
+• Derivative of ¯I1 and ¯I2 with respect to C:
+
+∂ ¯I1
+
+∂C = J−2/3
+
+(
+
+I − 1
+
+3 (tr C)C−1
+
+)
+
+, (A.9) 
+
+∂ ¯I2
+
+∂C = J−4/3
+
+[
+
+(tr C)I − C − C−1
+
+3
+
+((tr C)2 − tr( C2))]
+
+. (A.10) 
+
+• Derivative of G2 with respect to C:
+
+∂G2
+
+∂C = − 1
+
+3
+
+[C−1 ⊗ I − tr C (C−1 ⊙ C−1)] . (A.11) 
+
+• Derivative of G3:
+
+∂G3
+
+∂C = J−2/3
+
+[
+
+I − 2
+
+3 C−1 ⊗ C + 1
+
+3 tr( C2) (C−1 ⊙ C−1) − 1
+
+3 C ⊗ C−1 + 1
+
+9 tr( C2) (C−1 ⊗ C−1)]
+
+,
+
+(A.12) where I denotes the fourth-order unit tensor ( Iijkl = δik δjl ). This completes the derivation of the material tangent stiffness tensor C for energy-limited hyperelastic constitutive models expressed in terms of irreducible tensor bases, strain invariants, scalar response functions, and a stress-reduction factor. The corresponding spatial (Eulerian) tangent stiffness tensor 
+
+c—also referred to as the elasticity tensor in the spatial description—can be obtained through a standard push-forward operation as [15] 
+
+cijkl = J−1Fip Fjq Fkr Fls Cpqrs , (A.13) where F is the deformation gradient. Because the above derivation of tangent stiffness tensors does not rely on any specific functional forms, the resulting tangent operators apply equally to analytical and data-driven formulations within the energy-limited hyperelasticity framework. This provides the constitutive linearization required for numerical implementation (e.g., finite element analysis) of the proposed two-stage physics-informed GPR-based model. 
+
+References 
+
+[1] G. Puglisi, G. Saccomandi, Multi-scale modelling of rubber-like materials and soft tissues: an appraisal, Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences 472 (2187) (2016) 20160060. doi:10.1098/rspa.2016.0060 .[2] K. Volokh, Mechanics of soft materials, Springer Singapore, 2016. doi:https://doi.org/10. 1007/978-981-13-8371-7 .28 [3] S. Avril, Hyperelasticity of Soft Tissues and Related Inverse Problems, in: CISM International Centre for Mechanical Sciences, Courses and Lectures, Vol. 573, Springer International Publishing, 2017, pp. 37–66. doi:10.1007/978-3-319-45071-1_2 .[4] Y. Xiang, D. Zhong, S. Rudykh, H. Zhou, S. Qu, W. Yang, A Review of Physically Based and Thermodynamically Based Constitutive Models for Soft Materials, Journal of Applied Mechanics, Transactions ASME 87 (11) (2020) 1–21. doi:10.1115/1.4047776 .[5] K. Volokh, On modeling failure of rubber-like materials, Mechanics Research Communications 37 (8) (2010) 684–689. doi:10.1016/j.mechrescom.2010.10.006 .[6] A. Konale, V. Srivastava, On modeling fracture of soft polymers, Mechanics of Materials 206 (April) (2025) 105346. doi:10.1016/j.mechmat.2025.105346 .[7] S. N. S. H. Chittajallu, A. Richhariya, K. M. Tse, V. Chinthapenta, A Review on Dam-age and Rupture Modelling for Soft Tissues, Bioengineering 9 (1) (2022) 26. doi:10.3390/ bioengineering9010026 .[8] Y. C. Chandrashekar, K. Upadhyay, A constitutive framework for tension-compression failure asym-metry in soft materials (2025). arXiv:2512.12614 .URL https://arxiv.org/abs/2512.12614 
+
+[9] L. R. G. Treloar, The elasticity of a network of long-chain molecules—II, Transactions of the Faraday Society 39 (1943) 241–246. doi:10.1039/TF9433900241 .[10] R. Rivlin, Large elastic deformations of isotropic materials. I. Fundamental concepts, Philosoph-ical Transactions of the Royal Society of London. Series A, Mathematical and Physical Sciences 240 (822) (1948) 459–490. doi:10.1098/rsta.1948.0002 .[11] M. Mooney, A Theory of Large Elastic Deformation, Journal of Applied Physics 11 (9) (1940) 582–592. doi:10.1063/1.1712836 .[12] R. Rivlin, Large elastic deformations of isotropic materials IV. further developments of the general theory, Philosophical Transactions of the Royal Society of London. Series A, Mathematical and Physical Sciences 241 (835) (1948) 379–397. doi:10.1098/rsta.1948.0024 .[13] R. W. Ogden, Large deformation isotropic elasticity – on the correlation of theory and experiment for incompressible rubberlike solids, Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences 326 (1567) (1972) 565–584. doi:10.1098/rspa.1972.0026 .[14] A. N. Gent, A New Constitutive Relation for Rubber, Rubber Chemistry and Technology 69 (1) (1996) 59–61. doi:10.5254/1.3538357 .[15] G. A. Holzapfel, Nonlinear Solid Mechanics: A Continuum Approach for Engineering, John Wiley & Sons, Ltd, Chichester, England, 2000. [16] K. Upadhyay, G. Subhash, D. Spearot, Thermodynamics-based stability criteria for constitutive equations of isotropic hyperelastic solids, Journal of the Mechanics and Physics of Solids 124 (2019) 115–142. doi:10.1016/j.jmps.2018.09.038 .[17] M. Destrade, G. Saccomandi, I. Sgura, Methodical fitting for mathematical models of rubber-like materials, Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences 473 (2198) (2017) 20160811. doi:10.1098/rspa.2016.0811 .[18] K. Upadhyay, G. Subhash, D. Spearot, Hyperelastic constitutive modeling of hydrogels based on primary deformation modes and validation under 3D stress states, International Journal of Engineering Science 154 (2020) 103314. doi:10.1016/j.ijengsci.2020.103314 .[19] T. Beda, An approach for hyperelastic model-building and parameters estimation a review of constitutive models, European Polymer Journal 50 (1) (2014) 97–108. doi:10.1016/j.eurpolymj. 2013.10.006 .[20] C. Wex, S. Arndt, A. Stoll, C. Bruns, Y. Kupriyanova, Isotropic incompressible hyperelastic models for modelling the mechanical behaviour of biological tissues: a review, Biomedical Engineering / Biomedizinische Technik 60 (6) (2015) 577–592. doi:10.1515/bmt-2014-0146 .29 [21] H. B. Khaniki, M. H. Ghayesh, R. Chin, M. Amabili, Hyperelastic structures: A review on the mechanics and biomechanics, International Journal of Non-Linear Mechanics 148 (September 2022) (2023) 104275. doi:10.1016/j.ijnonlinmec.2022.104275 .[22] J. N. Fuhg, G. Anantha Padmanabha, N. Bouklas, B. Bahmani, W. Sun, N. N. Vlassis, M. Flaschel, P. Carrara, L. De Lorenzis, A Review on Data-Driven Constitutive Laws for Solids, Archives of Computational Methods in Engineering 32 (3) (2025) 1841–1883. doi:10.1007/ s11831-024-10196-2 .[23] S. Kumar, D. M. Kochmann, What Machine Learning Can Do for Computational Solid Mechan-ics, in: Current Trends and Open Problems in Computational Mechanics, Springer International Publishing, Cham, 2022, pp. 275–285. doi:10.1007/978-3-030-87312-7_27 .[24] G. Chen, Recurrent neural networks (RNNs) learn the constitutive law of viscoelasticity, Compu-tational Mechanics 67 (3) (2021) 1009–1019. doi:10.1007/s00466-021-01981-y .[25] S. Tang, Y. Li, H. Qiu, H. Yang, S. Saha, S. Mojumder, W. K. Liu, X. Guo, MAP123-EP: A mechanistic-based data-driven approach for numerical elastoplastic analysis, Computer Methods in Applied Mechanics and Engineering 364 (2020) 112955. doi:10.1016/j.cma.2020.112955 .[26] S. Tang, G. Zhang, H. Yang, Y. Li, W. K. Liu, X. Guo, MAP123: A data-driven approach to use 1D data for 3D nonlinear elastic materials modeling, Computer Methods in Applied Mechanics and Engineering 357 (2019) 112587. doi:10.1016/j.cma.2019.112587 .[27] L. Lu, M. Dao, P. Kumar, U. Ramamurty, G. E. Karniadakis, S. Suresh, Extraction of mechanical properties of materials through deep learning from instrumented indentation, Proceedings of the National Academy of Sciences of the United States of America 117 (13) (2020) 7052–7062. doi: 10.1073/pnas.1922210117 .[28] F. As’ad, P. Avery, C. Farhat, A mechanics-informed artificial neural network approach in data-driven constitutive modeling, International Journal for Numerical Methods in Engineering 123 (12) (2022) 2738–2759. doi:10.1002/nme.6957 .[29] A. Ostadrahimi, A. Teimouri, K. Upadhyay, G. Li, Physics-informed data-driven constitutive mod-eling of compressible, nonlinear soft materials under multiaxial cyclic loading, International Journal of Mechanical Sciences 312 (April 2025) (2026) 111250. doi:10.1016/j.ijmecsci.2026.111250 .[30] M. Peirlinck, J. A. Hurtado, M. K. Rausch, A. B. Tepole, E. Kuhl, A universal material model subroutine for soft matter systems, Engineering with Computers (0123456789) (2024). doi:10. 1007/s00366-024-02031-w .[31] Q. He, D. W. Laurence, C. H. Lee, J. S. Chen, Manifold learning based data-driven modeling for soft biological tissues, Journal of Biomechanics 117 (2021) 110124. doi:10.1016/j.jbiomech. 2020.110124 .[32] K. Linka, M. Hillg¨ artner, K. P. Abdolazizi, R. C. Aydin, M. Itskov, C. J. Cyron, Constitu-tive artificial neural networks: A fast and general approach to predictive data-driven consti-tutive modeling by deep learning, Journal of Computational Physics 429 (2021) 110010. doi: 10.1016/j.jcp.2020.110010 .[33] K. A. Kalina, L. Linden, J. Brummund, P. Metsch, M. K¨ astner, Automated constitutive modeling of isotropic hyperelasticity based on artificial neural networks, Computational Mechanics 69 (1) (2022) 213–232. doi:10.1007/s00466-021-02090-6 .[34] F. Masi, I. Stefanou, Evolution TANN and the identification of internal variables and evolution equations in solid mechanics, Journal of the Mechanics and Physics of Solids 174 (September 2022) (2023) 105245. doi:10.1016/j.jmps.2023.105245 .[35] M. Flaschel, S. Kumar, L. De Lorenzis, Unsupervised discovery of interpretable hyperelastic con-stitutive laws, Computer Methods in Applied Mechanics and Engineering 381 (2021) 113852. 
+
+doi:10.1016/j.cma.2021.113852 .[36] M. Flaschel, S. Kumar, L. De Lorenzis, Discovering plasticity models without stress data, npj Computational Materials 8 (1) (2022) 1–10. doi:10.1038/s41524-022-00752-4 .30 [37] H. Hu, L. Qi, X. Chao, Physics-informed Neural Networks (PINN) for computational solid me-chanics: Numerical frameworks and applications, Thin-Walled Structures 205 (2025) 112495. 
+
+doi:https://doi.org/10.1016/j.tws.2024.112495 .[38] I. Jeong, M. Cho, H. Chung, D.-N. Kim, Data-driven nonparametric identification of material behavior based on physics-informed neural network with full-field data, Computer Methods in Applied Mechanics and Engineering 418 (PB) (2024) 116569. doi:10.1016/j.cma.2023.116569 .[39] R. Eggersmann, T. Kirchdoerfer, S. Reese, L. Stainier, M. Ortiz, Model-Free Data-Driven in-elasticity, Computer Methods in Applied Mechanics and Engineering 350 (2019) 81–99. doi: 10.1016/j.cma.2019.02.016 .[40] T. Kirchdoerfer, M. Ortiz, Data-driven computational mechanics, Computer Methods in Applied Mechanics and Engineering 304 (2016) 81–101. doi:10.1016/j.cma.2016.02.001 .[41] Z. Yang, C. H. Yu, M. J. Buehler, Deep learning model to predict complex stress and strain fields in hierarchical composites, Science Advances 7 (15) (2021). doi:10.1126/SCIADV.ABD7416 .[42] D. K. Klein, M. Fern´ andez, R. J. Martin, P. Neff, O. Weeger, Polyconvex anisotropic hyperelasticity with neural networks, Journal of the Mechanics and Physics of Solids 159 (June 2021) (2022) 104703. doi:10.1016/j.jmps.2021.104703 .[43] P. Thakolkaran, Y. Guo, S. Saini, M. Peirlinck, B. Alheit, S. Kumar, Can KAN CANs? Input-convex Kolmogorov-Arnold Networks (KANs) as hyperelastic constitutive artificial neural networks (CANs), Computer Methods in Applied Mechanics and Engineering 443 (2025). doi:10.1016/j. cma.2025.118089 .[44] J. Wang, T. Li, F. Cui, C. Y. Hui, J. Yeo, A. T. Zehnder, Metamodeling of constitutive model using Gaussian process machine learning, Journal of the Mechanics and Physics of Solids 154 (June) (2021) 104532. doi:10.1016/j.jmps.2021.104532 .[45] J. N. Fuhg, M. Marino, N. Bouklas, Local approximate Gaussian process regression for data-driven constitutive models: development and comparison with neural networks, Computer Methods in Applied Mechanics and Engineering 388 (2022) 114217. doi:10.1016/j.cma.2021.114217 .[46] J. N. Fuhg, N. Bouklas, On physics-informed data-driven isotropic and anisotropic constitutive models through probabilistic machine learning and space-filling sampling, Computer Methods in Applied Mechanics and Engineering 394 (2022) 114915. doi:10.1016/j.cma.2022.114915 .[47] A. L. Frankel, R. E. Jones, L. P. Swiler, Tensor Basis Gaussian Process Models of Hyperelastic Materials, Journal of Machine Learning for Modeling and Computing 1 (1) (2020) 1–17. doi: 10.1615/jmachlearnmodelcomput.2020033325 .[48] M. Liu, L. Liang, W. Sun, A generic physics-informed neural network-based constitutive model for soft biological tissues, Computer Methods in Applied Mechanics and Engineering 372 (2020) 113402. doi:10.1016/j.cma.2020.113402 .[49] A. Konale, V. Srivastava, A physics-informed neural network for modeling fracture without gradient damage: Formulation, application, and assessment, Journal of the Mechanics and Physics of Solids 206 (PA) (2026) 106395. doi:10.1016/j.jmps.2025.106395 .[50] A. Ostadrahimi, A. Teimouri, K. Upadhyay, G. Li, Stress softening damage in strongly nonlinear viscoelastic soft materials: A physics-informed data-driven constitutive model with time–temperature coupling, International Journal of Plasticity 197 (December 2025) (2026) 1–31. 
+
+doi:10.1016/j.ijplas.2025.104582 .[51] K. Upadhyay, J. N. Fuhg, N. Bouklas, K. T. Ramesh, Physics-informed data-driven discovery of constitutive models with application to strain-rate-sensitive soft materials, Computational Me-chanics (jun 2024). doi:10.1007/s00466-024-02497-x .[52] K. Y. Volokh, Hyperelasticity with softening for modeling materials failure, Journal of the Me-chanics and Physics of Solids 55 (10) (2007) 2237–2264. doi:10.1016/j.jmps.2007.02.012 .31 [53] K. Volokh, Loss of ellipticity in elasticity with energy limiters, European Journal of Mechanics -A/Solids 63 (2017) 36–42. doi:10.1016/j.euromechsol.2016.10.003 .[54] S. Abu-Qbeitah, M. Jabareen, K. Y. Volokh, Quasi-static crack propagation in soft materials using the material-sink theory, International Journal of Mechanical Sciences 248 (December 2022) (2023) 108160. doi:10.1016/j.ijmecsci.2023.108160 .[55] A. Faye, Y. Lev, K. Y. Volokh, The effect of local inertia around the crack-tip in dynamic fracture of soft materials, Mechanics of Soft Materials 1 (1) (2019). doi:10.1007/s42558-019-0004-2 .[56] Y. Lev, A. Faye, K. Volokh, Thermoelastic deformation and failure of rubberlike materials, Journal of the Mechanics and Physics of Solids 122 (2019) 538–554. doi:10.1016/j.jmps.2018.09.033 .[57] V. Tac, E. Kuhl, A. B. Tepole, Data-driven continuum damage mechanics with built-in physics, Extreme Mechanics Letters 71 (August) (2024) 102220. doi:10.1016/j.eml.2024.102220 .[58] D. Gaetano, F. Greco, L. Leonetti, A. Pascuzzo, Investigation of failure in anisotropic composite structures via an efficient data-driven multiscale strategy, Meccanica 60 (10-11) (2025) 3235–3256. 
+
+doi:10.1007/s11012-025-02008-z .[59] D. Liu, X. Shao, X. Fu, C. Chen, K. Elkhodary, S. Tang, Data-driven nonlocal damage mechanics and fracture of shells, Engineering Fracture Mechanics 316 (November 2024) (2025) 110864. doi: 10.1016/j.engfracmech.2025.110864 .[60] C. J. Rojas, J. L. Boldrini, M. L. Bittencourt, Parameter identification for a damage phase field model using a physics-informed neural network, Theoretical and Applied Mechanics Letters 13 (3) (2023) 100450. doi:10.1016/j.taml.2023.100450 .[61] R. Abdusalamov, J. Weise, M. Itskov, Rediscovering the Mullins effect with deep symbolic regres-sion, International Journal of Plasticity 179 (June) (2024) 104037. doi:10.1016/j.ijplas.2024. 104037 .[62] A. Ani, R. Nakka, G. Subhash, J.-F. Molinari, S. A. Ponnusami, Machine learning for computa-tional fracture and damage mechanics— Status and perspectives, Engineering Fracture Mechanics 332 (September 2025) (2026) 111778. doi:10.1016/j.engfracmech.2025.111778 .[63] K. Y. Volokh, Review of the energy limiters approach to modeling failure of rubber, Rubber Chemistry and Technology 86 (3) (2013) 470–487. doi:10.5254/rct.13.87948 .[64] E. A. Kearsley, Note: Strain Invariants Expressed as Average Stretches, Journal of Rheology 33 (5) (1989) 757–760. doi:10.1122/1.550063 .[65] H. G. Kilian, An interpretation of the strain-invariants in largely strained networks, Colloid and Polymer Science 263 (1) (1985) 30–34. doi:10.1007/BF01411245 .[66] P. K. Currie, The Attainable Region of strain-invariant space for elastic materials, International Journal of Non-Linear Mechanics 39 (5) (2004) 833–842. doi:10.1016/S0020-7462(03)00059-3 .[67] F. Xing-gui, X. Jin-sheng, C. Xiong, L. Hui, T. Bing-dong, Hyperelastic Model with Energy Limiter for EPDM and Its Numerical Application, Journal of Physics: Conference Series 2235 (1) (2022) 012088. doi:10.1088/1742-6596/2235/1/012088 .[68] P. Mythravaruni, K. Y. Volokh, Failure of Rubber Bearings Under Combined Shear and Compres-sion, Journal of Applied Mechanics 85 (7) (2018) 1–4. doi:10.1115/1.4040018 .[69] P. Mythravaruni, K. Y. Volokh, On Incompressibility Constraint and Crack Direction in Soft Solids, Journal of Applied Mechanics 86 (10) (oct 2019). doi:10.1115/1.4044089 .[70] A. Pissarenko, M. A. Meyers, The materials science of skin: Analysis, characterization, and mod-eling, Progress in Materials Science 110 (2020) 100634. doi:10.1016/j.pmatsci.2019.100634 .[71] W. Li, X. Y. Luo, An Invariant-Based Damage Model for Human and Animal Skins, Annals of Biomedical Engineering 44 (10) (2016) 3109–3122. doi:10.1007/s10439-016-1603-9 .32 [72] K. Volokh, Prediction of arterial failure based on a microstructural bi-layer fiber–matrix model with softening, Journal of Biomechanics 41 (2) (2008) 447–453. doi:10.1016/j.jbiomech.2007. 08.001 .[73] K. Volokh, Modeling failure of soft anisotropic materials with application to arteries, Journal of the Mechanical Behavior of Biomedical Materials 4 (8) (2011) 1582–1594. doi:10.1016/j.jmbbm. 2011.01.002 .[74] C. Williams, C. Rasmussen, Gaussian processes for regression, in: D. Touretzky, M. Mozer, M. Hasselmo (Eds.), Advances in Neural Information Processing Systems, Vol. 8, MIT Press, 1995. URL https://proceedings.neurips.cc/paper_files/paper/1995/file/ 7cce53cf90577442771720a370c3c723-Paper.pdf 
+
+[75] M. L. Stein, Interpolation of Spatial Data, Springer Series in Statistics, Springer New York, New York, NY, 1999. doi:10.1007/978-1-4612-1494-6 .URL http://link.springer.com/10.1007/978-1-4612-1494-6 
+
+[76] B. Mat´ ern, Spatial Variation, Vol. 36 of Lecture Notes in Statistics, Springer New York, New York, NY, 1986. doi:10.1007/978-1-4615-7892-5 .URL http://link.springer.com/10.1007/978-1-4615-7892-5 
+
+[77] L. Laurent, R. Le Riche, B. Soulier, P.-A. Boucard, An Overview of Gradient-Enhanced Metamod-els with Applications, Archives of Computational Methods in Engineering 26 (1) (2019) 61–106. 
+
+doi:10.1007/s11831-017-9226-3 .[78] Y. M. Thant, T. Wakamiya, M. Nukunudompanich, K. Kameda, M. Ihara, S. Manzhos, Kernel regression methods for prediction of materials properties: Recent developments, Chemical Physics Reviews 6 (1) (mar 2025). doi:10.1063/5.0242118 .[79] P. S. Palar, L. Parussini, L. Bregant, K. Shimoyama, L. R. Zuhal, On kernel functions for bi-fidelity Gaussian process regressions, Structural and Multidisciplinary Optimization 66 (2) (2023) 37. doi:10.1007/s00158-023-03487-y .[80] M. Kuss, C. Rasmussen, Gaussian processes in reinforcement learning, in: S. Thrun, L. Saul, B. Sch¨ olkopf (Eds.), Advances in Neural Information Processing Systems, Vol. 16, MIT Press, 2003. URL https://proceedings.neurips.cc/paper_files/paper/2003/file/ 7993e11204b215b27694b6f139e34ce8-Paper.pdf 
+
+[81] P. Virtanen, R. Gommers, T. E. Oliphant, M. Haberland, T. Reddy, D. Cournapeau, E. Burovski, P. Peterson, W. Weckesser, J. Bright, S. J. van der Walt, M. Brett, J. Wilson, K. J. Millman, N. Mayorov, A. R. J. Nelson, E. Jones, R. Kern, E. Larson, C. J. Carey, ˙I. Polat, Y. Feng, E. W. Moore, J. VanderPlas, D. Laxalde, J. Perktold, R. Cimrman, I. Henriksen, E. A. Quintero, C. R. Harris, A. M. Archibald, A. H. Ribeiro, F. Pedregosa, P. van Mulbregt, SciPy 1.0 Contributors, SciPy 1.0: Fundamental Algorithms for Scientific Computing in Python, Nature Methods 17 (2020) 261–272. doi:10.1038/s41592-019-0686-2 .[82] J. Riihim¨ aki, A. Vehtari, Gaussian processes with monotonicity information, in: Proceedings of the Thirteenth International Conference on Artificial Intelligence and Statistics, Vol. 9, PMLR, 2010, pp. 645–652. [83] E. B. Tadmor, R. E. Miller, R. S. Elliott, Continuum Mechanics and Thermodynamics, Cambridge University Press, Cambridge, 2011. doi:10.1017/CBO9781139017657 .[84] G. H¨ utter, Coleman–Noll Procedure for Classical and Generalized Continuum Theories, in: Ency-clopedia of Continuum Mechanics, Springer Berlin Heidelberg, Berlin, Heidelberg, 2018, pp. 1–8. 
+
+doi:10.1007/978-3-662-53605-6_57-1 .URL http://link.springer.com/10.1007/978-3-662-53605-6_57-1 
+
+[85] J. Simo, C. Miehe, Associative coupled thermoplasticity at finite strains: Formulation, numerical analysis and implementation, Computer Methods in Applied Mechanics and Engineering 98 (1) (1992) 41–104. doi:10.1016/0045-7825(92)90170-O .33 [86] G. Franceschini, D. Bigoni, P. Regitnig, G. A. Holzapfel, Brain tissue deforms similarly to filled elastomers and follows consolidation theory, Journal of the Mechanics and Physics of Solids 54 (12) (2006) 2592–2620. doi:10.1016/j.jmps.2006.05.004 .[87] R. De Rooij, E. Kuhl, Constitutive Modeling of Brain Tissue: Current Perspectives, Applied Mechanics Reviews 68 (1) (2016) 1–16. doi:10.1115/1.4032436 .[88] O. H. Yeoh, Characterization of Elastic Properties of Carbon-Black-Filled Rubber Vulcanizates, Rubber Chemistry and Technology 63 (5) (1990) 792–805. doi:10.5254/1.3538289 .[89] O. H. Yeoh, Some Forms of the Strain Energy Function for Rubber, Rubber Chemistry and Tech-nology 66 (5) (1993) 754–771. doi:10.5254/1.3538343 .[90] S. Budday, T. C. Ovaert, G. A. Holzapfel, P. Steinmann, E. Kuhl, Fifty Shades of Brain: A Review on the Mechanical Testing and Modeling of Brain Tissue, Archives of Computational Methods in Engineering 27 (4) (2020) 1187–1230. doi:10.1007/s11831-019-09352-w .[91] Z. Liu, R. Ortigosa, A. J. Gil, J. Bonet, Large strain constitutive modelling of soft compressible and incompressible solids: Generalised isotropic and anisotropic viscoelasticity, Journal of the Mechanics and Physics of Solids 203 (June) (2025) 106194. doi:10.1016/j.jmps.2025.106194 .[92] S. Chockalingam, T. Cohen, Shear shock evolution in incompressible soft solids, Journal of the Mechanics and Physics of Solids 134 (2020) 103746. doi:10.1016/j.jmps.2019.103746 .[93] K. Upadhyay, D. Spearot, G. Subhash, Validated tensile characterization of the strain rate depen-dence in soft materials, International Journal of Impact Engineering 156 (June) (2021) 103949. 
+
+doi:10.1016/j.ijimpeng.2021.103949 .[94] K. Upadhyay, A. Bhattacharyya, G. Subhash, D. E. Spearot, Quasi-Static and High Strain Rate Simple Shear Characterization of Soft Polymers, Experimental Mechanics 59 (5) (2019) 733–747. 
+
+doi:10.1007/s11340-019-00507-1 .[95] K. Upadhyay, G. Subhash, D. Spearot, Visco-hyperelastic constitutive modeling of strain rate sensitive soft materials, Journal of the Mechanics and Physics of Solids 135 (2020) 103777. doi: 10.1016/j.jmps.2019.103777 .[96] Z. Du, G. Zhang, T. Guo, S. Tang, X. Guo, Tension-compression asymmetry at finite strains: A theoretical model and exact solutions, Journal of the Mechanics and Physics of Solids 143 (2020) 104084. doi:10.1016/j.jmps.2020.104084 .[97] D. E. Hanson, R. L. Martin, How far can a rubber molecule stretch before breaking? ab initio study of tensile elasticity and failure in single-molecule polyisoprene and polybutadiene, The Journal of Chemical Physics 130 (6) (2009) 064903. doi:10.1063/1.3071196 .[98] K. Y. Volokh, On Irreversibility and Dissipation in Hyperelasticity With Softening, Journal of Applied Mechanics 81 (7) (2014) 1–3. doi:10.1115/1.4026853 .[99] R. Ogden, Non-linear Elastic Deformations, Dover Civil and Mechanical Engineering, Dover Pub-lications, 1997. URL https://books.google.com/books?id=2u7wCaojfbEC 
+
+[100] E. Pucci, G. Saccomandi, A Note on the Gent Model for Rubber-Like Materials, Rubber Chemistry and Technology 75 (5) (2002) 839–852. doi:10.5254/1.3547687 .34 A physics-informed data-driven framework for modeling hyperelastic materials with progressive damage and failure 
+
+## Kshitiz Upadhyay ∗
+
+> Department of Aerospace Engineering and Mechanics, University of Minnesota, Minneapolis, MN 55455, USA
+
+# Supplementary Material 
+
+## S1 Effect of the nugget parameter in the Stage I isochoric GPR model 
+
+## This section examines the sensitivity of the proposed framework to the choice of the nugget parameter α used in the Stage I isochoric GPR model 
+
+## Miso . All other modeling choices, including kernel type, training data, intact cutoff stretch, and Stage II constrained damage learning, are held fixed. Figure S1 compares intact and total axial stress–stretch predictions ob-tained using four representative nugget values, α = 10 −4, 10 −2, 10 0, and 10 2,for a representative brain tissue gray matter dataset. For very small nugget values ( α = 10 −4 and 10 −2), the intact response interpolates the training data almost exactly; however, this near-interpolatory behavior introduces a spurious stress discontinuity at the intact cutoff stretch. This discontinuity propagates into the total stress prediction, is physically inadmissible, leads to elevated global errors, and may cause numerical issues in simulations due to the associated stiffness tensor. As the nugget parameter is increased, these overfitting-induced artifacts are progressively alleviated. For α = 10 0, the intact and total stress responses        
+
+> ∗Corresponding author. Email: kshitizu@umn.edu Figure S1: Sensitivity of intact and total axial stress–stretch predictions to the nugget parameter αin the Stage I isochoric GPR model Miso . Results are shown for α= 10 −4,10 −2, 10 0, and 10 2.Very small nugget values lead to overfitting and a spurious stress discontinuity at the intact cutoff stretch, which propagates into the total stress response. Intermediate values eliminate this discontinuity and yield smooth, physically meaningful predictions, while excessively large nugget values result in over-smoothing and loss of interpretability.
+
+## become smooth across the intact cutoff, and the spurious stress jump van-ishes. Although a mild overprediction near the transition from elastic to damage-dominated behavior is observed—consistent with the discussion in the main manuscript—the overall response remains physically reasonable and numerically well behaved. Based on systematic evaluation across all brain tissue datasets considered in this work, an intermediate nugget value α = 0 .5was found to provide the best balance between smoothness, fidelity, and physical interpretability. For excessively large nugget values ( α = 10 2), the intact response becomes over-smoothed and deviates noticeably from the total response even within 2the nominally intact regime. As a result, the inferred stress-reduction factor 
+
+## χ significantly deviates from unity at small strains, diminishing the physical interpretability of the elastic–damage decomposition. Overall, this sensitivity study highlights that appropriate nugget selection in Stage I is essential not only for fitting accuracy, but also for avoiding un-physical stress discontinuities, ensuring numerical robustness, and preserving meaningful damage evolution in the proposed two-stage framework. 3

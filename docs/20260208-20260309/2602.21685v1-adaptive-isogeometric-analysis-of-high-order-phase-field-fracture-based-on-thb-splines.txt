@@ -1,0 +1,1626 @@
+Title: Adaptive isogeometric analysis of high-order phase-field fracture based on THB-splines
+
+URL Source: https://arxiv.org/pdf/2602.21685v1
+
+Published Time: Thu, 26 Feb 2026 01:38:15 GMT
+
+Number of Pages: 30
+
+Markdown Content:
+# Adaptive isogeometric analysis of high-order phase-field fracture based on THB-splines 
+
+H.M. Verhelst a, ∗, L. Greco b, A. Reali b
+
+> aEindhoven University of Technology, Department of Mechanical Engineering, Traverse, PO Box 513, 5600 MB Eindhoven, Eindhoven, The Netherlands
+> bUniversity of Pavia, Department of Civil Engineering and Architecture, Via Adolfo Ferrata 3, 27100 PV, Pavia, Italy
+
+Abstract 
+
+In recent decades, the study of fracture propagation in solids has increasingly relied on phase-field models. Several recent contributions have highlighted the potential of this approach in both static and dynamic frameworks. However, a major limitation remains the high computational cost. Two main strategies have been identified to mitigate this issue: the use of locally refined meshes and the adoption of higher-order models. In this work, leveraging Truncated Hierarchical B-splines (THB-splines), we introduce adaptive simulations of higher-order phase-field formulations (AT1 and AT2), focusing primarily on two-dimensional fracture problems. 
+
+Keywords: Cross-talk, Isogeometric Analysis, Phase-field fracture, THB-splines, Adaptive meshing 
+
+1. Introduction 
+
+Fracture mechanics is a relatively young discipline whose foundations lie in the pioneering work of Griffith [1], who introduced the first energy-based approach to the theory of sharp brittle fracture. This framework was subsequently extended and widely adopted by Irwin [2] within the field of engineering. The development of this field has been strongly motivated by the profound societal impact of fracture phenomena, both in terms of safety implications and associated economic costs [3]. This pressing need, combined with the concurrent advancement of computational technologies, has led to the development of dedicated numerical methods for the analysis of fracture problems. Among these, the most widely adopted are the extended finite element method (XFEM) [4] and, more recently, the phase-field approach [5]. The latter has become one of the most widely used methods to date, owing to its ability to capture complex fracture phenomena such as branching, coalescence, and merging. However, its main drawback lies in the high computational cost, which has so far limited its competitiveness compared to alternative approaches. The need to reduce the computational cost of phase-field fracture simulations is a well-recognized issue in the literature. Two main strategies have been explored in this context: the use of higher-order formulations and the use of adaptive meshing. Firstly, the use of higher-order phase-field formulations follows the pio-neering work of Borden et al. [6], which involves the use of higher-order energy dissipation functionals based on the Cahn-Hilliard phase-field model. As shown by Greco et al. [7], this formulation yields significant reduction of the computational costs, since coarser meshes can be used to achieve the same accuracy. In ad-dition, another factor influencing the computational costs is the regularization functional, which determines the shape of the phase-field. The choice of this functional, originally proposed by Ambrosio and Tortorelli [8], can greatly reduce computational costs, as shown by Greco et al. [7].    
+
+> ∗Corresponding Author.
+> Email address: h.m.verhelst@tue.nl (H.M. Verhelst)
+> Preprint submitted to Elsevier February 26, 2026
+> arXiv:2602.21685v1 [math.NA] 25 Feb 2026
+
+The computational advantages of the higher-order phase-field fracture models are largely attributed to the use of the fourth-order Cahn-Hilliard phase-field model over the second-order Alan-Cahn model. Since the former is of higher order, classical discretization based on C0 continuity across element interfaces requires to introduce an auxiliary field for the solution gradient, doubling the computational costs of the model. Alternatively, higher continuity discretizations, such as spline-based Isogeometric Analysis, naturally pro-vide higher-order derivatives, making them an attractive alternative to classical Finite Element Analysis for phase-field modeling [9, 10]. One problem related to phase-field fracture modeling is the imposition of the irreversibility of the damage field. In the literature, several approaches have been proposed to ensure this, such as Strain history variable approach [11], Penalty method [12] and Projected Successive Over-Relaxation (PSOR) [13]. Secondly, besides the use of higher-order formulations to increase the efficiency of phase-field brittle frac-ture simulations, a second strategy relies on the use of adaptive mesh refinement techniques. This approach enables mesh refinement to be localized in the vicinity of the crack, thereby reducing the number of degrees of freedom in regions far from the fracture. The key idea is to employ the phase-field variable – its value, variation, or gradient – as an indicator to drive the refinement strategy. Since higher-order phase-field mod-els benefit from isogeometric analysis, as mentioned above, we limit ourselves to adaptive spline techniques in the sequel. Over the last years, different adaptive spline constructions have been successfully employed for adaptive phase-field fracture simulations. Firstly, Locally Refined (LR)-splines have been used by Proserpio et al. [14] in the context of phase-field fracture simulations for shell structures. In addition, Li and co-authors [15–17] studied fracture in rock-like materials – both in static and dynamic – using LR-splines. In a three-dimensional setting, however, LR-splines have hardly been used for isogeometric analysis, let alone to simulate phase-field fracture. Using Polynomial Splines over Hierarchical T-meshes (PHT-splines), phase-field fracture induced by thermal and electrical loading in composite materials has been simulated in three-dimensional space by [18–21]. In addition, mesh-free methods have been employed by Nguyen-Thanh et al. [22] and Li et al. [23] for adaptive fracture analysis in polycrystalline materials. Lastly, Truncated-Hierarchical B-splines [24] are known for their simple construction and refinement algorithms, generalized for domains of any dimension. Although this spline construction has been applied for adaptive simulation of tumor growth [25] and fluid immiscibility problems [26] based on phase-field models, application of these splines to phase-field fracture is yet undiscovered. This work aims to develop an inexpensive numerical framework for brittle fracture problems through higher-order phase-field models and adaptive meshing. Herein, we propose to employ the phase-field for-mulations from [7, 27] for their high accuracy, and Truncated Hierarchical B-splines (THB-splines) for their extensibility to volumetric domains. Numerical experiments will include comparisons of computational costs with respect to non-adaptive tensor-product B-splines. The outline of this paper is as follows: section 2 provides a background on phase-field fracture models, including the higher-order formulations from [7, 27]. Thereafter, section 3 provides a background on THB-splines and admissible refinement strategies. The novelty of this paper is presented in section 4, where we define adaptive meshing strategies dedicated to phase-field fracture problems. Section 5 presents numerical benchmarks to assess the performance of the proposed adaptive phase-field fracture model, comparing the results to tensor-product-based ones for different phase-field formulations. Finally, section 6 draws the conclusions of this work and provides perspectives for future research. Lastly, an appendix provides an algorithmic overview of the proposed adaptive phase-field fracture model. 
+
+2. Isogeometric phase-field brittle Fracture 
+
+In this section, we present the isogeometric model for brittle phase-field fracture used in the present paper. The section starts with the introduction of the variational formulation used for brittle phase-field fracture in section 2.1. This section provides energy functionals and their variations with respect to the displacements and the phase-field, needed for discretization. Section 2.2 elaborates on the temporal and 2spatial discretization of the variational formulations provided in section 2.1. Using the discrete operators, section 2.3 elaborates on the staggered solution scheme employed in this work. Lastly, section 2.4 provides a background on the initialization of a phase-field based on an initial crack. 
+
+2.1. Phase-field variational formulations 
+
+In this section, we briefly recall the phase-field formulations considered in this work. Following the framework introduced in [6], let us denote by Ω ⊂ RN the reference configuration, where N represents the spatial dimension of the problem. Dirichlet boundary conditions are prescribed on ∂ΩD ⊆ ∂Ω, while Neumann conditions are imposed on ∂ΩN ⊆ ∂Ω, with ∂Ω = ∂ΩD ∪ ∂ΩN and ∂ΩD ∩ ∂ΩN = ∅. The space of admissible displacements is thus defined as 
+
+Uu := {u ∈ H1(Ω; RN ) : u = ¯ u on ∂ΩD } , (1) whereas the phase-field variable d, representing a smooth approximation of the sharp crack topology, belongs to 
+
+Uii  
+
+> d
+
+:= {d ∈ H1(Ω) : d ≥ 0} ,
+
+Uiv  
+
+> d
+
+:= {d ∈ H2(Ω) : d ≥ 0} ,
+
+for the second- and fourth-order formulations, respectively. Strictly speaking, the phase-field variable d should take values within [0 , 1], corresponding to the intact (d = 0) and fully broken (d = 1) material states. In the present work, we relax this constraint and allow d ≥ 0, which a priori permits d > 1. However, during the staggered evolution scheme, the minimization process naturally restricts d to values within [0 , 1]. This weaker constraint is therefore adopted, as it proves to be more convenient from both the mathematical and numerical standpoints. 
+
+2.1.1. Energy functionals 
+
+We assume small strains, i.e., ε = 12
+
+ ∇u + ∇⊤u. Accordingly, for quasi-static brittle fracture, the total energy functionals for the second- and fourth-order formulations are expressed as Πii,iv (u, d) := E(u, d) + Gc Dii,iv (d) − W ext (u) . (2) Here, Wext (u) := R 
+
+> Ω
+
+b · u dΩ + R 
+
+> ∂ΩN
+
+t · u d∂ Ω denotes the external work functional, where b and t are the body and traction force densities, respectively. In equation (2), E(u, d) represents the elastic strain energy and is defined as 
+
+E(u, d) := 
+
+Z
+
+> Ω
+
+ψ(ε(u), d) dΩ = 
+
+Z
+
+> Ω
+
+ω(d) ψ+0 (ε(u)) + ψ− 
+
+> 0
+
+(ε(u))  dΩ , (3) where, following [28, 29], the positive and negative parts of the strain energy density are given by 
+
+ψ+0 (ε(u)) := 12
+
+K  ε+
+
+> v
+
+2 + μ |εd|2 , ψ− 
+
+> 0
+
+(ε(u)) := 12
+
+K  ε−
+
+> v
+
+2  . (4) The volumetric strain is εv = ε : I, where I is the identity tensor, and ε± 
+
+> v
+
+:= ⟨εv ⟩± denote its positive and negative parts. The deviatoric strain is defined as εd := ε − 1 
+
+> N
+
+εv I, while K > 0 and μ > 0 are the bulk and shear moduli, respectively. The monotonically decreasing degradation function ω(d) = (1 − d) 2 + η governs the reduction of stored elastic energy as damage evolves, and satisfies ω(0) = 1 + η, ω(1) = η, and ω′(1) = 0. The small positive parameter η ≪ 1 prevents full degradation of ψ+0 and ensures numerical stability by retaining a residual stiffness when d → 1, as discussed in [11]. The fracture energy contributions Dii,iv in equation (2) describe the regularized crack surface densities. In this work, we consider two different families of functionals, namely the AT1 and AT2 models, originally proposed by Ambrosio and Tortorelli [8]. The corresponding formulations are given as follows: 3• AT1 model: 
+
+Dii 
+
+> AT1
+
+(d) := 
+
+Z
+
+> Ω
+
+38l0
+
+ d + l20|∇d|2 dΩ , (5a) 
+
+Div 
+
+> AT1
+
+(d) := 
+
+Z
+
+> Ω
+
+1
+
+cρ l0
+
+ d + l20 
+
+> 2
+
+|∇d|2 + ρ(∇2d) 2 dΩ . (5b) 
+
+• AT2 model: 
+
+Dii 
+
+> AT2
+
+(d) := 
+
+Z
+
+> Ω
+
+12l0
+
+ d2 + l20|∇d|2 dΩ , (6a) 
+
+Div 
+
+> AT2
+
+(d) := 
+
+Z
+
+> Ω
+
+12l0
+
+ d2 + l20 
+
+> 2
+
+|∇d|2 + l40 
+
+> 16
+
+(∇2d) 2 dΩ , (6b) In these equations, cρ is the normalization constant associated with the optimal 1D profile. In this study, we adopt ρ = 1 and cρ = 4 .4485, as suggested in [27]. The internal length scale l0 controls the width of the diffused crack zone; as l0 → 0, the regularized phase-field formulation Γ-converges to the classical sharp crack representation (see, e.g., [30]). It is possible to summarize the functional as follows: 
+
+D(d) := 
+
+Z
+
+> Ω
+
+1
+
+cρ
+
+ dβ
+
+l0
+
++ γl 0|∇d|2 + δl 30(∇2d) 2
+
+
+
+dΩ (7) where the coefficients β, γ and δ are selected based on the regularization model (AT1 or AT2) and func-tional grade (second- or fourth-order). 
+
+2.1.2. Evolution in terms of energy variations 
+
+In this section, the variational formulation of fracture is presented. It is worth noting that an in-depth analysis of the variational problem lies beyond the scope of this work. However, for the sake of completeness, and with reference to [7, 27], we report below the system of equations governing the evolution of the problem in the continuum setting: 
+
+
+
+∂uΠii,iv (u, d) = 0 ,∂dΠii,iv (u, d) ≥ 0 ,∂dΠii,iv (u, d)[ ˙d] = 0 , ˙d ≥ 0 .
+
+(8) The system of equation (8) governs the evolution through the Karush–Kuhn–Tucker (KKT) conditions, from which the irreversibility condition of the problem directly follows from the third equation of the system. This variational formulation provides a unified energetic framework for the description of quasi-static fracture evolution, ensuring both mechanical equilibrium and the thermodynamic consistency of the damage growth process. 
+
+2.2. Space and time numerical discretization 
+
+Due to the irreversibility of the fracture process, the problem becomes path-dependent, and its solution requires a time integration of the mechanical model while enforcing the irreversibility condition throughout the evolution. Again, we refer the interested reader to [7, 27] for the discritized version of equation (8). The third equation of (8), in the discrete form, represents the irreversibility condition, solved via Projected Successive Over-Relaxation (PSOR) Algorithm [13]. For what concerns the spatial discretization, a Galerkin isogeometric approach based on C1-continuous quadratic basis functions is adopted (see, e.g., [9, 10, 31]). This choice allows a consistent numerical ap-proximation of the Laplacian operator. As will be discussed in sections 3 and 4, the adopted isogeometric framework relies on Truncated Hierarchical B-Splines (THB-splines), thereby enabling the advantages of 4local adaptivity. We denote by Ru 
+
+> i
+
+= Rd 
+
+> i
+
+= Ri : Ω → R the isogeometric basis functions used for the approximation of both the displacement field u and the phase-field variable d. Consequently, the approximate displacement field uh and phase-field variable d h are expressed as linear combinations of the IGA basis functions and the corresponding control variables, ˆ ui ∈ R3 and ˆdi ∈ R, respectively: 
+
+u(x, t ) ≈ uh(x, t ) = 
+
+> nsf
+
+X
+
+> i
+
+Ri(x) ˆ ui(t) ,
+
+d( x, t ) ≈ dh(x, t ) = 
+
+> nsf
+
+X
+
+> i
+
+Ri(x) ˆdi(t) ,
+
+(9) where n sf is the total number of basis functions associated with the spatial discretization. The approximated (9) are substituted into the weak form of the elasto-static problem and into the Karush–Kuhn–Tucker conditions. In this framework, the time-discretized variational formulation of the coupled system can be rewritten in matrix form as: 
+
+
+
+K(uhn+1 , dhn+1 ) un+1 − F ext  
+
+> n
+
+= 0, (10a) QII,IV (uhn+1 ) ∆d h − QII,IV (uhn+1 , dhn) ≥ 0, (10b) 
+
+ QII,IV (uhn+1 ) ∆d h − QII,IV (uhn+1 , dhn) · ∆d h = 0 , ∆d h ≥ 0. (10c) The phase-field matrix and vector are defined as follows: QII,IV := Ψ(ˆ u) + Gc ΦII,IV , QII,IV := Q II,IV ˆd − ψ(ˆ u) − ϕII,IV , (11) where: (Ψ(ˆ u)) ij := 
+
+Z
+
+> Ω
+
+2 ψ+0 (ˆ u) Ri,p Rj,p dΩ , (ψ(ˆ u)) i := 
+
+Z
+
+> Ω
+
+2 ψ+0 (ˆ u) Ri,p dΩ . (12) The Φ matrix, is the Galerkin approximation of eq: (7). If β = 2 the Φ AT2 phase-field matrix reads: (ΦII,IV )ij := 
+
+Z
+
+> Ω
+
+ 1
+
+l0
+
+Ri,p Rj,p + 2 l0γ Bi,p Bj,p + 2 l30δ Ci,p Cj,p 
+
+
+
+dΩ , (13) where, if δ = 0, the second-order model is recovered. Otherwise, if β = 1, the AT1 phase-field matrix is: (ΦII,IV )ij := 
+
+Z
+
+> Ω
+
+ 2l0γ Bi,p Bj,p + 2 l30δ Ci,p Cj,p 
+
+ dΩ . (14) For this case, the dissipated phase-field vector is defined as: (ϕII,IV )i := 
+
+Z
+
+> Ω
+
+Ri,p
+
+l0
+
+dΩ . (15) Instead, the stiffness matrix is defined as: (K)ij =
+
+Z
+
+> Ω
+
+
+
+[(1 − Ri,p ˆde)2(ψ+ 
+
+> v
+
++ ψd) + ψ− 
+
+> d
+
+]Ri,p Rj,p 
+
+
+
+dΩ , (16) and the external force vector as: (F ext )i =
+
+Z
+
+> Ω
+
+b Ri,p dΩ + 
+
+Z
+
+> ∂ΩN
+
+t Ri,p d∂Ω , (17) where b and t are the body and traction forces, respectively. For more details regarding the definitions of the matrices we refer the interested reader to [7, 27]. 52.3. Numerical solution scheme 
+
+In order to solve equation (8), we employ a staggered solution scheme, which alternates between solving the mechanical equilibrium and the phase-field evolution subproblems. Provided the solutions un and d n at load step n, and defining the solutions at staggered iteration i and load step n + 1 as uin+1 and d in+1 , the staggered scheme iteratively solves the mechanical and phase-field problems until convergence is achieved. Firstly, the mechanical subproblem from equation (10a) is solved using Picard iterations denoted by index 
+
+j:K( ui,j −1 
+
+> n+1
+
+, di−1 
+
+> n
+
+) ui,j n+1 = F ext  
+
+> n
+
+. (18) The Picard iterations are converged if the residual Res j 
+
+> Pic ,u
+
+= ∥K( ui,j n+1 , di−1 
+
+> n
+
+) ui,j n+1 − F ext  
+
+> n
+
+∥L2 is below a specified tolerance TOL Pic ,u. Once converged, the displacement solution is updated as uin+1 = ui,j n+1 and the phase-field subproblems from (10a) are solved using the PSOR algorithm with matrix Q II,IV (uin+1 )and vector R = Q II,IV (uin+1 , dn)d n − ψ(uin+1 ) + ϕII,IV using a tolerance TOL PSOR ,∆d (see [7, 13] for more details). The PSOR solver provides the solution increment ∆d in+1 , which is then used to update the phase-field solution as d in+1 = d n + ∆d in+1 . The staggered iterations are repeated until the residual Res stag =
+
+∥K( uin+1 , din+1 ) uin+1 − F ext  
+
+> n
+
+∥L2 is below a specified tolerance TOL stag . For an algorithmic summary of the staggered solution scheme, we refer to algorithms 1 to 3 in Appendix A. 
+
+2.4. Phase-field initialization 
+
+From physics perspective, it is well known that cracks initiate where stress concentrations are highest [1, 2]. Commonly, stress concentrations appear at geometric discontinuities, for example in notches, pores, sharp corners, or at places with pre-existing damage [7, 32]. Alternatively, cracks can initiated at material discontinuities, as shown in the works [12, 33, 34]. In phase-field fracture simulations, cracks can be instantiated through geometric representation of geo-metric discontinuities or by providing an initial representation of the damage field, simulating the crack by degrading the initial material locally. Firstly, geometric damage instantiation defines initial cracks or pores as geometric voids. This can be done by meshing of the initial geometry around these geometric discontinuities, as commonly done in FEM [12], or by geometric methods such as trimming or imersion to locally “disable” the geometric domain. In the isogeometric analysis framework, which is the scope of this paper, the former approach typically requires multi-patch simulation, which becomes non-trivial for higher-order basis functions [35]. The latter approach, on the other hand, provides geometric generality, but the price is paid in terms of complicated quadrature schemes and potential advanced preconditioning [36]. Secondly, damage instantiation by defining an initial phase-field is a common problem in phase-field fracture simulation. In this case, initial cracks or pores are represented by damaged material rather than material voids, which is done by initializing the phase-field. To this end, the phase-field can be initialized by imposition of the history variable [32], or by an interpolated phase-field variable (IPF, [7]). In the present paper, we employ the latter strategy as it is, contrary to the history variable approach, general for the chosen energy dissipation functional (AT1 or AT2). Ultimately, the two approaches can be combined. For example, porous media can be represented geo-metrically, while cracks in this media can be represented by an initial phase-field. In this paper, we focus on the phase-field initialization approach, leaving the geometric or combined representations of discontinuities in the presented framework future research. 
+
+3. Adaptive refinement using THB-splines 
+
+This section provides preliminary information regarding THB-splines and their refinement. The section relies on previous works on Hierarchical B-splines [37], Truncated Hierarchical B-splines [38, 39], and admis-6sible refinement [40, 41]. While the referenced works primarily form the mathematical foundation behind (T)HB-splines and their (admissible) refinement, the present section aims to provide an explanation of the THB-spline definition and the admissible meshing strategies by means of examples. For fundamental details about the material in this section, the reader is referred to the aforementioned references. The section is outlined as follows: section 3.1 elaborates on the construction of a THB-spline basis, and section 3.2 elabo-rates on the concept of mesh admissibility. 
+
+3.1. Truncated Hierarchical B-splines 
+
+Among other spline constructions, THB-splines provide a locally refinable spline basis. Compared to Hi-erarchical B-splines, THB-splines form a partition of unity, making them particularly appealing for solving partial differential equations using IGA. While we refer for the mathematical details behind THB-splines to the work of [37, 38], this section is limited to a brief definition of THB splines, and instead aims to provide the conceptual idea behind the construction of THB-spline bases. Since THB-splines are a truncated version of Hierarchical B-splines (HB-splines), we first define the latter. Provided a sequence of N nested tensor B-spline spaces in different levels l = 0 , ..., N − 1, denoted by V 0 ⊂ V 1 ⊂, ..., V N −1 with an associated basis Bℓ of degree p. Using a sequence of parametric domains defined as Ω = Ω 0 ⊇ Ω1 ⊇ ... ⊇ ΩN −1 = ∅, the set of Hierarchical B-spline basis functions is defined as follows: 
+
+H = β ∈ B ℓ : supp( β) ⊆ Ωℓ ∧ supp( β)̸ ⊆ Ωℓ+1 , ∀ℓ = 0 , . . . , N . (19) In other words, the active functions of level ℓ in H are the basis functions of Bℓ which are fully contained in the parametric domain Ω ℓ and which are not fully contained in level ℓ + 1. Similar to HB-splines, THB-splines are defined by a selection mechanism based on a sequence of nested parametric domains Ω k. However, the functions in the THB-spline basis are truncated using a truncation operation. Provided any function τ ∈ V ℓ, it can be represented in the finer basis V ℓ+1 by taking the linear combination of a set of coefficients cℓ+1  
+
+> β
+
+(τ ) ∈ R and the basis functions β ∈ B ℓ+1 , i.e., repr ℓ+1 (τ ) = X
+
+> β∈B ℓ+1
+
+cℓ+1  
+
+> β
+
+(τ )β. (20) In case of truncation of a function, this representation is restricted to the basis functions β ∈ B ℓ+1 which are not fully contained in Ω ℓ+1 , i.e. trunc ℓ+1 (τ ) = X 
+
+> β∈B ℓ+1 ,supp( β)̸⊆ Ωℓ+1
+
+cℓ+1  
+
+> β
+
+(τ )β. (21) Since the truncation is to be applied recursively on all levels overlapping with the support of the considered basis function, a recursive definition of the THB-spline basis is more common: 1. Initialize T 0 = τ ∈ B 0 : supp( β)̸ = ∅
+
+2. Recursively, let T ℓ+1 = T ℓ+1  
+
+> A
+
++ T ℓ+1  
+
+> B
+
+for ℓ = 0 , . . . , N − 2, where 
+
+T ℓ+1  
+
+> A
+
+= trunc ℓ+1 (τ ) : τ ∈ T ℓ ∧ supp() τ̸ ⊆ Ωℓ+1 ,
+
+T ℓ+1  
+
+> B
+
+= τ ∈ βℓ+1 : supp( τ ) ⊆ B ℓ+1 .
+
+3. Finally, T = T N −1.
+
+Example 3.1 (THB-spline representation and truncation) . Consider a knot vector with knots Ξ0 = 0, 0, 0, 18 , 14 , 38 , 12 , 58 , 34 , 1,
+
+hence defining a B-spline basis B0 of degree 2. Consequently, let the level B1 be defined using the knot vector 
+
+Ξ1 = 0, 0, 0, 116 , . . . , 1, 1, 1 . Additionally, let us refine the interval [ 38 , 78 ] = Ω 1, while Ω0 = Ω = [0 , 1] . The final THB-spline basis defined in this setting is given on the top of figure figure 1, where the black functions 
+
+7βT HB i            
+
+> 0
+> 1
+> β0
+> 0
+> 1
+> repr 1(β0)
+> 018
+> 14
+> 38
+> 716
+> 12
+> 916
+> 58
+> 11 16
+> 34
+> 781
+> 0
+> 1
+> ξ
+> trunc 1(τ )
+> 018
+> 14
+> 38
+> 716
+> 12
+> 916
+> 58
+> 11 16
+> 34
+> 781
+> ξ
+> 018
+> 14
+> 38
+> 716
+> 12
+> 916
+> 58
+> 11 16
+> 34
+> 781
+> ξFigure 1: The concept of Truncated Hierarchical B-spline refinement in one dimension. The THB-spline basis in the top row is locally refined on the interval [ 38,78] (shaded area) and the functions influenced by the local refinement are color-coded as follows: (yellow) non-truncated functions overlapping the refined area; (green and blue) truncated function of the coarse level, (orange) activated functions of the fine level. The second up to the last rows decompose three functions of the coarse level which are affected by the refinement: left and right the truncated coarse functions and in the middle the eliminated coarse function. In the second row, the original functions of the coarse level are highlighted. In the third row, the representation of the function in the finer level is provided, with the original function represented by a dotted line. In the last row, the representation coefficients of the functions which are fully contained in the marked (shaded) interval are set to zero, yielding the truncated functions (light) in the left and right columns. Since the function in the middle row is fully eliminated, the middle plot in the bottom row provides the functions from the fine level inserted instead.
+
+are B-spline functions β ∈ B 0 for which supp (β) ∩ Ω1 = ∅, the yellow and green/blue functions are, respec-tively, non-truncated and truncated functions β ∈ B 0 for which supp (β) ∩ Ω1̸ = ∅ and supp (β)̸ ⊆ Ω1 and the orange functions β ∈ B 1 are from the fine level, hence satisfying supp (β) ⊆ Ω1.In the second up to the fourth rows of figure 1, the truncation mechanism is illustrated for three different functions β ∈ B 0. Firstly, the second row of figure 1 shows three different functions β ∈ B 0. The green and blue function are active since supp (β)̸ ⊆ Ω1, whereas the orange function satisfies supp (β) ⊆ Ω1, hence is not activated. Nevertheless, it will be shown that its truncation trunc (β) would yield zero coefficients. In the third row of figure 1, repr 1(β) is plotted, with the functions γ ∈ B 1 in the background. Finally, the bottom row of figure 1 shows trunc 1(β) for each of the three functions, with the functions γ ∈ B 1 in the background, and with the functions from repr 1(β) which are not fully contained in Ω1, i.e., the functions contributing to trunc 1(β). For the orange function, which satisfies β ⊆ Ω1, it can be seen that all representing functions from B1 are fully contained in Ω1, hence trunc 1(β) = 0 . ⋄
+
+3.2. Admissible refinement 
+
+In the context of (T)HB-splines, the concept of admissible meshes was first presented by Buffa and Giannelli [40]. Admissible meshes are meshes where the number of elements acting in any mesh point is bounded and that the level of all active functions in an element is independent of the number of overall levels in the hierarchy. In the work [42] among others, it was shown that inadmissible meshes may lead to oscillations in the numerical solution when solving PDEs with (T)HB-splines, while in case of admissible meshes oscillations are avoided. The works of Gantner et al. [43] and Bracco et al. [41] provide algorithms for the construction of admissible meshes for HB- and THB- splines. In the present work, we employ the admissible refinement algorithms for 8(a) (b) (c) (d)        
+
+> Figure 2: Step-wise illustration of admissible refinement on a mesh corresponding to a THB-spline basis of degree p= 2. Firstly, (a) illustrates the marking of two elements (in blue and green) of the finest level ℓ, based on the damage field (in red). Secondly, (b) shows the support extensions of the marked elements as shaded areas. Thirdly, (c) (figure 2c) shows the element of level ℓ−2 intersecting with the support extensions of the marked elements in yellow. Lastly, (d) (figure 2d) shows the refined mesh.
+
+THB-splines based on the T -neigborhood [41]. In example 3.2, we provide a simple example of admissible refinement of class 2, while we refer to [40, 43, 43, 44] for the mathematical details behind admissible meshing, and specifically to [41] to the refinement algorithms, which are later used in appendix Appendix A. 
+
+Example 3.2 (Admissible meshing) . We consider a THB-spline basis of degree p = 2 with unique knot vectors Ξu = Ξ v = 0, 18 , . . . , 78 , 1 . The initial configuration is given in figure 2a and consists of mesh elements of levels 1, 2, 3, along with two elements of level 3 to be refined with admissibility of class m = 2 .The first step of the admissible meshing algorithm is to find the support extension of the marked elements, see figure 2b, which consists of the union of the supports of all functions of the tensor level ℓ = 3 active in the marked elements. Consequently, all elements of level ℓ − m = 1 intersecting these support extensions need to be refined in order to preserve admissibility of class m = 2 . The final result after refinement is depicted in figure 2d. 
+
+⋄
+
+4. Adaptive Isogeometric Phase-Field Fracture 
+
+This section presents the novelty of the paper: an adaptive meshing strategy dedicated to phase-field fracture simulations using Truncated Hierarchical B-splines (THB-splines). Following the preliminaries on phase-field fracture models for brittle fracture in section 2 and the preliminaries on THB-splines and admissible refinement in section 3, this section combines these two topics to present an adaptive meshing strategy for phase-field fracture simulations. Firstly, section 4.1 combines the contents of sections 3.1 and 3.2 and presents one of the novelties of this paper: a refinement strategy for phase-field fracture simulations. 
+
+4.1. Refinement strategies for phase-field fracture 
+
+In order to derive adaptive algorithms for phase-field brittle fracture, we first outline two observations about brittle fracture: 1. Brittle fracture is sudden , when compared to ductile fracture. As a consequence, when performing a load- or displacement-incremented simulation, it is expected that fracture propagation occurs in a small number of load steps. As computational costs are expected to be highest in the fracture propagation regime, it is expected that the total computational costs of the simulation are coming from the load or displacement steps corresponding to fracture propagation. 2. Brittle fracture is irreversible , i.e., damage cannot be undone. This implies that the damage phase only expands, and does not experience translations or rotations. Consequently, adaptive meshing algorithms for phase-field brittle fracture can be driven by refinement only, omitting coarsening. The advantage of this approach is that solution projections from old to new meshes are exact. Besides the aforementioned observations regarding brittle fracture impacting the phase-field fracture simu-lation, the phenomenon of cross-talk as explained by [45] is relevant for immersed or trimmed geometries, 9as well as for phase-field fracture simulations since the damage phase implies zero stiffness locally. In brief, cross-talk appears when the support of a basis function overlaps two sides of a disconnected part of the domain, e.g. due to trimming or damage. In this case, the overlapping basis function contributes to the stiffness matrix, hence add stiffness between the disconnected parts of the domain. For more information, we refer to [45] and to example 4.1 later in this section. In the following sub-sections, meshing and solution stepping approaches for phase-field brittle fracture are presented, based on the fracture suddenness, irreversibility and cross-talk. Firstly, section 4.2 provides an adaptive meshing algorithm incorporating damage irreversibility and cross-talk. Secondly, section 4.3 provides load stepping algorithms to handle the suddenness of brittle fracture. 
+
+4.2. Phase-field-based element marking 
+
+As highlight in previous sections, the aim of this paper is to provide an adaptive meshing strategy for phase-field brittle fracture simulations using THB-splines. By this means, the aim is to have a sufficiently fine mesh (typically with mesh size hmin = ℓ0/2 or hmin = ℓ0/4) in the damaged region in order to accurately resolve the damage profile and the material degradation, while keeping the mesh coarse in the undamaged region to reduce computational costs. Due to damage irreversibility, the adaptive meshing strategy only considers element refinement and no coarsening. For the marking criterion, the damage field is sampled in 3d uniformly distributed points in the element, and an element is marked for refinement to the finest level with size hmin if the damage in any of the sampled points exceeds a given threshold value. Such a field-based 
+
+marking strategy is motivated by the fact that the marking strategy to avoid cross-talk as outlined below will be based on the damage field as well. Note, however, that this strategy does not guarantee the reduction of the numerical approximation error, since a metric of this error is not incorporated in the marking criterion. 
+
+Example 4.1 (Cross-talk) . Consider a spline basis B with knot vector Ξ = 0, 0, 0, 15 , 25 , 35 , 45 , 1, 1, 1 and a THB-spline basis T constructed from Ξ with Ω1 =  15 , 45
+
+, see the top left and top right plots in figure 3, respectively. Using this basis, the brittle phase-field fracture model (second-order AT2) from section 2 is solved, subject to boundary conditions u(0) = −1 and u(1) = 1 and with a damage field defined by 
+
+d(ξ) = 
+
+
+
+1 ξ ∈
+
+ 25 , 35
+
+
+
+,
+
+0 elsewhere .
+
+(22) 
+
+In the bottom row of figure 3, the solution u(ξ) is plotted for the B-spline (bottom left) and THB-spline basis (bottom right). As can be seen from these results, the solution obtained by the B-spline basis is not decoupled, whereas the one obtained by the THB-spline basis is. This is explained by the fact that the middle basis function of the B-spline basis is supported on both sides of the interval  25 , 35
+
+. On the contrary, the THB-spline basis has no functions that are active on both sides of the interval  25 , 35
+
+, resulting in a fully decoupled solution field u(ξ). ⋄
+
+To guarantee the elimination of cross-talk, we note that it appears when basis functions overlap both sides of a disconnected region, e.g., due to trimming or damage, as briefly illustrated in example 4.1. Con-sequently, the marking strategy should ensure that basis functions of coarse levels are eliminated over the damaged region. Considering the construction of THB-splines as presented in section 3.1 a function of a coarser level is eliminated if all elements in its support are refined to a finer level. In addition, on an admis-sible mesh (see section 3.2) of class m = 2, the support of a basis function of level ℓ only contains elements of level ℓ and ℓ + 1. Combining these two observations, it can be concluded that cross-talk can naturally be eliminated by refining the supports of the functions of level ℓmax − 1 admissibly to the finest level ℓmax .Looking at example 4.1, it suffices to refine a region covering the support of the basis functions active on both sides of the damaged region. This region has a minimum width of p + 1 elements of level ℓmax − 1, where p is the polynomial degree of the basis. It should be noted that the choice of the mesh size of the finest level, in this paper chosen to be h = ℓ0 
+
+> 2
+
+or h = ℓ0 
+
+> 4
+
+, according to [7, 12, 27] guarantees that there is a sufficient number of basis functions in the damaged region provided basis functions with sufficiently low 10 0                        
+
+> 1
+> βi
+> βi
+> 015
+> 25
+> 35
+> 451
+> −1
+> 0
+> 1
+> ξ
+> u
+> 015
+> 310
+> 25
+> 12
+> 35
+> 710
+> 451
+> ξ
+> uFigure 3: The effect of cross-talk and the remedy of local refinement on a 1D bar. The top row represents a 1D B-spline basis (top left) and a 1D THB-spline basis (top right) locally refined in the interval [ 15,45] (blue) such that the middle function of the B-spline basis is eliminated. The bottom row represents the solution of a linear elasticity problem with a degraded material according to equations (3) and (4) using the red area between [ 25,35] as damage field, and end displacements of −1 and 1 at
+> ξ= 0 and ξ= 1, respectively. On the B-spline basis (bottom left), a gradual distribution of the displacement over the length coordinate ξis observed, whereas the result obtained on the THB-spline basis shows a discontinuity between the left ([0 ,25]) and right ([ 35,1]) part of the damaged region.
+
+degrees. In case of this paper, we restrict ourselves to quadratic basis functions, since ealier works [7, 27] have shown accurate results for these mesh sizes for quadratic basis functions. In practice, finding the support of all basis functions of level ℓmax − 1 overlapping the damaged region requires an algorithm checking the connectivity of the elements in the support of each basis function of level ℓmax − 1. As this can be computational challenging, we propose to mark the support extensions of the elements of level ℓmax − 1 to eliminate cross-talk. This approach re-uses the routine from admissible mesh-ing to find the support extension of an element and is slightly conservative in nature: it marks maximum 2p elements around the damaged region. An example of our approach is provided in example 4.2 and its algorithm is presented in algorithm 4. 
+
+Example 4.2 (Cross-talk elimination by local refinement) . In this example we consider a domain composed of 8 × 8 tensor B-spline elements of degree 2. A fictitious damage field is prescribed as shown in red in figure 4a. We aim to refine the original mesh locally up to ℓmax = 2 in the damaged region while eliminating cross-talk. The refinement procedure is outlined as follows. (a) shows marked elements of level ℓ = 0 in gray, corresponding to the elements overlapping the damaged region. (b) shows the mesh after refinement, with marked elements of level ℓ = 1 in gray, corresponding to the elements overlapping the damaged region as well as additional elements marked due to admissibility. (c) shows the mesh after refinement of the marked elements in (b), with additional elements of level ℓ = 1 from the support extension of the marked elements of level ℓ = 1 in (b). Finally, (d) shows the final mesh after refinement, where all basis functions of level 
+
+ℓ = 1 are eliminated over the damaged region by refining the support extensions of the marked elements of level ℓ = 1 to level ℓ = 2 . ⋄
+
+4.3. Load-stepping with adaptive meshing 
+
+Besides element marking strategies incorporating damage irreversibility and cross-talk elimination, an-other important aspect of adaptive meshing for phase-field brittle fracture simulations is the suddenness of fracture. When performing brittle fracture simulations using load- or displacement-stepping schemes, propagation of the damage field progresses slowly over a large number of steps, until a critical load or dis-placement has been reached after which the damage field evolves significantly. In case of tensor-product meshes which are fine over the whole domain, this suddenness does not pose any particular challenge, as the mesh provides sufficient resolution everywhere. However, in case of adaptive meshes, the suddenness of brittle fracture can cause the damage field to propagate significantly in a single load step, causing the 11 (a) (b) (c) (d)          
+
+> Figure 4: Illustration of cross-talk elimination through refinement of support extensions, provided a damage field (in red). The shaded cells represent elements marked for refinement. Firstly, (a) shows the damage on the coarsest (initial) mesh, where every element with sufficiently high damage value is marked for refinement. Secondly, (b) shows the mesh after refinement to level 1, where elements with sufficiently high damage value are again marked for refinement. The light shaded region of elements of level ℓ= 0 represents element marked by the admissibility algorithm. Thirdly, (c) shows the mesh after refinement to the finest level ℓ= 2, where now elements corresponding to the support extension of the previously marked elements are marked for refinement (in this case there is no need for additional refinement through admissibility). Finally, (d) shows the final mesh after refinement to the finest level ℓ= 2, where all basis functions of level ℓ= 1 have been eliminated over the damaged region, hence cross-talk is eliminated.
+
+damage field to be poorly resolved on coarse parts of the domain. To alleviate this issue, different strategies can be adopted when combining load stepping and adaptive meshing: 
+
+• Explicit mesh adaptivity : After solution step k, the mesh will be refined and the solutions uk and 
+
+dk will be projected onto the new mesh. Afterwards, the solution step k + 1 is solved. 
+
+• Implicit mesh adaptivity : After solution step k, the mesh will be refined and the solutions uk and 
+
+dk will be projected onto the new mesh. Afterwards, solution step k is repeated with the new solutions and the process is repeated until new elements are refined in the mesh. 
+
+• Quasi-implicit mesh adaptivity : As in implicit mesh adaptivity, solution steps are repeated after mesh refinement. However, repetition is only done if the change in the mesh is ‘significant’ compared to the previous refinement iteration. If not, the algorithm proceeds to the next solution step after projection of the solutions onto the mesh obtained in the latest refinement iteration. An algorithm for adaptive load stepping used in this paper is presented in algorithm 5 in appendix Appendix A. In this algorithm, quasi-implicit mesh adaptivity is driven by the ratio in the number of elements before and after refinement. If this ratio is below a given tolerance, the change in the mesh is considered insignificant and the algorithm proceeds to the next load step. Otherwise, the current load step is repeated on the new mesh. Alternatively to the ratio in the number of elements, other metrics can be used to determine whether the change in the mesh is significant, e.g., the total area of the new elements added to the mesh. 
+
+Example 4.3 (Adaptive phase-field refinement) . In this example, the schematic propagation of the damage field and the computational mesh from figure 5 are studied. The panels in figure 5 are illustrative, hence not a result from computations. Initially, consider the damage field in load step k −2 (figure 5a), with a two-level mesh refined around the non-zero part of the damage field. When arriving in load step k − 1 (figure 5b), the damage has propagated towards the right of the domain by a little. In this case, the two extra elements are not considered a significant change in the mesh, hence the mesh adaptivity is explicit. Now, let us assume that significant propagation of the damage field happens in load step k. Then, the damage field computed on the mesh of load-step k − 1 results in the damage field depicted in figure 5c. Consequently, a relatively large number of elements is marked for refinement, leading to a refinement iteration for load step k on the new mesh. As a result, the approximation of the damage field is improved, as can be seen in figure 5d, yielding no extra elements to be refined. ⋄
+
+12 (a) Load step k − 2 (b) Load step k − 1 (c) Load step k, iteration i. (d) Load step k, iteration j > i       
+
+> Figure 5: Schematic representation of sudden phase-field propagation combined with mesh adaptivity. From left to right: (a) phase-field at step k−2, (b) phase-field at step k−1; (b) slightly propagated phase-field with elements marked for refinement (gray); (c) significantly propagated phase-field, partially distorted due to representation on coarse elements with elements marked for refinement in gray; (d) phase-field represented on a locally refined mesh according to the phase-field in iteration
+> i < j as presented in c.
+
+4.4. Phase-field initialization on THB-meshes 
+
+As discussed in section 2.4, the initial phase-field can be constructed using the IPF method introduced by [7]. When using THB-splines as a basis for phase-field fracture, the mesh needs to be initialized such that the IPF provides a phase-field initialization such that the phase-field is identical to the one obtained on a uniform mesh with mesh size hmin , being the finest mesh size of the THB basis to be constructed. Since the IPF method relies basically performs a local L2-projection onto all basis functions with support in a 
+
+β-neighborhood around the crack, the mesh needs to be initialized such that all basis functions of the finest level with support in the β-neighborhood are present in the basis. For THB-splines, this can be achieved by applying the same method as for cross-talk elimination, see section 4.2, where the β-neighborhood is used to mark elements for refinement. 
+
+5. Benchmark examples 
+
+In this section, the proposed adaptive refinement framework for brittle phase-field fracture simulations is benchmarked using two basic examples: the Single Edge Notched (SEN) tensile and shear tests from [11, 12, 27]. The goal of the benchmarks is to assess the efficiency of the proposed framework in terms of computational costs, considering different phase-field formulations and meshing strategies. Therefore, sec-tion 5.1 introduces the benchmark problems, section 5.2 assess the effect of different phase-field formulations on the model performance and finally section 5.2 elaborates on the efficiency gains followed from different meshing settings. Unless stated otherwise, all simulations are performed with tolerances TOL Pic ,u = 10 −5,
+
+TOL PSOR ,∆d = 10 −9, TOL stag = 10 −5, TOL ref = 0 .005. The framework proposed in this paper is implemented in the Geometry + Simulation modules [46, 47]. Assembly of the linear systems is performed element-by-element with ( p + 1) d quadrature points per el-ement, using shared-memory parallelization via OpenMP on 10 threads of an Intel ® Xeon ® Silver 4316 CPU. Unless stated otherwise, the Pardiso [48] solver from Intel’s Math Kernel Library (MKL) is used to solve the linear systems related to the elasticity problem, while the (inherently serial) PSOR method [13] is used to solve the phase-field equations. It should be noted that the computational costs in this section are reported in terms of CPU walltime and in terms of degrees of freedom. Although the latter is more common, it implies that a lower number of degrees of freedom leads to lower computational costs. However, this implicit assumption omits any compu-tational overhead imposed by changing the spline basis from B-splines to THB-splines. On the other hand, CPU walltime heavily depends on the efficiency of the implementation of different spline constructions, and optimization of assemblers and solvers in favor of one spline construction over the other. The aforementioned points motivate that reporting of only degrees of freedom or only CPU time is not fully objective in either 13 u = [0 , 0] 
+
+u = [0 , u y ]
+
+2L
+
+2L
+
+L
+
+2LParameter Value Unit Description                     
+
+> L1.0mm Length parameter
+> ux[6 ,12] ·10 −3mm Incremental horizontal dis-placement
+> E210 kN /mm 2Young’s modulus
+> ν0.3Poisson’s ratio
+> Gc2.7·
+> 10 −3
+> kN /mm Toughness
+> ℓ00.010 mm Internal length
+> (a) SEN tensile test.
+
+## u = [0 , 0] 
+
+## u = [ ux, 0] 
+
+## 2L
+
+## 2L
+
+## L
+
+## 2L                       
+
+> Parameter Value Unit Description
+> L1.0mm Length parameter
+> ux[0 ,6] ·
+> 10 −3
+> mm Incremental horizontal dis-placement
+> E210 kN /mm 2Young’s modulus
+> ν0.3Poisson’s ratio
+> Gc2.7·
+> 10 −3
+> kN /mm Toughness
+> ℓ00.015 mm Internal length
+> (b) SEN shear test
+> Figure 6: Benchmark setup for the SEN (b) shear and (a) tensile tests including geometry, boundary conditions and parameters.
+
+way. In the supplementary material to this paper, we provide videos of the damage field evolution for the different phase-field models and meshing strategies considered in this paper. The videos are provided for the tensile (video 1) and shear tests (video 2), with the results of different models on different meshes with different load-stepping strategies merged into single videos for each test. 
+
+5.1. Problem definitions 
+
+The benchmark tests provided in this section are based on the SEN tensile and shear tests from [11]. These tests have been widely studied by [7, 27] among others. Figure 6 provides the geometry, boundary conditions and parameters related to the SEN tensile (figure 6a) and shear (figure 6b) tests. For the analy-ses, B-spline and THB-spline bases of degree p = 2 are used, and in both cases the results are studied with respect to a coarse and a fine reference element size. For the B-spline basis, the reference element size is the size everywhere in the domain, whereas for the THB-spline basis it is the size of the finest level used. For the tensile test, the characteristic length ℓ0 = 0 .015 [mm] is slightly higher than for the shear test, therefore a larger element size can be used. For the fine mesh, an element size of h = 0 .003125[mm] is chosen, corresponding with ℓ0 
+
+> h
+
+= 4 .8. For the THB-spline the hierarchy is composed of tensor B-spline levels with element sizes h = 0 .05 [mm] (level 0), h = 0 .025 [mm] (level 1), h = 0 .0125 [mm] (level 2), h = 0 .006125 [mm] (level 3), and h = 0 .003125 [mm] (level 4), the latter corresponding to the level of the B-spline basis. For the coarse mesh, the B-spline basis has mesh size h = 0 .00625 [mm] (hence ℓ0 
+
+> h
+
+= 2 .4), whereas the THB-spline basis has the same levels up to level 3. Using the mesh initialization method discussed in section 4.4, the fine 14 THB-spline basis has 3316 elements and 3076 degrees of freedom and the coarse THB-spline basis has 1822 elements and 1748 degrees of freedom. The numbers of elements and degrees of freedom of these bases are significantly lower than the number of element in the fine and coarse tensor B-spline bases with, respectively, 320 × 320 elements and 103684 degrees of freedom and 160 × 160 elements and 26244 degrees of freedom for 
+
+p = 2. For the shear test, the characteristic length is ℓ0 = 0 .010 [mm], hence the mesh sizes will be slightly smaller compared to those obtained for the tensile test. The fine B-spline mesh has an element size of 
+
+h = 0 .0025 [mm], corresponding to ℓ0 
+
+> h
+
+= 4. Similar to the tensile case, the THB-spline hierarchy is chosen such that its finest level is equal to the B-spline mesh. Therefore, for the fine THB-spline mesh, the hierarchy is composed of levels with mesh sizes h = 0 .04 [mm] (level 0), h = 0 .02 [mm] (level 1), h = 0 .01 [mm] (level 2), h = 0 .005 [mm] (level 3) and h = 0 .0025 [mm] (level 4). For the coarse B-spline basis, the mesh size is 
+
+h = 0 .005 [mm], corresponding to ℓ0 
+
+> h
+
+= 2, and the coars THB-spline hierarchy is composed of levels 0 up to 3. Using the mesh initialization discussed in section 4.4, the fine THB-spline basis has 4162 elements and 3868 degrees of freedom and the coarse THB-spline basis has 2308 elements and 2220 degrees of freedom. The number of elements and degrees of freedom of these bases are significantly lower than the number of element in the fine and coarse B-spline bases, with, respectively, 400 × 400 elements and 161604 degrees of freedom and 200 × 200 elements and 40804 degrees of freedom for p = 2. 
+
+5.2. Phase-field model comparison 
+
+Before elaborating on the adaptive refinement scheme in section 4, we first elaborate on the choice of phase-field fracture model and its effect on the propagation of the damage field as well as on the reaction forces and the dissipated energy. The observations made in the following confirm the observations made by [7, 27]. Firstly, figures 7a and 7b provide contour plots of the damage field at level d = 0 .5 in all load steps 
+
+u ∈ [0 .45 , 0.600] · 10 −3 [mm ] for the tensile case, and u ∈ [0 .93 , 1.2] · 10 −3 [mm ] for the shear case. In these figures, the distance between two consecutive contours represents the speed of the crack. Consequently, it can be observed that the crack in the tensile test forms suddenly, typically in 2-3 load steps, while the crack in case of the shear test propagates over a series of time steps towards the end of the simulation. In addition, for both tests it can be observed that the crack for the fourth order AT-1 model is wider in general and that this model generally propagates faster and slightly earlier than the other models. Besides the contour plots in figure 7a, figure 8a provide the vertical and horizontal reaction forces, Fy
+
+and Fx for the tensile and shear cases, respectively, as well as the dissipated energy D[kJ]. These plots are provided for all combinations of the AT1 and AT2 models of second and fourth order, on mesh sizes 
+
+h = ℓ0/2 h = ℓ0/4. Besides the reaction forces being a global metric from a mechanical perspective, the dissipated energy provides a global metric on the phase-field: the jump between the dissipated energy between the first and last load step provides a measure for the accuracy of the model. In addition, the accuracy of the phase-field initialization can be noted in the graphs of the dissipated energy: in the undeformed configuration the dissipated energy should start at 
+
+Z
+
+> Γ
+
+Gc dΓ = Gc · Linitial crack = 1 .35 [kN] . (23) As observed from the graph, a higher-order model or a finer mesh size provides more accurate phase-field initialization, hence more accurate initial dissipated energy. In addition, as can be seen in figure 8a, the fourth-order AT1 model is the only model providing consistent reaction forces between the coarse and the fine mesh, meaning that it is the only model for which the coarse mesh can be used to obtain accurate results. This is in line with the observations from literature [7]. Considering the results of the shear test 15 0.4
+
+0.5
+
+0.6 AT-1, Order 2, h = `0/2   
+
+> y [mm]  AT-1, Order 2, h=`0/4
+
+4.5
+
+5
+
+5.5
+
+6
+
+·10 −3
+
+> Vertical top displacement  [mm]
+
+0.4
+
+0.5
+
+0.6 AT-1, Order 4, h = `0/2   
+
+> y [mm]  AT-1, Order 4, h=`0/4
+
+0.4
+
+0.5
+
+0.6 AT-2, Order 2, h = `0/2   
+
+> y [mm]  AT-2, Order 2, h=`0/4
+
+0 0.2 0.4 0.6 0.8 1
+
+0.4
+
+0.5
+
+0.6 AT-2, Order 4, h = `0/2
+
+x [mm] 
+
+> y [mm]
+
+0 0.2 0.4 0.6 0.8 1   
+
+> AT-2, Order 4, h=`0/4
+
+x [mm] (a) Tensile test. 0.2
+
+0.4              
+
+> AT-1, Order 2, h=`0/2
+> y [mm]
+> AT-1, Order 4, h=`0/2AT-2, Order 2, h=`0/2AT-1, Order 4, h=`0/2
+
+0.95 
+
+1
+
+1.05 
+
+1.1
+
+1.15 
+
+1.2
+
+·10 −2
+
+> Horizontal top displacement  [mm]
+
+0.5 0.6 0.7
+
+0.2
+
+0.4   
+
+> AT-1, Order 2, h=`0/4
+
+x [mm] 
+
+> y [mm]
+
+0.5 0.6 0.7   
+
+> AT-1, Order 4, h=`0/4
+
+x [mm] 
+
+0.5 0.6 0.7   
+
+> AT-2, Order 2, h=`0/4
+
+x [mm] 
+
+0.5 0.6 0.7   
+
+> AT-1, Order 4, h=`0/4
+
+x [mm] 
+
+(b) Shear test. 
+
+Figure 7: Contours of the damage field at level d = 0 .5 for the (a) tensile and (b) tests. The contours are provided for load steps in the interval u ∈ [0 .93 , 1.2] · 10 −3 [mm ] (tensile) and u ∈ [0 .45 , 0.60] · 10 −3 [mm ] (shear) with step size ∆ u = 0 .03 · 10 −3 [mm ]as described in figures 6a and 6b. The rows represent the results obtained on a coarse ( h = ℓ0/2) and fine ( h = ℓ0/4) mesh, while the columns represent different fracture models. The color bars are used to indicate solutions in different load steps. 
+
+16 (see figure 8b), a similar conclusion can be drawn: all models except the fourth-order AT1 show a significant difference between the dissipation on the coarse and fine meshes, indicating that only for the fourth-order AT1 model the coarse mesh suffices. A similar conclusion was drawn in [7]. 
+
+5.3. The role of adaptive meshing 
+
+Following upon the comparison of the phase-field models, this section provides an assessment of the role of the adaptive meshing algorithm presented in this paper, applied to the problems presented in figure 6. To this end, the benchmark problems are solved by means of algorithm 5 in Appendix A. Firstly, the contours of the propagating damage field using the fourth-order AT1 model are provided in figures 9a and 9b. From these figures, it can be seen that the implicit and hybrid adaptive meshing simu-lations provide an accurate reproduction of the results obtained using the tensor-product B-spline basis. In addition, it can be seen that the results obtained using the explicit scheme lag behind the tensor-product results. The latter is explained by the fact that the mesh is not sufficiently refined to resolve the crack in the next load step. Through refinement iterations, this can be resolved, as shown by the implicit and hybrid schemes. Secondly, figures 10a and 10b provide the dissipated energy D, the CPU-time and the number of degrees of freedom per load step for all phase-field models considered, on the finest mesh with mesh size h = ℓ0/4. The coarse mesh size is omitted for the sake of compactness. As can be seen from the dissipated energy distribution and the number of degree of freedom over time, no significant difference between the tensor-product and the implicit and hybrid approaches are observed. The explicit refinement approach, however, shows that the damage progresses slower, which is visible in the plots of the dissipated energy D as well as the degrees of freedom plot. In addition, the results show that the adaptive approaches are significantly more efficient than the tensor-product simulation, even when the implicit and hybrid approaches re-compute a load step. In addition, the CPU-time plot corresponding to the hybrid scheme shows equivalent CPU times to the explicit scheme in the pre-crack regime, while in the crack propagation regime its CPU times follow the same pattern as the implicit simulations. 
+
+5.4. CPU time breakdown 
+
+Figures 11a and 11b provide plots of the computational costs in terms of CPU wall time for the tensile and shear simulations, respectively, comparing results obtained on a tensor-product B-spline basis and on an adaptive THB-spline basis (with hybrid load stepping). In figure 12, we compare the computational costs of the the explicit, implicit and hybrid approaches. The CPU times are subdivided into assembly and solver times for the elasticity and phase-field and optionally (only for adaptive meshes) a projection part. Based on these figures, several conclusions can be drawn. Firstly, figures 11a and 11b show that computational costs are dominated by the elasticity problem. This is explained by the fact that the number of degrees of freedom of the elasticity problem is higher due to the vector-valued solution space. In addition, within the staggered iterations the elasticity problem is solved using multiple iterations, whereas the phase-field problem is restricted to one. Moreover, the phase-field system of equations can partially be assembled once since it does not depend on solutions u and d, hence only equation (12) is assembled in each staggered iteration. Lastly, the phase-field solution typically con-verges faster within the staggered iteration, hence the PSOR solver is initialized almost perfectly, lowering the solver costs of the phase-field problem. Secondly, the figures show that the second-order fracture models are more efficient than the fourth order models on the same mesh. However, as observed in figures 8a and 8b, the fourth-order AT1 model provides similar accuracy on a mesh with h = ℓ0/2 (coarse) compared to h = ℓ0/4 (fine), yielding a CPU time reduction of approximately a factor 4. This is in line with the observations made in [27]. 17 Thirdly, explicit load stepping is always faster than implicit and hybrid load stepping, as shown in fig-ure 12. However, as observed in figure 10, explicit load stepping leads to inaccurate results in cases where mesh refinement lacks behind the crack evolution. The differences between the computational costs of hybrid and implicit load stepping are marginal, with hybrid load stepping being slightly more efficient in the tensile case where we have fast crack propagation, while in the shear case the differences are negligible. Overall, for the fourth-order AT 1 model, we observe a speed-up of approximately a factor 5 compared to tensor-product computation for the same model. 18 0
+
+0.2
+
+0.4
+
+0.6
+
+0.8 AT1, Order 2   
+
+> Vertical Reaction Force  Fy
+> AT1, Order 4 AT2, Order 2 AT2, Order 4
+
+0 2 4 6
+
+·10 −3
+
+2
+
+3
+
+4
+
+·10 −3
+
+> 1.35
+> AT1, Order 2
+
+uy [mm] 
+
+> Damage  D
+
+0 2 4 6
+
+·10 −3
+
+> 1.35
+> AT1, Order 4
+
+uy [mm] 
+
+0 2 4 6
+
+·10 −3
+
+> 1.35
+> AT2, Order 2
+
+uy [mm] 
+
+0 2 4 6
+
+·10 −3
+
+> 1.35
+> AT2, Order 4
+
+uy [mm] 
+
+Coarse Fine AT1, Order 2 AT1, Order 4 AT2, Order 2 AT2, Order 4 (a) Tensile test. 0.3
+
+0.4  
+
+> AT1, Order 2
+> Horizontal Reaction Force  Fx
+> AT1, Order 4 AT2, Order 2 AT2, Order 4
+
+0.6 0.8 1 1.2
+
+·10 −2
+
+1
+
+2
+
+3
+
+·10 −3
+
+> 1.35
+> AT1, Order 2
+
+ux [mm] 
+
+> Damage  D
+
+0.6 0.8 1 1.2
+
+·10 −2
+
+> 1.35
+> AT1, Order 4
+
+ux [mm] 
+
+0.6 0.8 1 1.2
+
+·10 −2
+
+> 1.35
+> AT2, Order 2
+
+ux [mm] 
+
+0.6 0.8 1 1.2
+
+·10 −2
+
+> 1.35
+> AT2, Order 4
+
+ux [mm] 
+
+Coarse Fine AT1, Order 2 AT1, Order 4 AT2, Order 2 AT2, Order 4 
+
+(b) Shear test. 
+
+Figure 8: Reaction force Fx, Fy (left) and dissipated energy D (right) for the (a) tensile and (b) shear tests with respect to the displacement at the top boundary, comparing different phase-field models on different meshes. 
+
+19 0.45 
+
+0.5
+
+0.55 u = 0 .45 · 10 −3   
+
+> y [mm]  u= 0 .48 ·10 −3
+
+0.45 
+
+0.5
+
+0.55 u = 0 .51 · 10 −3   
+
+> y [mm]  u= 0 .54 ·10 −3
+
+0.4 0.6 0.8 1
+
+0.45 
+
+0.5
+
+0.55 u = 0 .57 · 10 −3
+
+x [mm] 
+
+> y [mm]
+
+0.4 0.6 0.8 1   
+
+> u= 0 .6·10 −3
+
+x [mm] 
+
+TP Implicit Explicit Hybrid (a) Tensile test. 0.2
+
+0.3
+
+0.4
+
+0.5                  
+
+> u= 0 .93 ·10 −3
+> y [mm]
+> u= 0 .96 ·10 −3u= 0 .99 ·10 −3u= 1 .02 ·10 −3u= 1 .05 ·10 −3
+
+0.5 0.6 0.7
+
+0.2
+
+0.3
+
+0.4
+
+0.5   
+
+> u= 1 .08 ·10 −3
+
+x [mm] 
+
+> y [mm]
+
+0.5 0.6 0.7   
+
+> u= 1 .11 ·10 −3
+
+x [mm] 
+
+0.5 0.6 0.7   
+
+> u= 1 .14 ·10 −3
+
+x [mm] 
+
+0.5 0.6 0.7   
+
+> u= 1 .17 ·10 −3
+
+x [mm] 
+
+0.5 0.6 0.7   
+
+> u= 1 .2·10 −3
+
+x [mm] 
+
+TP Implicit Explicit Hybrid 
+
+(b) Shear test. 
+
+Figure 9: Contour plots of the damage field d at d = 0 .5 at different horizontal or vertical displacements u for the tensile (a) and shear (b) tests, comparing the tensor-product B-spline basis with the adaptive implicit, explicit and hybrid approaches using the fourth-order AT1 model on a mesh with coarsest mesh size h = ℓ0 
+
+> 2
+
+.
+
+20 2
+
+3
+
+·10 −3
+
+> 1.35
+> AT1, Order 2
+> Damage  D
+> 1.35
+> AT1, Order 4
+> 1.35
+> AT2, Order 2
+> 1.35
+> AT2, Order 4
+
+10 0
+
+10 2
+
+10 4
+
+> 1.35
+> AT1, Order 2
+> CPU time  [s]
+> 1.35
+> AT1, Order 4
+> 1.35
+> AT2, Order 2
+> 1.35
+> AT2, Order 4
+
+0 2 4 6
+
+·10 −3
+
+10 3
+
+10 4
+
+10 5
+
+> 1.35
+> AT1, Order 2
+
+uy [mm] 
+
+> #DoFs  [−]
+
+0 2 4 6
+
+·10 −3
+
+> 1.35
+> AT1, Order 4
+
+uy [mm] 
+
+0 2 4 6
+
+·10 −3
+
+> 1.35
+> AT2, Order 2
+
+uy [mm] 
+
+0 2 4 6
+
+·10 −3
+
+> 1.35
+> AT2, Order 4
+
+uy [mm] 
+
+Coarse Fine AT1, Order 2 AT1, Order 4 AT2, Order 2 AT2, Order 4 (a) Tensile test. 1.5
+
+2
+
+2.5
+
+·10 −3
+
+> 1.35
+> AT1, Order 2
+> Damage  D
+> 1.35
+> AT1, Order 4
+> 1.35
+> AT2, Order 2
+> 1.35
+> AT2, Order 4
+
+10 0
+
+10 2
+
+10 4
+
+> 1.35
+> AT1, Order 2
+> CPU time  [s]
+> 1.35
+> AT1, Order 4
+> 1.35
+> AT2, Order 2
+> 1.35
+> AT2, Order 4
+
+0.6 0.8 1 1.2
+
+·10 −2
+
+10 3
+
+10 4
+
+10 5
+
+> 1.35
+> AT1, Order 2
+
+uy [mm] 
+
+> #DoFs  [−]
+
+0.6 0.8 1 1.2
+
+·10 −2
+
+> 1.35
+> AT1, Order 4
+
+uy [mm] 
+
+0.6 0.8 1 1.2
+
+·10 −2
+
+> 1.35
+> AT2, Order 2
+
+uy [mm] 
+
+0.6 0.8 1 1.2
+
+·10 −2
+
+> 1.35
+> AT2, Order 4
+
+uy [mm] 
+
+Coarse Fine AT1, Order 2 AT1, Order 4 AT2, Order 2 AT2, Order 4 
+
+(b) Shear test. 
+
+Figure 10: Dissipation D (top row) and total CPU-time (bottom row) comparison for the (a) tensile and (b) shear tests using the second order AT1 (left), fourth order AT1 (middle left), second order AT2 (middle right) and fourth order AT2 (right) models, all plotted against the vertical displacement of the top boundary uy . All results are provided for the fine mesh (h = ℓ0/4) except for the fourth order AT-1 model, as it provides the same accuracy on the coarse mesh ( h = ℓ0/2). 
+
+21 AT1, Order 2 AT1, Order 4 AT2, Order 2 AT2, Order 4 
+
+0 0.5 1 1.5 0 0.5 1 1.5 0 0.5 1 1.5 0 0.5 1 1.5
+
+0 2 4 6
+
+·10 3CPU time [s] 
+
+0 2 4 6
+
+·10 3CPU time [s] 
+
+0 2 4 6
+
+·10 3CPU time [s] 
+
+0 2 4 6
+
+·10 3CPU time [s] 
+
+TP 
+
+THB 
+
+> Coarse
+
+TP 
+
+THB 
+
+> Fine
+
+Phase-field Solver Phase-field Assembly Elasticity Solver Elasticity Assembly Projection (a) Tensile test AT1, Order 2 AT1, Order 4 AT2, Order 2 AT2, Order 4 
+
+0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3
+
+0 5 10 
+
+·10 3CPU time [s] 
+
+0 5 10 
+
+·10 3CPU time [s] 
+
+0 5 10 
+
+·10 3CPU time [s] 
+
+0 5 10 
+
+·10 3CPU time [s] 
+
+TP 
+
+THB 
+
+> Coarse
+
+TP 
+
+THB 
+
+> Fine
+
+Phase-field Solver Phase-field Assembly Elasticity Solver Elasticity Assembly Projection 
+
+> (b) Shear test
+
+Figure 11: Computational cost comparison for different phase-field models using adaptive meshing for the (a) tensile and (b) shear tests for the tensor-product B-spline basis (TP) and the adaptive THB-spline basis with hybrid load stepping (THB). The bars are stacked and colored based on the solver and assembly time of the phase-field and elasticity problems. 
+
+22 AT1, Order 2 AT1, Order 4 AT2, Order 2 AT2, Order 4 
+
+0 0.2 0.4 0 0.2 0.4 0 0.2 0.4 0 0.2 0.4
+
+0 0.5 1 1.5
+
+·10 3CPU time [s] 
+
+0 0.5 1 1.5
+
+·10 3CPU time [s] 
+
+0 0.5 1 1.5
+
+·10 3CPU time [s] 
+
+0 0.5 1 1.5
+
+·10 3CPU time [s] 
+
+Implicit 
+
+Hybrid 
+
+Explicit 
+
+> Coarse
+
+Implicit 
+
+Hybrid 
+
+Explicit 
+
+> Fine
+
+Phase-field Solver Phase-field Assembly Elasticity Solver Elasticity Assembly Projection (a) Tensile test. AT1, Order 2 AT1, Order 4 AT2, Order 2 AT2, Order 4 
+
+0 0.2 0.4 0.6 0 0.2 0.4 0.6 0 0.2 0.4 0.6 0 0.2 0.4 0.6
+
+0 1 2
+
+·10 3CPU time [s] 
+
+0 1 2
+
+·10 3CPU time [s] 
+
+0 1 2
+
+·10 3CPU time [s] 
+
+0 1 2
+
+·10 3CPU time [s] 
+
+Implicit 
+
+Hybrid 
+
+Explicit 
+
+> Coarse
+
+Implicit 
+
+Hybrid 
+
+Explicit 
+
+> Fine
+
+Phase-field Solver Phase-field Assembly Elasticity Solver Elasticity Assembly Projection 
+
+> (b) Shear test.
+
+Figure 12: Comparison of load stepping approaches for adaptive THB-spline phase-field models in terms of computational cost for the (a) tensile and (b) shear tests. The bars are stacked and colored based on the solver and assembly time of the phase-field and elasticity problems, as well as the projection time. 
+
+23 6. Conclusions 
+
+This paper presents an adaptive isogeometric method for phase-field brittle fracture simulations. The framework is based on the isogeometric analysis of higher-order phase-field simulation of the damage field based on combinations of the AT1 and AT2 formulations of second- and fourth-order phase-field models. These equations are solved on an adaptive basis composed of Truncated Hierarchical B-splines, which is refined admissibly to avoid spurious oscillations. Since brittle fracture is phenomenologically irreversible, the adaptive refinement scheme is solely based on refinement, using phase-field-based element marking. In addition, since brittle fracture is phenomenologically sudden, load-steps are optionally re-computed on a mesh obtained in the previous refinement iteration, aiming to capture significant propagations of the dam-age field accurately across load steps. The re-computation algorithms presented in this paper consist of so-called explicit, implicit or hyrid schemes. Lastly, we reason on the phenomenon of cross-talk in relation to the presented refinement strategy. This phenomenon is naturally eliminated by admissible meshes refined to sufficient depth. The proposed adaptive isogeometric method is thoroughly tested on two common benchmarks for nu-merical phase-field brittle fracture: the SEN shear and tensile tests,. Based on the results obtained for the benchmark tests under different model configurations, several observations can be made, and conclusions can be drawn. Firstly, the results show that for tensor-product meshes, the dissipated energy obtained using the fourth order AT1 model on a coarse mesh with size h = ℓ0 
+
+> 2
+
+is close to the results obtained on a fine mesh with size 
+
+h = ℓ0 
+
+> 4
+
+, while the other phase field models considered in this study show significant differences between the fine and coarse meshes. Consequently, it can be concluded that a coarse mesh is sufficient for the fourth-order AT1 model, providing a speed-up of approximately a factor 4, similar to the one observed in earlier work [27]. Secondly, the suddenness of fracture can only be captured accurately by using hybrid of implicit load step-ping schemes. For the explicit load stepping sheme, the results show that crack propagation is limited by the propagation of the mesh. On the other hand, the implicit load stepping scheme provides a conserva-tive counterpart: load step recomputation is performed as soon as one or more elements are marked for refinement. Consequently, load step recomputation is also performed in the pre-propagation phase, yielding high computational costs in this regime, for low accuracy gains. Finally, the hybrid load stepping scheme, provides a combination of the two methods: it aims to be explicit in the pre-propagation phase, and implicit in the propagation phase. Although this approach requires a threshold parameter to be chosen, it provides efficiency gains over the implicit scheme. For the fourth-order AT1 model, we observe a speed-up of ap-proximately a factor 5 compared to tensor-product computation for the same model, yielding a speed-up of approximately a factor 20 compared to tensor-product second-order AT2 computations. Based on the findings of this paper and on other recent advances in the simulation of brittle fracture via phase-field methods, we suggest the following directions for future work. Firstly, the present paper provides a thorough analysis of phase-field brittle fracture simulations in 2D. As volumetric fracture simulations imply a significant increase in degrees of freedom, solver costs are limiting reasonable simulation times. Therefore, we plan to investigate distributed memory parallelization methods on hierarchical meshes to reduce assembly and solver times. Secondly, the analyses in the present paper are restricted to quadratic THB-splines, because of the fact that the IPF phase-field initialization method is primarily investigated for that degree, and because quadratic basis functions provide minimal support for sufficient smoothness. Nevertheless, the methods and algorithms for refinement proposed in this paper are degree-independent, hence an investigation into the effect of higher-degree bases is on our future planning. 
+
+7. Acknowledgments 
+
+H.M. Verhelst acknowledges financial support the knowledge and innovation covenant Fundamental Fluid Dynamics Challenges in Inkjet Printing (Phase II) (KICH2.V4C.20.001), a joint research program of Canon Production Printing, Eindhoven University of Technology, Utrecht University, University of Twente, and 24 the Netherlands Organization for Scientific Research (NWO). A. Reali and L. Greco acknowledge the support of the Italian Ministry of University and Research (MUR) through the PRIN project COSMIC (No. 2022A79M75), funded by the European Union — Next Generation EU. In addition, A. Reali is a member of the Gruppo Nazionale Calcolo Scientifico-Istituto Nazionale di Alta Matematica (GNCS-INDAM), and acknowledges the contribution of the National Recovery and Resilience Plan, Mission 4 Component 2 – Investment 1.4 – NATIONAL CENTER FOR HPC, BIG DATA AND QUANTUM COMPUTING, spoke 6. 
+
+References 
+
+[1] A. A. Griffith, G. I. Taylor, Vi. the phenomena of rupture and flow in solids, Philosophical Transactions of the Royal Society of London. Series A, Containing Papers of a Mathematical or Physical Character 221 (1921) 163–198. [2] G. R. Irwin, Analysis of stresses and strains near the end of a crack traversing a plate (1957). [3] R. P. Reed, The economic effects of fracture in the United States, volume 647, US Department of Commerce, National Bureau of Standards, 1983. [4] T. Belytschko, T. Black, Elastic crack growth in finite elements with minimal remeshing, International journal for numerical methods in engineering 45 (1999) 601–620. [5] B. Bourdin, G. Francfort, J.-J. Marigo, Numerical experiments in revisited brittle fracture, Journal of the Mechanics and Physics of Solids 48 (2000) 797–826. [6] M. Borden, T. Hughes, C. Landis, C. Verhoosel, A higher-order phase-field model for brittle fracture: Formulation and analysis within the isogeometric analysis framework, Computer Methods in Applied Mechanics and Engineering 273 (2014) 100–118. [7] L. Greco, A. Patton, M. Negri, A. Marengo, U. Perego, A. Reali, Higher order phase-field modeling of brittle fracture via isogeometric analysis, Engineering with Computers (2024). [8] L. Ambrosio, V. M. Tortorelli, Approximation of functional depending on jumps by elliptic functional via t-convergence, Communications on Pure and Applied Mathematics 43 (1990) 999 – 1036. [9] T. Hughes, J. Cottrell, Y. Bazilevs, Isogeometric analysis: Cad, finite elements, nurbs, exact geometry and mesh refine-ment, Computer Methods in Applied Mechanics and Engineering 194 (2005) 4135–4195. [10] J. Cottrell, T. Hughes, A. Reali, Studies of refinement and continuity in isogeometric structural analysis, Computer Methods in Applied Mechanics and Engineering 196 (2007) 4160–4183. [11] C. Miehe, F. Welschinger, M. Hofacker, Thermodynamically consistent phase-field models of fracture: Variational princi-ples and multi-field fe implementations, International Journal for Numerical Methods in Engineering 83 (2010) 1273–1311. [12] T. Gerasimov, L. De Lorenzis, On penalization in variational phase-field models of brittle fracture, Computer Methods in Applied Mechanics and Engineering 354 (2019) 990–1026. [13] A. Marengo, A. Patton, M. Negri, U. Perego, A. Reali, A rigorous and efficient explicit algorithm for irreversibility enforcement in phase-field finite element modeling of brittle crack propagation, Computer Methods in Applied Mechanics and Engineering 387 (2021) 114137. [14] D. Proserpio, M. Ambati, L. De Lorenzis, J. Kiendl, A framework for efficient isogeometric computations of phase-field brittle fracture in multipatch shell structures, Computer Methods in Applied Mechanics and Engineering 372 (2020) 113363. [15] Y. Li, T. Yu, S. Natarajan, T. Q. Bui, A dynamic description of material brittle failure using a hybrid phase-field model enhanced by adaptive isogeometric analysis, European Journal of Mechanics-A/Solids 97 (2023) 104783. [16] Y. Li, T. Yu, C. Xing, S. Natarajan, Modeling quasi-static and dynamic thermo-elastic coupled brittle fracture using an adaptive isogeometric hybrid phase-field method, Finite Elements in Analysis and Design 224 (2023) 103993. [17] Y. Li, T. Yu, S. Natarajan, An adaptive isogeometric phase-field method for brittle fracture in rock-like materials, Engineering Fracture Mechanics 263 (2022) 108298. [18] R. Kiran, N. Nguyen-Thanh, K. Zhou, Adaptive isogeometric analysis–based phase-field modeling of brittle electrome-chanical fracture in piezoceramics, Engineering Fracture Mechanics 274 (2022) 108738. [19] R. Kiran, N. Nguyen-Thanh, H. Yu, K. Zhou, Adaptive isogeometric analysis–based phase-field modeling of interfacial fracture in piezoelectric composites, Engineering Fracture Mechanics 288 (2023) 109181. [20] R. Kiran, N. Nguyen-Thanh, K. Zhou, On the phase-field modeling of thermo-electromechanical brittle fracture in piezoceramics using an adaptive isogeometric approach, Engineering Fracture Mechanics 304 (2024) 110068. [21] B. Xu, T. Xu, M. J. Heap, A. R. Kushnir, B.-y. Su, X.-c. Lan, An adaptive phase field approach to 3d internal crack growth in rocks, Computers and Geotechnics 173 (2024) 106551. [22] N. Nguyen-Thanh, W. Li, J. Huang, K. Zhou, Adaptive higher-order phase-field modeling of anisotropic brittle fracture in 3d polycrystalline materials, Computer Methods in Applied Mechanics and Engineering 372 (2020) 113434. [23] W. Li, N. Nguyen-Thanh, K. Zhou, Phase-field modeling of brittle fracture in a 3d polycrystalline material via an adaptive isogeometric-meshfree approach, International Journal for Numerical Methods in Engineering 121 (2020) 5042–5065. [24] C. Giannelli, B. J¨ uttler, H. Speleers, Thb-splines: The truncated basis for hierarchical splines, Computer Aided Geometric Design 29 (2012) 485–498. [25] G. Lorenzo, M. Scott, K. Tew, T. Hughes, H. Gomez, Hierarchically refined and coarsened splines for moving interface problems, with particular application to phase-field models of prostate tumor growth, Computer Methods in Applied Mechanics and Engineering 319 (2017) 515–548. 
+
+25 [26] C. Bracco, C. Giannelli, A. Reali, M. Torre, R. V´ azquez, Adaptive isogeometric phase-field modeling of the cahn–hilliard equation: Suitably graded hierarchical refinement and coarsening on multi-patch geometries, Computer Methods in Applied Mechanics and Engineering 417 (2023) 116355. [27] L. Greco, E. Maggiorelli, M. Negri, A. Patton, A. Reali, At1 fourth-order isogeometric phase-field modeling of brittle fracture, Mathematical Models and Methods in Applied Sciences 0 (0) 1–55. [28] C. Comi, U. Perego, Fracture energy based bi-dissipative damage model for concrete, International Journal of Solids and Structures 38 (2001) 6427–6454. [29] H. Amor, J.-J. Marigo, C. Maurini, Regularized formulation of the variational brittle fracture with unilateral contact: Numerical experiments, Journal of the Mechanics and Physics of Solids 57 (2009) 1209–1229. [30] M. Negri, γ-convergence for high order phase field fracture: Continuum and isogeometric formulations, Computer Methods in Applied Mechanics and Engineering 362 (2020) 112858. [31] L. Piegl, W. Tiller, The NURBS book, Springer Science and Business Media, 1996. [32] M. Borden, T. Hughes, C. Landis, C. Verhoosel, A higher-order phase-field model for brittle fracture: Formulation and analysis within the isogeometric analysis framework, Comput. Methods Appl. Mech. Engrg. 273 (2014) 100 – 118. [33] C. Miehe, M. Hofacker, F. Welschinger, A phase field model for rate-independent crack propagation: Robust algorithmic implementation based on operator splits, Computer Methods in Applied Mechanics and Engineering 199 (2010) 2765–2778. [34] J. M. Sargado, E. Keilegavlen, I. Berre, J. M. Nordbotten, High-accuracy phase-field models for brittle fracture based on a new family of degradation functions, Journal of the Mechanics and Physics of Solids 111 (2018) 458–489. [35] H. M. Verhelst, P. Weinm¨ uller, A. Mantzaflaris, T. Takacs, D. Toshniwal, A comparison of smooth basis constructions for isogeometric analysis, Computer Methods in Applied Mechanics and Engineering 419 (2024) 116659. [36] F. de Prenter, C. V. Verhoosel, E. H. van Brummelen, M. G. Larson, S. Badia, Stability and Conditioning of Immersed Finite Element Methods: Analysis and Remedies, Archives of Computational Methods in Engineering (2023) 1–61. [37] A.-V. Vuong, C. Giannelli, B. J¨ uttler, B. Simeon, A hierarchical approach to adaptive local refinement in isogeometric analysis, Computer Methods in Applied Mechanics and Engineering 200 (2011) 3554–3567. [38] C. Giannelli, B. J¨ uttler, H. Speleers, THB-splines: The truncated basis for hierarchical splines, Computer Aided Geometric Design 29 (2012) 485–498. [39] C. Giannelli, B. J¨ uttler, S. K. Kleiss, A. Mantzaflaris, B. Simeon, J. ˇSpeh, THB-splines: An effective mathematical technology for adaptive refinement in geometric design and isogeometric analysis, Computer Methods in Applied Mechanics and Engineering 299 (2016) 337–365. [40] A. Buffa, C. Giannelli, Adaptive isogeometric methods with hierarchical splines: Error estimator and convergence, Mathematical Models and Methods in Applied Sciences 26 (2016) 1–25. [41] C. Bracco, C. Giannelli, R. V´ azquez, Refinement Algorithms for Adaptive Isogeometric Methods with Hierarchical Splines, Axioms 7 (2018) 43. [42] M. Carraturo, C. Giannelli, A. Reali, R. V´ azquez, Suitably graded THB-spline refinement and coarsening: Towards an adaptive isogeometric analysis of additive manufacturing processes, Computer Methods in Applied Mechanics and Engineering 348 (2019) 660–679. [43] G. Gantner, D. Haberlik, D. Praetorius, Adaptive IGAFEM with optimal convergence rates: Hierarchical B-splines, Mathematical Models and Methods in Applied Sciences 27 (2017) 2631–2674. [44] A. Buffa, G. Gantner, C. Giannelli, D. Praetorius, R. V´ azquez, Mathematical Foundations of Adaptive Isogeometric Analysis, Archives of Computational Methods in Engineering 29 (2022) 4479–4555. [45] Z. Lian, L. Leidinger, S. Hartmann, F. Bauer, M. Pabst, C. Krisadawat, R. W¨ uchner, Cross-talk effects in trimmed isogeometric shells and the control point duplication approach, Computer Methods in Applied Mechanics and Engineering 438 (2025) 117849. [46] A. Mantzaflaris, H. M. Verhelst, M. M¨ oller, C. Karampatzakis, S. Takacs, S. Imperatore, P. Weinm¨ uller, J. Vogl, J. Li, Y. Ji, M. Matucci, A. Limkilde, F. Scholz, D. Mokriˇ s, J. Sogn, A. Shamanskiy, E. Vollebregt, R. Tielen, A. Bressan, A. Farahat, Geometry + Simulation Modules (G+Smo), Zenodo, 2025. doi:10.5281/zenodo.15874172. [47] B. J¨ uttler, U. Langer, A. Mantzaflaris, S. E. Moore, W. Zulehner, Geometry + Simulation Modules: Implementing Isogeometric Analysis, PAMM 14 (2014) 961–962. [48] O. Schenk, K. G¨ artner, Solving unsymmetric sparse systems of linear equations with pardiso, Future Generation Computer Systems 20 (2004) 475–487. 
+
+Appendix A. Algorithmic overview 
+
+In this section, we provide an overview of the algorithms used to solve the coupled phase-field fracture problem with adaptive refinement. In algorithms 1 and 2 we provide subroutines for solving the displacement and phase-field subproblems at each staggered iteration ı ≥ 1. The solve elasticity algorithm implements the Newton-Raphson scheme for solving equation (10a), while the solve phasefield algorithm employs the PSOR method to solve the linear complementarity problem defined by equations (10b) and (10c). In both algorithms, we denote the loading step index by n ≥ 1, the staggered iteration index by ı ≥ 1, and the Newton–Raphson/PSOR iteration index by ȷ ≥ 0. In algorithm 1, the subroutines assemble elasticity LHS and assemble elasticity RHS are responsible for assembling the stiffness matrix and the external force vector, respectively. In algorithm 2, 26 the subroutine assemble phasefield LHS constructs the solution-dependent part of the phase-field ma-trix, while solve PSOR implements the PSOR algorithm to solve the linear complementarity problem. The detailed implementation of the PSOR algorithm can be found in [13], while the assembly algorithms are based on standard procedures in isogeometric analysis. 
+
+Algorithm 1: solve elasticity( ui−1 
+
+> n
+
+,di−1 
+
+> n
+
+,F ext  
+
+> n
+
+,B,Q,TOL Pic ,u)
+
+Description: Newton-Raphson algorithm for the displacement field at a staggered iteration ı ≥ 1, solving equation (10a). 
+
+Input: Displacement field uin at current staggered iteration ı; phase-field from previous staggered iteration d i−1 
+
+> n
+
+; the basis B, the mesh Q and the tolerance for the Picard iterations TOL Pic ,u.
+
+for j = 0 , . . . do 
+
+# Assemble stiffness matrix 
+
+K ← assemble elasticity LHS (ui−1 
+
+> n
+
+, di−1 
+
+> n
+
+)
+
+# Solve equation (10a) 
+
+ui,j n ← K−1F ext 
+
+> n
+
+# Test the residual 
+
+if Res j 
+
+> Pic ,u
+
+< TOL Pic ,u then 
+
+uin ← ui,j n
+
+break end end Output: Displacement field uin at current staggered iteration ı. 
+
+Algorithm 2: solve phasefield (uin,d i−1 
+
+> n
+
+,ΦII,IV ,ϕII,IV ,B,Q,TOL PSOR ,∆d )
+
+Description: Solving the phase-field at staggered iteration ı ≥ 1, solving equations (10b) and (10c). 
+
+Input: Displacement field uin at current staggered iteration ı; phase-field from previous staggered iteration d i−1 
+
+> n
+
+; solution-independent phase-field matrix ΦII,IV and vector ϕII,IV from equations (13) to (15); the basis B, the mesh Q and the tolerance for the PSOR iterations 
+
+TOL PSOR ,∆d .
+
+# Assemble solution-dependent phase-field matrix and vector from equation (12) 
+
+Ψ ← assemble phasefield LHS (uin)
+
+ψ ← assemble phasefield RHS (uin)
+
+# Assemble total phase-field matrix and vector from equation (11) 
+
+QII,IV ← Ψ + Gc ΦII,IV 
+
+qII,IV ← QII,IV di−1 
+
+> n
+
+− ψ − ϕII,IV 
+
+# Solve equations (10b) and (10c) 
+
+∆d in ← solve PSOR  QII,IV , qII,IV , TOL PSOR ,∆d 
+
+
+
+# Update phase-field solution 
+
+din ← di−1 
+
+> n
+
++ ∆d in
+
+Output: Phase-field solution d in at current staggered iteration ı. Algorithm 3 summarizes the overall staggered solution scheme for a loading step n ≥ 1, utilizing the previously defined subroutines to solve the coupled problem iteratively until convergence is achieved. This load step algorithm can be embedded within a load stepping procedure to simulate the entire loading history a fixed basis B and mesh Q, material parameters and boundary conditions. The subroutines as-semble elasticity RHS , assemble phasefield LHS and assemble phasefield RHS are called once per load step, as they are independent of the solution fields. 27 Algorithm 3: load step (uk,d k,B,Q,TOL Pic ,u,TOL PSOR ,∆d ,TOL stag )
+
+Description: Performs staggered solution on a fixed mesh and spline space for a load step k.
+
+Input: Previous load step solution ( uk, dk), the basis B, the mesh Q, the tolerance for the Picard iterations TOL Pic ,u, the tolerance for the PSOR iterations TOL PSOR ,∆d and the tolerance for the staggered iterations TOL stag .
+
+# Initialize load step (assumes that the loads/displacements of load step k + 1 are set) 
+
+uk+1 = uk
+
+dk+1 = d k
+
+# Assemble solution-independent quantities 
+
+F ext  
+
+> k+1
+
+← assemble elasticity RHS (k + 1) 
+
+ΦII,IV ← assemble phasefield LHS () 
+
+ϕII,IV ← assemble phasefield RHS () 
+
+# Staggered iterations 
+
+while ∥R(uk+1 , dk+1 )∥ > TOL stag do 
+
+# Solve elasticity problem 
+
+uk+1 = solve elasticity (uk+1 , dk+1 , F ext 
+
+> k+1
+
+, B, Q, TOL Pic ,u)
+
+# Solve phase-field problem 
+
+dk+1 = solve phasefield (uk+1 , dk, dk+1 , ΦII,IV , ϕII,IV , B, Q, TOL PSOR ,∆d )
+
+# Test the staggered residual 
+
+if Res stag < TOL stag then break end end Output: New displacement field uk+1 , new damage field d k+1 .28 Contrary to algorithm 3, we aim to define an algorithm which includes mesh adaptivity. To this end, we define refine elements which marks elements for refinement based on the damage field. The algorithms mark elements admissibly in a level-by-level fashion. In the last level, the support extension of the marked elements is also marked to eliminate cross-talk, as discussed in section 4.2. The elements are marked based on sampling the damage field at a set of points within the element, which can be the quadrature points or another suitable set of points. The elements are marked for refinement if the damage field exceeds a given threshold d min at any of the sampled points. The marked elements are then refined using the re-fine hierarchical mesh routine, and the new spline space is built using build hierarchical space .
+
+Algorithm 4: refine elements (d, T ,Q,m,ℓmax ,d min )
+
+Description: Refines elements based on the damage field while ensuring cross-talk elimination and admissibility. 
+
+Input: Damage field d, spline space T , mesh Q, admissibility class m, the maximum refinement level ℓmax and the damage threshold d min for marking. 
+
+# Initialize the marked elements 
+
+{E} = ∅
+
+# Loop over all levels up to ℓmax − 1
+
+for ℓ = 0 , . . . , ℓ max − 1 do 
+
+# Loop over all elements Qk of level ℓ in the mesh Q
+
+for Qk ∈ Q ℓ do 
+
+# Check the damage in sampled points of element Qk
+
+if ∃ ξ ∈ Qk : d( ξ) > dmin then 
+
+# If ℓ = ℓmax -1, mark the support extension to eliminate cross-talk 
+
+if ℓ == ℓmax − 1 then 
+
+# Get the support extension of element Qk
+
+{S} = get support extension (T , Q, Q k)
+
+end else 
+
+# Otherwise, only mark the element itself 
+
+{S} = {Qk}
+
+end 
+
+# Add the element(s) to the marked set 
+
+{E} = {E} ∪ { S}
+
+end end 
+
+# Mark admissibly, see [41] 
+
+for ℓ = 0 , . . . , ℓ max − 1 do 
+
+{E} = mark recursive (T , Q, {E}, m )
+
+end 
+
+# Refine the marked elements 
+
+Q = refine hierarchical mesh (T , Q, {E})
+
+T = build hierarchical space (Q)
+
+end Output: Updated spline space T and mesh Q.Similar to the load step algorithm, we define adaptive load step in algorithm 5, which includes the mesh refinement procedure. The algorithm performs staggered iterations until convergence, and then refines the mesh based on the damage field. The solution fields are projected to the new mesh using the 
+
+project field routine, which can be based on L2-projection, quasi-interpolation or another suitable method. The algorithm continues to refine the mesh until a stopping criterion based on the ratio of new elements to 29 total elements is met with tolerance TOL ref , which allows for explicit ( TOL ref = 1), implicit ( TOL ref = 0) or hybrid mesh adaptivity. 
+
+Algorithm 5: adaptive load step (k,d k,uk,T ,Q,m,ℓmax ,d min ,TOL Pic ,u,TOL PSOR ,∆d ,TOL stag ,TOL ref )
+
+Description: Input: Load step index k, damage field d(ξ), displacement field u(ξ), spline space T , mesh Q and admissibility class m.
+
+# Initialize load step (assumes that the loads/displacements of load step k + 1 are set) 
+
+uk+1 = uk
+
+dk+1 = d k
+
+# Assemble solution-independent quantities 
+
+F ext  
+
+> k+1
+
+← assemble elasticity RHS (k + 1) 
+
+ΦII,IV ← assemble phasefield LHS () 
+
+ϕII,IV ← assemble phasefield RHS () 
+
+# Loop over refinement iterations 
+
+while true do 
+
+# Staggered iterations 
+
+while ∥R(uk+1 , dk+1 )∥ > T OL R do 
+
+# Solve elasticity problem 
+
+uk+1 = solve elasticity (uk+1 , dk+1 , T , Q, TOL Pic ,u)
+
+# Solve phase-field problem 
+
+dk+1 = solve phase field (uk+1 , dk+1 , T , Q, TOL PSOR ,∆d )
+
+end 
+
+# Refine elements based on the damage field 
+
+Q, T = refine elements (d k+1 , T , Q, m, ℓ max , dmin )
+
+# Project the solution fields to the new space 
+
+uk+1 = project field (uk+1 , T )dk+1 = project field (d k+1 , T )
+
+# Break refinement iterations 
+
+if |E||Q| < TOL ref then Break end end Output: New displacement field uk+1 , new damage field d k+1 , new spline space T and new mesh 
+
+Q.30

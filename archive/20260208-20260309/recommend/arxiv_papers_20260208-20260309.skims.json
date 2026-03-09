@@ -1,0 +1,562 @@
+{
+  "mode": "skims",
+  "generated_at": "2026-03-09T05:27:10.511132+00:00",
+  "stats": {
+    "mode": "skims",
+    "forced_all_quick": true,
+    "min_score": 8.0,
+    "deep_divecandidates": 15,
+    "deep_cap": null,
+    "deep_selected": 0,
+    "quick_candidates": 15,
+    "quick_skim_target": null,
+    "quick_selected": 15
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2602.13820v1",
+      "title": "Water-induced buoyancy controls transient water storage in the mantle transition zone",
+      "abstract": "The spinel phase (wadsleyite, ringwoodite) in the mantle transition zone (MTZ), can contain up to 1-2 weight percent of water. However, whether these water reservoirs in the MTZ are filled is debated. Here, we investigate water dynamics in the MTZ numerically by using a newly developed empirical model of deep hydrous mantle melting combined with 2D thermo-hydro-mechanical-chemical (THMC) upper mantle models. Numerical modeling results suggest that water-induced buoyancy triggers the development of hydrous solid-state mantle upwellings in the MTZ. On time scales of some tens of millions of years, they rise to and interact with the spinel-olivine phase transition. Depending on the water content and temperature of these thermal-chemical plumes, this crossing may trigger hydrous melting by water release from the wadsleyite upon its conversion to olivine. The melts are less dense than the solid matrix and continue rising upward in the form of either diapirs or porosity waives. Similar dehydration-induced melting process3 is also documented for the lower MTZ boundary, where hydrous downwellings (such as subducted slabs) generate buoyant melt diapirs rising through the MTZ. We therefore suggest that the MTZ operates as a transient water reservoir. Relatively small amounts of water (less than 0.1 weight percent, smaller than 0.2 ocean masses) and a geologically moderate duration (80-430 Myr) of the transient water storage should be characteristic for the MTZ, which may play a key role in stabilizing the surface ocean mass on Earth and Earth-like rocky exoplanets.",
+      "authors": [
+        "Taras V. Gerya",
+        "Nickolas M. Bardi",
+        "Shun-ichiro Karato",
+        "Motohiko Murakami"
+      ],
+      "primary_category": "physics.geo-ph",
+      "categories": [
+        "physics.geo-ph"
+      ],
+      "published": "2026-02-14T15:33:07+00:00",
+      "link": "https://arxiv.org/pdf/2602.13820v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "2D thermo-hydro-mechanical-chemical (THMC) modeling of mantle rocks",
+      "llm_evidence_cn": "地幔岩石的二维热-水-力-化 (THMC) 耦合模拟",
+      "llm_evidence": "地幔岩石的二维热-水-力-化 (THMC) 耦合模拟",
+      "canonical_evidence": "地幔岩石的二维热-水-力-化 (THMC) 耦合模拟",
+      "llm_tldr_en": "Uses THMC modeling to investigate water dynamics and buoyancy in the mantle transition zone.",
+      "llm_tldr_cn": "利用 THMC 模拟研究地幔过渡带的水动力学和浮力效应。",
+      "llm_tldr": "利用 THMC 模拟研究地幔过渡带的水动力学和浮力效应。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "thermo hydro mechanical coupling in porous rock mass fracture",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2602.15149v1",
+      "title": "SoliDualSPHysics: An extension of DualSPHysics for solid mechanics with hyperelasticity, plasticity, and fracture",
+      "abstract": "We introduce SoliDualSPHysics, a novel open-source and GPU-accelerated software that extends DualSPHysics to enable the numerical simulation of hyperelastic, finite-strain plastic, and brittle fracture behavior in deformable solids within a unified smoothed particle hydrodynamics (SPH) formulation. The software implements a total Lagrangian formulation for solid mechanics that allows direct application of external loads and boundary conditions, enabling independent solid mechanics simulations. Brittle fracture is modeled through a phase-field approach coupled with SPH, allowing crack initiation, propagation, and branching under dynamic loading without the need for additional criteria or local refinement. The framework also supports user-defined mathematical expressions to prescribe time- and space-dependent quantities, complementing the solid and fracture extensions and enhancing flexibility across existing and future DualSPHysics applications. Leveraging DualSPHysics' native CPU/GPU parallel architecture, the software achieves substantial computational acceleration for large-scale simulations, and the implementation is verified and validated against benchmark numerical problems and experimental data, demonstrating accuracy, robustness, and favorable scaling performance. Comprehensive implementation details and user documentation are provided to ensure reproducibility and to support further development by the community. The framework and source code are freely available through a public GitHub repository.",
+      "authors": [
+        "Mohammad Naqib Rahimi",
+        "George Moutsanidis"
+      ],
+      "primary_category": "cs.CE",
+      "categories": [
+        "cs.CE",
+        "math.NA"
+      ],
+      "published": "2026-02-16T19:46:41+00:00",
+      "link": "https://arxiv.org/pdf/2602.15149v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "phase-field approach for brittle fracture coupled with SPH",
+      "llm_evidence_cn": "耦合SPH的脆性断裂相场方法",
+      "llm_evidence": "耦合SPH的脆性断裂相场方法",
+      "canonical_evidence": "耦合SPH的脆性断裂相场方法",
+      "llm_tldr_en": "Introduces a GPU-accelerated SPH software using a phase-field approach for crack initiation and propagation.",
+      "llm_tldr_cn": "介绍了一种GPU加速的SPH软件，采用相场法模拟裂纹的萌生和扩展。",
+      "llm_tldr": "介绍了一种GPU加速的SPH软件，采用相场法模拟裂纹的萌生和扩展。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "phase field modeling of fracture and damage",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2602.21685v1",
+      "title": "Adaptive isogeometric analysis of high-order phase-field fracture based on THB-splines",
+      "abstract": "In recent decades, the study of fracture propagation in solids has increasingly relied on phase-field models. Several recent contributions have highlighted the potential of this approach in both static and dynamic frameworks. However, a major limitation remains the high computational cost. Two main strategies have been identified to mitigate this issue: the use of locally refined meshes and the adoption of higher-order models. In this work, leveraging Truncated Hierarchical B-splines (THB-splines), we introduce adaptive simulations of higher-order phase-field formulations (AT1 and AT2), focusing primarily on two-dimensional fracture problems.",
+      "authors": [
+        "H. M. Verhelst",
+        "L. Greco",
+        "A. Reali"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-02-25T08:38:29+00:00",
+      "link": "https://arxiv.org/pdf/2602.21685v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "adaptive isogeometric analysis of high-order phase-field fracture",
+      "llm_evidence_cn": "高阶相场断裂的自适应等几何分析",
+      "llm_evidence": "高阶相场断裂的自适应等几何分析",
+      "canonical_evidence": "高阶相场断裂的自适应等几何分析",
+      "llm_tldr_en": "Introduces an efficient adaptive isogeometric analysis for high-order phase-field fracture models.",
+      "llm_tldr_cn": "为高阶相场断裂模型引入了一种高效的自适应等几何分析方法。",
+      "llm_tldr": "为高阶相场断裂模型引入了一种高效的自适应等几何分析方法。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "phase field modeling of fracture and damage",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.01835v1",
+      "title": "Consistent initialization of mixed-dimensional multiphysics models for fractured reservoirs under geomechanical constraints and field measurements",
+      "abstract": "Modeling coupled processes in fractured porous media -- flow, deformation, fracture mechanics, and thermal/chemical effects -- often relies on mixed dimensional multiphysics formulations. These systems are nonlinear and depend on physical states and state dependent material laws. While in-situ field measurements consistently describe the deformed equilibrium configuration, computational models typically start from an idealized reference configuration and require explicit initialization of the in-situ stress state. This mismatch complicates initialization and linearization of constitutive laws. As a consequence, due to the two scale nature of fractured media, this can induce large deviations in fracture aperture directly impacting flow predictions. To address this, a discrete fracture model is introduced whose constitutive laws are expressed with respect to the unknown equilibrium state. This is paired with a fixed point initialization strategy that consistently reconstructs the reference configuration, consistent with both geomechanical constraints and field measurements up to load-path dependence. This data-consistent strategy provides a foundation for extending models to more complex scenarios, including multiphase and multicomponent flow in fractured reservoirs.",
+      "authors": [
+        "Jakub Wiktor Both",
+        "Inga Berre"
+      ],
+      "primary_category": "physics.geo-ph",
+      "categories": [
+        "physics.geo-ph"
+      ],
+      "published": "2026-03-02T13:09:15+00:00",
+      "link": "https://arxiv.org/pdf/2603.01835v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "multiphysics models for fractured reservoirs and geomechanical constraints",
+      "llm_evidence_cn": "裂隙储层的多物理场模型和地质力学约束",
+      "llm_evidence": "裂隙储层的多物理场模型和地质力学约束",
+      "canonical_evidence": "裂隙储层的多物理场模型和地质力学约束",
+      "llm_tldr_en": "Addresses initialization of coupled flow and deformation models in fractured porous media for reservoir engineering.",
+      "llm_tldr_cn": "解决了储层工程中裂隙多孔介质流固耦合模型的初始化问题。",
+      "llm_tldr": "解决了储层工程中裂隙多孔介质流固耦合模型的初始化问题。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "multiphysics coupling in porous media",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.04753v1",
+      "title": "Damage Prediction of Sintered α-SiC Using Thermo-mechanical Coupled Fracture Model",
+      "abstract": "A three-way coupled thermo-mechanical fracture model is presented to predict the damage of brittle ceramics, in particular α-SiC, over a wide range of temperatures (20-1400 C). Predicting damage over such a range of temperatures is crucial for thermal protection systems for many systems such as spacecraft. The model, which has been implemented in MOOSE, is divided into three modules: elasticity, damage phase field, and heat conduction. Analytical approaches for determining crack length scales are presented for both simple tension and simple shear. Validation tests are conducted for both flexural strength and fracture toughness over the specified range of temperatures. Flexural strength simulation results fall within the uncertainty region of the experimental data, and mode I fracture toughness simulation results are also in agreement with the experimental data. Mode II and mixed mode fracture toughness simulations results are presented with the modified G-criterion. Finally, the parallel computing capabilities of the model is considered in various scalability tests.",
+      "authors": [
+        "Jason Sun",
+        "Yu Chen",
+        "Joseph J. Marziale",
+        "Eric A. Walker",
+        "David Salac",
+        "James Chen"
+      ],
+      "primary_category": "cond-mat.mtrl-sci",
+      "categories": [
+        "cond-mat.mtrl-sci"
+      ],
+      "published": "2026-03-05T02:59:40+00:00",
+      "link": "https://arxiv.org/pdf/2603.04753v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "damage phase field and thermo-mechanical coupled fracture model",
+      "llm_evidence_cn": "损伤相场与热力耦合断裂模型",
+      "llm_evidence": "损伤相场与热力耦合断裂模型",
+      "canonical_evidence": "损伤相场与热力耦合断裂模型",
+      "llm_tldr_en": "Develops a three-way coupled thermo-mechanical phase field model to predict damage in brittle ceramic materials.",
+      "llm_tldr_cn": "开发了一种三向耦合热力相场模型，用于预测脆性陶瓷材料的损伤。",
+      "llm_tldr": "开发了一种三向耦合热力相场模型，用于预测脆性陶瓷材料的损伤。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "phase field modeling of fracture and damage",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2602.10550v1",
+      "title": "An Energy-Stable, Bound-Preserving and Locally Conservative Numerical Framework for Multicomponent Gas Flow in Poroelastic Media",
+      "abstract": "In this paper, we propose a robust and efficient numerical framework for simulating multicomponent gas flow in poroelastic media, with a focus on preserving fundamental thermodynamic principles and ensuring computational reliability. The model captures the complex nonlinear coupling between multicomponent transport and solid deformation, while addressing critical numerical challenges such as mass conservation, energy stability, and molar density boundedness. To achieve this, we develop a stabilized discretization approach that guarantees the preservation of the original energy dissipation law and ensures the boundedness of each gas component's molar density. Furthermore, the proposed method incorporates an adaptive time-stepping strategy that dynamically adjusts the time step size based on the system's dynamics, significantly enhancing computational efficiency without compromising stability or accuracy. For spatial discretization, a mixed finite element method combined with an upwind scheme is employed for the flow and transport equations to ensure local mass conservation, while a discontinuous Galerkin (DG) method is utilized for discretizing the momentum equation of poroelasticity to effectively overcome numerical locking phenomena. Numerical experiments are presented to demonstrate the performance, robustness, and applicability of the method in simulating multicomponent gas flow under various scenarios.",
+      "authors": [
+        "Huangxin Chen",
+        "Yuxiang Chen",
+        "Jisheng Kou",
+        "Shuyu Sun"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-02-11T05:46:05+00:00",
+      "link": "https://arxiv.org/pdf/2602.10550v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "multicomponent gas flow coupled with solid deformation in poroelastic media",
+      "llm_evidence_cn": "多组分气体流动与多孔弹性介质固体变形的耦合",
+      "llm_evidence": "多组分气体流动与多孔弹性介质固体变形的耦合",
+      "canonical_evidence": "多组分气体流动与多孔弹性介质固体变形的耦合",
+      "llm_tldr_en": "Proposes a numerical framework for multicomponent gas flow in poroelastic media ensuring energy stability.",
+      "llm_tldr_cn": "提出了一种多孔弹性介质中多组分气体流动的数值框架，确保能量稳定性和质量守恒。",
+      "llm_tldr": "提出了一种多孔弹性介质中多组分气体流动的数值框架，确保能量稳定性和质量守恒。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "multiphysics coupling in porous media",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2602.10803v2",
+      "title": "Bound-Preserving Adaptive Time-Stepping Method with Energy Stability for Simulating Compressible Gas Flow in Poroelastic Media",
+      "abstract": "In this paper, we present an efficient numerical method to address a thermodynamically consistent gas flow model in porous media involving compressible gas and deformable rock. The accurate modeling of gas flow in porous media often poses significant challenges due to their inherent nonlinearity, the coupling between gas and rock dynamics, and the need to preserve physical principles such as mass conservation, energy dissipation and molar density boundedness. The system is further complicated by the need to balance computational efficiency with the accuracy and stability of the numerical scheme. To tackle these challenges, we adopt a stabilization approach that is able to preserve the original energy dissipation while achieving linear energy-stable numerical schemes. We also prove the convergence of the adopted linear iterative method. At each time step, the stabilization parameter is adaptively updated using a simple and explicit formula to ensure compliance with the original energy dissipation law. The proposed method uses adaptive time stepping to improve computational efficiency while maintaining solution accuracy and boundedness. The adaptive time step size is calculated explicitly at each iteration, ensuring stability and allowing for efficient handling of highly dynamic scenarios. A mixed finite element method combined with an upwind scheme is employed as spatial discretization to ensure mass conservation and stability. Finally, we conduct a series of numerical experiments to validate the performance and robustness of the proposed numerical method.",
+      "authors": [
+        "Huangxin Chen",
+        "Yuxiang Chen",
+        "Jisheng Kou",
+        "Shuyu Sun"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-02-11T12:44:21+00:00",
+      "link": "https://arxiv.org/pdf/2602.10803v2",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "gas flow in poroelastic media involving deformable rock",
+      "llm_evidence_cn": "涉及可变形岩石的多孔弹性介质中的气体流动",
+      "llm_evidence": "涉及可变形岩石的多孔弹性介质中的气体流动",
+      "canonical_evidence": "涉及可变形岩石的多孔弹性介质中的气体流动",
+      "llm_tldr_en": "Develops a stable numerical method for gas flow in poroelastic media with rock deformation.",
+      "llm_tldr_cn": "开发了一种用于多孔弹性介质中气体流动与岩石变形耦合的稳定数值方法。",
+      "llm_tldr": "开发了一种用于多孔弹性介质中气体流动与岩石变形耦合的稳定数值方法。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "fluid flow and deformation in saturated porous rocks",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2602.11208v1",
+      "title": "Adaptive Physics Transformer with Fused Global-Local Attention for Subsurface Energy Systems",
+      "abstract": "The Earth's subsurface is a cornerstone of modern society, providing essential energy resources like hydrocarbons, geothermal, and minerals while serving as the primary reservoir for $CO_2$ sequestration. However, full physics numerical simulations of these systems are notoriously computationally expensive due to geological heterogeneity, high resolution requirements, and the tight coupling of physical processes with distinct propagation time scales. Here we propose the \\textbf{Adaptive Physics Transformer} (APT), a geometry-, mesh-, and physics-agnostic neural operator that explicitly addresses these challenges. APT fuses a graph-based encoder to extract high-resolution local heterogeneous features with a global attention mechanism to resolve long-range physical impacts. Our results demonstrate that APT outperforms state-of-the-art architectures in subsurface tasks across both regular and irregular grids with robust super-resolution capabilities. Notably, APT is the first architecture that directly learns from adaptive mesh refinement simulations. We also demonstrate APT's capability for cross-dataset learning, positioning it as a robust and scalable backbone for large-scale subsurface foundation model development.",
+      "authors": [
+        "Xin Ju",
+        "Nok Hei",
+        "Fung",
+        "Yuyan Zhang",
+        "Carl Jacquemyn",
+        "Matthew Jackson",
+        "Randolph Settgast",
+        "Sally M. Benson",
+        "Gege Wen"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-02-10T22:48:58+00:00",
+      "link": "https://arxiv.org/pdf/2602.11208v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "neural operator for subsurface energy systems and coupled physical processes",
+      "llm_evidence_cn": "用于地下能源系统和耦合物理过程的神经算子",
+      "llm_evidence": "用于地下能源系统和耦合物理过程的神经算子",
+      "canonical_evidence": "用于地下能源系统和耦合物理过程的神经算子",
+      "llm_tldr_en": "Proposes a physics-agnostic Transformer for efficient simulation of coupled subsurface systems.",
+      "llm_tldr_cn": "提出了一种用于高效模拟地下耦合系统的物理无关Transformer模型。",
+      "llm_tldr": "提出了一种用于高效模拟地下耦合系统的物理无关Transformer模型。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "phase field modeling of multi physical coupling in rock fracture",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2602.11414v1",
+      "title": "A physics-informed data-driven framework for modeling hyperelastic materials with progressive damage and failure",
+      "abstract": "This work presents a two-stage physics-informed, data-driven constitutive modeling framework for hyperelastic soft materials undergoing progressive damage and failure. The framework is grounded in the concept of hyperelasticity with energy limiters and employs Gaussian Process Regression (GPR) to separately learn the intact (undamaged) elastic response and damage evolution directly from data. In Stage I, GPR models learn the intact hyperelastic response through volumetric and isochoric response functions (or only the isochoric response under incompressibility), ensuring energetic consistency of the intact response and satisfaction of fundamental principles such as material frame indifference and balance of angular momentum. In Stage II, damage is modeled via a separate GPR model that learns the mapping between the intact strain energy density predicted by Stage I models and a stress-reduction factor governing damage and failure, with monotonicity, non-negativity, and complete-failure constraints enforced through penalty-based optimization to ensure thermodynamic admissibility. Validation on synthetic datasets, including benchmarking against analytical constitutive models and competing data-driven approaches, demonstrates high in-distribution accuracy under uniaxial tension and robust generalization from limited training data to compression and shear modes not used during training. Application to experimental brain tissue data demonstrates the practical applicability of the framework and enables inference of damage evolution and critical failure energy. Overall, the proposed framework combines the physical consistency, interpretability, and generalizability of analytical models with the flexibility, predictive accuracy, and automation of machine learning, offering a powerful approach for modeling failure in soft materials under limited experimental data.",
+      "authors": [
+        "Kshitiz Upadhyay"
+      ],
+      "primary_category": "cs.CE",
+      "categories": [
+        "cs.CE",
+        "cond-mat.mtrl-sci",
+        "cond-mat.soft"
+      ],
+      "published": "2026-02-11T22:31:49+00:00",
+      "link": "https://arxiv.org/pdf/2602.11414v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "constitutive modeling of progressive damage and failure",
+      "llm_evidence_cn": "渐进损伤与破坏的本构建模",
+      "llm_evidence": "渐进损伤与破坏的本构建模",
+      "canonical_evidence": "渐进损伤与破坏的本构建模",
+      "llm_tldr_en": "Presents a physics-informed data-driven framework for modeling material damage and failure.",
+      "llm_tldr_cn": "提出一种用于模拟材料损伤与破坏的物理告知数据驱动框架。",
+      "llm_tldr": "提出一种用于模拟材料损伤与破坏的物理告知数据驱动框架。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "phase field modeling of fracture and damage",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2602.11915v1",
+      "title": "Eigenfracture approximation of quasi-static crack growth in brittle materials",
+      "abstract": "We study an approximation scheme for a variational theory of quasi-static crack growth based on an eigendeformation approach. We consider a family of energy functionals depending on a small parameter $\\varepsilon$ and on two fields, the displacement field and an eigendeformation field that approximates the crack in the material. By imposing a suitable irreversibility condition and adopting an incremental minimization scheme, we define a notion of quasi-static evolution for this model. We then show that, as $\\varepsilon \\to 0$, these evolutions converge to a quasi-static crack evolution for the Griffith energy of brittle fracture, characterized by irreversibility, global stability, and an energy balance.",
+      "authors": [
+        "Ba Duc Duong",
+        "Manuel Friedrich"
+      ],
+      "primary_category": "math.AP",
+      "categories": [
+        "math.AP"
+      ],
+      "published": "2026-02-12T13:10:42+00:00",
+      "link": "https://arxiv.org/pdf/2602.11915v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Variational theory of quasi-static crack growth using eigendeformation",
+      "llm_evidence_cn": "基于特征变形的准静态裂纹扩展变分理论",
+      "llm_evidence": "基于特征变形的准静态裂纹扩展变分理论",
+      "canonical_evidence": "基于特征变形的准静态裂纹扩展变分理论",
+      "llm_tldr_en": "Develops an eigenfracture approximation for quasi-static crack growth in brittle materials.",
+      "llm_tldr_cn": "开发了一种用于脆性材料准静态裂纹扩展的特征断裂近似方法。",
+      "llm_tldr": "开发了一种用于脆性材料准静态裂纹扩展的特征断裂近似方法。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "numerical simulation of crack initiation and propagation",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2602.16439v1",
+      "title": "Multiscale Hyperbolic-Parabolic Models for Nonlinear Reactive Transport in Heterogeneously Fractured Porous Media",
+      "abstract": "We study nonlinear reactive transport in a layered porous medium separated by an $\\varepsilon$-thin, highly heterogeneous fracture whose aperture and obstacle pattern vary periodically. Species transport in the bulk is governed by parabolic reaction--diffusion equations, coupled to a convection-diffusion-reaction problem in the fracture with nonlinear wall and obstacle reactions and Peclet number of order $O(\\varepsilon^{-1})$. Via multiscale analysis as $\\varepsilon \\to 0$, when the fracture collapses to a flat interface, we derive a new type of homogenized model consisting of bulk diffusion--reaction equations coupled through nonlinear interface conditions and a first-order semilinear hyperbolic system on the interface. We prove well-posedness and regularity of the limit system, construct a multiscale approximation with boundary-layer correctors, and derive quantitative error estimates in suitable energy norms.",
+      "authors": [
+        "Taras Mel'nyk",
+        "Sorin Pop",
+        "Christian Rohde"
+      ],
+      "primary_category": "math.AP",
+      "categories": [
+        "math.AP"
+      ],
+      "published": "2026-02-18T13:19:49+00:00",
+      "link": "https://arxiv.org/pdf/2602.16439v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "multiscale models for reactive transport in fractured porous media",
+      "llm_evidence_cn": "裂隙多孔介质中反应输运的多尺度模型",
+      "llm_evidence": "裂隙多孔介质中反应输运的多尺度模型",
+      "canonical_evidence": "裂隙多孔介质中反应输运的多尺度模型",
+      "llm_tldr_en": "Derives homogenized models for nonlinear reactive transport in heterogeneously fractured porous media.",
+      "llm_tldr_cn": "推导了非均匀裂隙多孔介质中非线性反应输运的均质化模型。",
+      "llm_tldr": "推导了非均匀裂隙多孔介质中非线性反应输运的均质化模型。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "multiphysics coupling in porous media",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2602.19457v1",
+      "title": "Optimal Error Estimates of a new Multiphysic Finite Element Method for Nonlinear Poroelasticity model with Hencky-Mises Stress Tensor",
+      "abstract": "In this paper, we develop a new multiphysics finite element method for a nonlinear poroelastic model with Hencky-Mises stress tensor. By introducing some new notations, we reformulate the original model into a fluid-fluid coupling problem, which is viewed as a generalized nonlinear Stokes sub-problem combined with a reaction-diffusion sub-problem. Then, we establish the existence and uniqueness of the weak solution for the reformulated problem, and propose a stable, fully discrete multiphysics finite element method which employs Lagrangian finite element pairs for spatial discretization and a backward Euler scheme for temporal discretization. By ensuring the parameters $κ_1$ and $κ_3$ remain bounded and non-zero even as $λ$ tends to infinity, the proposed method maintains stability for a wide range of Lagrangian element pairs. Based on the continuity and monotonicity of the nonlinear term $\\mathcal{N}(\\varepsilon(\\mathbf{u}_h^{n}))$, we give the stability analysis and derive optimal error estimates for the displacement vector $\\mathbf{u}$ and the pressure $p$ in both $L^2$-norm and $H^1$-norm. In particular, the $L^2$-norm error estimate for the displacement $\\mathbf{u}$, which was not present in previous literature, is established here through an auxiliary problem and a Poincar$\\acute{e}$ inequality. Also, we present numerical tests to verify the theoretical analysis, and the results confirm the optimal convergence rates. Finally, we draw conclusions to summarize the work.",
+      "authors": [
+        "Yanan He",
+        "Zhihao Ge"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA",
+        "math.AP"
+      ],
+      "published": "2026-02-23T02:58:23+00:00",
+      "link": "https://arxiv.org/pdf/2602.19457v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "multiphysics finite element method for nonlinear poroelasticity",
+      "llm_evidence_cn": "非线性多孔弹性模型的多物理场有限元法",
+      "llm_evidence": "非线性多孔弹性模型的多物理场有限元法",
+      "canonical_evidence": "非线性多孔弹性模型的多物理场有限元法",
+      "llm_tldr_en": "Proposes a new multiphysics finite element method for nonlinear poroelasticity models.",
+      "llm_tldr_cn": "为非线性多孔弹性模型提出了一种新的多物理场有限元方法。",
+      "llm_tldr": "为非线性多孔弹性模型提出了一种新的多物理场有限元方法。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "multiphysics coupling in porous media",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2602.22188v1",
+      "title": "Surrogate models for Rock-Fluid Interaction: A Grid-Size-Invariant Approach",
+      "abstract": "Modelling rock-fluid interaction requires solving a set of partial differential equations (PDEs) to predict the flow behaviour and the reactions of the fluid with the rock on the interfaces. Conventional high-fidelity numerical models require a high resolution to obtain reliable results, resulting in huge computational expense. This restricts the applicability of these models for multi-query problems, such as uncertainty quantification and optimisation, which require running numerous scenarios. As a cheaper alternative to high-fidelity models, this work develops eight surrogate models for predicting the fluid flow in porous media. Four of these are reduced-order models (ROM) based on one neural network for compression and another for prediction. The other four are single neural networks with the property of grid-size invariance; a term which we use to refer to image-to-image models that are capable of inferring on computational domains that are larger than those used during training. In addition to the novel grid-size-invariant framework for surrogate models, we compare the predictive performance of UNet and UNet++ architectures, and demonstrate that UNet++ outperforms UNet for surrogate models. Furthermore, we show that the grid-size-invariant approach is a reliable way to reduce memory consumption during training, resulting in good correlation between predicted and ground-truth values and outperforming the ROMs analysed. The application analysed is particularly challenging because fluid-induced rock dissolution results in a non-static solid field and, consequently, it cannot be used to help in adjustments of the future prediction.",
+      "authors": [
+        "Nathalie C. Pinheiro",
+        "Donghu Guo",
+        "Hannah P. Menke",
+        "Aniket C. Joshi",
+        "Claire E. Heaney",
+        "Ahmed H. ElSheikh",
+        "Christopher C. Pain"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "physics.flu-dyn"
+      ],
+      "published": "2026-02-25T18:34:03+00:00",
+      "link": "https://arxiv.org/pdf/2602.22188v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "surrogate models for rock-fluid interaction in porous media",
+      "llm_evidence_cn": "多孔介质中岩石-流体相互作用的代理模型",
+      "llm_evidence": "多孔介质中岩石-流体相互作用的代理模型",
+      "canonical_evidence": "多孔介质中岩石-流体相互作用的代理模型",
+      "llm_tldr_en": "Develops grid-size-invariant surrogate models to predict fluid flow and interaction in porous rocks.",
+      "llm_tldr_cn": "开发了网格尺寸无关的代理模型，用于预测多孔岩石中的流体流动和相互作用。",
+      "llm_tldr": "开发了网格尺寸无关的代理模型，用于预测多孔岩石中的流体流动和相互作用。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "fluid flow and deformation in saturated porous rocks",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.02826v1",
+      "title": "A phase-field framework for anisotropic viscoelastic-viscoplastic fracture in short fiber-reinforced polymers in hygrothermal environments",
+      "abstract": "This work presents a comprehensive phase-field framework for modeling anisotropic viscoelastic-viscoplastic fracture in short fiber-reinforced polymer (SFRP) composites under hygrothermal environments at finite deformation. The constitutive model employs a multiplicative decomposition of the deformation gradient into viscoelastic and viscoplastic components. An anisotropic phase-field formulation is developed using structural tensors to capture orientation-dependent fracture energy induced by multiple fiber families. Hygrothermal effects are incorporated through moisture-dependent swelling, thermal expansion, and temperature- and moisture-sensitive material parameters within the coupled framework. Numerical investigations demonstrate the framework's capability to capture complex fracture phenomena in SFRPs. Results reveal that fiber orientation fundamentally governs the spatial distribution of crack driving force, with maximum energy accumulation along fiber directions persisting throughout viscous relaxation. The anisotropy parameter controlling directional fracture resistance significantly influences crack path deflection. Hygrothermal degradation substantially reduces both peak load and fracture energy, with moisture absorption and elevated temperature each contributing to decreased mechanical performance. The framework captures the influence of fiber mechanical properties on global load-bearing capacity and crack propagation resistance. This unified computational framework advances the predictive modeling of damage evolution in SFRPs subjected to realistic environmental and mechanical loading conditions.",
+      "authors": [
+        "Behrouz Arash",
+        "Shadab Zakavati",
+        "Timon Rabczuk"
+      ],
+      "primary_category": "cs.CE",
+      "categories": [
+        "cs.CE"
+      ],
+      "published": "2026-03-03T10:21:26+00:00",
+      "link": "https://arxiv.org/pdf/2603.02826v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "phase-field framework for anisotropic viscoelastic-viscoplastic fracture in hygrothermal environments",
+      "llm_evidence_cn": "湿热环境下各向异性粘弹性-粘塑性断裂的相场框架",
+      "llm_evidence": "湿热环境下各向异性粘弹性-粘塑性断裂的相场框架",
+      "canonical_evidence": "湿热环境下各向异性粘弹性-粘塑性断裂的相场框架",
+      "llm_tldr_en": "Develops a phase-field model for complex fracture in polymers under multiphysics (hygrothermal) conditions.",
+      "llm_tldr_cn": "开发了湿热多场耦合环境下聚合物复杂断裂的相场模型。",
+      "llm_tldr": "开发了湿热多场耦合环境下聚合物复杂断裂的相场模型。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "phase field modeling of fracture and damage",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.03707v1",
+      "title": "Insights into hydrogen-induced vacancy stability and creep in chemically complex alloys",
+      "abstract": "Hydrogen (H) content modifies the creep response of Fe-based alloys by altering thermodynamics of point-defects; here we identify the electronic-structure mechanism underlying this effect. Using spin-polarized first-principles calculations combined with a cluster dynamics formulation, we establish a general framework linking H-assisted vacancy stabilization to diffusion-mediated creep in BCC Fe, FCC Fe, and chemically complex FCC Fe-Cr-Ni alloys. H-vacancy binding analysis shows that H-stabilized vacancies form at low hydrogen content in BCC Fe but require much higher chemical potentials in FCC Fe and Fe-Cr-Ni alloys due to broader d-bands, electronic screening, and chemical disorder. Consequently, plastic deformation mediated by diffusive processes is expected to be far more strongly impacted in BCC Fe than in FCC alloys. These electronic-controlled trends determine steady-state vacancy populations and provide a symmetry-resolved microscopic basis for H-assisted creep in ferritic and austenitic steels.",
+      "authors": [
+        "Prashant Singh",
+        "Yash Pachaury",
+        "Aaron Anthony Kohnert",
+        "Laurent Capolungo",
+        "Duane D. Johnson"
+      ],
+      "primary_category": "cond-mat.mtrl-sci",
+      "categories": [
+        "cond-mat.mtrl-sci",
+        "cond-mat.other"
+      ],
+      "published": "2026-03-04T04:20:36+00:00",
+      "link": "https://arxiv.org/pdf/2603.03707v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "hydrogen-induced vacancy stability and diffusion-mediated creep",
+      "llm_evidence_cn": "氢诱导空位稳定性与扩散介导的蠕变",
+      "llm_evidence": "氢诱导空位稳定性与扩散介导的蠕变",
+      "canonical_evidence": "氢诱导空位稳定性与扩散介导的蠕变",
+      "llm_tldr_en": "Investigates the electronic-structure mechanisms of hydrogen-assisted vacancy stabilization and its effect on creep.",
+      "llm_tldr_cn": "研究了氢辅助空位稳定性的电子结构机制及其对蠕变的影响。",
+      "llm_tldr": "研究了氢辅助空位稳定性的电子结构机制及其对蠕变的影响。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "creep deformation mechanisms",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    }
+  ]
+}

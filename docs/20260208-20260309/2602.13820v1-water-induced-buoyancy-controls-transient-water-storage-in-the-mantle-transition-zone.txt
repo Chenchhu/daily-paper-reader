@@ -1,0 +1,2506 @@
+Title: 2602.13820v1.pdf
+
+URL Source: https://arxiv.org/pdf/2602.13820v1
+
+Published Time: Tue, 17 Feb 2026 01:41:11 GMT
+
+Number of Pages: 41
+
+Markdown Content:
+1
+
+Water -induced buoyancy controls transient water storage in the mantle 
+
+transition zone 
+
+T. V. Gerya 1, N.M. Bardi 1, S . Karato 2 & M. Murakami 1
+
+> 1
+
+Swiss Federal Institute of Technology Zurich, Department of Earth and Planetary 
+
+Sciences, Zurich, Switzerland. 
+
+> 2
+
+Yale University, Department of Earth & Planetary Science s, New Haven, CT, United 
+
+States 
+
+The spinel phase (wadsleyite, ringwoodite) in the mantle transition zone 
+
+(MTZ), can contain up to 1 –2 wt% of water 1,2 . However, wheth er these water 
+
+reservoirs in the MTZ are filled is debated 2,3 . Here, w e investigate water 
+
+dynamics in the MTZ numerically by using a newly developed empirical model 
+
+of deep hydrous mantle melting combined with 2D thermo -hydro -mechanical -
+
+chemical 4 (THMC) up per mantle models. Numerical model ing results suggest 
+
+that water -induced buoyancy triggers the development of hydrous solid -state 
+
+mantle upwellings in the MTZ 5,6 . On time scales of some tens of million s of 
+
+years, th ey rise to and interact with the spinel -olivine phase transition. 
+
+Depending on the water content and temperature of these thermal -chemical 
+
+plumes, this crossing may trigger hydrous melting by water release from the 
+
+wadsleyite upon its conversion to olivine 3, 7. The melts are less dense than the 
+
+solid matrix and continue rising upward in the form of either diapirs or 
+
+porosity waives. Similar dehydration -induced melting process 3 is also 
+
+documented for the lower MTZ boundary, where hydrous downwellings (such 
+
+as s ubducted slabs) generate buoyant melt diapirs rising through the MTZ . We 
+
+therefore suggest that the MTZ operates as a transient water reservoir. 
+
+Relatively small amount s of water (<0. 1 wt% , <0.2 ocean masses ) and a
+
+geologically moderate duration ( 80-43 0 Myr) of the transient water storage 
+
+should be characteristic for the MTZ, which may play a key role in stabilizing 
+
+the surface ocean mass on Earth and Earth -like rocky exoplanets 2,8 .2
+
+The long -term stability of surface ocean on Earth and Earth -like rocky 
+
+exoplanets is a prerequisite for maintaining habitable conditions and is governed by 
+
+interactions with the mantle 3. The water capacity of mantles for rocky planets is 
+
+dominated by minerals in the mantle transition zone (MTZ). These spinel phase 
+
+minerals (wadsleyite, ringwoodite) can contain up to 1 –2 wt% of water 1,2 well 
+
+beyond the capacity of other minerals. However, whether these water reservoirs in 
+
+the MTZ of rocky planets are filled is debated 2,3 . For Earth, water content estimates 
+
+in t he MTZ range from less than 1 to up to 11 ocean masse s1, which can be strongly 
+
+dependent on the water dynamics in the MTZ and, in particular, the efficiency of the 
+
+transition -zone water filter effect 7. This effect implies that the hydrated mantle 
+
+ascending through the top boundary of the MTZ undergoes dehydration -induced 
+
+partial melting 7,9 . Depending on the mantle composition, t he formed Fe -rich 
+
+hydrous melt may potentially be denser than the surrounding solid and accordingly 
+
+trapped at the top MTZ boundary , which may thus delay or even preclude the 
+
+efficient water return to the surface 7. It has also been hypothesized that t he filter 
+
+effect could be suppressed for mantle plumes and a hotter mantle potential 
+
+temperature 7.
+
+An important additional unstudied issue is the nature and dynamics of the 
+
+similar water filter effect associated with down -going mantle flow at the lower MTZ 
+
+boundary, related for example to downward penetrati ng hydrated slabs through 
+
+this boundary. Simil ar to the processes at the MTZ -upper mantle boundary, if water -
+
+rich MTZ materials move into the lower mantle, then hydrous partial melting may 
+
+occur, and if the melts were less dense than the surrounding solid 3, hydrous melts 
+
+will leak back into the overla ying reservoir . And thus, the geophysically inferred 
+
+water -rich MTZ state 10 can be dynamically stimulated. It is thus important to 
+
+consider the processes in both upper and the lower MTZ boundaries to understand 
+
+the nature of global water circulation 3,7 .
+
+The processes of when and how water and hydrous melt will migrate below, 
+
+inside and above the MTZ remain rather poorly understood. In turn, water 
+
+dynamics in the MTZ of rocky (exo) planets with surface oceans critically affects its 3
+
+ability of these planets to maintain the long -term stability of the ir surface ocean 
+
+volume. In the presence of continents (i.e., significant subaerial land masses), the 
+
+surface ocean level stability is likely a pre -requisite for maintaining stimulating 
+
+habitable conditions for com plex and advanced life 11 , which needs careful 
+
+understanding and quantification. Even for Earth, the long -term stability of the 
+
+surface ocean volume and emergence of continents above the sea level remain 
+
+controversial 12,13 and more uncertainty exists for ot her terrestrial planets and rocky 
+
+exoplanets. 
+
+Previous numerical studies 5,6 predicted that thermal relaxation of cold, 
+
+water -rich downwellings (such as subducting slabs and lithospheric drips) 
+
+accumulating in the bottom of the MTZ should trigger the development of cold 
+
+hydrous upwellings (plumes, diapirs) moving upward from this region, which are 
+
+driven by the water -induced buoyancy 5,6 . These mo dels however did not explore the 
+
+effects of hydrous mantle melting, which leave important uncertaint ies concerning 
+
+the extent and efficiency of MTZ water filter effect s both above and below this 
+
+region 3,7 .
+
+In this paper, we investigate thermodynamically a nd numerically the water 
+
+dynamics in the MTZ by developing a new experimentally -based empirical model of 
+
+deep hydrous mantle melting combined with 2D numerical thermo -hydro -
+
+mechanical -chemical (THMC) MTZ models with solid -state phase transitions and 
+
+hydrous melt formation and percolation in the mantle. Our results indicate that 
+
+water -induced buoyancy of hydrous mantle melts will likely overcome effects of Fe -
+
+incorporation into melts. MTZ water storage for Earth -like planets will therefore be 
+
+transien t. This should define strong MTZ undersaturation in term of water content 
+
+as well as promote the stability of surface ocean volume, which cannot be efficiently 
+
+recycled into the MTZ by subduction processes. 
+
+Deep hydrous mantle melting 
+
+In order to constrai n water dynamics in the MTZ region by THMC models, 
+
+thermodynamic calculations are required 4, which couple composition, density and 
+
+volumetric proportions of coexisting melt and solid matrix thereby taking into 4
+
+account both volumetric and thermal effects of melting and solid -state phase 
+
+transformations. Such a thermodynamic framework is currently unavailable mainly 
+
+because the existing experimentally -based mantle melting models 14,15 are calibrated 
+
+with relatively low -pressure experiments and do not incorpora te available 
+
+experimental data for melting at MTZ P -T conditions 16 -20 . To overcome this 
+
+deficiency, we calibrated a new experimentally -based empirical model of deep 
+
+hydrous mantle melting ( see Methods), which can account in a simplified manner 
+
+for composit ional variations of coexisting hydrous melt and solid matrix under 
+
+characteristic P -T conditions of the MTZ. The melting model is coupled to 
+
+calculations of coexisting solid matrix and hydrous melt density on the basis of a
+
+thermodynamic database for the d eep mantle 21 , a calibrated reaction of water 
+
+incorporation from coexisting melt into wadsle yite (Methods), known water 
+
+partitioning coefficients from wadsle yite to ringwoodite, olivine and perovskite 22 
+
+and the equations of state for the hydrous melt 23 and water 24 .
+
+One important question related to water stability in the MTZ is related to 
+
+variations of density difference between the coexisting solid matrix and hydrous 
+
+melt. In particular, the transition -zone water filter effect has been proposed 3,7 by 
+
+analyzing consequences of very different water capacities of nominally anhydrous 
+
+mantle minerals inside and outside MTZ .
+
+Fig . 1 shows results of thermodynamic modeling of the density difference 
+
+between coexisting solid and melt for p yrolite mantle at the MTZ P -T conditions. As 
+
+follows from this figure, melt density remains below the density of the solid matrix 
+
+in the entire MTZ P -T range irrespective of the water content in the mantle . Below 
+
+the lower MTZ boundary, this difference can reach up to ca. 6 00 kg/m 3, which 
+
+suggest efficien cy of upward return flow of produced hydrous melts back into the 
+
+MTZ 3. Above the upper MTZ boundary, solid -melt density difference reduces 
+
+drastically (up to ca. 200 kg/m 3) mainly because of the wadsle yite -olivine phase 
+
+tran sition in the solid matrix 7. The hydrous melt, however, remains positively 
+
+buoyant relative to the solid matrix and should therefore move upward rather than 
+
+downward, thereby controlling gradual water loss from the MTZ through its upper 
+
+boundary . Melt -soli d density contrast depends notably on the iron content in the 5
+
+mantle and may further reduce for more iron -rich compositions (Extended Data 
+
+Figure 3) . This compositional effect should control water dynamics in the interior of 
+
+rocky exoplanets with variable mantle compositions 2,8 .
+
+Th e new empirical model of hydrous mantle melting is coupled to 2D TH MC 
+
+upper mantle model ( see Methods), which allowed us to simulate water dynamics in 
+
+the entire range of P -T conditions below , inside and above the MTZ. We performed 
+
+simulations in 5 different geodynamic situations relevant for the MTZ water cycle 3,5 -
+
+> 7
+
+: (1) upward hydrous plume penetration through the upper MTZ boundary across 
+
+the wadsle yite -olivine phase transition, (2) development of gravitational instabili ty 
+
+at the upper MTZ boundary caused by uniformly hydrated MTZ, (3) downward 
+
+hydrated cold dense drip penetration through the lower MTZ boundary across the 
+
+ringwoodite -perovskite phase transition, (4) upward penetration of hot hydrous 
+
+plume through the lowe r MTZ boundary and (5) large -scale dynamics of cold 
+
+hydrated slab fragments located in the bottom of the MTZ. Results from these 
+
+experiments consistently predict transient nature of water storage in the MTZ 
+
+controlled by the water -induced mantle buoyancy and related thermal -chemical 
+
+convection and upward hydrous melt percolation and assembling .
+
+Hydrated plume at the upper MTZ boundary 
+
+Fig. 2 show dynamics of cold hydrous upwelling approaching the MTZ upper 
+
+boundary, which can be formed by thermal relaxati on and related rheological 
+
+softening of stagnated subducted slabs 5,6 . This thermal -chemical plume with initial 
+
+cold temperature anomaly of -100 K is driven upward by the water -induced 
+
+chemical buoyancy 5,25 (Fig. 2a,e,i) . A p ositive Clapeyron slope characteristic of the 
+
+spinel -olivine transition causes the cold upwelling to slow down and flatten at the 
+
+MTZ boundary until its temperature rises enough to cross the transition (F ig. 2b,c) .
+
+This happens as a positive Clayperon slop e implies that lower pressure (and depth) 
+
+is required to stabilize wadsleyite inside the colder plume compared to the 
+
+surrounding warmer ambient MTZ mantle, a previously unrecognized geodynamic 
+
+effect. The reduction of plume positive buoyancy created by th is effect slows down 
+
+or even temporarily arrest the upward plume motion. This thermodynamic effect is 6
+
+to some degree analogous to the well -known mechanism causing cold slab 
+
+stagnation at the lower MTZ boundary. There, a negative Clapeyron slope of the 
+
+spin el -perovskite transition requires higher pressure (and depth) of the transition 
+
+inside the descending cold slab compared to the warmer ambient mantle. 
+
+At sufficiently high water content in the plume ( ≥0. 3 wt%), the spinel -olivine 
+
+phase transition causes d ehydration -induced melting due to the lower water 
+
+capacity of olivine compared to wadsle yite (Fig. 1) . At Earth -like mantle 
+
+composition, the density of resulting Fe -rich hydrous melt is by 150 -200 kg/m 3
+
+lower than the density of the coexisting solid (Fig. 1) . This density contrast enables 
+
+melt rising toward the surface in form of either porosity waves or in form of a diapir. 
+
+The choice of melt upwelling mode is mainly dependent on the water (and melt) 
+
+content in the ambient mantle located above the MTZ: hig her (>0.3%) water content 
+
+stabilizes porous melt in the mantle and enables porosity waves ( Extended Data Fig. 
+
+3) whereas lower (<0.3 wt%) water content precludes hydrous melting of the 
+
+ambient mantle and promotes rising of a complex plume/diapir with melt being 
+
+concentrated on its leading edge (Fig. 2g,h ). 
+
+Gravitational instability of the uniformly hydrated MTZ 
+
+Extended Data Fig. 4 shows the d ensity profile of uniformly hydrated MTZ ,
+
+which apparently look gravitationally stable as the density of hydrated spinel -
+
+bearing mantle remans higher than the density of overlaying drier olivine -bearing 
+
+mantle. Th is density profile is perturbed by a small circular temperature anomaly of 
+
++10 K at the up per MTZ boundary. On a long term, t his perturbation leads to the 
+
+development of exponentially growing gravitational instability across the phase 
+
+transition, which produces a large -scale overturn of the hydrated MTZ and dr ier 
+
+overlaying mantle. The Rayleigh -Taylor instability develops exponentially from the 
+
+small initial thermal perturbation of the density field leading to the development of 
+
+a hydrated diapir . At high MTZ water content (0. 4 wt%), the diapir is subjected to 
+
+hydrous partial melting upon crossi ng spinel -olivine transition. Partial melt 
+
+accumulates in the leading edge of the diapir, creating a thin melt -rich layer. The 
+
+timescale of development of the instability increases with decreasing initial MTZ 7
+
+water content from ca. 9 Myr for 0.4 wt% (Exten ded Dara Fig. 3b) to 37 Myr for 0. 1
+
+wt % (model diapir91, Extended Data Table 2) . This implies that only very low water 
+
+content can remain in the MTZ for protracted time of some tens of million years. 
+
+Hydrated drip penetration through the lower MTZ boundary 
+
+Fig. 3 shows initial conditions and results for the experiment simulat ing 
+
+consequence of cold hydrated drip penetration through the lower MTZ boundary 
+
+defined by the spinel -perovskite transition. The d riving force for this penetration 
+
+resides in the higher density of the fragment core due to the presence of an Fe -rich 
+
+circular drip core mimicking fertilized man tle. This situation is somewhat different 
+
+from that of hydrated subducting slab penetration 3 driven by the thermal (rather 
+
+than compositional) negative slab buoyancy in the upper mantle. However, 
+
+penetration -induced melting processes will remain largely si milar , which approve 
+
+the use of this highly simplified model setup . Upon penetration, hydrous melts 
+
+produced inside the drip percolate upward toward its rear part. As the result, a 
+
+high -degree localized lens -like melting region (> 10 vol.% melt) forms insid e (Fig. 3f) 
+
+the downward moving drip and stays behind it (Fig. 3g) . This positively buoyant 
+
+melt continue s to focus and penetrates back into the MTZ in form of two small 
+
+diapir s (<3 km in diameter), where it continues rising upward toward the upper 
+
+MTZ bou ndary without being solidified (Fig. 3h) . As such, hydrous melt produced by 
+
+the slab penetration does not remain at the lower MTZ boundary but is rapidly 
+
+transported across the MTZ. The downward drip penetration is mainly driven by the 
+
+compositional negati ve buoyancy. Drips less enriched in iron and with smaller 
+
+enriched core size (cf. models diapir69, diapir71, diapir73, diapir78, Extended Data 
+
+Table 2) tend to stagnate above the spinel -perovskite transition with only partial or 
+
+no penetration into it. 
+
+Hy drated plume at the lower MTZ boundary 
+
+Fig. 4 shows hot hydrous plume interaction with the lower MTZ boundary. 
+
+Positive temperature anomaly of the plume and negative Clapeyron slope of the 
+
+spinel perovskite phase transition drive plume stagnation at this b oundary . Due to 8
+
+the low water capacity of perovskite, h ydrous melt instantaneously form inside the 
+
+plume and start to move upward by porosity waves (Fig.4f) form ing a thin melt -rich 
+
+layer (> 3 vol% melt) at the spinel -perovskite transition. T his layer destabilizes by 
+
+producing small (<2 km in diameter) melt diapir (>90 vol% melt) rapidly rising 
+
+across the MTZ (Fig.4 g,h) . The d epleted compositional core of the plume stagnates 
+
+and flattens below and within the spinel -perovskite transition. The p lume ’s core 
+
+stagnation depends on the size of the core . A larger depleted core size leads to 
+
+plume penetration into and ascent within the MTZ (Extended Data Fig. 5). In this 
+
+case, the partially molten plume below the MTZ with porosity waves inside evolves 
+
+into a solid plume inside the MTZ with melt lens on top. In contrast, a non -depleted ,
+
+hot hydrous plume rapidly focus es melt in its top part so that a small secondary 
+
+melt diapir (2 -3 km in diameter, >90 vol.% melt) is formed, which rises more 
+
+rapidly than the plume itself. Whereas the hot plume is arrested by the negative 
+
+Clapeyron slope of perovskite -ringwoodite phase transition, the melt diapir 
+
+continues to ris e through the MTZ unimpeded (cf. model diapir89 in Exte nded Data 
+
+Table 2) . In this way, hydrous melt is efficiently transported upward and can reach 
+
+the upper MTZ boundary , subsequently rising further toward the surface. 
+
+Large -scale dynamics of cold hydrated slab fragments 
+
+Extended Data Fig. 6 shows dynamics of an elongated cold hydrated slab 
+
+fragment located above the lower MTZ boundary. Initially, due to the cold 
+
+temperature, the density of the fragment is larger than that of the ambient warmer 
+
+and drier MTZ mantle. Therefore , the fragment move s downward unt il colliding 
+
+with the lower MTZ boundary, where it stagnates and relaxes thermally for ca. 30
+
+Myr (Extended Data Fig.6d) until its negative temperature anomaly reduces to less 
+
+than -100 K . In agreement with previous numerical studies 5,6 , thermal relaxation of 
+
+the slab fragment triggers solid -state hydrous plumes from its warmer edges, which 
+
+are driven by the water -induced buoyancy. In addition, partial penetration of the 
+
+hydrated fragment through the spinel -perovskite transition triggers dehydration -
+
+induced melting which form small melt diapirs on two edges of the deformed slab 
+
+material (Extended Data Fig.6d). Solid state hydrous plumes and melt diapirs rise 9
+
+together across the MTZ on timescales of some tens Myr fragment (Extended Data 
+
+Fi g.6g). The p ositive Clapeyron slope of the ringwoodite -wadsle yite transition, 
+
+which is located in the middle of the MTZ, causes transient delay of the cold plume s
+
+rise, similarly to what has been already described for the wadsle yite -olivine 
+
+transition. Arr ival of the cold hydrous plumes to the upper MTZ boundary results in 
+
+yet further delay and trigger s hydrous melting similarly to the first series of 
+
+experiments (cf. Extended Data Fig. 6j and Fig.2c) . A twin m odel with a smaller 
+
+initial negative temperatur e anomaly of -100 K (Extended Data Fig. 7a) does not 
+
+produce significant slab fragment subsidence into the spinel -perovskite transition 
+
+region. As a result, a larger single heterogeneous solid state plume develops , which 
+
+moves more rapidly across the MTZ w ithin 60 -70 Myr (Extended Data Fig. 7d,g). 
+
+Penetration of this plume across the spinel -olivine transition is analogous to 
+
+previous models and triggers dehydration -induced melting resulting in the 
+
+development of melt lenses on the leading edge of the plume (Extended Data Fig. 7j -
+
+l). Similar single solid state plume also forms in the case of a large depleted slab core 
+
+(cf. models diapir83, diapir84 in Extended Data Table 2), which move s more rapidly 
+
+across the MTZ within ca. 20 -30 Myr. 
+
+The timescales of large -scale water dynamics in the MTZ are thus mainly 
+
+defined by the slab relaxation time at the lower MTZ boundary (ca. 20 -30 Myr in our 
+
+models ) and hydrous plumes and diapirs rising time across the MTZ (ca. 20 -90 Myr 
+
+in our models ), which in turn depend on their characteristic water - and depletion -
+
+induced chemical buoyancy and thickness . As the result, these timescales can vary 
+
+from 50 to >1 50 Myr, thereby defining the magnitude of the transient water 
+
+residence time in the MTZ. 
+
+Density crossover and MTZ wa ter filter effect 
+
+Density crossover corresponds to conditions at which density of the mantle -
+
+derived melt becomes larger than the density of coexisting solid phase and this 
+
+effect has originally been proposed to explain differentiation of the terrestrial 
+
+magma ocean 26 -28 . It has been demonstrated experimentally that the density 
+
+crossover of the dry peridotite melt and the equilibrium olivine occurs in the range 10 
+
+of pressure and temperature immediately above the MTZ, where olivine should float 
+
+in the coexisti ng primitive peridotite melt 26 -29 . Later, density crossover has been 
+
+also hypothesized for hydrous mantle melts forming above the MTZ as the result of 
+
+dehydration melting 3,7,30 . Some experiments on hydrous mantle melting 31 indeed 
+
+suggest strong enrichment of low -degree (2 -7 vol %) hydrous melts in iron, which 
+
+can notably increase the melt density. However, some other recent experiments 
+
+show rather moderate iron enrichment of low -degree (7 vol%) hydrous melt 
+
+formed at low water content in the peridotite 20 .
+
+Be rcovici and Karato 7 proposed that when the ascending ambient hydrated 
+
+mantle rises out of MTZ into the low -solubility upper mantle above 410 km it 
+
+undergoes dehydration -induced partial melting that filters out incompatible 
+
+elements. The filtered, dry and d epleted solid phase continues to rise whereas the 
+
+wet, enriched hydrous melt may be denser than the surrounding solid matrix and 
+
+accordingly trapped at the MTZ upper boundary 7. The potential feasibility of the 
+
+density crossover has been tested experimenta lly by varying water content in the 
+
+peridotite melt under MTZ P -T conditions and showing that at certain critically low 
+
+water content in the melt its density can approach that of the solid peridotite 23,30,31 .
+
+Our experimentally base d empirical melting mode l however suggests that, for 
+
+hydrous pyrolite mantle compositions, the equilibrium water content in the hydrous 
+
+melt in the MTZ temperature range of 1400 -2000 oC always remains higher than the 
+
+critical water content and the density crossover does not occur. Density of the 
+
+hydrous partial melt remains lower than the density of coexisting solid matrix 
+
+(composed of olivine, pyroxenes and majoritic garnet) by at least 150 -200 kg/m 3
+
+(Fig. 1). The density contrast decreases with increasing concentration of iron -ri ch 
+
+component B (Extended Data Table 1) in the mantle (cf. Fig. 1 and Extended Data 
+
+Fig. 1) and the density crossover is predicted to occur at X B=0.67, which is four 
+
+times more enriched mantle composition compared to pyrolite. This prediction has 
+
+however to be taken with caution since our melting model is calibrated for pyrolite 
+
+bulk mantle composition and may not be accurate for very different mantle 
+
+compositions. 11 
+
+In order to test potential dynamical effects of both neutrally (i.e., at the 
+
+density crossover ) and strongly negatively buoyant hydrous melts, we conducted 
+
+four numerical experiments similar to the model shown in Fig.2 but with an ad hock 
+
+increment added to the computed melt density of 150 , 200 kg/m 3 (neutrally 
+
+buoyant melt) and 300 , 400 kg/m 3 (negatively buoyant melt), respectively. These 
+
+experiments suggest that the neutrally buoyant melt created by dehydration melting 
+
+above the MTZ is passively transported upward by chemically buoyant hydrous 
+
+mantle plumes driven by the water -induced density reduction . In contrast, strongly 
+
+negatively buoyant melt tends to stand behind the plume and then slowly return to 
+
+the top of the MTZ where it can reside (Extended Data Fig. 8), thereby retaining 
+
+some part of the initial water present in the rising plume, similarly to what has been 
+
+hypothesized by Bercovici and Karato 7. The feasibility of this effect has however to 
+
+be tested more rigorously for variable mantle compositions and water contents .
+
+This in turn requires high -accuracy experimental data for equilibrium low -degree 
+
+hydrous partial melt compositions 20,31 as well as calibration of new experimentally 
+
+based MTZ melting model valid for non -pyrolite mantles .
+
+Dynamically supported water content in the MTZ 
+
+Based on the results of our solid/melt density calculations and numerical 
+
+experiments, we suggest that, due to the intrinsic positive buoyancy of (i) hydrated 
+
+solid mantle compared to dry mantle and (ii) hydrous melts compared to coexisting 
+
+solid matrix, the MTZ o perates as a transient water reservoir (Fig. 5) . Water content 
+
+in the MTZ should therefore be regulated by the balance between incoming and 
+
+outgoing water on characteristic water retention timescale. This timescale is mainly 
+
+dictated by (i) the characteris tic time of thermal relaxation of hydrated slabs and 
+
+drips ( trelaxation =70 -33 0 Myr, depending on the sla b thermal thickness) and (ii) the 
+
+characteristic time needed for hydrous upwellings to leave the MTZ ( tescape =10 -100 
+
+Myr, depending on the water content and size , based on our models ). For modern 
+
+Earth, the global balance of water on these timescales can be represented as 
+
+𝑊𝐴𝑇𝐸𝑅 !"# = 𝑤𝑎𝑡𝑒𝑟 $%&'%()*+, (𝑡 -./010)*+, + 𝑡 .$(02. ),12 
+
+𝑡 -./010)*+, = 3! 
+
+> 4
+
+,
+
+where water subduction = 2− 6 × 10 17 kg/ Myr 33 -35 is water mass subducted to MTZ per 
+
+million year , h = 45 -100 km is thermal thickness of subducted slabs 32 , 𝜅 = 30 
+
+km 2/Myr ( 10 -6 m2/s ) is thermal diffusivity. Relatively small amount of water ( 0.00 4-
+
+0. 06 wt% , 0. 01-0. 19 ocean masses) , consistent with geophysical estimates 10 , and 
+
+geologically moderate duration ( 80-43 0 Myr) of the transient water storage should 
+
+be characteristic for the MTZ, which may thus play a key role in stabil izing surface 
+
+ocean level on Earth and Earth -like rocky exoplanets. This relatively low average 
+
+global MTZ water storage estimate is in strong contrast with estimated large values 
+
+based on the water capacity of mantle minerals 2, which in particular suggest a key 
+
+role of MTZ water dynamics for maintaining the long -term planetary habitability. 
+
+Our models also suggest that water dynamics above the MTZ can alternate 
+
+between porosity waves and melt diapirs, with the mode depending critically on the 
+
+ambient wate r content and olivine water capacity. As the result, the hydrous melt 
+
+transport efficiency, and thus the overall escape time of water from the MTZ , is 
+
+highly sensitive to a switch in transport mode governed by the upper mantle's water 
+
+content. To solidify these estimates, future work should rigorously address the 
+
+sensitivity of the mode -switching conditions to fundamental physical parameters. 
+
+Speci fically, conducting further sensitivity analyses on how melt viscosity and the 
+
+solid matrix's permeability and rheology influence the transition from porous flow 
+
+to diapir formation will be an important step in refining the constraints on water 
+
+transport e fficiency and residence time within the MTZ (Fig. 5) , which in particular 
+
+impose geodynamical and geochemical controls on intraplate volcanism 36 -38.
+
+References 
+
+1. Ohtani, E. Hydration and Dehydration in Earth's Interior. Annual Rev. Earth 
+
+Planet. Sci. 49, 25 3-278 (2021). 
+
+2. Guimond, C.M., Shorttle, O., Rudge, J.F. Mantle mineralogy limits to rocky planet 
+
+water inventories. Monthly Notices Royal Astronom. Soc. 521, 2535 -2552 
+
+(2022). 13 
+
+3. Karato, S., Karki, B., Park, J. Deep mantle melting, global water circulation an d its 
+
+implications for the stability of the ocean mass. Progress Earth Planet. Sci. 7, 76 
+
+(2020). 
+
+4. Gerya T.V. Introduction to Numerical Geodynamic Modelling. Second Edition. 
+
+Cambridge University Press, 472 pp (2019). 
+
+5. Richard, G. C., Bercovici, D. Water -indu ced convection in the Earth’s mantle 
+
+transition zone. J. Geophys. Res. 114, B01205 (2009). 
+
+6. Perchuk , A. L., Gerya, T. V., Zakharov, V. S. Griffin, W. L. Building cratonic keels 
+
+in Precambrian plate tectonics. Nature, 586, 395 -401 (2020). 
+
+7. Bercovici, D., Kar ato, S. Whole -mantle convection and the transition zone water 
+
+filter. Nature 425, 39 –44 (2003). 
+
+8. Spaargaren, R. J., Wang, H. S., Mojzsis, S. J., Ballmer, M. D., Tackley, P.J. Plausible 
+
+constraints on the range of bulk terrestrial exoplanet compositions in t he Solar 
+
+neighborhood. Astrophys. J. 948, 53 (2023). 
+
+9. Ohtani, E., Litasov, K., Hosoya, T., Kubo, T., Kondo, T. Water transport into the 
+
+deep mantle and formation of a hydrous transition zone. Phys. Earth Planet. 
+
+Interiors 143 –144, 255 –269 (2004). 
+
+10. Karato, S . Water distribution across the mantle transition zone and its 
+
+implications for global material circulation. Earth Planet. Sci. Let. 301, 413 –423 
+
+(2011). 
+
+11. Stern, R. J., Gerya, T. V. The importance of continents, oceans and plate tectonics 
+
+for the evolution of complex life: implications for finding extraterrestrial 
+
+civilizations. Sci. Rep. 14, 8552 (2024). 
+
+12. Korenaga, J. Was there land on the early Earth? Life 11, 1142 (2021). 
+
+13. Miyazaki, Y., Korenaga, Y. A wet heterogeneous mantle creates a habitable world 
+
+in th e Hadean. Nature 603, 86 –90 (2022). 
+
+14. Katz, R. F., Spiegelman, M., Langmuir, C. H. A new parameterization of hydrous 
+
+mantle melting. Geochem. Geophys. Geosyst. 4, 1073 (2003). 
+
+15. Holland , T.B., Green, E.C.R., Powell, R. Melting of peridotites through to granit es: 
+
+A simple thermodynamic model in the system KNCFMASHTOCr. J. Petrology 59, 
+
+881 –900, (2018). 14 
+
+16. Inoue, T., Sawamoto, H. High pressure melting of pyrolite under hydrous 
+
+condition and its geophysical implications. In: High -Pressure Research. 
+
+Application to Ea rth and Planetary Sciences (ed. Y. Syono, M. H. Manghnani) 323 
+
+– 331 (Geophysical Monograph Serie, AGU, Washington D.C., 1992). 
+
+17. Zhang, J., Herzberg, C. Melting experiments on anhydrous peridotite KLB -1 from 
+
+5.0 to 22.5 GPa. J. Geophys. Res. 99, 17,729 -17,742 (1994). 
+
+18. Litasov,K., Ohtani, E. Phase relations and melt compositions in CMAS –pyrolite –
+
+H2O system up to 25 GPa. Phys. Earth Planet. Interiors 134, 105 –127 (2002). 
+
+19. Mibe, K., Orihashi, Y., Nakai, S., Fujii, T. Element partitioning between transition -
+
+zone minerals and ultramafic melt under hydrous conditions. Geophysical 
+
+Research Letters, 33, L16307 (2006). 
+
+20. Fei, H., Chen, J., Wang, F., Zhang, B., Xia, Q., Katsura, T. Gravitationally unstable 
+
+hydrous melts at the base of the upper mantle. J. Geophys. Res. 130, 
+
+e2024JB030737 (2025). 
+
+21. Stixrude, L., Lithgow -Bertelloni, C. Thermal expansivity, heat capacity and bulk 
+
+modulus of the mantle. Geophys. J. Int. 228, 1119 –1149, (2022). 
+
+22. Inoue, T., Wada, T., Sasakia, R., Yurimoto, H. Water partitioning in the Earth’s 
+
+mantle. Phys. Earth Planet. Interiors 183, 245 –251 (2010). 
+
+23. Jing, Z., Karato, S. Effect of H 2O on the density of silicate melts at high pressures: 
+
+Static experiments and the application of a modified hard -sphere model of 
+
+equation of state. Geoch im. Cosmochim. Acta 85, 357 –372 (2012). 
+
+24. Gerya T. V., Podlesskii K. K., Perchuk L. L., Maresch, W. V. Semi -empirical Gibbs 
+
+free energy formulations for minerals and fluids. Phys. Chem. Minerals 31, 429 -
+
+455 (2004). 
+
+25. Gerya, T. V., Yuen, D. A. Rayleigh -Taylor i nstabilities from hydration and melting 
+
+propel "cold plumes" at subduction zones. Earth Planet Sci. Let. 212, 47 -62 
+
+(2003). 
+
+26. Agee. C. B., and Walker, D. Static compression and olivine flotation in ultrabasic 
+
+silicate liquid. J. Geophys. Res. 93, 3437 -3449 ( 1988). 
+
+27. Ohtani, E., Nagata, Y., Suzuki, A., Katoa, T. Melting relations of peridotite and the 
+
+density crossover in planetary mantles. Chem. Geol. 120, 207 -221 (1995). 15 
+
+28. Suzuki, A., Ohtani, E. Density of peridotite melts at high pressure. Phys. Chem. 
+
+Minerals 30, 449 –456 (2003). 
+
+29. Ohtani, E.. Suzuki, A. and Kato, T. Flotation of olivine in the peridotite melt at 
+
+high pressure. Proc. Jpn. Acad., Ser. B 69, 23 -28 (1993) .
+
+30. Matsukage, K. N., Jing, Z., Karato, S. Density of hydrous silicate melt at the 
+
+conditions of Ea rth's deep upper mantle. Nature, 438(7067), 488 –491 (2005). 
+
+31. Freitas, D., Manthilake, G., Schiavi1, F., Chantel, J., Bolfan -Casanova, N., Bouhifd, 
+
+M.A., Andrault, D. Experimental evidence supporting a global melt layer at the 
+
+base of the Earth’s upper mant le. Nature Comm. 8, 2186 (2017) 
+
+32. Garel, F., Goes, S., Davies, D. R., Davies, J. H., Kramer, S. C., Wilson, C. R. 
+
+Interaction of subducted slabs with the mantle transition -zone: A regime 
+
+diagram from 2 -D thermo -mechanical models with a mobile trench and an 
+
+overriding plate. Geochem. Geophys. Geosyst., 15, 1739 –1765 (2014). 
+
+33. van Keken, P. E., Hacker, B. R., Syracuse, E. M., Abers G. A. Subduction factory: 4. 
+
+Depth-dependent flux of H2O from subducting slabs worldwide. J. Geophys. Res. 
+
+Solid Earth https://doi.o rg/10.1029/2010JB007922 (2011). 
+
+34. Faccenda, M., Gerya, T. V., Mancktelow, N. S., Moresi, L. Fluid flow during slab 
+
+unbending and dehydration: Implications for intermediate -depth seismicity, 
+
+slab weakening and deep water recycling. Geochem. Geophys. Geosystem s 13, 
+
+Q01010 (2012). 
+
+35. Cerpa, N. G., Arcay, D., Padrón -Navarta, J. A. Sea -level stability over geological 
+
+time owing to limited deep subduction of hydrated mantle. Nature Geosci. 15, 
+
+423 –428 (2022). 
+
+36. Mazza, S.E., Gazel, E., Bizimis, M., Moucha, R., Béguelin, P., Johnson, E.A., McAleer, 
+
+R.J., Sobolev, A.V. Sampling the volatile -rich transition zone beneath Bermuda. 
+
+Nature 569, 398 –403 (2019) .
+
+37. Yang, J., Faccenda, M. Intraplate volcanism originating from upwelling hydrous 
+
+mantle transition zone. Nature 579, 88 –91 (2020). 
+
+38. Zhu, X., Balázs, A., Gerya, T., Sun, Z. Secondary plumes formation controlled by 
+
+interaction of thermochemical mantle plumes with the mantle transition zone. 
+
+Geophys . Research Let . 52, e2025GL117079 (2025) .16 
+
+Figure legends 
+
+Fig . 1. Computed solid -liquid density contrast for MTZ P -T conditions in pirolite 
+
+mantle ( XB=0.17) . a, mantle with 1 wt% water . b, mantle with 0.3 wt% water . Coexisting 
+
+solid and melt compositions are computed with the empirical melting model (Methods). 
+
+Melt density is computed with the equation of state of Jing and Karato 23 . Solid density is 
+
+computed with the software PERPLE -X by using the thermodynamic database of Stixrude 
+
+and Lithgow -Bertelloni 21 (20 22 ) and a water content -related correction (Methods) .
+
+Fig . 2. Development of partially molten mantle plume from solid -state hydrous 
+
+upwelling at the upper MTZ boundary . Hydrous upwelling is initially characterized by 
+
+the negative ( -100 K) temperature anomaly and increased water content ( 0.5 wt%), which 
+
+causes its positive buoyancy relative to the ambient mantle (0.03 wt% H 2O) (model 
+
+diapir59, Extended Data Table S2) . White contour shows the upwelling core. Black lines 
+
+are isotherms in oC. Blue arrows indicate the velocity field of the solid matrix. 
+
+Fig . 3. Development of small molten diapirs from solid -state hydrous drip at the lower 
+
+MTZ boundary . Hydrous downwelling is initially characterized by the negative ( -100 K) 
+
+temperature anomaly, increased water content ( 0.4 wt%) and enriched composition 
+
+(XB=0.34), which causes its negative buoyancy relative to the ambient mantle ( XB=0.17, 
+
+0.03 wt% H 2O) (model diapir77, Extended Data Table S2). White contour shows the drip 
+
+core. Black lines are isotherms in oC. Blue arrows indicate the velocity field of the solid 
+
+matrix. 
+
+Fig . 4. Development of small molten diapirs from hydrous hot plume at the lower 
+
+MTZ boundary . Hydrous plume is initially characterized by the positive (+200 K) 
+
+temperature anomaly, increased water content (0. 2 wt%) and depleted composition ( 𝑿 𝑩 
+
+> 𝑿 𝑩 #𝑿 𝑳
+> =
+> 0.12
+
+), which causes its positive buoyancy relative to the ambient mantle ( 𝑿 𝑩  
+
+> 𝑿 𝑩 #𝑿 𝑳
+> =0.17
+
+, 0.03 
+
+wt% H 2O) (model diapir60, Extended Data Table S2). White contour shows the plume 
+
+core. Black lines are isotherms in oC. Blue arrow s indicate the velocity field of the solid 17 
+
+matrix. 
+
+Fig . 5. Conceptual model of transient water dynamics in the MTZ. Water is introduced 
+
+into the MTZ mainly by subducting slabs and (in subordinate amount) by deep hydrous 
+
+plumes. Three principal types of transient hydrous structures should be characteristic for 
+
+the heterogeneous MTZ: stagnant fragments of hydrated cold s labs, solid -state hydrous 
+
+plumes and small melt diapirs. 
+
+Methods 
+
+The following mass conservation equations 4 consistent with Biot’s poroelasticity 
+
+theory and Gassmann’s relation 39-41 have been used to account for the volumetric effects 
+
+of phase transition s (including melting) and compressibility and thermal expansion of 
+
+melt and solid matrix whereas neglecting compressibility and thermal expansion of pores 
+
+for solid (porous matrix divergence) 
+
+𝑑𝑖𝑣 (𝑣 ⃗ $) + 𝛽 ' 65$6% 
+
+> 5)
+
+− 𝐾 78  
+
+> 5&6&
+> 5)
+
+9 + 6%96& 
+
+> (;9<)>'
+
+= 𝛼 $ 5$" 
+
+> 5)
+
++ Γ?0$$ < ; 
+
+> @(
+> &
+
+− ;
+
+> @(
+> $
+
+=, (1) 
+
+for fluid (Darcy flux divergence) 
+
+𝑑𝑖𝑣 (𝑞 ⃗ 5) − 𝐾 78 𝛽 ' 65$6% 
+
+> 5)
+
+− ; 
+
+> A)*
+> 5&6&
+> 5)
+
+9 − 6%96& 
+
+> (;9<)>'
+
+= 𝜙 6𝛼 B 5&" 
+
+> 5)
+
+− 𝛼 $ 5$" 
+
+> 5)
+
+9, (2) 
+
+where 𝛽 ' = C$DC' 
+
+> ;9<
+
+is drained compressibility, 𝐾 78 = 1 − C$
+
+> C+
+
+is Biot -Willis coefficient, 
+
+𝐾 EF = C+9C$ 
+
+> C+9C$D<(C&9C$)
+
+is Skempton’s coefficient, 𝛽 $, 𝛽 B and 𝛽 < = 0 are respectively 
+
+compressibility of solid, fluid and pores ( 𝛽 < is assumed to be negligibl e). 𝑃 ) = 𝜙 𝑃 B +
+
+(1 − 𝜙 )𝑃 $ is the total pressure, 𝑃 $ and 𝑃 B are respectively solid and fluid pressure, 𝜙 is 
+
+the porosity (volumetric fluid fraction), 𝛼 $ is the effective thermal expansion of solid 
+
+(including effects of solid -state phase transformat ions), 𝛼 B is fluid thermal expansion, 
+
+Γ?0$$ is the rate of mass transfer from solid to fluid due to melting, 𝜌 ( 
+
+> $
+
+and 𝜌 ( 
+
+> B
+
+is the 
+
+density of the transferred chemical component in the solid and liquid state, respectively 4, 
+
+> 5$
+> 5)
+
+and 5& 
+
+> 5)
+
+denote Lagrangian time derivatives in the solid and fluid velocity frame, 
+
+respectively, 𝑣 ⃗ $ is velocity vector of solid, 𝑞 ⃗ 5 is Darcy flux vector, 𝜂 < = >$ 
+
+> <
+
+is 18 
+
+compaction viscosity, 𝜂 $ is shear viscosity of the solid computed with the upper man tle 
+
+flow law of Karato and Wu 42 .
+
+The momentum equations for bulk viscous material and for the fluid are , respectively 
+
+> GH,-
+> %
+> G1-
+
+− G6%
+
+> G1,
+
+= 𝜌 )𝑔 *, (3) 
+
+𝑞 * 
+
+> 5
+
+= − F' 
+
+> >&
+
+6G6&
+
+> G1,
+
+− 𝜌 B𝑔 *9, (4) 
+
+where 𝜏 *I  
+
+> )
+
+= 𝜂 ) HGJ,
+
+> $
+> G1-
+
++ GJ-
+
+> $
+> G1,
+
+− 𝛿 *I  
+
+> ;
+> K
+
+𝑑𝑖𝑣 (𝑣 ⃗ $)J is deviatoric stress tensor, 𝜂 ) = 𝜂 $𝑒 9LM < is 
+
+shear viscosity of the bulk material 43, 𝜂 B is shear viscosity of fluid, 𝑘 < =
+
+𝑘 - 
+
+> <
+
+6 <
+
+> <.
+
+9K
+
+6;9<. 
+
+> ;9<
+
+9L
+
+is the permeability 4,4 4, 𝑘 - 
+
+> <
+
+= 10 9;K m2 and 𝜙 - = 0.01 are reference 
+
+values for permeability and porosity, respectively, 𝜌 ) = 𝜙 𝜌 B + (1 − 𝜙 )𝜌 $ is density of 
+
+bulk material, 𝜌 $ and 𝜌 B are respectively density of solid and fluid, 𝑥 * are coordinates, 𝛿 *I 
+
+is the Kronecker delta. 
+
+The e nergy conservation equation is formulated for the bulk material as 4
+
+𝜌 )𝐶 6 
+
+> )
+
+6𝜙 5&" 
+
+> 5)
+
++ (1 − 𝜙 ) 5$" 
+
+> 5)
+
+9 = − GN,
+
+> %
+> G1,
+
++ 𝐻 - 
+
+> )
+
++ 𝐻 0 
+
+> )
+
++ 𝐻 $ 
+
+> )
+
++ 𝐻 O
+
+> )
+
+, (5) 
+
+𝑞 * 
+
+> )
+
+= −𝑘 ) G" 
+
+> G1,
+
+, (6) 
+
+𝐻 - 
+
+> )
+
+= (1 − 𝜙 )𝐻 - 
+
+> $
+
++ 𝜙 𝐻 -
+
+> B
+
+, (7) 
+
+𝐻 0 
+
+> )
+
+= 61 − 𝜌 ) GP% 
+
+> G6
+
+9 56% 
+
+> 5)
+
+, (8) 
+
+𝐻 $ 
+
+> )
+
+= QH,-  
+
+> %R!
+> L>%
+
++ S6%96&T! 
+
+> (;9<)>'
+
++ >& 
+
+> F'
+
+(𝑞 * 
+
+> 5
+
+)L, (9) 
+
+𝐻 O 
+
+> )
+
+= −∆𝐻 B9$Γ?0$$ , (8) 
+
+where 𝐶 6 
+
+> )
+
+is effective isobaric heat capacity of bulk material (including effects of 
+
+solid -state phase transformations), 𝑞 * 
+
+> )
+
+are components of bulk heat flux vector ,
+
+𝐻 -
+
+> )
+
+, 𝐻 0 
+
+> )
+
+, 𝐻 $ 
+
+> )
+
+and 𝐻 O 
+
+> )
+
+is volumetric radioactive, adiabatic, shear and latent heat 
+
+production, respectively, is the enthalpy difference between the fluid and the 
+
+solid, GP% 
+
+> G6
+
+is pressure derivative of enthalpy of bulk material (including effects of 
+
+solid -state phase transformations), 𝑘 ) = RF$F& 
+
+> L
+
++ UF$(K<9L)DF&(;9K<)V! 
+
+> ;W
+
+−
+
+ΔH f −s19  
+
+> F$(K<9L)DF&(;9K<)
+> X
+
+is ther mal conductivity of bulk material 4,4 5, 𝑘 $ = 3 W/m/K and 
+
+𝑘 B = 5 W/m/K are respectively thermal conductivity of solid and fluid. 
+
+Mass transfer -related terms linked to melting/solidification are computed 
+
+numerically 4 on the basis of the new MTZ melting model 
+
+Γ?0$$ < ; 
+
+> @(
+> &
+
+− ;
+
+> @(
+> $
+
+= = ;9Y/ 
+
+> ∆)
+
+,
+
+Γ?0$$ = @&∆%<∆%9Y/@&1 <1 
+
+> ∆)
+
+,
+
+where 𝑅 [ = U @$1 (;9<1)D@&1 <1
+
+> @$∆%(;9<∆%)D@&∆%<∆%
+
+V
+
+> 9;
+
+is the initial (i.e., for the beginning of the time 
+
+step) to final (i.e., for the end of the time step) local system volume ratio for the 
+
+given time step, ∆𝑡 is the time step size, 𝜙 +, 𝜌 $+ , 𝜌 B+ and , 𝜙 ∆), 𝜌 $∆), 𝜌 B∆) are 
+
+porosity and density of the solid and fluid for the beginning and the end of the time 
+
+step, respectively. 
+
+Empirical model of MTZ melting 
+
+We developed a new empirical model of deep hydrous mantle melting at 
+
+characteristic MTZ P -T conditions of 10 -25 GPa, which is based on available 
+
+experimental data for both dry and hydrous conditions 16 -20 . In order to account in a 
+
+simpl ified manner for compositional and density variations of coexisting melt and solid, 
+
+we followed the approach presented by Gerya 4 and considered three end -members that 
+
+can mix in different proportions in liquid and solid phase: depleted silicate component 
+
+(L), enriched silicate component ( B) and water ( H). When calibrating compositions of the 
+
+two silicate components we mainly focused on reproducing the experimentally 
+
+determined variations of H 2O content and FeO/(FeO+MgO+CaO) and 
+
+(SiO 2+Al 2O3)/(SiO 2+Al 2O3+MgO+ CaO) ratios in the liquid, which are responsible for 
+
+the largest variations in the melt density 20,23 . Our empirical melting model assumes ideal 
+
+mixing of all three melt components in both solid and liquid state. This empirical model 
+
+is obviously very simp lified and neglects actual mineralogy of the solid matrix coexisting 
+
+with the melt focussing instead on reproducing the experimentally determined degree of 
+
+mantle melting and density variations of the resulting liquid in the P -T range 20 
+
+characteristic for th e MTZ. Three end -member reactions then characterise the melting 
+
+process 
+
+melting of the enriched silicate component B: Bs =Bf ,
+
+melting of the depleted silicate component L: Ls =Lf ,
+
+dehydration of wadsle yite: Hwad =Hf,
+
+where superscripts s, f and wad stand for solid, liquid (aqueous fluid, melt) and 
+
+wadsle yite, respectively. 
+
+Thermodynamic equilibrium conditions for these three reactions are formulated as 
+
+∆𝐺 7(6&,") = 0 = ∆𝐻 7 − 𝑇 ∆𝑆 7 + 𝑃 B∆𝑉 7 + 𝑅𝑇𝑙𝑛 <]2 
+
+> &
+> ]2
+> $
+
+=,
+
+∆𝐺 O(6&,") = 0 = ∆𝐻 O − 𝑇 ∆𝑆 O + 𝑃 B∆𝑉 O + 𝑅𝑇𝑙𝑛 <]3 
+
+> &
+> ]3
+> $
+
+=,
+
+∆𝐺 P(6&,") = 0 = ∆𝐻 P − 𝑇 ∆𝑆 P + 𝑃 B∆𝑉 P + 𝑅𝑇𝑙𝑛 H 𝑋 P
+
+> B
+
+𝑋 P 
+
+> ^0'
+
+J
+
+𝑋 7 
+
+> B
+
++ 𝑋 O 
+
+> B
+
++ 𝑋 P 
+
+> B
+
+= 1,
+
+𝑋 7 
+
+> $
+
++ 𝑋 O 
+
+> $
+
++ 𝑋 P 
+
+> $
+
+= 1,
+
+𝑋 P 
+
+> $
+
+= 𝑋 P
+
+> ^0'
+
+𝑋 ^0'  
+
+> $
+
++ 𝑋 P
+
+> +/
+
+𝑋 +/  
+
+> $
+
++𝑋 P
+
+> -*,_
+
+𝑋 -*,_  
+
+> $
+
++ 𝑋 P
+
+> 2J
+
+𝑋 2J  
+
+> $
+
+,
+
+𝑋 7 
+
+> $
+
+, 𝑋 O
+
+> $
+
+, 𝑋 P 
+
+> $
+
+and 𝑋 7
+
+> B
+
+, 𝑋 O
+
+> B
+
+, 𝑋 P 
+
+> B
+
+are molar fractions of respective components in the solid and 
+
+melt, respectively, 𝑋 P
+
+> ^0'
+
+, 𝑋 P
+
+> +/
+
+, 𝑋 P
+
+> -*,_
+
+, 𝑋 P 
+
+> 2J
+
+are molar fractions of water in respectively 
+
+wadsle yite, olivine, ringw oodite, perovskite coexisting with liquid, 𝑋 ^0'  
+
+> $
+
+, 𝑋 +/  
+
+> $
+
+, 𝑋 -*,_  
+
+> $
+
+, 𝑋 2J 
+
+> $
+
+are molar fractions of respective minerals in solid, R=8.314 J/K/mol is the gas constant, 
+
+ΔG, ΔH, ΔS and Δ V are molar Gibbs free energy, enthalpy, entropy and volume chan ge 
+
+in respective reactions. Mass balance constraints are given by the composition of the 
+
+system 𝑋 7 
+
+> )
+
+, 𝑋 O
+
+> )
+
+, 𝑋 P
+
+> )
+
+𝑋 7 
+
+> )
+
+= 𝑋 7 
+
+> $
+
+𝑋 $ + 𝑋 7
+
+> B
+
+𝑋 B
+
+𝑋 O 
+
+> )
+
+= 𝑋 O
+
+> $
+
+𝑋 $ + 𝑋 O
+
+> B
+
+𝑋 B
+
+𝑋 P 
+
+> )
+
+= 𝑋 P 
+
+> $
+
+𝑋 $ + 𝑋 P
+
+> B
+
+𝑋 B
+
+𝑋 7 
+
+> )
+
++ 𝑋 O 
+
+> )
+
++ 𝑋 P 
+
+> )
+
+= 1
+
+𝑋 $ + 𝑋 B = 1
+
+where Xs and Xf are equilibrium molar fractions of solid and fluid in the system. 21 
+
+Water content in wadsle yite ( 𝑋 P
+
+> ^0'
+
+) has been computed from its experimentally 
+
+determined stoichiometry 18 . Partition coefficients between wadsle yite and other water -
+
+bea ring nominally anhydrous minerals (NAMs) are taken from Inoue et al. 22 . Calibrated 
+
+parameters for the three end member reactions are given in Extended Data Table S1 . Dry 
+
+pyrolite solidus and liquidus for this empirical model are shown in Extended Data Fig. 1a .
+
+Density and other thermodynamic properties 
+
+Our melting model is able to predict chemical compositions of coexisting melt and 
+
+solid in the CaO -FeO -MgO -Al 2O3-SiO 2-H2O (CFMASH) system with compositional 
+
+variations along the ternary B -L-H mixing trend. In order to compute liquid density in 
+
+this system we used equation of state of Jing and Karato 23 . Dry solid mineralogical 
+
+composition (including 𝑋 P
+
+> ^0'
+
+, 𝑋 P
+
+> +/
+
+, 𝑋 P
+
+> -*,_
+
+, 𝑋 P
+
+> 2J
+
+), density, compressibility has been 
+
+computed with the PERPLE -X Gibbs free energy minimization software by using the 
+
+thermodynamic database of Stixrude and L ithg ow -Bert elloni 21 . Water incorporation into 
+
+wadsle yite, olivine, ringwoodite and perovskite is computed on the basis of the calibrated 
+
+wadsle yite dehydration reaction and partition coefficients between wadsle yite and other 
+
+three NAMs (olivine, ringwoodite and perovskite) 22 . Density changes of the dry solid 
+
+related to water incorporation are computed on the basis of pure water density predicted 
+
+by the equation of state of Jing and Karato 23 and the calibrated negative volumetric effect 
+
+of wadsle yite dehydration reaction ( Extended Data Table S1 ). Effective 𝐶 6 
+
+> )
+
+and GP% 
+
+> G6
+
+of the 
+
+bulk dry material (including effects of solid -state phase transitio ns) are computed for the 
+
+given bulk composition from the thermodynamic database of Stixrude and Li thg ow -
+
+Bert elloni 21 with the software PERPLE -X. Water -related correction of these parameters 
+
+is based on the Gibbs free energy equation for water of Gerya et a l. 24 , which works well 
+
+for MTZ P -T conditions and gives water density values consistent with the equation of 
+
+state of Jing and Karato 23 . In order to speedup calculations, all thermodynamic properties 
+
+were precomputed in form of lookup tables in 𝑃 − 𝑇 − ]2
+
+> ]2D]3
+
+− 𝑋 P space. 
+
+Comparison of melt density for experimentally measured and computed equilibrium melt 
+
+compositions in both dry and hydrous system is shown in Extended Data Fig.1b. 22 
+
+References of Methods 
+
+39. Biot, M. A. General theory of three -dimensional consolidation. J. Applied Phys. 12, 
+
+155 –164 (1941). 
+
+40. Gassmann, F. Über die elastizität poröser medien. Vierteljahrsschrift der 
+
+Naturforschenden Gesellschaft in Z ürich, 96, 1 –23 (1951). 
+
+41. Yarushina, V. M., Podladchikov , Y. Y. (De)compaction of porous viscoelastoplastic 
+
+media: model formulation. J. Geophys. Res. 120, 4146 –4170 (2015) .
+
+42. Karato, S., Wu, P. Rheology of the upper mantle: a synthesis. Science 260, 771 –778 
+
+(1993). 
+
+43. Katz, R. F., Spiegelman, M., Holtzman, B. The dynamics of melt and shear 
+
+localization in partially molten aggregates. Nature, 442, 676 –679 (2006). 
+
+44. Yarushina, V. M., Bercovici, D., Oristaglio, M. L. Rock deformation models and 
+
+fluid leak -off in hydraulic fracturing. Geophysical Journal International, 194, 1514 –
+
+1526 (2013). 
+
+45. Budiansky, B. Thermal and thermoelastic properties of isotropic composites. Journal 
+
+of Composite Materials, 4, 286 –295 (1970). 
+
+Data availability 
+
+All data files used for the empirical melting model calibration and for running numerical 
+
+experiments will be made publicly available upon publication of the paper .
+
+Code availability 
+
+The Mat Lab codes used for numerical experiments and visualization will be made 
+
+publicly available upon publication of the paper .
+
+Acknowledgement s This work was supported by SN SF research projects 200021 -
+
+231594 and 200021_192296 (to T.V.G.) by SNSF Sinergia grant N° 213539 (to N.M.B 
+
+and T.V.G.) and by SNSF research visit project IZSEZ0_230945 (to S.K) . Zhicheng Jing 
+
+is thanked for providing the MatLab code for melt density calculation. The simulations 
+
+were performed with the ETH -Zurich Euler cluster. 23 
+
+Author contributions T.V.G. conceptualized the study, calibrated the empirical melting 
+
+model, programmed the numerical THMC code and conducted most of the numerical 
+
+experiments . S.K. conceptualized the study and collected literature data on high -pressure 
+
+melting experiments . N.M.B. computed thermodynamic database for solid matrix and 
+
+conducted part of numerical experiments. All authors discussed the results, problems and 
+
+methods, and contributed to interpretation of the data and writing the paper. 
+
+Competing int erests The authors declare no competing interests. Extended Data figure legends 
+
+Extended Data Fig. 1. a, Experimental data used for calibration of the empirical 
+
+melting model. b, Comparison of modeled and experimental melt densities. 
+
+Experimental data are taken from literature: L&O_2002 18 , MEA_2006 19 , I&S_1992 16 ,
+
+FEA_2025 20 , Z&H_1994 17 . Both experimental and modeled densities in b are 
+
+computed from EOS of Jing and Karato 23 based on experimentally measured and 
+
+computed melt composition, respectively . With exception of experiments of Fei et al. 20 
+
+who provided measured water content in the melt, water content in hydrous 
+
+experimental melts is computed from the empirical melting model developed in this 
+
+work. C(F)MAS(H) corresponds to CaO -(FeO) -MgO -Al 2O3-SiO 2-(H 2O) system. 
+
+Extended Data Fig. 2. Computed solid -liquid density contrast for MTZ P -T
+
+conditions in enriched mantle (XB=0.34). a , mantle with 1 wt% water. b, mantle with 
+
+0.3 wt% water . Coexisting solid and melt compositions are computed with the empirical 
+
+melting model (Methods). Melt density is computed with the equation of state of Jing 
+
+and Karato 23 . Solid density is computed with the software PERPLE -X by using 
+
+thermodynamic database of Stixrude and Lithgow -Bertelloni 21 and water content -
+
+related correction (Methods) . Note color scale difference with Fig.1. 
+
+Extended Data Fig . 3. Development of porosity waives from solid -state hydrous 
+
+upwelling at the upper MTZ boundary . Hydrous upwelling is initially characterized 
+
+by the negative ( -100 K) temperature anomaly and increased water content ( 0.7 wt% 
+
+H2O), which causes its positive buoyancy relative to the ambient mantle (0.2 wt% H 2O) 
+
+(model diapir75, Extended Data Table S2). White con tour shows the plume core. Black 
+
+lines are isotherms in oC. Blue arrows indicate the velocity field of the solid matrix. 
+
+Note faster movement of porosity waives compared to the plume core. 
+
+Extended Data Fig. 4. Development of Rayleigh -Taylor instability from 
+
+homogeneously hydrated MTZ . MTZ mantle is initially characterized by an increased 
+
+water content (0.4 wt%), which is higher compared to the ambient mantle (0.03 wt% 
+
+H2O). Small Gaussian thermal perturbation of 10 K is prescribed in the center of the 
+
+mod el at the depth of 405 km, which triggers the instability (model diapir62, Extended Data Table S2). Note apparently stable initial density stratification in a. White line 
+
+shows the boundary between the water -rich MTZ mantle and water -poor upper mantle. 
+
+Black lines are isotherms in oC. Blue arrows indicate the velocity field of the solid 
+
+matrix. 
+
+Extended Data Fig. 5. Penetration of hydrous depleted hot plume thro ugh the 
+
+lower MTZ boundary . Hydrous plume is initially characterized by the positive (+200 
+
+K) temperature anomaly, increased water content (0.2 wt%) and depleted composition 
+
+( 𝑿 𝑩   
+
+> 𝑿 𝑩 #𝑿 𝑳
+> =0.12
+
+), which causes its positive buoyancy relative to the ambient m antle 
+
+( 𝑿 𝑩  
+
+> 𝑿 𝑩 #𝑿 𝑳
+> =0.17
+
+, 0.03 wt% H 2O) (model diapir80, Extended Data Table S2). White contour 
+
+shows the plume core. Black lines are isotherms in oC. Blue arrows indicate the velocity 
+
+field of the solid matrix. 
+
+Extended Data Fig. 6. Development of hydrous plumes and melt diapirs from cold 
+
+hydrated slab fragment located above the lower MTZ boundary . Slab fragment is 
+
+initially characterized by the strong negative ( -500 K) temperature anomaly and 
+
+increased water content (0.4 wt% H 2O), which causes its initial negative buoyancy 
+
+relative to the ambient mantle (0.03 wt% H 2O) and partial penetration through the lower 
+
+MTZ boundary (model diapir67, Extended Data Table S2). White contour shows the 
+
+fragment core. Black lines are isotherms in oC. Blue arrows indicate the velocity field 
+
+of the solid matrix. Note development of solid -state hydrous plumes and small melt 
+
+diapirs inside the MTZ. 
+
+Extended Data Fig. 7. Development of hydrous plume from cold hydrated slab 
+
+fragment located above the lower MTZ boundary . Slab fragment is initially 
+
+characterized by the moderate negative ( -100 K) temperature anomaly and increased 
+
+water content (0.4 wt% H 2O), which causes its initial positive buoyancy relative to the 
+
+ambient mantle (0.03 wt% H 2O) (model diapir74, Extended D ata Table S2). White 
+
+contour shows the fragment core. Black lines are isotherms in oC. Blue arrows indicate 
+
+the velocity field of the solid matrix. Note development of solid -state hydrous plumes 
+
+and small melt diapirs inside the MTZ. 
+
+Extended Data Fig. 8. Development of partially molten mantle plume and descending small melt diapirs from solid -state hydrous upwelling at the upper 
+
+MTZ boundary under condition of negatively buoyant hydrous melt . Hydrous 
+
+upwelling is initially characterized by the negative ( -100 K) temperature anomaly and 
+
+increased water content (0.5 wt%), which causes its positive buoyancy relative to the 
+
+ambient mantle (0.03 wt% H 2O) (model diapir 104 , Extended Data Table S2). Melt 
+
+density is increased by adding an ad hock value of 400 kg/m 3 to the computed melt 
+
+density. White contour shows the upwelling core. Black lines are isotherms in oC. Blue 
+
+arrows indicate the velocity field of the solid matrix. 
+
+Extended Data Table 1. Calibrated parameters of the empirical melting model used 
+
+in n umerical experiments. 
+
+Extended Data Table 2. Conditions and results of numerical experiments. T, oCP, GPa  P, GPa 
+
+> liquidus
+
+# melt melt+solid solid 
+
+# olivine wadsleyite ringwoodite perovskite 
+
+> liquidus
+
+# melt melt+solid olivine wadsleyite ringwoodite perovskite 
+
+# solid      
+
+> 200 300 400 500 600 700
+
+# ab
+
+# T, oCsolid-melt density difference, kg/m 3Figure 1 3500 3600 3700 3800 
+
+# 0 Myr 10.9 Myr 15.9 Myr 22.2 Myr 
+
+# abcdefghijkl
+
+## km km km km km km km km density, kg/m 3
+
+-4 -3 -2 -1 0
+
+## log 10 (melt fraction) log 10 (water), wt% 
+
+-1.5 -1.0 -0.5 0 0.5 1.0 olivine wadsleite 
+
+1540 1520 1540 1520 1540 1520 1540 1520 
+
+olivine wadsleite olivine wadsleite olivine wadsleite Figure 2 3800 4000 4200 4400 
+
+# 0 Myr 9.5 Myr 23.8 Myr 74.6 Myr 
+
+# abcdefghijkl
+
+## km km km km km km km km density, kg/m 3
+
+-4 -3 -2 -1 0
+
+## log 10 (melt fraction) log 10 (water), wt% 
+
+-1.5 -1.0 -0.5 0 0.5 1.0 ringwoodite perovskite 
+
+1620 1620 1600 1620 1620 1620 
+
+ringwoodite perovskite ringwoodite perovskite ringwoodite perovskite 
+
+1620 1600 1580 1620 1620 Figure 3 3800 4000 4200 4400 
+
+# 0 Myr 7.2 Myr 24.0 Myr 119.5 Myr 
+
+# abcdefghijkl
+
+## km km km km km km km km density, kg/m 3
+
+-4 -3 -2 -1 0
+
+## log 10 (melt fraction) log 10 (water), wt% 
+
+-1.5 -1.0 -0.5 0 0.5 1.0 ringwoodite perovskite 
+
+1660 1660 1700 1660 1660 1660 
+
+ringwoodite perovskite ringwoodite perovskite ringwoodite perovskite 
+
+1660 1700 1740 Hier Text eingeben Figure 4 Figure 5 0        
+
+> 5
+> 10
+> 15
+> 20
+> 25
+> 30
+> 900 1100 1300 1500 1700 1900 2100 2300 2500
+
+L&O_2002, CMAS 
+
+L&O_2002, CMASH 
+
+MEA_2006, CFMASH 
+
+FEA_2025, CFMASH 
+
+I&S_1992, CFMASH 
+
+L&O_2002, dry solidus 
+
+L&O_2002, dry liquidus 
+
+Z&H_1994, dry solidus 
+
+Z&H_1994, dry liquidus 
+
+This study, dry solidus 
+
+This study, dry liquidus          
+
+> 2700
+> 2800
+> 2900
+> 3000
+> 3100
+> 3200
+> 3300
+> 3400
+> 3500
+> 3600
+> 2700 2800 2900 3000 3100 3200 3300 3400 3500 3600
+
+## L&O_2002, CMAS 
+
+## L&O_2002, CMASH 
+
+## MEA_2006, CFMASH 
+
+## FEA_2025, CFMASH 
+
+## I&S_1992, CFMASH 
+
+# modeled melt density, kg/m 3         
+
+> experimental melt density, kg/m 3
+> 2700
+> 2800
+> 2900
+> 3000
+> 3100
+> 3200
+> 3300
+> 3400
+> 3500
+> 3600
+> 2700 2800 2900 3000 3100 3200 3300 3400 3500 3600
+
+## L&O_2002, CMAS 
+
+## L&O_2002, CMASH 
+
+## MEA_2006, CFMASH 
+
+## FEA_2025, CFMASH 
+
+## I&S_1995, CFMASH 
+
+# T, oCP, GPa 
+
+# abExtended Data Figure 1 T, oCP, GPa  P, GPa 
+
+> liquidus
+
+# melt melt+solid solid 
+
+# olivine wadsleyite ringwoodite perovskite 
+
+> liquidus
+
+# melt melt+solid olivine wadsleyite ringwoodite perovskite 
+
+# solid 
+
+# ab
+
+# T, oCsolid-melt density difference, kg/m 3   
+
+> 100 200 300 500 400 Extended Data Figure 2
+
+3500 3600 3700 3800 
+
+# 0 Myr 11.3 Myr 15.0 Myr 19.4 Myr 
+
+# abcdefghijkl
+
+## km km km km km km km km density, kg/m 3
+
+-4 -3 -2 -1 0
+
+## log 10 (melt fraction) log 10 (water), wt% 
+
+-1.5 -1.0 -0.5 0 0.5 1.0 olivine wadsleyite 
+
+1540 1520 1540 1520 1540 1520 1540 1520 
+
+olivine wadsleyite olivine wadsleyite olivine wadsleyite Extended Data Figure 3 3500 3600 3700 3800 
+
+# 0 Myr 9.1 Myr 16.0 Myr 29.6 Myr 
+
+# abcdefghijkl
+
+## km km km km km km km km density, kg/m 3
+
+-4 -3 -2 -1 0
+
+## log 10 (melt fraction) log 10 (water), wt% 
+
+-1.5 -1.0 -0.5 0 0.5 1.0 olivine wadsleyite 
+
+1540 1520 1540 1520 1540 1520 1540 1520 
+
+olivine wadsleyite olivine wadsleyite olivine wadsleyite Extended Data Figure 4 3800 4000 4200 4400 
+
+# 0 Myr 6.0 Myr 24.4 Myr 69.1 Myr 
+
+# abcdefghijkl
+
+## km km km km km km km km density, kg/m 3
+
+-4 -3 -2 -1 0
+
+## log 10 (melt fraction) log 10 (water), wt% 
+
+-1.5 -1.0 -0.5 0 0.5 1.0 ringwoodite perovskite 
+
+1660 1660 1700 1660 1660 1660 
+
+ringwoodite perovskite ringwoodite perovskite ringwoodite perovskite 
+
+1660 1700 1740 Extended Data Figure 5 0 Myr 
+
+# a
+
+density, kg/m 3
+
+olivine wadsleyite 
+
+1650 1700 
+
+ringwoodite perovskite olivine wadsleyite ringwoodite perovskite olivine wadsleyite ringwoodite perovskite olivine wadsleyite ringwoodite perovskite 
+
+# 30.7 Myr 
+
+3400 4400 -4 -2 03900 -1 0 1
+
+# b c d e f
+
+3400 4400 -4 -2 03900 -1 0 1
+
+log 10 (melt fraction) log 10 (water), wt% density, kg/m 3 log 10 (melt fraction) log 10 (water), wt% 
+
+# 97.1 Myr 
+
+# g 125.0 Myr 
+
+# h i j k l
+
+## km km km km km km km km km km 
+
+1700 1700 1650 1700 1700 1700 1650 1700 1700 1700 1650 1700 Extended Data Figure 6 0 Myr 
+
+# a
+
+density, kg/m 3
+
+olivine wadsleyite 
+
+1550 1600 
+
+ringwoodite perovskite olivine wadsleyite ringwoodite perovskite olivine wadsleyite ringwoodite perovskite 
+
+# 53.8 Myr 
+
+3400 4400 -4 -2 03900 -1 0 1
+
+# b c d e f
+
+3400 4400 -4 -2 03900 -1 0 1
+
+log 10 (melt fraction) log 10 (water), wt% density, kg/m 3 log 10 (melt fraction) log 10 (water), wt% 
+
+# 93.3 Myr 
+
+# g h i
+
+## km km km km km km km 
+
+1600 1600 1550 1600 1650 1550 1600 1650 1650 
+
+olivine wadsleyite ringwoodite perovskite 
+
+# 103.8 Myr 
+
+# j k l
+
+## km km km 
+
+1550 1600 1650 Extended Data Figure 7 3500 3600 3700 3800 
+
+# 0 Myr 20.2 Myr 35.7 Myr 97.1 Myr 
+
+# abcdefghijkl
+
+## km km km km km km km km density, kg/m 3
+
+-4 -3 -2 -1 0
+
+## log 10 (melt fraction) log 10 (water), wt% 
+
+-1.5 -1.0 -0.5 0 0.5 1.0 olivine wadsleyite 
+
+1540 1520 1540 1520 1540 1520 1540 1520 
+
+olivine wadsleyite olivine wadsleyite olivine wadsleyite Extended Data Figure 8 Extended Data Table 1. Calibrated parameters of the 
+
+empirical melting model used in numerical experiments. 
+
+Parameter Units Value 
+
+∆𝐻 ! J/mol 13740 
+
+∆𝑆 ! J/K/mol 11.635 
+
+∆𝑉 ! J/bar/mol 0.013748 
+
+∆𝐻 " J/mol 27797 
+
+∆𝑆 " J/K/mol 12.399 
+
+∆𝑉 " J/bar/mol 0.031432 
+
+∆𝐻 # J/mol 3563 
+
+∆𝑆 # J/K/mol 14.865 
+
+∆𝑉 # J/bar/mol -0.036069 
+
+SiO 2 in B molar % 25.7 3
+
+Al 2O3 in B molar % 1.37 
+
+FeO in B molar % 0 (CMAS *)
+
+20.45 (CFMAS*) 
+
+MgO in B molar % 45.08 (CMAS *)
+
+37.03 (CFMAS*) 
+
+CaO in B molar % 27.8 2 (CMAS *)
+
+15.4 2 (CFMAS *)
+
+SiO 2 in L molar % 41.65 
+
+Al 2O3 in L molar % 2.99 
+
+FeO in L molar % 0 (CMAS *)
+
+2.0 3 (CFMAS*) 
+
+MgO in L molar % 54.99 (CMAS *)
+
+52.9 3 (CFMAS*) 
+
+CaO in L molar % 0.3 6 (CMAS *)
+
+0. 40 (CFMAS *)
+
+XB in pyrolite 0. 16 80 
+
+* C(F)MAS corresponds to CaO -(FeO) -MgO -Al 2O3-SiO 2 system Extended Data Table 2 . Conditions and results of numerical experiments .1
+
+Model Mantle 
+
+temp. a
+
+(K) 
+
+Mantle 
+
+press. a
+
+(GPa )
+
+Ambient 
+
+water 
+
+(wt% )
+
+Anomaly 
+
+water 
+
+(wt% )
+
+Anomaly 
+
+temp. 
+
+(K) 
+
+Anomaly 
+
+size b
+
+(km )
+
+Anomaly 
+
+𝑿 𝑩 
+
+𝑿 𝑩 + 𝑿 𝑳 
+
+Results , Figures 
+
+diapir59 1773 12 0.0348 0.523 -100 20 0.168 partially molten plume with melt lens on top, Fig. 2 
+
+diapir60 192 3 22 0.0348 0.175 +200 20 0.118 partially molten plume below the MTZ producing small melt 
+
+diapir inside the MTZ, Fig. 4 
+
+diapir61 192 3 23 0.0348 0.175 +200 20 0.118 partially molten plume, small melt diapir 
+
+diapir62 1773 12 0.0348 0.384 0 50 c 0.168 MTZ overturn, large partially molten plume with melt lens on top, 
+
+Extended Data Fig. 3 
+
+diapir63 1773 12 0.351 0.701 0 50 c 0.168 MTZ overturn, large partially molten plume with porosity waves 
+
+inside 
+
+diapir64 1773 12 0.349 0.839 -100 20 0.168 MTZ overturn, porosity waves ahead of large partially molten 
+
+plume 
+
+diapir65 e 1873 9.5 0.0349 0.387 -500 60 ×20 d 0.150 g solid and then partially molten hydrous plumes with melt lens on 
+
+top, small melt diapirs 
+
+diapir67 f 1873 9.5 0.0349 0.387 -500 60 ×20 d 0.150 g solid and then partially molten hydrous plumes with melt lens on 
+
+top, small melt diapirs, Extended Data Fig. 5 
+
+diapir69 1773 21.5 0.0348 0.384 -100 20 0.218 stagnant solid drip core above the lowe r MTZ boundary, hydrous 
+
+solid plume inside the MTZ 
+
+diapir70 f 1873 9.5 0.0349 0.386 -500 60 ×20 d 0.150 g unfinished, solid state hydrous plumes inside the MTZ 
+
+diapir71 1873 21.5 0.0348 0.382 -100 20 0.268 stagnant drip core with partial melt above the lowe r MTZ 
+
+boundary, hydrous solid plume inside the MTZ 
+
+diapir72 1773 12 0.227 0.716 -100 20 0.168 porosity waves ahead of partially molten plume 
+
+diapir73 1873 21.5 0.0348 0.382 -500 20 0.268 stagnant drip core with partial melt above the lowe r MTZ 
+
+boundary, hydrous solid plume inside the MTZ 
+
+diapir74 f 1773 9.5 0.0349 0.392 -100 60 ×20 d 0.150 g solid and then partially molten heterogeneous hydrous plume with 
+
+melt lens on top, Extended Data Fig. 6 
+
+diapir75 1773 12 0.220 0.709 -100 20 0.168 porosity waves ahead of partially molten plume, Extended Data 
+
+Fig. 4 
+
+diapir76 1773 12 0.217 0.705 -100 20 0.168 porosity waves ahead and inside of partially molten plume 
+
+diapir77 1873 21.5 0.0348 0.381 -100 40 0.336 sinking drip core, melt lens at the lower MTZ boundary, small 
+
+melt diapirs, Fig. 4 
+
+diapir78 192 3 21.5 0.0348 0.384 -100 20 0.218 stagnant solid drip core above the lowe r MTZ boundary, hydrous 
+
+solid plume inside the MTZ 
+
+diapir80 192 3 22 0.0348 0.175 +200 40 0.118 partially molten plume below the MTZ with porosity waves 
+
+inside evolving into solid plume inside the MTZ with melt lens on 
+
+top, Ex tended Data Fig. 7 
+
+diapir82 1773 12 0.0348 0.525 -100 40 0.118 partially molten plume with melt lens on top 
+
+diapir83 e 1773 9.5 0.0174 0.371 -300 80 ×40 h 0.118 solid and then partially molten heterogeneous hydrous plume 
+
+diapir84 f 1773 9.5 0.0174 0.372 -300 80 ×40 h 0.118 solid and then partially molten heterogeneous hydrous plume 
+
+diapir85 e 1773 9.5 0.0174 0.370 -300 80 ×40 h 0.168 solid and then partially molten heterogeneous hydrous plume 
+
+diapir86 f 1773 9.5 0.0174 0.370 -300 80 ×40 h 0.168 unfinished, solid hydrous plume 
+
+diapir87 1873 21.5 0.0348 0.384 -100 40 0.218 stagnant flattened solid drip core above the lowe r MTZ boundary, 
+
+thin partially molten layer at the lower MTZ boundary, hydrous 
+
+solid plume inside the MTZ 
+
+diapir89 192 3 22 0.0348 0.175 +200 40 0.168 partially molten plume below the MTZ with porosity waves 
+
+inside evolving into solid plume core slowly penetrating the MTZ 
+
+and small melt diapir rising inside the MTZ, Extended Data Fig. 7 
+
+diapir90 1773 12 0.0348 0. 210 0 50 c 0.168 MTZ overturn, large solid hydrous plume 
+
+diapir91 1773 12 0.0348 0. 122 0 50 c 0.168 MTZ overturn, large solid hydrous plume 
+
+2 a mantle temperature and pressure boundary conditions on the top of the model 3 b diameter of the sharp anomaly for 𝑿 𝑩 
+
+> 𝑿 𝑩 $𝑿 𝑳
+
+, diameter of Gaussian anomaly for XH and temperature is 20 km (unless indicated differently) 4 
+
+> c
+
+homogeneously hydrated MTZ 5 d elliptic anomaly with 60 ×20 diameters for sharp 𝑿 𝑩 
+
+> 𝑿 𝑩 $𝑿 𝑳
+
+anomaly as well for Gaussian anomaly for XH and temperature 6 
+
+> e
+
+100 ×400 km 2 model with resolution 1 ×1 km 2
+
+7 f 100 ×400 km 2 model with resolution 0.5 ×0.5 km 2
+
+8 g ambient composition : 𝑿 𝑩 
+
+> 𝑿 𝑩 $𝑿 𝑳
+
+= 0.15 9 
+
+> h
+
+elliptic anomaly with 80 ×40 km 2 km size for sharp 𝑿 𝑩 
+
+> 𝑿 𝑩 $𝑿 𝑳
+
+anomaly and 40 ×20 km 2 size for Gaussian anomaly for temperature and XH10

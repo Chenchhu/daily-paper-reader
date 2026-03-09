@@ -1,0 +1,665 @@
+Title: Damage Prediction of Sintered {\alpha}-SiC Using Thermo-mechanical Coupled Fracture Model
+
+URL Source: https://arxiv.org/pdf/2603.04753v1
+
+Published Time: Fri, 06 Mar 2026 01:24:21 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+# Damage Prediction of Sintered α-SiC Using Thermo-mechanical Coupled Fracture Model 
+
+## Jason Sun, Yu Chen, Joseph J. Marziale, Eric A. Walker, David Salac, James Chen ∗
+
+## Department of Mechanical and Aerospace Engineering, The State University of New York at Buffalo, Buffalo, New York 14260, United States 
+
+∗Author to whom correspondence should be addressed. e-mail: chenjm@buffalo.edu October 2022 
+
+Abstract 
+
+A three-way coupled thermo-mechanical fracture model is presented to predict the damage of brit-tle ceramics, in particular α-SiC, over a wide range of temperatures (20-1400 ◦C). Predicting damage over such a range of temperatures is crucial for thermal protection systems for many systems such as spacecraft. The model, which has been implemented in MOOSE, is divided into three modules: elasticity, damage phase field, and heat conduction. Analytical approaches for determining crack length scales are presented for both simple tension and simple shear. Validation tests are conducted for both flexural strength and fracture toughness over the specified range of temperatures. Flexural strength simulation results fall within the uncertainty region of the experimental data, and mode I fracture toughness simulation results are also in agreement with the experimental data. Mode II and mixed mode fracture toughness simulations results are presented with the modified G-criterion. Finally, the parallel computing capabilities of the model is considered in various scalability tests. Key words: Fracture mechanics; Fracture toughness; Phase field; α-SiC. 
+
+# 1 Introduction 
+
+The idea of integrating the processing and structure of materials with the target goals and properties is not new. The concept of an Integrated Computational Materials Engineering (ICME) approach, whereby computational tools are utilized to achieve this goal of integration, is newer and has been introduced by Olson [1, 2], and has also been known as Through Process Modelling [3]. The concept behind ICME is to use a systematic approach to facilitate the cycle between commercial design and production, with a linear hierarchical relationship among processing, structure, properties, and performance, as shown in Fig. 1 [1]. All of the internal connections are vital in material design processes. 1
+
+> arXiv:2603.04753v1 [cond-mat.mtrl-sci] 5 Mar 2026
+
+While substantial research effort exists on developing ICME for alloys exist [4, 5, 6, 7, 8], there are much fewer studies on ICME for advanced ceramics. The recent and increasing maturity of advanced ceramics has drawn more attention in research and industrial applications [9], which has increased the need for true ICME efforts for ceramics that can bridge models and experimental data to accelerate material developments for applications such as those required for spacecraft systems. Examples include Shi et al, where it was proposed to use an ICME approach for Ceramic Matrix Composite Development with a focus on aircraft engine applications using SiC/SiC composites [10]. Raether et al gives an overlook of ICME for ceramics with examples of Zirconia Toughened Alumina ceramics [9]. Raether’s work uses defects obtained from scanned images as a mesh input to calculate stress concentration. However, study in fracture strength of ceramics through ICME is still lacking. In particular, fracture or damage under high temperatures or hypersonic conditions is in the critical need for aerospace applications. Material modeling plays an important role in predicting the relationship between material properties and performance, with engineering designs often requiring the ability to predict where and when cracks will appear over a wide range of temperatures. Various attempts have been made to model the fracture mechanics of brittle materials such as ceramics. Miehe et al first proposed a phase field model that separated the elastic strain into tensile and compressive parts, where damage only affects the tensile portion [11]. Clayton et al proposed a phase field model that captures both the micro-structure and fracture of heterogeneous poly-crystal ceramic composites [12]. Wu et al also showed that phase field modeling performs well for brittle materials [13]. Zuo et al proposed a phase field model to predict thermal-shock induced fracture of Al 2O3 and 3Y–ZrO 2 through water quenching, but mechanical loading was not considered [14]. Similarly, Chu el al used phase field method to model the dynamic crack path of brittle material subjected to thermal shock [15]. Ruan et al also utillizied a thermo-mechanical phase field model to model the defects induced by solidification shrinkage in additive manufacturing [16]. While there has been rapid growth of material modeling efforts regarding ceramics, none of these studies provides ceramic damage prediction under a wide range of temperatures. The simulation model used in this work is a coupled scheme involving fracture mechanics, elasticity, and heat conduction. Fracture mechanics is arguably the most important engineering consideration for materials. Linear elastic fracture mechanics (LEFM) assumes that the stressed material is brittle and undergoes little plastic deformation before fracture, which is an appropriate assumption for ceramics. In general there are two ways to predict damage: (1) the sharp interface model, where tracking the complex crack surface is required, and (2) a diffuse crack model, which approximates the crack interface as a diffusive zone. In the latter case, which is the basis of this work, an auxiliary scalar function provides a continuous description of the damaged state at any location and time. Griffith’s fracture theory was the first of its kind to use energy criteria, positing that the energy required to create new crack surfaces is equivalent to the stored strain energy being released during crack propagation [17]. This concept is used to define crack initiation and propagation criteria. The phase field model is used to capture the crack evolution and propagation using the variational principle of the free energy. For a non-conserved phase 2field variable, the Allen-Cahn equation is utilized to describe this reaction-diffusion system [18]. A heat conduction model is also included to account for temperature effects. The primary objective of this study is to implement the thermal-mechanical coupled fracture model for damage prediction over a wide range of temperatures. The framework is built in the open source Multiphysics Object Oriented Simulation Environment (MOOSE) [19]. The ceramic α-SiC is used as an exemplar to show that this proposed framework is capable of modeling fracture phenomena over a wide range of temperatures. The material α-SiC is chosen due to it’s many applications, from abrasives to semiconductors [20, 21]. Because of its high wear resistance and strength at high temperatures, α-SiC is also a leading candidate for use in thermal protection systems [22]. Therefore the proposed framework is designed with a view towards α-SiC applications. The rest of this report is organized as follows: the three different modules and how they are coupled are presented in Sec. 2; validation tests that compare simulation results with experimental data are shown in Sec. 3; and the parallel computing capacity of the multiphysics model is considered in Sec. 4. 
+
+# 2 Theory 
+
+The problem at hand is to build a framework to accurately model the fracture phenomena of α-SiC ceramics for the high temperatures. The framework presented here contains three modules: elasticity, phase field, and heat conduction, each of which are discussed in detail below. 
+
+## 2.1 Elasticity 
+
+Elasticity governs the mechanical behavior of the material. The model assumes linear elasticity, since ceramics are brittle in nature, and any body forces are negligible. An isotropic assumption is applied as there is no directionality in material properties. Also, as displacement occurs at a small time scale, a quasi-steady state is assumed. The equation of motion at equilibrium is given by 
+
+σij,j = 0 , (1) where σij is the Cauchy stress tensor and indices i, j subsume directions x, y, z . With the small strain assumption, the elastic strain is 
+
+εEij = 12 (uEi,j + uEj,i ), (2) where uEi,j represents the elastic displacement gradient. By definition, the stress is equal to the partial derivative of elastic strain energy with respect to elastic strain; i.e., 
+
+σEij = ∂f elas 
+
+∂ε Eij 
+
+. (3) 3For isotropic materials, the elastic strain energy 
+
+felas = ω(ξ)σij εEij = ω(ξ) 12 E(T )εEij εEij , (4) where ω(ξ) is the degradation function and E(T ) is the Young’s modulus as a function of temperature. The degradation function ω describes how material strength changes with the damage phase field variable 
+
+ξ and is defined in Sec. 2.2. Finally, the total strain is given as a linear combination of the elastic strain 
+
+εEij and thermal expansion εTij ; i.e., 
+
+εij = εEij + εTij , (5) where the thermal strain εTij of an isotropic material can be expressed in terms of the change in temper-ature T and thermal expansion coefficient α(T) as 
+
+εTij = α(T )∆ T δ ij , (6) where δij is the Kronecker delta. 
+
+## 2.2 Phase Field 
+
+The damage phase field variable, ξ, is an auxiliary, non-conserved, scalar variable that regularizes the range between undamaged and damaged states; i.e., 
+
+ξ(xi) = 
+
+
+
+0, undamaged material; (0 , 1) , partially damaged material; 1, complete material failure. (7) The degradation function, ω(ξ), is a function of the phase field variable used to provide a continuous description of the diffusive damage zone. It is defined as 
+
+ω(ξ) = (1 − ξ)2(1 − β) + β, (8) with β ≪ 1 enforcing numerical stability and has been introduced in several formulations [23, 24, 25]. The function satisfies the conditions 
+
+ω(0) = 1 , ω(1) = 0 ,
+
+indicating that a non-damaged region ( ξ = 0) has the full material strength and a fully damaged region (ξ = 1) can no longer store any elastic strain. The evolution of ξ is modeled using the Allen-Cahn phase field equation, which follows the variational 4principle of energy. First proposed by John W. Cahn and Sam Allen [18], the Allen-Cahn equation is defined as 
+
+∂ξ ∂t = −Lξ
+
+∂f loc (ξ, ε Eij )
+
+∂ξ − (κξ ,i ),i 
+
+!
+
+, (9) where Lξ is the associated mobility constant, floc is the local free energy, and κ is the coefficient of the surface energy contribution from ξ. The first component of the right-hand-side drives the system to a lower-energy state, while the second controls the sharpness of the transition between ξ = 0 and ξ = 1. The local free energy is defined as a linear combination between the contribution from elasticity and the volumetric contribution from the damage phase field variable; i.e., 
+
+floc = felas + ff rac ,
+
+where felas is the elastic free energy and ff rac is the free energy from the phase field variable, ξ. Physically, once the material fractures, it can withstand compressive stress but not tensile stress. Therefore, it is assumed that the damage only affects the tensile strain and stress. Through strain spectral decomposition, the strain energy ψelas is broken into tensile and compressive components ψ+ and ψ−; i.e., 
+
+ψelas = ψ+ + ψ−.
+
+Since the crack does not self-heal, crack irreversibility is a necessary condition. To achieve this, a history variable H is introduced to record the maximum tensile strain energy throughout the time domain: 
+
+H = max  
+
+> t
+
+(ψ+, f barrier ), (10) where 
+
+fbarrier = − ff rac 
+
+ω(ξ) ξ=0 
+
+. (11) The free energy lower bound fbarrier exists to ensure the tensile strain energy never becomes negative. Then the elastic free energy becomes 
+
+felas = ω(ξ)H + ψelas 
+
+Modeling the volumetric fracture energy term as a quadratic expression is a well-documented approach [11, 26]. The corresponding fracture free energy terms are then 
+
+ff rac = gcξ2
+
+2l0
+
+, κ = gcl0
+
+2 . (12) where gc is the critical energy release rate defined by Griffith’s theory of fracture [17] and l0 is the regularization crack length scale. The fracture energy formulation is presented explicitly in Sec. 2.5. 52.3 Heat Conduction 
+
+The heat conduction module is applied to account for the effects of temperature on material properties and on thermally induced expansion. It is also assumed that there is no heat generation within the material. There exist three modes of heat transfer: conduction, convection, and radiation. Convection is not possible within solid materials, but convection can be prescribe as thermal boundary conditions as well as radiation. Radiative heat transfer especially prominent at high temperatures, and it can be calculated by Stefan-Boltzmann law, ˙Q = σsAs(T 4 
+
+> ∞
+
+− T 4). In the case of an isotherm environment (T = T∞), no radiation heat transfer is needed. The thermal conduction coefficient is coupled with the damage phase field variable, ξ, based on the assumption that there will be no conductive heat transfer once the material becomes totally damaged: 
+
+∂T ∂t = ω(ξ)α(T )T,ii . (13) 
+
+## 2.4 Coupling 
+
+The coupling between the three modules is illustrated in Fig. 2. The elasticity and phase field modules are coupled by letting the elastic free energy be a function of the damage phase field variable; i.e., 
+
+felas = felas (ξ). The assumption that there is no heat transfer through totally damaged material allows the coupling between heat conduction and the damage phase field. With material properties as a function of temperature, the elastic strain energy term, after strain spectral decomposition, becomes 
+
+ψ±(T ) = 12 λ0(T )⟨P εi⟩2 
+
+> ±
+
++ μ0(T )( P⟨εi⟩±)2, (14) where εi are eigenstrains, λ0 and μ0 are Lam´ e parameters given by 
+
+λ0(T ) = ν(T )E(T )(1 + ν(T ))(1 − 2ν(T )) , μ0(T ) = E(T )2(1 + ν(T )) , (15) and the operator ⟨∗⟩ ± = 12 (∗ ± | ∗ | ). This provides the complete links among the three modules. The model is considered weakly two-way coupled, because temperature gradient is assumed to be negligible as heat conduction speed is much slower compared to the propagation speed of cracks. 
+
+## 2.5 Crack Length Scale 
+
+The regularization crack length scale is vital in describing the free energy term contributed by the damage phase field variable as mentioned in Eq. 12. To avoid complex crack surface tracking, a diffusive crack modeling approach is adopted. Typical diffusive crack approximation takes on the form of a standard exponential function as shown in Fig. 3. To determine an appropriate crack length scale the exponential 6function used to approximate the geometry of the diffusive crack is 
+
+ξ0 = e−| x|/l 0 . (16) The crack length scale, l0, determines the width of the diffusive zone of cracks. Physically, the smaller the crack length scale, the more accurate the results. However, numerical simulations have shown that too small of a crack length scale can result in a non-physical overshoot in material strength [27]. Therefore, the choice of l0 significantly impacts the accuracy of the fracture model. Equation 16 smears the sharp crack interface into a diffusive zone over the length of l0 in both directions from the axial origin. The crack length scale is material dependent, as different materials have different fracture behaviors. A greater 
+
+l0 implies a larger diffusive zone. Cracks of brittle materials are usually smaller than those of ductile materials. The crack length scale significantly affects material strength in the simulation environment. Based on the form of the crack surface geometry modeling, the exponential equation shown in Eq. 16 is a solution to the ordinary differential equation 
+
+−ξ′′ + 1
+
+l20
+
+ξ = 0 , (17) with boundary conditions 
+
+ξ(0) = 1 , ξ(±∞ ) = 0 . (18) Integrating this ODE the regularized functional Ad is defined as the weak form of Eq. 17: 
+
+Ad(ξ) ≡
+
+Z ∞−∞ 
+
+ ξ2
+
+2l0
+
++ l0|∇ ξ|2
+
+2
+
+
+
+dV (19) This aligns with a widely adopted approach which assumes that the volumetric free energy due to damage is a quadratic expression [11, 28]. Based on the Griffith’s theory of fracture, the energy required to create a new crack is equivalent to the amount of strain energy released. The critical energy release rate gc is defined to normalize such energy over the newly created surface area. Multiplying the functional with gc
+
+results in Γ = gcAd =
+
+Z ∞−∞ 
+
+ gcξ2
+
+2l0
+
++ gcl0|∇ ξ|2
+
+2
+
+
+
+dV, (20) where Γ represents both the volumetric and surface energy contributions of damaged materials, matching Eqs. 9, 12. 
+
+2.5.1 Analytical Solution 
+
+Any deformation tensor can be decomposed into symmetric and anti-symmetric parts, which are equiva-lent to tensile/compressive and shear contributions. Therefore, analytical solutions to these problems can be derived separately. These analytical solutions provide insight into how to determine the crack length scale used in a specific problem. Many have attempted to derive and propose the analytical solution to 7the crack length scale [23, 26, 27, 29]. The solution for two cases, simple tension and simple shear, are summarized here. 
+
+2.5.2 Simple Tension 
+
+Consider a homogeneous 1D weightless bar whose domain is Ω, subjected to deformation and a phase damage parameter (cf. Fig. 4): 
+
+σxx,x = 0 in Ω , (21) (1 − ξ)ψelas − gc
+
+2l0
+
+ξ + 2 gcl0ξ,ii = 0 in Ω , (22) with boundary conditions 
+
+ux(x = 0) = 0 , ux(x = L) = ¯ u, dξ dx |x=0 = 0 , dξ dx |x=L = 0 .
+
+Given that only tensile strain is present, the uncoupled elastic strain energy, ψelas , becomes 
+
+ψelas = 12 Eε 2. (23) For simplicity, the degradation function shown in Eq. 8 can be reduced by eliminating the small constant 
+
+β, i.e., 
+
+ω(ξ) = (1 − ξ)2, (24) as β does not carry any significance to the analytical derivations. Multiplying Eq. 24 by Eq. 23, the same form of elastic free energy as in Eq. 4 is recovered. The strain of the bar is then 
+
+ε = ¯uL . (25) Substituting Eq. 25 into Eq. 23 the elastic strain energy becomes 
+
+ψelas = 12 Eε 2 = 12
+
+E ¯u2
+
+L2 , (26) while the Cauchy stress becomes 
+
+σxx = ω(ξ)Eε = (1 − ξ)2 E ¯uL . (27) The damage parameter can be obtained through Eq. 22 along with the boundary conditions, resulting in 
+
+ξ = 2( 12 E)l0 ¯u2
+
+2( 12 E)l0 ¯u2 + gcL2 . (28) 8Now substituting Eq. 28 into Eq. 27, the stress is obtained as a function of ¯ u only: 
+
+σxx (¯ u) = g2 
+
+> c
+
+L3E ¯u
+
+(2 El 0 ¯u2 + gcL2)2 . (29) This reveals the critical stress σc by letting ∂σ xx   
+
+> ∂¯u
+
+= 0. The corresponding displacement ¯ u∗ is then ¯u∗ =
+
+s
+
+gcL2
+
+3El 0
+
+. (30) Substituting Eq. 30 into Eq. 29, critical stress becomes 
+
+σc = 916 
+
+r Eg c
+
+3l0
+
+; (31) Rearranging yields expressions for the regularized crack length and the critical energy release rate: 
+
+l0 = 27 256 
+
+gcEσ2
+
+> c
+
+= 27 256 
+
+K2
+
+> Ic
+
+σ2
+
+> c
+
+, (32) 
+
+gc = K2
+
+> Ic
+
+E , (33) where KIC is the critical stress intensity factor under mode I fracture. Experimental data for E, σc, and 
+
+KIC are well-documented for many materials, from which l0 and gc are straightforwardly derived through Eq. 32 and Eq. 33 and entered into the fracture free energy term shown in Eq. 12. 
+
+2.5.3 Simple Shear 
+
+Besides simple tension, shear fracture constitutes another important part of fracture phenomena. Con-sider a square subjected to a horizontal displacement, ¯ u, at the top surface. The domain of interest is Ω. The dimension of the square is set to be L ×L (cf. Fig. 5). The strain energy due to this shear deformation can be represented as 
+
+ψelas = σij εEij = 12 με Eij εEij . (34) Let the ratio ¯uL be ϕ; then, the elastic strain energy can be expressed as 12 μϕ 2. Since isotropy is assumed for the material, the shear direction is irrelevant to damage. As before the governing equations involve deformation and a phase damage parameter: 
+
+σij,j = 0 in Ω , (35) (1 − ξ)ψelas − gc
+
+2l0
+
+ξ + 2 gcl0ξ,ii = 0 in Ω , (36) with boundary conditions 
+
+ux(x = 0) = 0 , ux(x = L) = ¯ u, 
+
+9dξ dx |x=0 = 0 , dξ dx |x=L = 0 .
+
+To solve Eq. 36, a linear crack is assumed such that ξ,ii = 0, yielding (1 − ξ)ψelas − gc
+
+2l0
+
+ξ = 0 , (37) 
+
+ξ = l0μκ 2
+
+l0μκ 2 + gc
+
+= 2l0( 12 μ)¯ u2
+
+2l0( 12 μ)¯ u2 + gcL2 . (38) The Cauchy stress is then 
+
+σxy = ω(ξ)Gε xy = (1 − ξ)2 G¯uL . (39) Eq. 39 is similar in form to that of Eq. 27. Substituting Eq. 38 into Eq. 39, the stress is obtained as a function of ¯ u only: 
+
+σxy (¯ u) = g2 
+
+> c
+
+L3( 12 μ)¯ u
+
+(2( 12 μ)l0 ¯u2 + gcL2)2 (40) This allows us to find the critical stress by setting ∂σ 12   
+
+> ∂¯u
+
+= 0. The corresponding displacement ¯ u∗ is ¯u∗ =
+
+s
+
+gcL2
+
+3( 12 μ)l0
+
+. (41) Substituting Eq. 41 into Eq. 40, critical shear stress is then 
+
+σc,shear = 916 
+
+s
+
+( 12 μ)gc
+
+3l0
+
+, (42) yielding the properties of interest: 
+
+l0 = 27 256 
+
+gc(μ)
+
+σ2
+
+> c,shear
+
+= 27 256 
+
+K2
+
+> IIc
+
+σ2
+
+> c,shear
+
+, (43) 
+
+gc = K2
+
+> IIc
+
+μ , (44) where KIIC is the fracture toughness under mode II, which is fracture under pure shear. Similar to the results shown for simple tension case, if given μ, σc, and KIIc , the values for l0 and gc are derived and entered into the fracture free energy term shown in Eq. 12. 
+
+2.5.4 Remark 
+
+The analytical crack length scales are of very similar forms in both simple shear and simple tension. However, the fracture toughness data under pure shear are not as readily available as those in pure tension. It may be assumed that the critical energy release rate is identical for both mode I and mode II fractures. This allows for the estimation of KII C by setting Eq. 33 equal to Eq. 44. 10 3 Validation 
+
+The coupled framework is implemented in MOOSE, an open source finite element framework developed by Idaho National Lab [19]. The validation case for the proposed framework is flexural strength of α-SiC. The temperature dependent material properties of α-SiC are obtained from Munro [30], which are also shown in Table 1, where uk is 12% for T ≤400 ◦C and 8% for T >400 ◦C, and ρ0 = 3 .16 ± 0.03 g/cm 3 when 
+
+T0 = 0 ◦C The mode I fracture toughness data are obtained from the straight notch bending test results reported in Ghosh et al [31]. As ceramics are generally too brittle to perform conventional tensile testing, bending tests are used to obtain a quantitative understanding of the critical strength properties. Flexural strength, by definition, is the maximum stress that occurs at the bottom surface of a specimen during bending tests. The bottom surface is where cracks first form due to tensile stress in these bending tests. Since the tensile strength of brittle ceramics, like α-SiC, are much less than the compressive strength of 
+
+α-SiC, the bottom surface will reach fracture faster than the top surface. 
+
+## 3.1 Four Point Bending Test 
+
+The numerical experiment is done through four point bending. The geometry is scaled down from the standard specified by ASTM C1161-18 [32]. The mesh size is constrained in order to capture the crack geometry defined by the crack length scale. The general guideline is h/l 0 > 1/10, i.e. it requires at least 10 elements to capture the crack geometry. Munro has collected four sets of bending tests on α-SiC with various configurations [30]. The general interpolation function of the flexural strength of α-SiC is given as FS (MPa) = 359 + 87 .61 + 208600 e−0.012 T ± 15% (45) Numerical simulations are conducted at 9 different temperatures, ranging from 20 to 1400 ◦C in ambient air which is consistent with the experimental setup [30]. The specimens are assumed to be held at the corresponding temperatures. As the material properties used in the present model are measured in experiments, the uncertainty in the experimental properties will affect the simulation results. To explore the influence of this uncertainty the two extremes of the Young’s modulus and Poisson’s ratio, as shown in Table 1, are used to create four sets of inputs. These inputs were then sent to the model to provide an estimate of the uncertainty of the output. The results are shown in Fig. 6. It shows that the region marked by light purple are still within the 15% uncertainty bandwidth measured from experiments. There appears to be an increase and then decrease in predicted flexural strength between 400-1200 ◦C, which is similar to that of the experimentally measured critical energy release rate shown in Fig. 8. It should be noted that these experimentally obtained critical energy release rates are used in the phase field model for damage. However, uncertainties in other material properties that goes into the simulations also contribute to such changes. For example, changes in flexural strength over this temperature range are comparable 11 to the changes by varying Young’s modulus and Poisson’s ratio. From the simulation results, one can see that the the flexural strengths are well aligned with the expected experimental data outside the transition region, 800 ◦C to 1200 ◦C . This behavior of increasing flexural strength as temperature increases in the transition region is because oxidization on the surface of the specimen results in short-term crack healing. This chemical phenomena, however, is not incorporated in the current framework. Once the temperature passes the transition region, an oxidization layer is formed on the surface of the material. When the newly formed oxidation layer is taken into account as the bulk property such as Young’s modulus and Poisson’s ratio that are also measured at elevated temperatures, the flexural strength is once again well aligned with the expected curve. 
+
+## 3.2 Fracture Toughness 
+
+In linear elastic fracture mechanics (LEFM), one of the classic examples is an infinite plate under uniform stress. Fracture Toughness, K, is defined as the stress intensity factor when the material’s crack starts to propagate. Sneddon’s solution provides analytically-derived displacements and stress responses for any point in the domain, for an infinite plate under uniform stress [33, 34]. If one applies the Sneddon’s solution of displacement responses, shown in Eqs. 46 and 47 as the boundary condition to a finite domain with a centered crack, it essentially recreates the same problem as an infinite plate. Fig. 7 shows the problem setup of Sneddon’s solution. 4μu x = K1
+
+√arr 2
+
+
+
+(ζ − 1) rr 2 cos θ + θ2
+
+2 − 2r21 sin θ1 sin 
+
+
+
+θ1 − θ + θ2
+
+2
+
+ 
+
++ K2
+
+√arr 2
+
+
+
+(ζ + 1) rr 2 sin θ + θ2
+
+2 + 2 r21 sin θ1 cos 
+
+
+
+θ1 − θ + θ2
+
+2
+
+ 
+
+− 0.5r1 cos θ1(σ − χ)( ζ + 1) (46) 4μu y = K1
+
+√arr 2
+
+
+
+(ζ + 1) rr 2 sin θ + θ2
+
+2 − 2r21 sin θ1 cos 
+
+
+
+θ1 − θ + θ2
+
+2
+
+ 
+
++ K2
+
+√arr 2
+
+
+
+(1 − ζ)rr 2 cos θ + θ2
+
+2 − 2r21 sin θ1 sin 
+
+
+
+θ1 − θ + θ2
+
+2
+
+ 
+
+− 0.5r1 sin θ1(σ − χ)( ζ − 3) (47) where 
+
+K1 = σ√a K2 = τ √a (48) 
+
+ζ =
+
+
+
+3 − 4ν for plane strain,  
+
+> 3−ν
+> 1+ ν
+
+for plane stress, (49) and a is the half crack length. By specifying the values of the far-field stresses, σ, τ, χ , one can make the problem to mode I, II or mixed mode. 12 3.2.1 Mode I 
+
+Mode I fracture refers to the case when the material is under simple tension. The simulations utilize a square domain and Sneddon’s displacement response under far field tensile stress, σ, as boundary conditions. The mesh size is uniform 120 ×120 cells with dimensions of 0.3 ×0.3 mm. The half center crack length, a, is 25 μm. Fig. 8 shows that the general trend of the fracture toughness obtained from simulations are well aligned with the experimental data, with the the results from our simulations being on the lower end of the confidence interval. It is worth noting that the experimental data of mode I fracture toughness are obtained from single edge notched bending (SENB) specimens with straight notches and that tests with different size and shapes of the notches are known to lead to different results. The numerical results, although at most 10.9% lower than the experimental data, are still within the acceptable range. 
+
+3.2.2 Mode II 
+
+Mode II fracture refers to the case when the material is under simple shear. The simulations utilize a square domain and Sneddon’s displacement response under far field shear stress, τ , as boundary condi-tions. It can be seen that the model II fracture toughness decreases slightly as temperature increases, which also shows that fracture toughness for mode II is not very sensitive to temperature. This is consis-tent with literature which shows that the fracture toughness of α-SiC under mode I fracture is temperature independent, while data for mode II fracture toughness of α-SiC is relatively independent [31]. There are not sufficient data for mode II fracture toughness of α-SiC over the proposed wide range of temperatures from 20 to 1400 ◦C. Since the predicted mode I fracture toughness data have been validated, one can infer that the predicted mode II fracture toughness data that follows the same set of definitions are reliable. 
+
+## 3.3 Modified G-Criterion 
+
+In general, materials fracture under both shear and tensile stress. Experiments have suggested the following modified G-criterion [35]: 
+
+ KI
+
+KIC
+
+2
+
++
+
+ KII 
+
+KII C
+
+2
+
+= 1 (50) where 
+
+KIC = σC
+
+√πa KIIC = τC
+
+√πa (51) and σC , τ C are the corresponding critical far field stresses when a crack first appears. A total of eight temperatures ranging from 0 ◦C to 1400 ◦C are considered, with numerical results for three of these temperatures provided in Table 2. In this table case 1 is mode I, case 2 is mode II, and cases 3-5 are mixed modes. Fig. 10 shows that the fracture toughness under mixed mode fracture is generally on the lower side, consistent with the findings for Mode I fracture toughness. As the simulation results 13 of mode II fracture toughness are more consistent that those of mode I fracture toughness, the profile of modified G-criterion is mainly affected by mode I fracture fracture toughness. This provides a more realistic guideline for engineering designs. Finally, Fig. 11 shows that the proposed framework is capable of modeling the fracture phenomena under various stress modes and temperatures. Similar to Fig. 9, the mixed mode fractures also show relative temperature independence. 
+
+# 4 Scalability 
+
+Work in MOOSE is undergirded by a library of numerical solvers offered by PETSc, a widely used parallel high performance computing package [36, 37, 38]. As outlined by Chang et al [39], the following scalability tests are motivated by answering the question of which iterative methods offered by PETSc are best for solving the present set of partial differential equations across various domain sizes, degrees of freedom, and computer architectures. 
+
+## 4.1 Solver Choice 
+
+Information on scalability of a solver-preconditioner combination, along with a procured set of associated parameters, is only relevant after it is clear that such a solver converges to a sufficiently accurate result. Therefore, the prerequisite criteria to scalability testing are stability, i.e. convergence, and reliability, i.e. accuracy with respect to a direct solve. The mesh used to test these is a coarse two-dimensional square with a free surface established at the middle of the left edge as a demonstration of mode I fracture. The length of each side of a cell relative to the physical domain size is ∆ x = ∆ y = 10 −2. The resolution of the mesh is low to make possible a direct calculation via the Newton method, the result with which error analysis can be performed in comparison to a particular iterative solver-preconditioner combina-tion. Solver options considered are the Jacobian-free Newton-Krylov method (JFNK) and preconditioned JFNK (PJFNK); preconditioning options considered are LU decomposition (LU), the Additive Schwarz method (ASM), and an algebraic multigrid method (BoomerAMG). PETSc offers a suite of customiza-tions associated with the BoomerAMG preconditioner, such as matrix entry truncation and the intensity of aggressive coarsening. Various combinations of these sub-parameters are also considered. 
+
+4.1.1 Convergence 
+
+The assembler output file generated by MOOSE returns in a message whether or not the residual has fallen below the preset nonlinear relative tolerance after a number of time steps less than what captures the onset of crack propagation. Such a time window is considered as opposed to that of crack propagation itself because the probability of numerical divergence following material failure is much higher and would not be indicative of solver reliability. 14 4.1.2 Accuracy 
+
+For a particular test, after testing for convergence, the average L2 norm of strain components εxx , ε yy 
+
+in the mesh is subject to the Newton method among n cells according to error per cell = 
+
+P
+
+> n
+
+q
+
+δε 2 
+
+> xx
+
++ δε 2
+
+> yy
+
+n . (52) The average L2 norm is used as a metric for computational accuracy of the iterative solver-preconditioner combination of that test. 
+
+4.1.3 Result 
+
+Following the prescribed testing, a PJFNK-BoomerAMG variant with a low setting on aggressive coars-ening emerged as the optimal combination for the current coupled scheme on the basis of cell accuracy, with a difference of 1 .06 × 10 −3 per cell. This difference in cell accuracy is comparable to the leading term of the finite difference approximation of the displacement derivative O(∆ x2) ∼ 10 −4 = ∆ x2.
+
+## 4.2 Scaling methods 
+
+The PJFNK-BoomerAMG combination is chosen for scalability testing, a procedure divided into strong scaling, weak scaling, and static scaling. 
+
+4.2.1 Strong scaling 
+
+Several simulations with different numbers of cores attributed to a fixed domain are measured on wall clock time in strong scaling. By finding the job time of N cores, tN , the parallel proportion of the input file p ∈ [0 , 1] is recovered according to a rearranged Amdahl’s Law, 
+
+p = 1 − tN /t 1
+
+1 − 1/N = 1 − 1/S (N )1 − 1/N , (53) where a higher p indicates a more scalable algorithm and S(N ) = tN /t 1 indicates the speedup of using 
+
+N cores compared to the 1-core case. Fig. 12 is a visualization of the mesh used, with differences in color representing discrete sub-domains, and Fig. 13 maps algorithmic speedup as a function of the number of cores utilized. From this we obtain p = 0 .862, which represents the average of the data set. 
+
+4.2.2 Weak scaling 
+
+In weak scaling, wall clock time is measured again, but now the number of degrees of freedom per core is fixed while the size of the domain is increased. In test i, for an n-dimensional mesh with square faces (n ≥ 2), with C cells per interval, P characteristic PDEs, and domain scale D, degrees of freedom is given by DoF i = P [CD 1/n i + 1] n.
+
+15 In the current scheme we take P = 5 , n = 2 , C = 200, and D = {42, 82, 16 2}. Weak scaling is predicated on the relationship DoF i/N i = constant; (54) therefore, DoF i/N i = DoF 1/N 1 = 5[200(16) 1/2 + 1] 2
+
+1 = 3 , 208 , 005 (55) provided the control N1 = 1. Locating the appropriate N for a chosen D requires 
+
+Ni = DoF i
+
+DoF 1/N 1
+
+= P [CD 1/n i + 1] n
+
+P [CD 1/n  
+
+> 1
+
++ 1] n/1 ≈ P [CD 1/n i ]n
+
+P [CD 1/n  
+
+> 1
+
+]n = Di
+
+D1
+
+,
+
+giving simply 
+
+Ni ≈ Di
+
+D1
+
+. (56) Parallelizability p is again recovered, now in weak scaling according to a rearranged Gustafson’s Law, 
+
+p = Ss(D) − 1
+
+N (D) − 1 . (57) Fig. 14 is a visualization of the meshes used, and Fig. 15 maps scaled algorithmic speedup as a function of the number of cores utilized. The procedure yields p = 0 .463, meaning that the case is moderately parallelizable subject to an increased domain size, although less so relative to the strong scaling metric. 
+
+4.2.3 Static scaling 
+
+Static scaling subsumes features of both strong and weak scaling, while also offering an optimal scaling region in units of degrees of freedom per core [39]. In strong scaling, complex computer architectures managing a relatively small problem size experience latency rooted in communication inefficiency. This is shown in the right-most experimental data points on Fig. 13. Also, in weak scaling, given that the number of degrees of freedom exponentially increases between tests, failure of the experimental data points in Fig. 15 to maintain a linear shape can be attributed to memory overloading effects. Static scaling experimentation across tests only changes the number of cells per interval, keeping constant the domain size (4 2) and the number of CPUs (2 nodes × 32 cores per node = 64 cores = N ). DoF per job time is plotted against the same job time in Fig. 17 to reveal algorithmic speed, under the assumption that each degree of freedom carries equal magnitude. The PJFNK solver continually used in the present scalability testing is compared to a direct Newton method to demonstrate the utility of an iterative method for large problem sizes. Ten tests are repeated for each case to ensure procedural reproducibility. Fig. 16 illustrates the various mesh discretizations. As shown by Fig. 17, the combined PJFNK-BoomerAMG method is more scalable than the Newton method by all definitions. Therefore, this solver is chosen for the numerical experiments shown in Sec. 3. 16 Whereas the optimal scaling region for the Newton method is narrow, that of PJFNK-BoomerAMG spans the rest of the domain after C ≥ 100 which corresponds to DoF /N ≥ 12 , 563. Above this lower bound, communication costs are modest. At the upper bound, memory overloading effects are theoretically demonstrated, but no such bound was located in the set of problem sizes investigated, indicating that even for C = 375 cells-per-interval with a DoF per node of 176,015, which corresponds to a total number of DoF of 11,265,005, memory effects are negligible. An optimal scaling region of at least 12 , 563 ≤ DoF /N ≤
+
+176 , 015 implies the capability of diverse problem sizes to be solved with high parallel efficiency. 
+
+# 5 Conclusion 
+
+A framework that models ceramic in a wide range of temperatures that couples elasticity, fracture phase field, and heat transfer has been developed. Four-point bending tests showed agreement of the flexural strengths predicted by the model’s confidence intervals. Mode I fracture tests of infinite plate showed that the fracture toughness of mode I were also well matched with the experiments. When combined with mode II fracture, the modified G-criterion provided a general guideline for application design under mixed mode fractures. The simulation results showed independence of temperatures for various modes of fractures across a wide temperature range. These validation tests proved the reliability for damage prediction, linking between performance and material properties as detailed in the three-link ICME model. The uncertainty quantification presented in this study, while still preliminary, revealed that flexural strength is not qualitatively influenced by the uncertainty of the material properties. At temperature ranges from 800-1200 ◦C, the oxidization effect that causes short-term crack healing has not yet considered in this framework. It is noteworthy that the fracture tests were based on an analytical infinite plate case. The geometric difference between the standard notch tests and theoretical infinite plate contribute much of the disparity. Scalability tests, following rigorous convergence and accuracy checks, were also conducted on the iterative solver-preconditioner combination functioning as the numerical solver. Results demonstrated that using the proper solver results is scalable, allowing for a wide range of problem sizes which can be solved. Future investigation will be focusing on adding the microstructure model, which will link manufacturing processes and material properties to the system performance, such that a complete ICME model for advanced ceramics can be used to facilitate a complete design to production cycle. 
+
+# 6 Acknowledgement 
+
+The authors wish to acknowledge their appreciation for their frequent constructive discussions with Dr. David Hicks, Dr. Amberlee Haselhuhn, and Bradley Friend from LIFT. Funding for this project was provided, in part, by LIFT, the Detroit-based national manufacturing innovation institute operated by ALMMII, the American Lightweight Materials Manufacturing Innovation Institute, a Michigan-based nonprofit, 501(c)3 as part of ONR Grant N00014-21-1-2660. 17 References 
+
+[1] Olson GB. Computational Design of Hierarchically Structured Materials. Science. 1997;277:1237-42. [2] Olson GB. Systems Design of Hierarchically structured materials: Advanced steels. Journal of Computer-Aided Materials Design. 1998;4:143-56. [3] Hirsch J. Through process modelling. In: Poole W, Wells M, Lloyd D, editors. Aluminium Alloys 2006, PTS 1 and 2: Research Through Innovation and Technology. vol. 519-521 of Materials Science Forum; 2006. p. 15-24. 10th International Conference on Aluminium Alloys (ICAA-10), Vancouver, CANADA, JUL 09-13, 2006. [4] Horstemeyer MF. Integrated Computational Materials Engineering (ICME) for Metals: Using Mul-tiscale Modeling to Invigorate Engineering Design with Science. John Wiley & Sons, Inc.; 2012. [5] Zhang Z, Li Y, Li H, Zhang D, Zhao Z, Du Q, et al. ICME guided design of heat-treatable Zn-modified Al–Mg alloys. Calphad. 2021;74:102298. [6] Wang WY, Tang B, Lin D, Zou C, Zhang Y, Shang S, et al. A brief review of data-driven ICME for intelligently discovering advanced structural metal materials: Insight into atomic and electronic building blocks. Journal of Materials Research. 2020;35:872-89. [7] Raturi A, Aditya J, Gurao NP, Biswas K. ICME approach to explore equiatomic and non-equiatomic single phase BCC refractory high entropy alloys. Journal of Alloys and Compounds. 2019;806:587-95. [8] Taylor CD, Lu P, Saal J, Frankel GS, Scully JR. Integrated computational materials engineering of corrosion resistant alloys. npj Materials Degradation. 2018;2:6. [9] Raether F, Seifert G. Integrated Computational Ceramics Engineering – an Approach to Radically Reduce Time-to-Market. Ceramic Forum International/Berichte der DKG (Deutsche Keramische Gesellschaft). 2018. [10] Shi J, Cook T, Matlik J. Integrated Computational Materials Engineering for Ceramic Matrix Composite Development. In: 53rd AIAA/ASME/ASCE/AHS/ASC Structures, Structural Dynamics and Materials Conference. American Institute of Aeronautics and Astronautics; 2012. p. 1409. [11] Miehe C, Welschinger F, Hofacker M. Thermodynamically consistent phase-field models of fracture: Variational principles and multi-field FE implementations. International Journal for Numerical Methods in Engineering. 2010;83:1273-311. [12] Clayton JD, Leavy RB, Knap J. Phase field modeling of heterogeneous microcrystalline ceramics. International Journal of Solids and Structures. 2019;166:183-96. [13] Wu J, Nguyen VP. A length scale insensitive phase-field damage model for brittle fracture. Journal of the Mechanics and Physics of Solids. 2018;119:20-42. 18 [14] Zuo C, Li Q, Wang Q, Li Y, Li L, Wei J, et al. Effect of material parameters on thermal shock crack of ceramics calculated by phase-field method. Journal of the American Ceramic Society. 2022;105(12):7649-57. Available from: https://onlinelibrary.wiley.com/doi/10.1111/jace. 18720 .[15] Chu D, Li X, Liu Z. Study the dynamic crack path in brittle material under thermal shock loading by phase field modeling. International Journal of Fracture. 2017;208(1):115-30. Available from: 
+
+http://link.springer.com/10.1007/s10704-017-0220-4 .[16] Ruan H, Rezaei S, Yang Y, Gross D, Xu BX. A thermo-mechanical phase-field fracture model: Appli-cation to hot cracking simulations in additive manufacturing. Journal of the Mechanics and Physics of Solids. 2023;172:105169. Available from: https://linkinghub.elsevier.com/retrieve/pii/ S0022509622003453 .[17] Lajtai EZ. A theoretical and experimental evaluation of the Griffith theory of brittle fracture. Tectonophysics. 1971;11:129-56. [18] Allen SM, Cahn JW. Ground state structures in ordered binary alloys with second neighbor inter-actions. Acta Metallurgica. 1972;20:423-33. [19] Permann CJ, Gaston DR, Andrˇ s D, Carlsen RW, Kong F, Lindsay AD, et al. MOOSE: Enabling massively parallel multiphysics simulation. SoftwareX. 2020;11:100430. [20] Ma G, Li S, Liu F, Zhang C, Jia Z, Yin X. A Review on Precision Polishing Technology of Single-Crystal SiC. Crystals. 2022;12:101. [21] Matsunami H. Fundamental research on semiconductor SiC and its applications to power electronics. Proceedings of the Japan Academy, Series B. 2020;96:235-54. [22] Al-Jothery HKM, Albarody TMB, Yusoff PSM, Abdullah MA, Hussein AR. A review of ultra-high temperature materials for thermal protection system. IOP Conference Series: Materials Science and Engineering. 2020;863:012003. [23] Kuhn C, Schl¨ uter A, M¨ uller R. On degradation functions in phase field fracture models. Computa-tional Materials Science. 2015;108:374-84. [24] Borden MJ, Verhoosel CV, Scott MA, Hughes TJR, Landis CM. A phase-field description of dynamic brittle fracture. Computer Methods in Applied Mechanics and Engineering. 2012;217-220:77-95. [25] Bourdin B, Francfort G, Marigo J. The Variational Approach to Fracture. Journal of Elasticity. 2008;91:5-148. [26] Miehe C, Sch¨ anzel L, Ulmer H. Phase field modeling of fracture in multi-physics problems. Part I. Balance of crack surface and failure criteria for brittle crack propagation in thermo-elastic solids. Computer Methods in Applied Mechanics and Engineering. 2015;294:449–485. 19 [27] Zhang X, Vignes C, Sloan SW, Sheng D. Numerical evaluation of the phase-field model for brittle fracture with emphasis on the length scale. Computational Mechanics. 2017;59:737-52. [28] Moln´ ar G, Doitrand A, Estevez R, Gravouil A. Toughness or strength? Regularization in phase-field fracture explained by the coupled criterion. Theoretical and Applied Fracture Mechanics. 2020;109:102736. [29] Tann´ e E, Li T, Bourdin B, Marigo J, Maurini C. Crack nucleation in variational phase-field models of brittle fracture. Journal of the Mechanics and Physics of Solids. 2018;110:80-99. [30] Munro RG. Material Properties of a Sintered α-SiC. Journal of Physical and Chemical Reference Data. 1997;26:1195-203. [31] Ghosh A, Jenkins MG, White KW, Kobayashi AS, Brad RC. Elevated-Temperature Fracture Re-sistance of a Sintered α-Silicon Carbide. Journal of the American Ceramic Society. 1989;72:242-7. [32] C28 Committee. Test Method for Flexural Strength of Advanced Ceramics at Ambient Tempera-ture. ASTM International; 2013. Available from: http://www.astm.org/cgi-bin/resolver.cgi? C1161-18 .[33] Sneddon IN, Lowengrub M. Crack Problems in the Classical Theory of Elasticity. John Wiley & Sons; 1969. [34] Chen J, Niemkiewicz SD. Multiscale modeling of fracture in Barium Titanate: fracture toughness estimation and modified G-Criterion: Multiscale modeling of fracture in Barium Titanate. ZAMM - Journal of Applied Mathematics and Mechanics / Zeitschrift f¨ ur Angewandte Mathematik und Mechanik. 2015;95:165-72. [35] Sun T, Jin Z. Fracture Mechanics. Academic Press; 2012. [36] Balay S, Abhyankar S, Adams MF, Benson S, Brown J, Brune P, et al.. PETSc Web page; 2022. 
+
+https://petsc.org/ . Available from: https://petsc.org/ .[37] Balay S, Abhyankar S, Adams MF, Benson S, Brown J, Brune P, et al. PETSc/TAO Users Manual. Argonne National Laboratory; 2022. ANL-21/39 - Revision 3.18. [38] Balay S, Gropp WD, McInnes LC, Smith BF. Efficient Management of Parallelism in Object Oriented Numerical Software Libraries. In: Modern Software Tools in Scientific Computing. Birkh¨ auser Press; 1997. p. 163-202. [39] Chang J, Fabien MS, Knepley MG, Mills RT. Comparative Study of Finite Element Methods Using the Time-Accuracy-Size (TAS) Spectrum Analysis. SIAM Journal on Scientific Computing. 2018;40:779-802. 20 7 Figure/table Caption List 
+
+Figure 1 : The linear hierarchical structural relation of material science and engineering. 
+
+Figure 2 : Schematic of elasticity, phase field, and heat conduction coupling. 
+
+Figure 3 : Sharp and diffusive crack topologies. (a) Sharp (b) Diffusive. 
+
+Figure 4 : Schematic of simple tension problem. 
+
+Figure 5 : Schematic of simple shear problem. 
+
+Figure 6 : Simulation and experimental flexural strength comparison of α-SiC at various temperatures [30]. Uncertainty bands are shown as well. 
+
+Figure 7 : Geometry and loading conditions of infinite plate with center crack. 
+
+Figure 8 : Mode I critical stress intensity factor at various temperatures are plotted along side with the experiment data. 
+
+Figure 9 : Mode I and mode II stress intensity factors versus temperature. 
+
+Figure 10 : Stress intensity factors of mixed mode fracture with the modified G-criterion model for (a) T = 20 ◦C; (b) T = 600 ◦C; (c) T = 1400 ◦C. 
+
+Figure 11 : Isosurfaces for modified G-criterion at temperatures from 20 ◦C to 1400 ◦C. 
+
+Figure 12 : 1200 2 element mesh used in strong scaling (300 cells per interval). 
+
+Figure 13 : Speedup S = t1/tN versus number of CPUs N. 
+
+Figure 14 : Mesh series used in weak scaling (200 cells per interval). (a): D = 4 2; (b): D = 8 2; (c): D = 16 2.
+
+Figure 15 : Scaled speedup versus number of CPUs. 
+
+Figure 16 : Mesh series used in static scaling (variable cells per interval). 
+
+Figure 17 : DoF/job time versus job time. 
+
+Table 1 : Experimental Material Properties as Functions of Temperature. 
+
+Table 2 : Fracture Toughness Under Mixed Modes at T = 20, 600, 1400 ◦C. 21 8 List of Tables 
+
+Table 1: Experimental Material Properties as Functions of Temperature. Function 
+
+E(GP a ) 415-0.023T ± 3% 
+
+ν 0.160 − 2.62 · 10 −6T ± 25% 
+
+Cp (Jkg −1K−1) 1110 + 0 .15 · T − 425 e−0.003 T ± 5% 
+
+k(W m −1K−1) 52000 e−1.24 ·10 −5
+
+(T + 219) −1 ± uk
+
+ρ(g/cm 3) ρ0[1 + (4 .22 + 8 .33 · 10 −4T − 3.51 e−0.00527 T ± 10%)( T − T0)] −3
+
+Table 2: Fracture Toughness Under Mixed Modes at T = 20, 600, 1400 ◦C. Temperature ( ◦C) Stress Intensity Factor (MPa ·m1/2 )Case 1 (τ = 0) Case 2 (σ = 0) Case 3 (σ = 2 τ )Case 4 (σ = τ )Case 5 (τ = 2 σ)20 KIC 3.4845 0 2.9583 2.2229 1.3820 KIIC 0 3.3912 1.4791 2.2229 2.7640 600 KIC 3.6233 0 2.9102 2.1865 1.3593 KIIC 0 3.3317 1.4551 2.1865 2.7186 1400 KIC 4.2452 0 2.8432 2.1357 1.3272 KIIC 0 3.2528 1.4216 2.1357 2.6544 22

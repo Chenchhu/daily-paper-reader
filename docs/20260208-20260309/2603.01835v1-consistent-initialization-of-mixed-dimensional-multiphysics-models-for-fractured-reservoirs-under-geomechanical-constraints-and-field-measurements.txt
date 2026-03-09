@@ -1,0 +1,281 @@
+Title: Consistent initialization of mixed-dimensional multiphysics models for fractured reservoirs under geomechanical constraints and field measurements
+
+URL Source: https://arxiv.org/pdf/2603.01835v1
+
+Published Time: Tue, 03 Mar 2026 04:09:15 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+# Consistent initialization of mixed-dimensional multiphysics models for fractured reservoirs under geomechanical constraints and field measurements 
+
+Jakub Wiktor Both ∗ Inga Berre †
+
+Abstract 
+
+Modeling coupled processes in fractured porous media – flow, deformation, fracture mechan-ics, and thermal/chemical effects – often relies on mixed dimensional multiphysics formulations. These systems are nonlinear and depend on physical states and state dependent material laws. While in-situ field measurements consistently describe the deformed equilibrium configuration, computational models typically start from an idealized reference configuration and require ex-plicit initialization of the in-situ stress state. This mismatch complicates initialization and linearization of constitutive laws. As a consequence, due to the two scale nature of fractured media, this can induce large deviations in fracture aperture directly impacting flow predictions. To address this, a discrete fracture model is introduced whose constitutive laws are expressed with respect to the unknown equilibrium state. This is paired with a fixed point initialization strategy that consistently reconstructs the reference configuration, consistent with both geome-chanical constraints and field measurements up to load-path dependence. This data-consistent strategy provides a foundation for extending models to more complex scenarios, including mul-tiphase and multicomponent flow in fractured reservoirs. 
+
+# 1 Introduction 
+
+Geophysical systems of societal and industrial relevance, such as geothermal reservoirs and fractured crystalline rock, exhibit a combination of nonlinear physics, heterogeneous material behavior, and intricate fracture networks. Their evolution is in general governed by tightly cou-pled thermo-hydro-mechanical-chemical (THMC) processes, while flow and transport pathways are strongly affected by the opening, closure, and shear behavior of individual fractures [16]. Accurate modeling of the associated non-smooth mechanics, especially during transitions be-tween open and contact states, pose therefore a substantial requirement for predictive modeling. Mixed-dimensional discrete-fracture–matrix (DFM) formulations have emerged as a consistent mathematical and computational framework to resolve these coupled phenomena while explicitly representing the geometry and physics of fracture networks [2, 14]. In subsurface applications, the fractured geometry and material properties obtained from field campaigns before injection and production operations correspond to an in-situ equilibrium configuration shaped by the interplay of lithostatic loading, hydrostatic pressure, and regionally varying tectonic stresses [8]. However, aiming at initializing with the equilibrium state, most numerical geomechanics workflows begin from a stress-free reference configuration and recover an equilibrated initial state through gravity or hydrostatic initialization [11]. While this approach 
+
+> ∗
+
+Center for Modeling of Coupled Subsurface Dynamics, Department of Mathematics, University of Bergen, All´ egaten 41, 5007 Bergen, Norway. Email: jakub.both@uib.no .
+
+> †
+
+Center for Modeling of Coupled Subsurface Dynamics, Department of Mathematics, University of Bergen, All´ egaten 41, 5007 Bergen, Norway. Email: inga.berre@uib.no .
+
+1
+
+> arXiv:2603.01835v1 [physics.geo-ph] 2 Mar 2026
+
+yields reasonable stress fields in the intact matrix, it can introduce significant inconsistencies in fractured domains: even small perturbations of fracture-normal stresses can substantially modify mechanical apertures and, consequently, fracture transmissivities, inconsistent with field measurements. As a result, initialization artifacts can overshadow genuine coupled THMC responses and severely distort flow predictions during forward simulations. At the same time, multi-disciplinary reservoir characterization provides increasingly rich constraints. Borehole images, acoustic logs, well tests, and hydraulic measurements offer infor-mation on fracture orientation, roughness, fill, stress state, and effective transmissivity, while laboratory experiments deliver porosity, permeability, elastic moduli, and density [12, 6]. This wealth of data enables reasonable estimates for reference values across various material pa-rameters and constitutive relations, when linearized/expanded around the equilibrium state. However, coupled THMC models commonly linearize constitutive laws around a stress-free con-figuration. This results in two important limitations: 1. Initialization-induced aperture biases: equilibration routines may produce unphysically large fracture openings and artificially enhanced flow pathways. 2. Limited integration of measurements: many parameters are challenging to incorporate, and particularly those associated with the in-situ state. In this work, we introduce a coupled poromechanics model for fractured porous media with frictional contact that incorporates reference states directly into all constitutive and kinematic definitions. This reference-state-aware formulation offers a systematic way to embed field mea-surements directly into both the choice of primary variables and the constitutive relations gov-erning coupled processes. Together with the modeling approach, we propose a simple yet robust iterative initialization procedure that reconstructs and treats the unknown in-situ equilibrium configuration as a part of the problem, consistent with geomechanical constraints loads and field measurements and taken as initial state for a forward model. With reference displacements holding the main complexity, this reduced perspective serves as boilerplate and can directly be applied to general THMC modeling. The remainder of the article is organized as follows. Section 2 presents the reference-state-aware mathematical model, including the choice of primary variables and constitutive structure. Sec-tion 3 introduces the initialization strategy that reconstructs the in-situ equilibrium configu-ration from measurements and external forcing. Section 4 provides numerical studies quanti-fying the impact of the modeling approach and equilibration strategy and discussion on path-dependence. Concluding remarks are given in Section 5. 
+
+# 2 Poromechanics modeling around reference states 
+
+Models for coupled multiphysics processes in geophysical fractured systems combine first-principles governing equations (mass conservation, momentum balance in both matrix and fractures) with constitutive relations that capture the physics of flow, deformation, and fracture behavior (e.g., Darcy flow, poroelasticity, friction, and aperture–permeability relations). In this section, we build on these fundamental ingredients and introduce a formulation in which all constitutive laws explicitly incorporate a reference configuration. Each physical quantity can, in principle, be defined relative to a reference configuration. The particular choice of primary variables and constitutive relations therefore utilizes a collection of reference states, which may be fully known, partially constrained by measurements, or en-tirely unknown. In this work, we assume for simplicity that the observed geophysical system is initially at rest, and we take this in-situ equilibrium to define the reference configuration for all constitutive laws. Accordingly, initial/reference values are denoted with a subscript 0. We employ the general modeling principle: Given the state s, each quantity of interest q has its reference value q0 at some reference state s0 and is otherwise expressed as functional expansion 
+
+2around that reference state 
+
+q(s) = Q0(s − s0) + q0 · Q1(s − s0), (1) 
+
+where Q0 and Q1 are potentially nonlinear and satisfy Q0(0) = 0 and Q1(0) = 1 , enabling additive and multiplicative expansions. 
+
+2.1 Modeling assumptions 
+
+The following assumptions will motivate the subsequent choices of constitutive laws: 1. The material is poroelastic and has a linear effective stress-strain relationship around the equilibrium state with the classical linear pore pressure following Biot’s linear theory of poroelasticity. 2. Fluid flow is governed by linear Darcy flow across matrix and fractures with cubic-law fracture permeability. 3. In-situ porosity and fracture aperture are known and are varying linearly around the equilibrium state. 4. At initial time, the material is in equilibrium with geomechanical constraints imposed by gravitational forces, hydrostatic and lithostatic pressures and tectonic stresses. 
+
+2.2 Mixed-dimensional geometry and computational domain 
+
+In this work, we consider a spatial configuration Ω ⊂ Rd, d ∈ { 2, 3}, (called matrix) as obtained from reservoir characterization. Fractures, denoted Γ, are represented as lower-dimensional ellipsoidal surfaces embedded within Ω; their possible intersections generate a hierarchy of progressively lower-dimensional subdomains. Focusing directly on the impact of the reference states, we omit technical details of domains and operators for the transfer in between matrix and fractures (typically realized through mortar methodology) and for simplicity identify all lower-dimensional objects with the fracture. Details on mixed-dimensional geometries can be found in [2, 14, 9]. Overall, based on the modeling assumption of linear elasticity, this collection of domains also defines the reference computational domain, on which all partial differential equations and associated variables are defined. 
+
+2.3 Primary variables and the special role of mechanical displacements 
+
+To describe poromechanics, we adopt as primary variables the mechanical displacement of the matrix, u, together with the fluid pressures in the matrix and fractures, p and pf . Mechanical deformation is governed by the total stress, σ, within the matrix complying with tractions, λ,acting on fracture interfaces. Fluid flow on the other hand is controlled by fluxes within the matrix, fractures, and across the matrix-fracture interfaces. Mechanical displacements play a special role because they are in general defined as be-ing relative to a specific spatial reference configuration. We distinguish three configurations, cf. Figure 1: the stress-free computational reference configuration (cf. 2.2), the equilibrium configu-ration complying with geomechanical constraints (hydrostatic/lithostatic pressures and tectonic horizontal stresses), and the current configuration, which evolves in time due to external forcing such as fluid injection. With variables associated to the computational reference configuration, we denote the displacement between the stress-free and equilibrium configuration by u0, and u
+
+is associated with the current configuration. Consequently, u − u0 denotes in-situ measurable displacement and is of main relevance in the field settings. Despite the linearizing assumptions of linear elasticity with infinitesimal strains, implying that the three configurations are practically identical, this distinction remains essential for consistently relating displacements to stresses, fracture aperture evolution, and the resulting modifications of effective hydraulic properties. The remaining variables have an absolute character. The introduction of a reference pressure 
+
+p0, reference stresses σ0 and λ0, and reference fluxes (zero assuming geomechanical constraints that do not induce background flow) – associated with the equilibrated reference state – is conceptually simpler and results in an additive split. The direct access to the deviation from the equilibrium state as p − p0 etc. will be central in consistent constitutive modeling and integration of field measurements. 
+
+3equilibrated con fi guration current con fi guration injection    
+
+> gravity gravity closed aperture u0(unknown background deformation) u("unphysical"/computational displacement)
+> u - u 0(in-situ relevant) hydrostatic, lithostatic, tectonic forces hydrostatic, lithostatic, tectonic forces fracture stimulation critically stressed fracture opening/ sliding fracture stress-free con fi guration unstressed fracture
+
+Figure 1: Illustration of spatial stress-free, equilibrium and dynamic configurations with associated notion of mechanical displacement in between these. 
+
+2.4 Constitutive modeling of poroelastic materials 
+
+We consider the reference state s0 = ( u0, p 0, σ0, λ0) and adapt central constitutive relations for the modeling of poromechanic in fractured media, complying with (1). This enables meeting the co-existing objectives of linearizing parameter laws around reference states and fitting laws to field measurements. 
+
+Constitutive modeling of fracture. The fracture aperture highlights the multi-scale char-acter of fractured media and has a central impact on hydraulic properties through modeling of fracture permeability [2]. We distinguish between mechanical and hydraulic apertures, resulting from the fact that despite in closed state, roughness of fractures retains residual volume for fluid to flow and thus contributes to hydraulic properties; the nuances between different notions of apertures is illustrated in Fig. 2. Overall, we consider: 
+
+• Mechanical aperture (non-negative by construction and complementarity): 
+
+amech = amech ,0 + [ u − u0]n, (2a) where [ ·]n denotes the jump across a fracture in normal direction. 
+
+• Fracture gap (aperture increase, e.g., due to deformation history in terms of shear dila-tion [17], extandable to first-order compressibility effects [1] and others): 
+
+g = g0 + tan( θdil ) · [u − u0]t (2b) where [ ·]t is the tangential jump, and g0 identifies an initial gap. 
+
+• Hydraulic aperture (effectively available pore space in fracture): 
+
+ahydr = ares + amech (2c) 
+
+• Fracture permeability (correlated with the aperture, here via a cubic-law [2]): 
+
+κf = a2hydr /12 . (2d) 
+
+Constitutive modeling of matrix properties. Hydraulic and mechanical properties in relation to associated reference states include: 
+
+4open fracture dilated fracture closed fracture a hydr = a res a hydr = a res + g ahydr = a res + a mech a mech = 0 a mech = g amech > 0 Figure 2: Fracture aperture modeling: Open, closed, and shear-dilated fracture modes. In closed state, positive residual aperture ares remains available. In open and dilated states, a non-negative mechanical aperture contributes, while in the latter, it is gov-erned through the fracture gap model, cf. (4g)–(4i). 
+
+• Total stress (based on classical effective stress theory [4]): 
+
+σ = σ0 + Cε(u − u0) − α(p − p0)I, (3a) where it is important to note that the reference stress σ0 is not known a priori, and is characterized by geomechanical constraints. Although allowing for distinct modeling, simplifying the presentation, we employ a linear stress-strain relation for the deformation of the stress-free to the equilibrium spatial configuration and set 
+
+σ0 = Cε(u0) − αp 0I. (3b) 
+
+• Porosity (employing standard linearized poroelasticity [4]): 
+
+ϕ = ϕ0 + α∇ · (u − u0) + 1
+
+M (p − p0), (3c) where ϕ0 typically would be heterogeneous and depending on the heterogeneous back-ground stress σ0 and background pressure p0, e.g., following again standard theory and based on some (stress-free) ex-situ measure porosity ϕref 
+
+ϕ0 = ϕref + α2
+
+Kdr 
+
+tr( σ0) + 1
+
+M p0 (3d) 
+
+• Fluid density (employing a simple thermodynamical law): 
+
+ρ = ρref · exp( c(p − pref )) , (3e) where pref is a reference pressure associated with the reference density ρref , typically ob-tained during ex-situ laboratory testing and independent of p0.
+
+2.5 Coupled model characterizing reference and current states 
+
+The coupled model can be split into the subproblems of fluid flow, mechanical deformation, and contact mechanics, while we implicitly will employ the reference-aware constitutive laws introduced in Section 2.4. Fluid flow is modeled using a DFM modeling principle combining conservation of mass, Darcy’s law, and direct impact of hydraulic properties such as matrix porosity, hydraulic aperture, and fracture permeability; for more details, we refer to [2, 14]. We employ the mixed-dimensional model 
+
+∂t
+
+ ρϕ  + ∇ · 
+
+
+
+− ρκ μf
+
+(∇p − ρg)
+
+
+
+= h on Ω (domain) (4a) 
+
+∂t
+
+ ρ a hydr 
+
+ + ∇ · 
+
+
+
+− ρ a hydr κf
+
+μf
+
+(∇pf − ρg)
+
+
+
+= hf + q⊥ on Γ (domain) (4b) 
+
+− ρκ μf
+
+(∇p − ρg)·n = q⊥ on Γ (boundary) (4c) 
+
+− 2κ⊥
+
+ahydr 
+
+(p − pf ) = q⊥ on Γ (interface) . (4d) 
+
+5The fracture Γ serves multiple purposes (indicated in parentheses), and thus q⊥ acts both as boundary condition and source. Here, we employ a constant matrix permeability κ, normal permeability κ⊥, fluid viscosity μf , external source terms h and hf .Mechanical deformation is governed by the balance of linear momentum combined with the Biot theory combined with contact mechanics introducing a force balance 
+
+−∇ · σ = ( ϕρ + (1 − ϕ)ρs)g on Ω (4e) 
+
+σn = λ − pf n on Γ , (4f) where ρs denotes the constant solid density. Contact mechanics modeling splits into normal compliance conditions (non-penetration wrt. the fracture gap) on Γ 
+
+amech − g ≥ 0 (4g) 
+
+λn ≤ 0 (4h) 
+
+λn(amech − g) = 0 . (4i) and friction modeling (here Coulomb’s law) in tangential direction (also on Γ) 
+
+|λt| + μλ n ≤ 0 (4j) [ ˙u]t = 0 if |λt| < −μλ n (4k) [ ˙u]t = ξλt ξ ≥ 0 otherwise. (4l) To ensure consistency with geomechanical constraint, the governing equations are paired with boundary conditions for specified ∂ΩD,M ∪ ∂ΩN,M = ∂ΩD,F ∪ ∂ΩN,F = ∂Ω with outer normal n
+
+and in-situ measured data σlith /tect and phydr 
+
+u = u0 on ∂ΩD,m (4m) 
+
+σn = σlith /tect n on ∂ΩN,m (4n) 
+
+p = phydr on ∂ΩD,f (4o) 
+
+∇p · n = 0 on ∂ΩN,f (4p) as well as initial conditions, assumed to be identical with the reference state, 
+
+u = u0 on Ω (4q) 
+
+p = p0 on Ω . (4r) 
+
+Remark 1 (Quasi-static evolution) . On geological time scales, reservoir deformation proceeds through a sequence of near-static states, with the background stress and deformation adjusting between these stages. This quasi-static character is represented in model (4), which is formulated relative to a fixed reference state in time. In view of load-path dependence, cf. Remark 2, the background displacement u0 is not uniquely determined from first principles, and the absence of detailed geological history prevent a unique identification. 
+
+Remark 2 (Non-unique characterization of the reference state) . The above model (4) implicitly assumes consistency between the reference state and the governing equations at initial time. Thus, at initial time the contact conditions reduce to 
+
+λ0,n ≤ 0 and |λ0,t | + μλ 0,n ≤ 0 on Γ .
+
+Since no restriction is imposed on the stationary displacement u0 itself, and a complete varia-tional structure is lacking, the resulting equilibrated background state is generally non-unique. This feature is consistent with both the auxiliary role played by the computational reference configuration, cf. Section 2.3, and the hysteretic behavior of systems governed by Coulomb friction resulting in non-uniqueness [10]. 
+
+6Remark 3 (Consistency of the modeling approach) . The governing equations in (4) are written in terms of absolute stresses, forces, and fluxes, and do not propagate reference states through the balance laws. Instead, the reference configuration enters only through the constitutive relations, which ensures that field data and initial conditions can be incorporated in a consistent manner. At the initial time, the system is at rest, implying σ = σ0, λ = λ0, and a stationary flow field with p0 equal to the hydrostatic pressure (up to discretization effects). Likewise, the background stress obtained from the poroelastic model (3b) reflects the boundary conditions applied to ∂Ω while respecting the fracture geometry. This construction guarantees that any available measurements of amech , 0 or ϕ0 can be imposed coherently, including in regions that are effectively traction–free. In particular, open fractures may be assigned any admissible reference aperture consistent with the contact conditions at initial time. 
+
+Remark 4 (Numerical discretization) . We consider a cell-centered finite volume method tailored towards mixed-dimensional DFM modeling conforming to fracture networks, combined with an implicit Euler discretization; the details can be reviewed in [14]. The numerical methodology is implemented in PorePy [9, 15]. At each discrete time t, the system to be solved reads 
+
+G(X; Xprev , X0, t ) = 0, (5) where X, Xprev , and X0 denote the current, previous and reference states. 
+
+# 3 Effective initialization strategies for obtaining reference states 
+
+To use the formalism introduced in Section 2, the (discretized) stationary state is consistently characterized by the condition 
+
+G(X0; X0, X0, t 0) = 0. (6) To effectively compute a consistent initial state X0, we employ a simple iterative initialization procedure that can be interpreted as a pseudo–time-stepping scheme consistent with (5) and reflecting the quasi-static character of geological systems, cf. Remark 1. A key advantage of this strategy is that it reuses the original model G without modification. The iteration merely updates X0 while retaining the same primary variables as in G. In this way, we avoid treating 
+
+X and X0 as simultaneous unknowns in (6), circumvent the inherent non-uniqueness of the reference state, cf. Remark 2, and ensuring a consistent initialization. 
+
+Algorithm 1 Iterative Solution for finding X0 
+
+> 1:
+
+Set X(0) 0 = 0 and select a tolerance ε 
+
+> 2:
+
+for n = 1 , 2, . . . do  
+
+> 3:
+
+Solve G(X(n)0 ; X(n−1) 0 , X(n−1) 0 ) = 0 for X(n)0 (e.g. using a semi-smooth Newton method)  
+
+> 4:
+
+if |X(n)0 − X(n−1) 0 | < ε then  
+
+> 5:
+
+break  
+
+> 6:
+
+end if  
+
+> 7:
+
+end for 
+
+Remark 5 (Improved initial guesses) . Instead of employing trivial initial guesses for X(0) 0 , cf. Alg. 1, improved guesses, e.g., analytical expressions of the hydrostatic pressure combined with the resulting displacement decoupled from the flow problem, are expected to improve the nu-merical efficiency. 
+
+Remark 6 (Alternative models) . To improve convergence during initialization, one may employ simplified variants of the model G, e.g., in cases when several constitutive relations reduce to 
+
+7hydrostatic, lithostatic, tectonic forces Figure 3: Left: Salt Cove, modified excerpt from [6], the box marks the considered ca. 150 × 150 m sized fracture network embedded in a vertical 2d domains and subject to geomechanical constraints (hydrostatic, lithostatic and horizontal stress for 3000 -4000 m) Right: Equilibrated state with highlighted boxes; consistent and inconsistent apertures (green top left), background deformation (blue, bottom left, and outside the boxes), fracture pressure (pink, top right), slip tendency (yellow, bottom right). constants and the equilibrium configuration is (quasi-)stationary (assuming no background flow and simple background deformation), which typically lowers the degree of nonlinearity. Likewise, ideas from homotopy continuation could be used to transition gradually between models, for instance through staged application of external loads or constitutive parameters. 
+
+# 4 Numerical consistency check in light of path-dependence 
+
+We consider a two-dimensional test case based on a fracture network extracted from an outcrop at Salt Cove near the Utah FORGE site [6]; see Fig. 3. The outcrop is interpreted as a vertical cross section embedded in a 1000 m × 1000 m domain. Lithostatic and hydrostatic pressures increasing with depth, corresponding to conditions of 3000–4000 m, are applied along the model boundaries. Horizontal stresses are prescribed as 25% of the lithostatic pressure. Material parameters follow [3]. Specifically, we employ amech ,0 = 0 m, θdil = 0 .1, α = 1, κ = 4 .35 e − 6 D, 
+
+κ⊥ = 4 .35 e − 6 D, ares = 1 e − 4 m, ϕ0 ≡ 1.36 e − 2, G = 16 .8e9 Pa and λ = 19 .73 e9 Pa (defining 
+
+C), ρs = 2653 kg/m 3, μ = 0 .6 and properties of water for the fluid. A pseudo time step of 1 year is employed. 
+
+Consistent modeling of the reference state. We begin by examining the consistent construction of the reference state using the initialization strategy described in Alg. 1. To en-hance convergence, we initialize the pressure field with an analytical hydrostatic profile and, in the first iteration, solve a mechanics-contact problem subjected to this fluid pressure but decou-pled from the flow equation; see Remark 5 and Remark 6. The final equilibrium configuration (after 5 iterations) is visualized in Fig. 3. 
+
+Path-dependence. To illustrate the influence of load-path dependence, and thereby the inherent difficulty, yet importance, of reconstructing geological history in the absence of direct historical data, we consider a simplified scenario based on Remark 6. Motivated by fracture healing and the associated increase in frictional strength over time [5], we prescribe a fric-tion coefficient that varies over the pseudo–time steps: the system is initialized with reduced friction values, which are then restored to the target friction after three iterations. The result-ing deformation field is shown in Fig. 4. While the final states are (almost) indistinguishable 
+
+8Figure 4: Path dependence of fractured systems under quasi-static friction. Final states after initialization with different initial friction values: 0.0 (left) , 0.5 (center) ,0.6 (right) . Consistency in terms of far-field deformation, near-field deformation and contact traction shows (significant) differences. in the far-field and remain consistent with geomechanical constraints, they exhibit significant differences in the near-fracture region. This behavior aligns with the inherent ambiguity in reconstructing the background deformation field, as discussed in Remark 2. 
+
+# 5 Concluding remarks 
+
+Field-scale simulations are essential for planning and monitoring geothermal developments, and the increasing availability of reservoir characterization data, ranging from material parameters to detailed geomechanical constraints, makes it crucial to incorporate these measurements con-sistently into numerical models. In this work, we proposed a systematic modeling framework based on constructing reference states through equilibrium configurations, combined with an effective equilibration strategy. A central feature of this approach is that the same computa-tional model used for forward simulations can also be used to generate the initial equilibrium state, thereby ensuring consistency with both field measurements and underlying geomechanical principles. While the focus here has been on poromechanics in fractured media, the main conceptual challenge lies in the treatment of displacement as a primary variable. As a result, extending the methodology to broader THMC models follows naturally from the same modeling princi-ples, although multiphase–multicomponent settings would require coupling to more elaborate thermodynamic descriptions. The use of reference states and the additive decomposition in (1) also raises the question of whether formulations based on deviations of primary variables can improve the nonlinear robustness of mixed-dimensional THMC models, where convergence dif-ficulties are well known [13]. Looking forward, several aspects deserve further investigation. A more complete characterization of complex reservoirs and improved data integration workflows will be essential for reducing uncertainty in estimates of near-fracture stress states, underscoring the value of borehole-scale stress analyses, stress observations [8], and hybrid/data-integrated modeling approaches [7]. Finally, the intrinsic ambiguity associated with the reference de-formation state, as highlighted in this work, calls for deeper analysis to determine its con-sequences for model calibration, uncertainty quantification, and risk evaluation. Overall, the proposed reference-state–based framework provides a consistent and extensible foundation for data-integrated simulations of fractured geothermal reservoirs, and it offers a promising pathway toward more robust and physically grounded THMC modeling strategies. 
+
+Acknowledgment. This project has received funding from the European Research Coun-cil (ERC) under the European Union’s Horizon 2020 research and innovation program (grant agreement No. 101002507). The authors thank Eirik Keilegavlen and Ivar Stefansson for their feedback. 
+
+9Data availability statement All data and materials to reproduce the numerical experi-ments are openly available at Zenodo https://doi.org/10.5281/zenodo.18833363 
+
+# References 
+
+[1] Nick Barton, S Bandis, and K Bakhtar. Strength, deformation and conductivity coupling of rock joints. In International journal of rock mechanics and mining sciences & geomechanics abstracts , volume 22, pages 121–140. Elsevier, 1985. [2] Inga Berre, Florian Doster, and Eirik Keilegavlen. Flow in fractured porous media: A review of conceptual models and discretization approaches. Transp. Porous Med. , 130(1):215–236, 2019. [3] Jakub W. Both, Marius Nevland, Ivar Stefansson, Yury Zabegaev, Eirik Keilegavlen, and Inga Berre. Fracture reactivation in geothermal reservoirs: Strategies for numerical model-ing of fracture contact mechanics in thermoporoelastic media. In Proceedings of the Euro-pean Geothermal Congress (EGC 2025) , Z¨ urich, Switzerland, 2026. European Geothermal Energy Council. [4] Olivier Coussy. Poromechanics . John Wiley & Sons, 2004. [5] James H Dieterich. Time-dependent friction in rocks. Journal of Geophysical Research ,77(20):3690–3697, 1972. [6] Aleta Finnila, Thomas Doe, Robert Podgorney, Branko Damjanac, and Pengju Xing. Re-visions to the discrete fracture network model at utah forge site. GRC Transactions , 45, 2021. [7] Emmanuel Gaucher, Martin Schoenball, Oliver Heidbach, Arno Zang, Peter A Fokker, Jan-Diederik van Wees, and Thomas Kohl. Induced seismicity in geothermal reservoirs: A review of forecasting approaches. Renewable and Sustainable Energy Reviews , 52:1473– 1490, 2015. [8] Oliver Heidbach, Mojtaba Rajabi, Xiaofeng Cui, Karl Fuchs, Birgit M¨ uller, John Reinecker, Karsten Reiter, Mark Tingay, Friedemann Wenzel, Furen Xie, et al. The world stress map database release 2016: Crustal stress pattern across scales. Tectonophysics , 744:484–498, 2018. [9] Eirik Keilegavlen, Runar Berge, Alessio Fumagalli, Michele Starnoni, Ivar Stefansson, Jhabriel Varela, and Inga Berre. Porepy: An open-source software for simulation of mul-tiphysics processes in fractured porous media. Computational Geosciences , 25(1):243–265, 2021. [10] A Klarbring. Examples of non-uniqueness and non-existence of solutions to quasistatic contact problems with friction. Ingenieur-Archiv , 60(8):529–541, 1990. [11] Lawrence Livermore National Laboratory (LLNL). Model Initialization: Hydrostatic and Mechanical Equilibrium — GEOS documentation , 2026. Accessed 24 Feb 2026. [12] Xiaodong Ma, Marian Hertrich, Florian Amann, Kai Br¨ oker, Nima Gholizadeh Doonechaly, Valentin Gischig, Rebecca Hochreutener, Philipp K¨ astli, Hannes Krietsch, Mich` ele Marti, et al. Multi-disciplinary characterizations of the bedretto lab–a unique underground geo-science research facility. Solid Earth Discussions , 2021:1–40, 2021. [13] Marius Nevland, Inga Berre, Jakub Wiktor Both, and Eirik Keilegavlen. Augmented lagrangian solvers for poroelasticity with fracture contact mechanics. arXiv preprint arXiv:2508.11508 , 2025. [14] Ivar Stefansson, Inga Berre, and Eirik Keilegavlen. A fully coupled numerical model of thermo-hydro-mechanical processes and fracture contact mechanics in porous media. Com-puter Methods in Applied Mechanics and Engineering , 386:114122, 2021. 
+
+10 [15] Ivar Stefansson, Jhabriel Varela, Eirik Keilegavlen, and Inga Berre. Flexible and rigorous numerical modelling of multiphysics processes in fractured porous media using porepy. 
+
+Results in Applied Mathematics , 21:100428, 2024. [16] Iman Vaezi, Keita Yoshioka, Silvia De Simone, Berta Mar´ ıa G´ omez-Castro, Adriana Paluszny, Mohammadreza Jalali, Inga Berre, Jonny Rutqvist, Ki-Bok Min, Qinghua Lei, et al. A review of thermo-hydro-mechanical modeling of coupled processes in fractured rock: From continuum to discontinuum perspective. Journal of Rock Mechanics and Geotechnical Engineering , 2025. [17] J Willis-Richards, K Watanabe, and H Takahashi. Progress toward a stochastic rock me-chanics model of engineered geothermal systems. Journal of geophysical research: solid earth , 101(B8):17481–17496, 1996. 
+
+11

@@ -1,0 +1,4269 @@
+Title: Bound-Preserving Adaptive Time-Stepping Method with Energy Stability for Simulating Compressible Gas Flow in Poroelastic Media
+
+URL Source: https://arxiv.org/pdf/2602.10803v2
+
+Published Time: Mon, 16 Feb 2026 01:38:30 GMT
+
+Number of Pages: 30
+
+Markdown Content:
+BOUND-PRESERVING ADAPTIVE TIME-STEPPING METHOD WITH ENERGY STABILITY FOR SIMULATING COMPRESSIBLE GAS FLOW IN POROELASTIC MEDIA 
+
+HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Abstract. In this paper, we present an efficient numerical method to address a thermodynami-cally consistent gas flow model in porous media involving compressible gas and deformable rock. The accurate modeling of gas flow in porous media often poses significant challenges due to their inherent nonlinearity, the coupling between gas and rock dynamics, and the need to preserve phys-ical principles such as mass conservation, energy dissipation and molar density boundedness. The system is further complicated by the need to balance computational efficiency with the accuracy and stability of the numerical scheme. To tackle these challenges, we adopt a stabilization ap-proach that is able to preserve the original energy dissipation while achieving linear energy-stable numerical schemes. We also prove the convergence of the adopted linear iterative method. At each time step, the stabilization parameter is adaptively updated using a simple and explicit for-mula to ensure compliance with the original energy dissipation law. The proposed method uses adaptive time stepping to improve computational efficiency while maintaining solution accuracy and boundedness. The adaptive time step size is calculated explicitly at each iteration, ensuring stability and allowing for efficient handling of highly dynamic scenarios. A mixed finite element method combined with an upwind scheme is employed as spatial discretization to ensure mass conservation and stability. Finally, we conduct a series of numerical experiments to validate the performance and robustness of the proposed numerical method. 
+
+1. Introduction 
+
+Porous media flow processes often involve complex physical phenomena. Traditional analytical methods are difficult to accurately describe these complex phenomena, but numerical simulations can flexibly handle these complex interactions by establishing accurate mathematical models. With the development of computing technology and advancement of experimental methods, researchers continue to propose more accurate models and efficient numerical methods to gradually solve com-plex flow problems. Continued research in this area will provide important support for energy development, environmental protection and industrial optimization [9, 15]. The phenomenon of gas flow inside porous media has become a popular research topic in the field of modeling and simu-lation [12, 16, 29]. In porous media, the classic flow model mainly describes the penetration and flow behavior of gas in porous media. These models are based on classical fluid mechanics theory and describe the flow characteristics of gases through a series of assumptions and simplifications. When simulating gas flow in porous media, energy stability and rock compressibility are two factors that must be considered. They respectively affect the thermodynamic behavior of gas flow and the structural response of porous media. Biot’s poroelasticity theory is used to explain the deformation of solid skeletons [2]. This theory first obtains the displacement of the solid by solving the solid mechanics equation, and then calculates the change in porosity based on these displacements. En-ergy stability requires the model to adhere to the law of energy dissipation, which is derived from the second law of thermodynamics. It states that, in an isothermal, closed system, total free energy decreases over time during spontaneous processes until the system reaches a stable or equilibrium state. In this paper, we consider the compressible single-phase gas flow model in porous media that satisfies the law of energy dissipation, as proposed in paper [8]. The model explains the effect of rock deformation on porosity by introducing the pore elasticity equation and the state equation for porosity variation. The Peng-Robinson equation of state (PR-EoS) [30] is used to characterize the 
+
+Key words and phrases. gas flow in porous media, poroelasticity, energy stability, conservation of mass, adaptive time step, stabilized scheme.  
+
+> 1
+> arXiv:2602.10803v2 [math.NA] 13 Feb 2026 2HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN
+
+relationship between molar density and pressure at a given temperature. Additionally, the chemical potential gradient is used to replace the pressure gradient as the main driving force. Finally, the free energy of the rock skeleton is introduced to account for the compressibility of the rock. Due to our physical model strictly adhering to the principles of thermodynamic consistency, the numerical methods used for its implementation must also satisfy this critical property, as viola-tions can lead to non-physical and unstable results [9, 20, 21, 26]. Established approaches range from the rigorously nonlinear convex splitting method [14, 31], which guarantees stability at the cost of solving nonlinear systems, to more efficient linear strategies. The latter category includes versatile stabilization methods [17, 27, 33] and structure-preserving exponential time-differencing (ETD) schemes [3, 4], which offer improved computational efficiency. Furthermore, the invariant energy quadratization (IEQ) [41, 42] and scalar auxiliary variable (SAV) [33, 34] approaches provide linear and easily implementable energy-stable schemes, though the discrete energy they produce typically differs from the original functional. Another notable method in this domain is the energy factorization (EF) approach [22, 23], which also operates within an efficient linear framework while successfully preserving the dissipation characteristics of the original energy. Building upon this foun-dation, our work adopts the novel stabilization method proposed by Kou et al. [24], which achieves a linear energy-stable scheme while exactly preserving the original energy functional. Beyond energy stability, the positivity and boundedness of molar density are fundamental and essential physical constraints in the numerical simulation of compressible gas flow in porous media. Designing numerical schemes that respect these bounds is crucial for obtaining physically reasonable solutions. The exploration of provably bound-preserving schemes has led to various strategies, in-cluding the Lagrange multiplier approach [6, 7], the variational approach [13, 40], the post-processing approach [43], the cut-off approach [39], and the nonlinear convex splitting approach [5, 10, 35]. Re-cent advances have further produced high-order methods that simultaneously ensure energy stability and solution boundedness. These include stabilized linear schemes requiring only linear [37, 32], auxiliary variable methods like SAV combined with cut-off operations [1, 34]. Building on the foun-dation of exponential integrators, a significant advancement was achieved by Ju et al. [18, 19], who ingeniously combined SAV with stabilized first-order ETD and ETDRK2 methods. This hybrid ap-proach successfully constructed schemes that simultaneously preserve the original energy-dissipation law and the maximum bound principle (MBP) for a class of Allen-Cahn type gradient flows. How-ever, in the specific context of gas flow in porous media, many overshoot/undershoot correction techniques may compromise numerical accuracy and critical properties like local mass conservation. To address this challenge, the present paper adopts an adaptive time-stepping strategy to maintain the molar density bounds. Specifically, we employ the novel stabilization method from [24] to sepa-rate the discretized chemical potential into explicit and semi-implicit stability terms. This allows us to explicitly handle the velocity in the mass conservation equation during linear iterations, thereby deriving an explicit formula to adaptively compute the time step at each iteration, ensuring both thermodynamic consistency and solution boundedness. Meanwhile, a mixed finite element method with upwind schemes is used for spatial discretization to guarantee mass conservation, while the momentum equation of poroelasticity is solved using a discontinuous Galerkin method to prevent the locking phenomenon [28]. The paper is organized as follows. In section 2, we introduce the formulation of gas flow model with rock compressibility. In section 3, we propose the fully discrete numerical scheme. In section 4, we analyze the selection criteria for the time-adaptive algorithm. In section 5, the convergence of the iterative method and the energy stability are rigorously proven. In section 6, numerical experiments are presented to validate the proposed methods. 2. Mathematical model 
+
+In this section, we present the mathematical model for a thermodynamically consistent gas flow system in porous media, which accounts for the interaction between compressible gas and deformable rock. The model is designed to ensure thermodynamic consistency, capturing the essential physical processes such as gas flow, rock deformation, and their mutual coupling. 3
+
+The formulation of the gas flow model with compressible rock in porous media is presented as follows (cf. [8]) 
+
+∇ · σ(us, p ) = 0 , in Ω t =: Ω × (0 , t ),(2.1a) 
+
+∂(ϕc )
+
+∂t + ∇ · (uf c) = 0 , in Ω t,(2.1b) 
+
+uf = −λ(ϕ)c∇μ, in Ω t,(2.1c) 
+
+p = cμ (c) − f (c), in Ω t,(2.1d) 
+
+∂ϕ ∂t = 1
+
+N∂p ∂t + α∇ · vs, in Ω t.(2.1e) Here, the mobility λ(ϕ) is defined as 
+
+λ(ϕ) = κ(ϕ)
+
+ν ,
+
+where ν is the viscosity of the gas, ϕ is the porosity and κ(ϕ) represents the permeability by the Kozeny-Carman model (cf. [9]) as 
+
+κ(ϕ) = κ0
+
+ ϕϕr
+
+3  1 − ϕr
+
+1 − ϕ
+
+2
+
+.
+
+Here, κ0 is the initial intrinsic permeability, ϕr is the porosity at the reference pressure. The stress tensor σ(us, p ) is given by 
+
+σ(us, p ) = σe − αp I, σe = 2 ηε(us) + γ div( us)I,
+
+where ε(us) = 12
+
+ ∇us + ( ∇us)T  is the strain tensor, σe is the effective stress tensor, I is the unit tensor, us is the displacement of the solid phase, vs = ∂us 
+
+> ∂t
+
+is the velocity of the solid phase, η and 
+
+γ are the Lam´ e parameters, α is the Biot’s coefficient, N = (α−ϕ) 
+
+> Ks
+
+is the Biot’s modulus, Ks is the bulk modulus of the solid grains, c is the molar density of the gas. The pressure p = p(c) is given by 
+
+p = cRT 
+
+1 − βc − bc 2
+
+1 + 2 βc − β2c2 .(2.2) The Helmholtz free energy density f (c) and the chemical potential μ(c) are determined by the Peng-Robinson equation of state. These quantities are expressed as 
+
+f (c) = fide (c) + frep (c) + fatt (c),(2.3a) 
+
+fide (c) = cRT ln( c),(2.3b) 
+
+frep (c) = −cRT ln(1 − βc ),(2.3c) 
+
+fatt (c) = b(T )c
+
+2√2β ln 1 + (1 − √2) βc 
+
+1 + (1 + √2) βc 
+
+!
+
+,(2.3d) and 
+
+μ(c) = f ′(c).(2.4) This formulation integrates the key physical mechanisms, including poroelasticity, gas compress-ibility and non-ideal gas behavior, which provides a robust framework for modeling gas flow in deformable porous media. The use of the Peng-Robinson equation of state ensures precise represen-tation of the gas phase’s thermodynamic properties [30]. In equation (2.3), the term fide represents the contribution from an ideal, homogeneous gas, whereas frep and fatt describe the effects arising from intermolecular repulsive and attractive forces, respectively. We introduce the critical tempera-ture Tc and define the reduced temperature as Tr = T /T c. The parameters b and β are determined based on the fluid’s critical properties and its acentric factor. 
+
+b = 0 .45724 R2T 2
+
+> c
+
+Pc
+
+
+
+1 + m
+
+
+
+1 − pTr
+
+ 2
+
+, β = 0 .07780 RT c
+
+Pc
+
+,4 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+where Pc is the critical pressure and m relies on the acentric factor ωm = 0 .37464 + 1 .54226 ω − 0.26992 ω2, ω ≤ 0.49 ,m = 0 .379642 + 1 .485030 ω − 0.164423 ω2 + 0 .016666 ω3, ω > 0.49 .
+
+In order to close the system, the following boundary conditions are imposed as 
+
+σ(us, p ) · n = 0 , on ∂Ω,(2.5) 
+
+uf · n = 0 , on ∂Ω.(2.6) The total free energy of (2.1) and (2.5) in Ω can be defined as 
+
+E(t) = 
+
+Z
+
+> Ω
+
+
+
+ϕf (c) + 12 σe(us) : ε(us) + 12N p2
+
+
+
+dx.(2.7) 
+
+Remark 2.1. It is noteworthy that the total free energy of the system includes not only the fluid free energy and the elastic strain energy of the solid skeleton, but also an additional term 12N p2.This term accounts for the energy stored due to the compressibility of the solid framework under pore pressure, and is interpreted as the compressive storage energy. Under isothermal conditions, the variation of the solid density ρs is governed by the following equation of state [25] 1
+
+ρs
+
+∂ρ s
+
+∂t = 11 − ϕ
+
+ 1
+
+N∂p ∂t − (1 − α)∇ · vs
+
+
+
+.(2.8) 
+
+This equation shows that changes in solid density are influenced not only by volumetric strain, but also directly by pore pressure. Therefore, the energy term 12N p2 reflects the stored energy resulting from the compressibility of the solid matrix. Substituting Equation (2.8) into the mass conservation equation for the solid yields the porosity equation (2.1e) (cf. [25] ). When the solid phase approaches incompressibility, the bulk modulus N tends to infinity, and consequently the term 12N p2 becomes negligible. This implies that the influence of pore pressure on the solid density can be disregarded. Under this assumption, the total free energy of the system can be simplified to the sum of the fluid free energy and the elastic strain energy of the solid skeleton. A systematic formulation of the free energy under the incompressibility assumption for the solid phase is provided in Reference [24] .
+
+3. Energy stable and bounds-preserving numerical method 
+
+In this section, we first introduce the time semi-discrete scheme for the problem. Following this, we describe the discrete function spaces and propose the fully discrete scheme based on these spaces. Finally, we provide a detailed analysis of the scheme, including proofs of the boundedness of molar density, the convergence of the iterative method, and the energy stability of the system. These results collectively establish the theoretical foundation and numerical robustness of the proposed approach. 3.1. Stable time semi-discrete scheme. Let Xn+1 denote the approximation of X at time t =
+
+tn+1 , where X represents any of the variables ϕ, us, uf , p, c, or μ. To construct the time semi-discrete scheme, we employ a novel stabilization method [24], which ensures numerical stability and accuracy in the temporal discretization. The stabilization terms are carefully designed to maintain the physical consistency of the system while improving computational efficiency. Using the novel stabilization strategy, we define the following stabilized discrete chemical potential 
+
+μn+1 = μ(cn) + θnRT ζ n+1 ,(3.1) where θn is an adaptive stabilization parameter, and its selection criterion is given in Theorem 5.3. ζn+1 represents the stabilization term, which depends on the discrete approximations of the concentration cn+1 at time tn+1 :
+
+ζn+1 := cn+1 − cn
+
+cn(1 − βc n)2 .(3.2) This stabilization term is designed to enhance numerical stability, and ensure the preservation of energy dissipation. 5
+
+− ∇ · σ(un+1  
+
+> s
+
+, p n+1 ) = 0 ,(3.3a) 
+
+Dτ (ϕn+1 cn+1 ) + ∇ · (un+1  
+
+> f
+
+cn) = 0 ,(3.3b) 
+
+un+1  
+
+> f
+
+= −λ(ϕn)cn∇μn+1 ,(3.3c) 
+
+pn+1 = cnμn+1 − f (cn),(3.3d) 
+
+Dτ ϕn+1 = 1
+
+N Dτ pn+1 + α∇ · Dτ un+1  
+
+> s
+
+,(3.3e) where Dτ Xn+1 = Xn+1 −Xn 
+
+> τ
+
+.3.2. Full discretization. Let Kh denote a family of non-degenerate, quasi-uniform triangulations of Ω, with the diameter of an element K ∈ K h denoted by hK . We define the standard finite element space of d-vectors whose components are piecewise linear polynomials as follows 
+
+Vh := ψ ∈ L2(Ω) d : ψ|K ∈ P1(K)d, ∀K ∈ K h ,
+
+where P1(K) represents the space of linear polynomials on the element K. The set of all faces (for 
+
+d = 3) or edges (for d = 2) of the triangulation Kh is denoted by Eh, while the set of interior edges or faces is denoted by EIh . For two neighboring elements Ki, K j ∈ K h, their common face or edge is denoted by e = ∂K i ∩ ∂K j ∈ E Ih , and the outward unit normal vector ne is oriented from Ki to Kj .We define the average and jump of a function ψ ∈ V h on an interior edge or face e as follows 
+
+{ψ} := 12 (( ψ|Ki )|e + ( ψ|Kj )|e), [ψ] :=   ψ|Ki
+
+ 
+
+> e
+
+−  ψ|Kj
+
+ |e,
+
+where ψ|Ki denotes the restriction of ψ to the element Ki.For any domain D ⊆ Ω, and for scalar functions ϑ1, ϑ 2 or vector functions ϑ1, ϑ2, we define the inner products as follows (ϑ1, ϑ 2)D =
+
+Z
+
+> D
+
+ϑ1ϑ2 dx, (ϑ1, ϑ2)D =
+
+Z
+
+> D
+
+ϑ1 · ϑ2 dx.
+
+The L2-norm on a domain D is denoted by ∥ · ∥ L2(D), while the inner product on an edge or face 
+
+e ∈ E h is denoted by ⟨· , ·⟩ e, and the associated norm by ∥ · ∥ L2(e).For dealing with the convection term, we adopt the upwind strategy. The upwind value of cnh on an interior edge e is defined as 
+
+cn∗ 
+
+> h
+
+=
+
+(
+
+cnh |Ki , unf,h · ne ≥ 0,cnh |Kj , unf,h · ne < 0.
+
+(3.4) Next, we introduce the lowest-order Raviart-Thomas finite element space RT 0. On a simplicial mesh, the space RT 0 is given by 
+
+RT 0 = [ P0]d + xP0,
+
+where P0 denotes the piecewise constant space. The corresponding finite element spaces are defined as follows 
+
+Uh = {vh ∈ H(div , Ω) : vh|K ∈ RT 0(K), ∀K ∈ K h} ,
+
+Qh = qh ∈ L2(Ω) : qh|K ∈ P0(K), ∀K ∈ K h ,
+
+where H(div , Ω) is the space of vector fields v ∈ [L2(Ω)] d such that ∇ · v ∈ L2(Ω). Finally, we define the subspace U0 
+
+> h
+
+⊂ U h as 
+
+U0 
+
+> h
+
+= {v ∈ U h : v · n = 0 on ∂ Ω} .6 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+For any vh ∈ V h, wh ∈ U 0 
+
+> h
+
+, q h, z h, φ h ∈ Q h, we find un+1  
+
+> s,h
+
+∈ V h, un+1  
+
+> f,h
+
+∈ U h, c n+1  
+
+> h
+
+, ϕ n+1  
+
+> h
+
+, p n+1  
+
+> h
+
+∈ Q h
+
+such that 
+
+A(un+1  
+
+> s,h
+
+, p n+1  
+
+> h
+
+, vh) = 0 ,(3.5a) (Dτ (ϕn+1  
+
+> h
+
+cn+1  
+
+> h
+
+), q h) + X
+
+> e∈E Ih
+
+⟨cn∗ 
+
+> h
+
+un+1  
+
+> f,h
+
+· n, [qh]⟩e + X
+
+> e∈E Ih
+
+ς1
+
+he
+
+⟨[μn+1  
+
+> h
+
+], [qh]⟩e = 0 ,(3.5b) (λ−1(ϕnh )un+1  
+
+> f,h
+
+, wh) = X
+
+> e∈E Ih
+
+⟨[μn+1  
+
+> h
+
+], c n∗ 
+
+> h
+
+wh · n⟩e,(3.5c) (pn+1  
+
+> h
+
+, z h) = ( cnh μn+1  
+
+> h
+
+− f (cnh ), z h),(3.5d) (Dτ ϕn+1  
+
+> h
+
+, φ h) = 1
+
+N (Dτ pn+1  
+
+> h
+
+, φ h) + α(Dτ (∇ · un+1  
+
+> s,h
+
+), φ h) − α X
+
+> e∈E Ih
+
+⟨{ φhne}, [Dτ un+1  
+
+> s,h
+
+]⟩e,(3.5e) where A is the bilinear form defined as 
+
+A(us,h , p h, vh) := X
+
+> K∈K h
+
+(σe(us,h ), ε (vh)) K − X
+
+> e∈E Ih
+
+⟨{ σe(us,h )ne}, [vh]⟩e(3.6) 
+
+− α X
+
+> K∈K h
+
+(ph, ∇ · vh)K + α X
+
+> e∈E Ih
+
+⟨{ phne}, [vh]⟩e
+
+− X
+
+> e∈E Ih
+
+⟨[us,h ], {σe(vh)ne}⟩ e + X
+
+> e∈E Ih
+
+ς2
+
+he
+
+⟨[us,h ], [vh]⟩e.
+
+Here, ς1 and ς2 are penalty parameters to be determined (see the Numerical Experiments section), and the inner product ( ·, ·) = P
+
+> K∈T h
+
+(·, ·)K denotes the global inner product over the computational mesh Th, the notation he simply means the length of e in 2D and the area of e in 3D. Since (3.5b) is nonlinear, we use the linear iteration method to solve the equations (3.5): 
+
+A(un+1 ,l +1  
+
+> s,h
+
+, p n+1 ,l +1  
+
+> h
+
+, vh) = 0 ,(3.7) ( ϕn+1 ,l h cn+1 ,l +1  
+
+> h
+
+− ϕnh cnh
+
+τ , q h) + X
+
+> e∈E Ih
+
+⟨cn∗ 
+
+> h
+
+un+1 ,l f,h · n, [qh]⟩e + X
+
+> e∈E Ih
+
+ς1
+
+he
+
+⟨[μn+1 ,l +1  
+
+> h
+
+], [qh]⟩e = 0 ,(3.8) (λ−1(ϕnh )un+1 ,l +1  
+
+> f,h
+
+, wh) = X
+
+> e∈E Ih
+
+⟨[μn+1 ,l +1  
+
+> h
+
+], c n∗ 
+
+> h
+
+wh · n⟩e,(3.9) (pn+1 ,l +1  
+
+> h
+
+, z h) = ( cnh μn+1 ,l +1  
+
+> h
+
+− f (cnh ), z h),(3.10) (Dτ ϕn+1 ,l +1  
+
+> h
+
+, φ h) = 1
+
+N (Dτ pn+1 ,l +1  
+
+> h
+
+, φ h) + α(Dτ (∇ · un+1 ,l +1  
+
+> s,h
+
+), φ h)(3.11) 
+
+− α X
+
+> e∈E Ih
+
+⟨{ φhne}, [Dτ un+1 ,l +1  
+
+> s,h
+
+]⟩e.
+
+4. Bound-preserving Adaptive Time-Stepping strategies 
+
+Next, we will conduct some theoretical analysis to prove the convergence of the iterative method we adopted, the boundedness of the molar density, and the energy stability. These analyses are crucial for understanding the effectiveness and reliability of our numerical scheme. Specifically, we will firstly prove that the molar density remains bounded throughout the entire computational process. By performing a rigorous analysis of the boundedness of the molar density, we can ensure that, during the numerical solution process, the molar density stays within the physically acceptable range. Then, we demonstrate that during each iteration, the iterative method progressively converges to a stable solution, ensuring that no divergence occurs during the numerical computation. Finally, we will demonstrate the stability of the proposed numerical scheme in terms of energy conservation. 7
+
+Lemma 4.1. For two given real constants a, b and a < b , for any ch ∈ Q h, we define ch, − =min( ch + a, 0) , ch, + = max( ch − b, 0) . We have the following inequalities hold 
+
+X
+
+> e∈E Ih
+
+⟨[ch], [ch, −]⟩e ≥ X
+
+> e∈E Ih
+
+⟨[ch, −], [ch, −]⟩e,(4.1) 
+
+X
+
+> e∈E Ih
+
+⟨[ch], [ch, +]⟩e ≥ X
+
+> e∈E Ih
+
+⟨[ch, +], [ch, +]⟩e.(4.2) 
+
+Proof. By the definition ch, −, we deduce that 
+
+X
+
+> e∈E Ih
+
+⟨[ch], [ch, −]⟩e(4.3) = X
+
+> e∈E Ih
+
+(⟨ch|K + a, c h, −|K ⟩e − ⟨ ch|K + a, c h, −|K′ ⟩e
+
+−⟨ ch|K′ + a, c h, −|K ⟩e + ⟨ch|K′ + a, c h, −|K′ ⟩e)
+
+≥ X
+
+> e∈E Ih
+
+(⟨ch, −|K , c h, −|K ⟩e − ⟨ ch, −|K , c h, −|K′ ⟩e
+
+−⟨ ch, −|K′ , c h, −|K ⟩e + ⟨ch, −|K′ , c h, −|K′ ⟩e)= X
+
+> e∈E Ih
+
+⟨[ch, −], [ch, −]⟩e,
+
+where K′ is the neighboring element that shares the edge (or face) e with the element K. Similarly, we can also derive (4.2). □
+
+Lemma 4.2. Assume that 0 < ϱ 0 ≤ βc nh ≤ ϱ < 1 and the boundary condition (2.5) holds. For n ≥ 0
+
+and given constants 0 < δ 1 < 1 and 0 < δ 2 < 1, if the time step size τ ln satisfies 
+
+τ ln = min 
+
+> K∈K h
+
+(τ1, τ 2, τ max ) ,(4.4) 
+
+where 
+
+τ1 := 
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 δ1 − (ϕn+1 ,l h − ϕnh )cnh
+
+
+
+|K|
+
+P
+
+> e∈∂K +
+> uf,h
+
+cnh un+1 ,l f,h · n|e| + P 
+
+> e∈∂K +
+> μ
+> ς1
+> he
+
+[μ(cnh )] |e| + ϵ ,τ2 := 
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 δ2 + ( ϕn+1 ,l h − ϕnh )cnh
+
+
+
+|K|−
+
+ P
+
+> e∈∂K −
+> uf,h
+
+cn∗ 
+
+> h
+
+un+1 ,l f,h · n|e| + P 
+
+> e∈∂K −
+> μ
+> ς1
+> he
+
+[μ(cnh )] |e|
+
+ + ϵ,ϵ > 0 is a very small constant to avoid zero denominator, τmax is the allowed maximum time step size to guarantee the accuracy of numerical solutions and ∂K + 
+
+> uf,h
+
+= {e ∈ ∂K : un+1  
+
+> f,h
+
+· n|e > 0, ∀K ∈ K h},
+
+∂K − 
+
+> uf,h
+
+= {e ∈ ∂K : un+1  
+
+> f,h
+
+· n|e < 0, ∀K ∈ K h}, ∂K − 
+
+> μ
+
+= {e ∈ ∂K : [ μ(cnh )] < 0, ∀K ∈ K h}, ∂K + 
+
+> μ
+
+=
+
+{e ∈ ∂K : [ μ(cnh )] > 0, ∀K ∈ K h}. Then cn+1 ,l +1  
+
+> h
+
+satisfies 
+
+0 < (1 − δ1 (1 − βc nh )2)cnh ≤ cn+1 ,l +1  
+
+> h
+
+≤ (1 + δ2 (1 − βc nh )2)cnh < 1
+
+β .
+
+Proof. Let us define ζn+1 ,l +1  
+
+> h, −
+
+= min( ζn+1 ,l +1  
+
+> h
+
++δ1, 0) and ζn+1 ,l +1  
+
+> h, +
+
+= max( ζn+1 ,l +1  
+
+> h
+
+−δ2, 0). Obviously 
+
+ζn+1 ,l +1  
+
+> h, −
+
+≤ 0 and ζn+1 ,l +1  
+
+> h, +
+
+≥ 0. 8 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Taking qh = ζn+1 ,l +1 
+
+h, − in (3.8) and using (3.1), we can obtain 1
+
+τ ln
+
+
+
+ϕn+1 ,l h (cn+1 ,l +1 
+
+h − cnh ), ζ n+1 ,l +1 
+
+h, −
+
+
+
++ 1
+
+τ ln
+
+
+
+(ϕn+1 ,l h − ϕnh )cnh , ζ n+1 ,l +1 
+
+h, −
+
+
+
+(4.5) + X
+
+e∈E Ih
+
+⟨cn∗
+
+h un+1 ,l f,h · n, [ζn+1 ,l +1 
+
+h, − ]⟩e + X
+
+e∈E Ih
+
+ς1
+
+he
+
+⟨[μ(cnh )] , [ζn+1 ,l +1 
+
+h, − ]⟩e
+
++ θnRT X
+
+e∈E Ih
+
+ς1
+
+he
+
+⟨[ζn+1 ,l +1 
+
+h ], [ζn+1 ,l +1 
+
+h, − ]⟩e = 0 .
+
+In terms of the definition of ζn+1 ,l +1 
+
+h, − , we deduce that 
+
+
+
+ϕn+1 ,l h (cn+1 ,l +1 
+
+h − cnh ), ζ n+1 ,l +1 
+
+h, −
+
+
+
+=
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 ζn+1 ,l +1 
+
+h , ζ n+1 ,l +1 
+
+h, −
+
+
+
+(4.6) =
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 
+
+ζn+1 ,l +1 
+
+h + δ1
+
+
+
+, ζ n+1 ,l +1 
+
+h, −
+
+
+
+−
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 δ1, ζ n+1 ,l +1 
+
+h, −
+
+
+
+=
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 ζn+1 ,l +1 
+
+h, − , ζ n+1 ,l +1 
+
+h, −
+
+
+
+−
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 δ1, ζ n+1 ,l +1 
+
+h, −
+
+
+
+.
+
+Taking into account (4.4), ζn+1 ,l +1 
+
+h, − ≤ 0, and Lemma 4.1, we can get 
+
+X
+
+K∈K h
+
+X
+
+e∈∂K 
+
+⟨cn∗
+
+h un+1 ,l f,h · n, ζ n+1 ,l +1 
+
+h, − ⟩e − 1
+
+τ ln
+
+X
+
+K∈K h
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 δ1, ζ n+1 ,l +1 
+
+h, −
+
+
+
+(4.7) + 1
+
+τ ln
+
+X
+
+K∈K h
+
+
+
+(ϕn+1 ,l h − ϕnh )cnh , ζ n+1 ,l +1 
+
+h, −
+
+
+
++ X
+
+K∈K h
+
+X
+
+e∈∂K 
+
+ς1
+
+he
+
+⟨[μ(cnh )] , ζ n+1 ,l +1 
+
+h, − ⟩e
+
+= 1
+
+τ ln
+
+X
+
+K∈K h
+
+
+
+(ϕn+1 ,l h − ϕnh )cnh , ζ n+1 ,l +1 
+
+h, −
+
+
+
+− 1
+
+τ ln
+
+X
+
+K∈K h
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 δ1, ζ n+1 ,l +1 
+
+h, −
+
+
+
++ X
+
+K∈K h
+
+X
+
+e∈∂K −
+
+> uf,h
+
+⟨cn∗
+
+h un+1 ,l f,h · n, ζ n+1 ,l +1 
+
+h, − ⟩e + X
+
+K∈K h
+
+X
+
+e∈∂K +
+
+> uf,h
+
+⟨cn∗
+
+h un+1 ,l f,h · n, ζ n+1 ,l +1 
+
+h, − ⟩e
+
++ X
+
+K∈K h
+
+X
+
+e∈∂K −
+
+> μ
+
+ς1
+
+he
+
+⟨[μ(cnh )] , ζ n+1 ,l +1 
+
+h, − ⟩e + X
+
+K∈K h
+
+X
+
+e∈∂K +
+
+> μ
+
+ς1
+
+he
+
+⟨[μ(cnh )] , ζ n+1 ,l +1 
+
+h, − ⟩e
+
+= X
+
+K∈K h
+
+
+
+(ϕn+1 ,l h − ϕnh )cnh − ϕn+1 ,l h cnh (1 − βc nh )2 δ1
+
+
+
+ζn+1 ,l +1 
+
+h, − |K|
+
+τ ln
+
++ X
+
+K∈K h
+
+X
+
+e∈∂K −
+
+> uf,h
+
+cn∗
+
+h un+1 ,l f,h · nζn+1 ,l +1 
+
+h, − |e| + X
+
+K∈K h
+
+X
+
+e∈∂K +
+
+> uf,h
+
+cnh un+1 ,l f,h · nζn+1 ,l +1 
+
+h, − |e|
+
++ X
+
+K∈K h
+
+X
+
+e∈∂K −
+
+> μ
+
+ς1
+
+he
+
+[μ(cnh )] ζn+1 ,l +1 
+
+h, − |e| + X
+
+K∈K h
+
+X
+
+e∈∂K +
+
+> μ
+
+ς1
+
+he
+
+[μ(cnh )] ζn+1 ,l +1 
+
+h, − |e| ≥ 0.
+
+Here we assume that ϕn+1 ,l h (1 − βc nh )2 δ1 > (ϕn+1 ,l h − ϕnh ), which means 
+
+ϕn+1 ,l h
+
+ϕnh
+
+< 11 − (1 − βc nh )2 δ1
+
+.(4.8) Combining (4.5)-(4.7), we get 1
+
+τ ln
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 ζn+1 ,l +1 
+
+h, − , ζ n+1 ,l +1 
+
+h, −
+
+
+
++ θnRT X
+
+e∈E Ih
+
+ς1
+
+he
+
+⟨[ζn+1 ,l +1 
+
+h, − ], [ζn+1 ,l +1 
+
+h, − ]⟩e ≤ 0.(4.9) 9
+
+Due to 0 < c nh < 1
+
+β , we obtain 
+
+ζn+1 ,l +1 
+
+h, − ≡ 0,(4.10) and 
+
+cn+1 ,l +1 
+
+h ≥ (1 − δ1 (1 − βc nh )2)cnh > 0.(4.11) Taking qh = ζn+1 ,l +1 
+
+h, + in (3.8), we can obtain 1
+
+τ ln
+
+
+
+ϕn+1 ,l h (cn+1 ,l +1 
+
+h − cnh ), ζ n+1 ,l +1 
+
+h, +
+
+
+
++ 1
+
+τ ln
+
+
+
+(ϕn+1 ,l h − ϕnh )cnh , ζ n+1 ,l +1 
+
+h, +
+
+
+
+(4.12) + X
+
+e∈E Ih
+
+⟨cn∗
+
+h un+1 ,l f,h · n, ζ n+1 ,l +1 
+
+h, + ⟩e + X
+
+e∈E Ih
+
+ς1
+
+he
+
+⟨[μn+1 
+
+h ], [ζn+1 ,l +1 
+
+h, + ]⟩e = 0 .
+
+In terms of the definition of ζn+1 ,l +1 
+
+h, + , we deduce that 
+
+
+
+ϕn+1 ,l h (cn+1 ,l +1 
+
+h − cnh ), ζ n+1 ,l +1 
+
+h, +
+
+
+
+=
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 ζn+1 ,l +1 
+
+h , ζ n+1 ,l +1 
+
+h, +
+
+
+
+(4.13) =
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 
+
+ζn+1 ,l +1 
+
+h − δ2
+
+
+
+, ζ n+1 ,l +1 
+
+h, +
+
+
+
++
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 δ2, ζ n+1 ,l +1 
+
+h, +
+
+
+
+=
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 ζn+1 ,l +1 
+
+h, + , ζ n+1 ,l +1 
+
+h, +
+
+
+
++
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 δ2, ζ n+1 ,l +1 
+
+h, +
+
+
+
+.
+
+By (4.4), ζn+1 ,l +1 
+
+h, + ≥ 0 and Lemma 4.1, we get 
+
+X
+
+K∈K h
+
+X
+
+e∈∂K 
+
+⟨cn∗
+
+h un+1 ,l f,h · n, ζ n+1 ,l +1 
+
+h, + ⟩e + 1
+
+τ ln
+
+X
+
+K∈K h
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 δ2, ζ n+1 ,l +1 
+
+h, +
+
+
+
+(4.14) + 1
+
+τ ln
+
+X
+
+K∈K h
+
+
+
+(ϕn+1 ,l h − ϕnh )cnh , ζ n+1 ,l +1 
+
+h, +
+
+
+
++ X
+
+K∈K h
+
+X
+
+e∈∂K 
+
+ς1
+
+he
+
+⟨[μ(cnh )] , ζ n+1 ,l +1 
+
+h, + ⟩e
+
+= 1
+
+τ ln
+
+X
+
+K∈K h
+
+
+
+(ϕn+1 ,l h − ϕnh )cnh , ζ n+1 ,l +1 
+
+h, +
+
+
+
++ 1
+
+τ ln
+
+X
+
+K∈K h
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 δ2, ζ n+1 ,l +1 
+
+h, +
+
+
+
++ X
+
+K∈K h
+
+X
+
+e∈∂K −
+
+> uf,h
+
+⟨cn∗
+
+h un+1 ,l f,h · n, ζ n+1 ,l +1 
+
+h, + ⟩e + X
+
+K∈K h
+
+X
+
+e∈∂K +
+
+> uf,h
+
+⟨cn∗
+
+h un+1 ,l f,h · n, ζ n+1 ,l +1 
+
+h, + ⟩e
+
++ X
+
+K∈K h
+
+X
+
+e∈∂K −
+
+> μ
+
+ς1
+
+he
+
+⟨[μ(cnh )] , ζ n+1 ,l +1 
+
+h, + ⟩e + X
+
+K∈K h
+
+X
+
+e∈∂K +
+
+> μ
+
+ς1
+
+he
+
+⟨[μ(cnh )] , ζ n+1 ,l +1 
+
+h, + ⟩e
+
+= X
+
+K∈K h
+
+
+
+(ϕn+1 ,l h − ϕnh )cnh + ϕn+1 ,l h cnh (1 − βc nh )2 δ2
+
+
+
+ζn+1 ,l +1 
+
+h, + |K|
+
+τ ln
+
++ X
+
+K∈K h
+
+X
+
+e∈∂K −
+
+> uf,h
+
+cn∗
+
+h un+1 ,l f,h · nζn+1 ,l +1 
+
+h, + |e| + X
+
+K∈K h
+
+X
+
+e∈∂K +
+
+> uf,h
+
+cnh un+1 ,l f,h · nζn+1 ,l +1 
+
+h, + |e|
+
++ X
+
+K∈K h
+
+X
+
+e∈∂K −
+
+> μ
+
+ς1
+
+he
+
+[μ(cnh )] ζn+1 ,l +1 
+
+h, + |e| + X
+
+K∈K h
+
+X
+
+e∈∂K +
+
+> μ
+
+ς1
+
+he
+
+[μ(cnh )] ζn+1 ,l +1 
+
+h, + |e| ≥ 0.
+
+Here we need ϕn+1 ,l h (1 − βc nh )2 δ2 > (ϕnh − ϕn+1 ,l h ), which means 
+
+ϕn+1 ,l h
+
+ϕnh
+
+> 1(1 + (1 − βc nh )2 δ2) .(4.15) 10 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Due to (4.13)-(4.14), we can obtain 
+
+
+
+ϕn+1 ,l h cnh (1 − βc nh )2 ζn+1 ,l +1  
+
+> h, +
+
+, ζ n+1 ,l +1 
+
+> h, +
+
+
+
++ θnRT X
+
+> e∈E Ih
+
+⟨[ζn+1 ,l +1  
+
+> h, +
+
+], [ζn+1 ,l +1  
+
+> h, +
+
+]⟩e ≤ 0,(4.16) which directly yields 
+
+ζn+1 ,l +1  
+
+> h, +
+
+= 0 .
+
+Then, we can get 
+
+cn+1 ,l +1  
+
+> h
+
+≤ (1 + δ2 (1 − βc nh )2)cnh .(4.17) By 0 < c nh < 1 
+
+> β
+
+and 0 < δ 2 < 1, we deduce that 
+
+βc n+1 ,l +1  
+
+> h
+
+= (1 + δ2 (1 − βc nh )2)βc nh(4.18) = βc nh + δ2 (1 − βc nh )2 βc nh
+
+< βc nh + 1 − βc nh = 1 .
+
+The proof is completed. □
+
+Remark 4.1. In the above proof, we use the following inequality 
+
+1(1 + (1 − βc nh )2 δ2) < ϕn+1 ,l h
+
+ϕnh
+
+< 11 − (1 − βc nh )2 δ1
+
+,
+
+when l = 0 , we can get ϕn+1 ,0 = ϕn, the above assumption is obviously true. Next we will prove that when 0 ≤ cn+1 ,l h ≤ 1 is established, the appeal assumption holds. 
+
+Theorem 4.3. According to Lemma 4.2, we assume that the inequality 0 < ϱ 0 ≤ βc nh ≤ ϱ < 1
+
+holds, where ϱ0 and ϱ are positive constants. Furthermore, let the parameters γ and ς1 be chosen sufficiently large. Under these assumptions, the function ϕn+1 ,l +1  
+
+> h
+
+is bounded by 
+
+0 < ϕ nh − Cϵ ≤ ϕn+1 ,l +1  
+
+> h
+
+≤ ϕnh + Cϵ < 1,
+
+where the parameter Cϵ satisfies the condition 
+
+Cϵ < min (1 − ϱ)2 δ2Cϕ,min 
+
+(1 + (1 − ϱ)2 δ2) , (1 − ϱ)2 δ1Cϕ,min 
+
+(1 − (1 − ϱ)2 δ1) , 1 − Cϕ,max 
+
+!
+
+.(4.19) 
+
+Here, Cϕ,min and Cϕ,max are the maximum and minimum values of ϕn respectively. Proof. We begin by considering the difference: A(un+1 ,l +1  
+
+> s,h
+
+, p n+1 ,l +1  
+
+> h
+
+, vh)−A (uns,h , p nh , vh) = 0. Then, by selecting vh = un+1 ,l +1  
+
+> s,h
+
+− uns,h as the test function, we obtain: 2η X
+
+> K∈K h
+
+∥ε(un+1 ,l +1  
+
+> s,h
+
+− uns,h )∥2 
+
+> L2(K)
+
++ γ X
+
+> K∈K h
+
+∥∇ · (un+1 ,l +1  
+
+> s,h
+
+− uns,h )∥2
+
+> L2(K)
+
+(4.20) + X
+
+> e∈E Ih
+
+ς2
+
+he
+
+∥[un+1 ,l +1  
+
+> s,h
+
+− uns,h ]∥2 
+
+> L2(e)
+
+− 2 X
+
+> e∈E Ih
+
+⟨{ σe(un+1 ,l +1  
+
+> s,h
+
+− uns,h )ne}, [un+1 ,l +1  
+
+> s,h
+
+− uns,h ]⟩e
+
+− α X
+
+> K∈K h
+
+(pn+1 ,l +1  
+
+> h
+
+− pnh , ∇ · (un+1 ,l +1  
+
+> s,h
+
+− uns,h )) K
+
++ α X
+
+> e∈E Ih
+
+⟨{ (pn+1 ,l +1  
+
+> h
+
+− pnh )ne}, [un+1 ,l +1  
+
+> s,h
+
+− uns,h ]⟩e
+
+= 0 ,11 
+
+Due to the trace inequality, Cauchy-Schwarz inequality and the Young’s inequality, we get 2 X
+
+e∈E Ih
+
+⟨{ σe(un+1 ,l +1 
+
+s,h − uns,h )ne}, [un+1 ,l +1 
+
+s,h − uns,h ]⟩e(4.21) 
+
+≤ 2 X
+
+e∈E Ih
+
+∥{ σe(un+1 ,l +1 
+
+s,h − uns,h )ne}∥ L2(e)∥[un+1 ,l +1 
+
+s,h − uns,h ]∥L2(e)
+
+≤ 2( X
+
+e∈E Ih
+
+∥{ σe(un+1 ,l +1 
+
+s,h − uns,h )ne}∥ 2
+
+L2(e)) 12 ( X
+
+e∈E Ih
+
+∥[un+1 ,l +1 
+
+s,h − uns,h ]∥2
+
+L2(e)) 12
+
+≤ 2( C
+
+2he
+
+X
+
+K∈K h
+
+(σe(un+1 ,l +1 
+
+s,h − uns,h ), ϵ (un+1 ,l +1 
+
+s,h − uns,h )) K ) 12 ( X
+
+e∈E Ih
+
+∥[un+1 ,l +1 
+
+s,h − uns,h ]∥2
+
+L2(e)) 12
+
+≤ 12
+
+X
+
+K∈K h
+
+(σe(un+1 ,l +1 
+
+s,h − uns,h ), ϵ (un+1 ,l +1 
+
+s,h − uns,h )) K + Che
+
+X
+
+e∈E Ih
+
+∥[un+1 ,l +1 
+
+s,h − uns,h ]∥2
+
+L2(e),α X
+
+e∈E Ih
+
+⟨{ (pn+1 ,l +1 
+
+h − pnh )ne}, [un+1 ,l +1 
+
+s,h − uns,h ]⟩e(4.22) 
+
+≤ α X
+
+e∈E Ih
+
+∥{ (pn+1 ,l +1 
+
+h − pnh )ne}∥ L2(e)∥[un+1 ,l +1 
+
+s,h − uns,h ]∥L2(e)
+
+≤ α( X
+
+e∈E Ih
+
+∥{ (pn+1 ,l +1 
+
+h − pnh )ne}∥ 2
+
+L2(e)) 12 ( X
+
+e∈E Ih
+
+∥[un+1 ,l +1 
+
+s,h − uns,h ]∥2
+
+L2(e)) 12
+
+≤ α( C
+
+2he
+
+X
+
+K∈K h
+
+∥pn+1 ,l +1 
+
+h − pnh ∥2
+
+L2(K)) 12 ( X
+
+e∈E Ih
+
+∥[un+1 ,l +1 
+
+s,h − uns,h ]∥2
+
+L2(e)) 12
+
+≤ α
+
+2
+
+X
+
+K∈K h
+
+∥pn+1 ,l +1 
+
+h − pnh ∥2
+
+L2(K) + αC he
+
+X
+
+e∈E Ih
+
+∥[un+1 ,l +1 
+
+s,h − uns,h ]∥2
+
+L2(e),
+
+and 
+
+α X
+
+K∈K h
+
+(pn+1 ,l +1 
+
+h − pnh , ∇ · (un+1 ,l +1 
+
+s,h − uns,h )) K(4.23) 
+
+≤ α
+
+2
+
+X
+
+K∈K h
+
+∥pn+1 ,l +1 
+
+h − pnh ∥2
+
+L2(K) + α
+
+2
+
+X
+
+K∈K h
+
+∥∇ · (un+1 ,l +1 
+
+s,h − uns,h )∥2
+
+L2(K).
+
+Here we have used the following trace inequality (cf. [36]). 
+
+∥σe(vh)n∥2
+
+L2(e) ≤ Ch −1
+
+e
+
+Z
+
+K
+
+(σe(vh) : ε(vh)) dx, ∀vh ∈ Pr (K)d ,(4.24) where Pr is the rth-order polynomial space. By substituting formulas (4.21), (4.22), and (4.23) into (4.20), we obtain 
+
+η X
+
+K∈K h
+
+∥ε(un+1 ,l +1 
+
+s,h − uns,h )∥2
+
+L2(K) + γ − α
+
+2
+
+X
+
+K∈K h
+
+∥∇ · (un+1 ,l +1 
+
+s,h − uns,h )∥2
+
+L2(K)(4.25) + ( ς2 − (1 + α)C) X
+
+e∈E Ih
+
+1
+
+he
+
+∥[un+1 ,l +1 
+
+s,h − uns,h ]∥2
+
+L2(e)
+
+≤ α X
+
+K∈K h
+
+∥pn+1 ,l +1 
+
+h − pnh ∥2
+
+L2(K).12 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Due to (4.25), we get 
+
+X
+
+K∈K h
+
+∥∇ · un+1 ,l +1 
+
+s,h − uns,h ∥2
+
+L2(K) ≤ 2αγ − α
+
+X
+
+K∈K h
+
+∥pn+1 ,l +1 
+
+h − pnh ∥2
+
+L2(K),(4.26) 
+
+X
+
+e∈E Ih
+
+1
+
+he
+
+∥[un+1 ,l +1 
+
+s,h − uns,h ]∥2
+
+L2(e) ≤ ας2 − (1 + α)C
+
+X
+
+K∈K h
+
+∥pn+1 ,l +1 
+
+h − pnh ∥2
+
+L2(K).(4.27) In equation (3.10), we take the test function qh to be 1 on the element K and 0 on all other elements, we get 
+
+pn+1 ,l +1 
+
+h = cnh μn+1 ,l +1 
+
+h − f (cnh )(4.28) = RT c n+1 ,l +1 
+
+h
+
+1 − βc nh
+
++ bc nh
+
+2√2β
+
+(1 − √2) βc n+1 ,l +1 
+
+h
+
+1 + (1 − √2) βc nh
+
+− (1 + √2) βc nh
+
+1 + (1 + √2) βc nh
+
+!
+
+.
+
+Due to (4.28) and 0 < c nh , cn+1 ,l +1 
+
+h < 1
+
+β , we get 
+
+∥pn+1 ,l +1 
+
+h ∥∞ ≤ RT 
+
+1 − ϱ + b
+
+2√2
+
+(√2 − 1) 1 + (1 − √2) + (1 + √2) 
+
+!
+
+(4.29) = RT 
+
+1 − ϱ + (2 √2 − 1) b
+
+4√2 − 1 := Cp,
+
+where ∥ · ∥ ∞ = max 
+
+K∈K h
+
+| · | .Letting φh = ϕn+1 ,l +1 
+
+h − ϕnh , we obtain 
+
+X
+
+K∈K h
+
+∥ϕn+1 ,l +1 
+
+h − ϕnh ∥2
+
+L2(K) = 1
+
+N
+
+X
+
+K∈K h
+
+(pn+1 ,l +1 
+
+h − pnh , ϕ n+1 ,l +1 
+
+h − ϕnh )K(4.30) + α X
+
+K∈K h
+
+(∇ · un+1 ,l +1 
+
+s,h − ∇ · uns,h , ϕ n+1 ,l +1 
+
+h − ϕnh )K
+
+− α X
+
+e∈∂K 
+
+⟨[un+1 ,l +1 
+
+s,h ], {ϕn+1 ,l +1 
+
+h − ϕnh }ne⟩e
+
++ α X
+
+e∈∂K 
+
+⟨[uns,h ], {ϕn+1 ,l +1 
+
+h − ϕnh }ne⟩e.
+
+By (4.30), we get 
+
+X
+
+K∈K h
+
+∥ϕn+1 ,l +1 
+
+h − ϕnh ∥2
+
+L2(K)(4.31) 
+
+≤ 1
+
+N
+
+X
+
+K∈K h
+
+∥pn+1 ,l +1 
+
+h − pnh ∥2
+
+L2(K)
+
+! 12 X
+
+K∈K h
+
+∥ϕn+1 ,l +1 
+
+h − ϕnh ∥2
+
+L2(K)
+
+! 12
+
++ α X
+
+K∈K h
+
+∥∇ · un+1 ,l +1 
+
+s,h − ∇ · uns,h ∥2
+
+L2(K)
+
+! 12 X
+
+K∈K h
+
+∥ϕn+1 ,l +1 
+
+h − ϕnh ∥2
+
+L2(K)
+
+! 12
+
++ αC 
+
+2
+
+X
+
+e∈∂K 
+
+h−1
+
+e ∥[un+1 ,l +1 
+
+s,h − uns,h ]∥2
+
+L2(e)
+
+! 12 X
+
+K∈K h
+
+∥ϕn+1 ,l +1 
+
+h − ϕnh ∥2
+
+L2(K)
+
+! 12
+
+.13 
+
+Eliminating the same terms on both sides of the above inequality, we further obtain 
+
+X
+
+> K∈K h
+
+∥ϕn+1 ,l +1  
+
+> h
+
+− ϕnh ∥2
+
+> L2(K)
+
+! 12
+
+(4.32) 
+
+≤ 1
+
+N
+
+X
+
+> K∈K h
+
+∥pn+1 ,l +1  
+
+> h
+
+− pnh ∥2
+
+> L2(K)
+
+! 12
+
++ α X
+
+> K∈K h
+
+∥∇ · (un+1 ,l +1  
+
+> s,h
+
+− uns,h )∥2
+
+> L2(K)
+
+! 12
+
++ αC 
+
+2
+
+X
+
+> e∈∂K
+
+h−1 
+
+> e
+
+∥[un+1 ,l +1  
+
+> s,h
+
+− uns,h ]∥2
+
+> L2(e)
+
+! 12
+
+.
+
+Due to the inverse inequality, (4.26),(4.27), (4.29) and (4.32), we can get max 
+
+> K∈K h
+
+∥ϕn+1 ,l +1  
+
+> h
+
+− ϕnh ∥L∞(K) = ∥ϕn+1 ,l +1  
+
+> h
+
+− ϕnh ∥L∞(K0)(4.33) 
+
+≤ Ch d
+
+> 2
+
+∥ϕn+1 ,l +1  
+
+> h
+
+− ϕnh ∥L2(K0)
+
+≤ CC x
+
+h d
+
+> 2
+
+√CN
+
+X
+
+> K∈K h
+
+∥ϕn+1 ,l +1  
+
+> h
+
+− ϕnh ∥2
+
+> L2(K)
+
+! 12
+
+≤ Ch d
+
+> 2
+
+Cx
+
+√CN
+
+ 2α2
+
+γ − α + αC 
+
+2
+
+ας2 − (1 + α)C + 1
+
+N
+
+ X
+
+> K∈K h
+
+∥pn+1 ,l +1  
+
+> h
+
+− pnh ∥2
+
+> L2(K)
+
+! 12
+
+≤ CC x
+
+ 2α2
+
+γ − α + αC 
+
+2
+
+ας2 − (1 + α)C + 1
+
+N
+
+
+
+Cp,
+
+where K0 is the unit with the maximum value of ∥ϕn+1 ,l +1  
+
+> h
+
+− ϕnh ∥, CN is the number of elements of 
+
+Kh and Cx ≤ CN .By (4.8) and (4.15), we can define Cϵ to satisfy 
+
+Cϵ < min 1 − 1(1 + (1 − βc nh )2 δ2)
+
+!
+
+ϕnh , 1(1 − (1 − βc nh )2 δ1) − 1
+
+!
+
+ϕnh , 1 − ϕnh
+
+!
+
+.(4.34) Due to the assumption ϱ0 ≤ βc nh ≤ ϱ, Cϕ,min ≤ ϕnh ≤ Cϕ,max , we further get 
+
+Cϵ < min (1 − ϱ)2 δ2Cϕ,min 
+
+(1 + (1 − ϱ)2 δ2) , (1 − ϱ)2 δ1Cϕ,min 
+
+(1 − (1 − ϱ)2 δ1) , 1 − Cϕ,max 
+
+!
+
+.(4.35) Due to the definition of Cϵ and (4.33), we can get that γ and ς2 should be sufficiently large to ensure that the following inequality holds, 
+
+C( α2
+
+2γ + αC 
+
+2
+
+ας2 − (1 + α)C )CpCN ≤ Cϵ.(4.36) Enumerating all l = 0 , 1, 2, · · · L in the aforementioned proof, we can prove 0 < ϕ n+1 ,l +1  
+
+> h
+
+< 1 and 0 < c n+1 ,l +1  
+
+> h
+
+< 1 
+
+> β
+
+, for any l = 0 , 1, 2, · · · , L , where L is the number of iterations. Now we complete the proof. 
+
+□
+
+5. Convergence of the iterative method and energy stability 
+
+Next, we will use the Banach fixed-point theorem to prove the convergence of the above iter-ative method. We now introduce a mapping Fh such that cn+1 ,l +1  
+
+> h
+
+= Fh(cn+1 ,l h ), where cn+1 ,l +1 
+
+> h
+
+along with un+1 ,l +1  
+
+> s,h
+
+pn+1 ,l +1  
+
+> h
+
+, un+1 ,l +1  
+
+> f,h
+
+, ϕn+1 ,l +1  
+
+> h
+
+, μn+1 ,l +1  
+
+> h
+
+solves the equations (3.7)-(3.11). To prove Fh is a contraction map, we introduce the following iterative error equation. Let en+1 ,l +1  
+
+> ch
+
+,
+
+en+1 ,l +1  
+
+> ph
+
+, en+1 ,l +1  
+
+> μh
+
+, en+1 ,l +1  
+
+> us,h
+
+, en+1 ,l +1  
+
+> uf,h
+
+be the corresponding difference between the l-th layer and 14 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+(l + 1)-th layer solutions of (3.7)-(3.11), which satisfy the following variational problem: find (en+1 ,l +1 
+
+ch , e n+1 ,l +1 
+
+ph , e n+1 ,l +1 
+
+μh , e n+1 ,l +1 
+
+us,h , e n+1 ,l +1 
+
+uf,h ) ∈ Q h × Q h × Q h × V h × U 0
+
+h there hold 
+
+A(en+1 ,l +1 
+
+us,h , e n+1 ,l +1 
+
+ph , vh) = 0 ,(5.1a) ( en+1 ,l ϕh cn+1 ,l h + ϕn+1 ,l h en+1 ,l +1 
+
+ch
+
+τ , q h) + X
+
+e∈E Ih
+
+⟨cn∗
+
+h en+1 ,l 
+
+uf,h · ne, [qh]⟩e(5.1b) + X
+
+e∈E Ih
+
+ς1
+
+he
+
+⟨[en+1 ,l +1 
+
+μh ], [qh]⟩e = 0 ,
+
+(λ−1(ϕnh )en+1 ,l +1 
+
+uf,h , wh) = X
+
+e∈E Ih
+
+⟨[en+1 ,l +1 
+
+μh ], c n∗
+
+h wh · ne⟩e,(5.1c) (en+1 ,l +1 
+
+ϕh , φ h) = 1
+
+N (en+1 ,l +1 
+
+ph , φ h) + α(∇ · en+1 ,l +1 
+
+us,h , φ h) − α X
+
+e∈E Ih
+
+⟨{ φhne}, [en+1 ,l +1 
+
+us,h ]⟩e,(5.1d) where 
+
+en+1 ,l +1 
+
+μh = θnRT cnh (1 − βc nh )2 en+1 ,l +1 
+
+ch ,(5.2) 
+
+en+1 ,l +1 
+
+ph = cnh en+1 ,l +1 
+
+μh .(5.3) 
+
+Lemma 5.1. Assume that 0 < ϱ 0 ≤ βc nh ≤ ϱ < 1 and the parameters γ, ς 1, ς 2 and N are chosen to be large enough, we can get Fh : cn+1 ,l h → cn+1 ,l +1 
+
+h is a contraction, i.e., there exists a constant 
+
+Ccon ∈ (0 , 1) such that 
+
+3Cϕ,min 
+
+4
+
+X
+
+K∈K h
+
+∥F h(cn+1 ,l h ) − F h(cn+1 ,l −1
+
+h )∥2
+
+L2(K)(5.4) + ( ς1Cμ,min − ϱ2Cβ2Cλ
+
+) X
+
+e∈E Ih
+
+1
+
+he
+
+∥[Fh(cn+1 ,l h ) − F h(cn+1 ,l −1
+
+h )] ∥2
+
+L2(e)
+
+< C con 
+
+3Cϕ,min 
+
+4
+
+X
+
+K∈K h
+
+∥cn+1 ,l h − cn+1 ,l −1
+
+h ∥2
+
+L2(K)
+
++( ς1Cμ,min − ϱ2Cβ2Cλ
+
+) X
+
+e∈E Ih
+
+1
+
+he
+
+∥[cn+1 ,l h − cn+1 ,l −1
+
+h ]∥2
+
+L2(e)
+
+ ,
+
+where Cλ is the lower bound of λ−1(ϕn), Cμ,min and Cμ,max are the upper and lower bounds of 
+
+θnRT cnh (1 −βc nh )2 , respectively. Proof. Let qh = en+1 ,l +1 
+
+ch in (5.1b) and wh = en+1 ,l 
+
+uf,h in (5.1c), we can get ( en+1 ,l ϕh cn+1 ,l h + ϕn+1 ,l h en+1 ,l +1 
+
+ch
+
+τ , e n+1 ,l +1 
+
+ch ) + X
+
+e∈E Ih
+
+⟨cn∗
+
+h en+1 ,l 
+
+uf,h · n, [en+1 ,l +1 
+
+ch ]⟩e(5.5) + X
+
+e∈E Ih
+
+ς1
+
+he
+
+⟨[en+1 ,l +1 
+
+μh ], [en+1 ,l +1 
+
+ch ]⟩e = 0 ,
+
+(λ−1(ϕnh )en+1 ,l 
+
+uf,h , e n+1 ,l 
+
+uf,h ) = X
+
+e∈E Ih
+
+⟨[en+1 ,l μh ], c n∗
+
+h en+1 ,l 
+
+uf,h · ne⟩e.(5.6) 15 
+
+By the Cauchy-Schwarz inequality, the Young’s inequality and ϱ0 ≤ βc nh ≤ ϱ, we obtain (en+1 ,l ϕh cn+1 ,l h , e n+1 ,l +1 
+
+ch ) ≤ ϱ2
+
+β2Cϕ,min 
+
+X
+
+K∈K h
+
+∥en+1 ,l ϕh ∥2
+
+L2(K)(5.7) + Cϕ,min 
+
+4
+
+X
+
+K∈K h
+
+∥en+1 ,l +1 
+
+ch ∥2
+
+L2(K),
+
+Using the trace inequality and the bound ϱ0 ≤ βc nh ≤ ϱ, we can get 
+
+X
+
+e∈E Ih
+
+⟨[en+1 ,l +1 
+
+ch ], c n∗
+
+h en+1 ,l 
+
+uf,h · n⟩e ≤ Cλ
+
+4
+
+X
+
+K∈K h
+
+∥en+1 ,l 
+
+uf,h ∥2
+
+L2(K)(5.8) + ϱ2Cβ2Cλ
+
+X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l +1 
+
+ch ]∥2
+
+L2(e).
+
+Similarly, we have 
+
+X
+
+e∈E Ih
+
+⟨[en+1 ,l μh ], c n∗
+
+h en+1 ,l 
+
+uf,h · n⟩e ≤ Cλ
+
+4
+
+X
+
+K∈K h
+
+∥en+1 ,l 
+
+uf,h ∥2
+
+L2(K)(5.9) + ϱ2C2
+
+μ,max Cβ2Cλ
+
+X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l ch ]∥2
+
+L2(e).
+
+By (5.6) and (5.9), we deduce 3Cλ
+
+4
+
+X
+
+K∈K h
+
+∥en+1 ,l 
+
+uf,h ∥2
+
+L2(K) ≤ ϱ2C2
+
+μ,max Cβ2Cλ
+
+X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l ch ]∥2
+
+L2(e).(5.10) Combining (5.7)-(5.10), we obtain 3Cϕ,min 
+
+4
+
+X
+
+K∈K h
+
+∥en+1 ,l +1 
+
+ch ∥2
+
+L2(K) + ( ς1Cμ,min − ϱ2Cβ2Cλ
+
+) X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l +1 
+
+ch ]∥2
+
+L2(e)(5.11) 
+
+≤ ϱ2
+
+β2Cϕ,min 
+
+X
+
+K∈K h
+
+∥en+1 ,l ϕh ∥2
+
+L2(K) + ϱ2C2
+
+μ,max Cβ2Cλ
+
+X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l ch ]∥2
+
+L2(e).
+
+Letting φh = en+1 ,l ϕh in (5.1d), we have (en+1 ,l ϕh , e n+1 ,l ϕh ) = 1
+
+N (en+1 ,l ph , e n+1 ,l ϕh ) + α(∇ · en+1 ,l 
+
+us,h , e n+1 ,l ϕh )(5.12) 
+
+− α X
+
+e∈E Ih
+
+⟨{ en+1 ,l ϕh ne}, [en+1 ,l 
+
+us,h ]⟩e.
+
+As a result of the Cauchy-Schwarz inequality, the Young’s inequality, (5.3) and ϱ0 ≤ βc nh ≤ ϱ, we have 
+
+α(∇ · en+1 ,l 
+
+us,h , e n+1 ,l ϕh ) ≤ α
+
+2
+
+X
+
+K∈K h
+
+∥∇ · en+1 ,l 
+
+us,h ∥2
+
+L2(K) + α
+
+2
+
+X
+
+K∈K h
+
+∥en+1 ,l ϕh ∥2
+
+L2(K),(5.13) 1
+
+N (en+1 ,l ph , e n+1 ,l ϕh ) ≤ 12N
+
+X
+
+K∈K h
+
+∥en+1 ,l ph ∥2
+
+L2(K) + 12N
+
+X
+
+K∈K h
+
+∥en+1 ,l ϕh ∥2
+
+L2(K)(5.14) 
+
+≤ (ϱC μ, max )2
+
+2N β 2
+
+X
+
+K∈K h
+
+∥en+1 ,l ch ∥2
+
+L2(K) + 12N
+
+X
+
+K∈K h
+
+∥en+1 ,l ϕh ∥2
+
+L2(K).
+
+By the trace inequality, we obtain 
+
+α X
+
+e∈E Ih
+
+⟨{ en+1 ,l ϕh ne}, [en+1 ,l 
+
+us,h ]⟩e ≤ α
+
+2
+
+X
+
+K∈K h
+
+∥en+1 ,l ϕh ∥2
+
+L2(K) + αC X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l 
+
+us,h ]∥2
+
+L2(e).(5.15) 16 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+On account of (5.13)-(5.15), we get the following inequality 
+
+X
+
+K∈K h
+
+∥en+1 ,l ϕh ∥2
+
+L2(K) ≤ (ϱC μ, max )2
+
+2N β 2(1 − α − 12N ) ∥en+1 ,l ch ∥2
+
+L2(K) + α
+
+2(1 − α − 12N )
+
+X
+
+K∈K h
+
+∥∇ · en+1 ,l 
+
+us,h ∥2
+
+L2(K)
+
+(5.16) + αC 
+
+(1 − α − 12N )
+
+X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l 
+
+us,h ]∥2
+
+L2(e).
+
+Let vh = en+1 ,l 
+
+us,h in (5.1a), we get 
+
+X
+
+K∈K h
+
+(σe(en+1 ,l 
+
+us,h ), ε (en+1 ,l 
+
+us,h )) K − X
+
+e∈E Ih
+
+⟨{ σe(en+1 ,l 
+
+us,h )ne}, [en+1 ,l 
+
+us,h ]⟩e(5.17) 
+
+− α X
+
+K∈K h
+
+(en+1 ,l ph , ∇ · en+1 ,l 
+
+us,h )K + α X
+
+e∈E Ih
+
+⟨{ en+1 ,l ph ne}, [en+1 ,l 
+
+us,h ]⟩e
+
+− X
+
+e∈E Ih
+
+⟨[en+1 ,l 
+
+us,h ], {σe(en+1 ,l 
+
+us,h )ne}⟩ e + X
+
+e∈E Ih
+
+ς2
+
+he
+
+⟨[en+1 ,l 
+
+us,h ], [en+1 ,l 
+
+us,h ]⟩e
+
+= 0 .
+
+By the Cauchy-Schwarz inequality, Young’s inequality, trace inequality and ϱ0 ≤ βc nh ≤ ϱ, we have 2 X
+
+e∈E Ih
+
+⟨{ σe(en+1 ,l 
+
+us,h )ne}, [en+1 ,l 
+
+us,h ]⟩e(5.18) 
+
+≤ 12
+
+X
+
+K∈K h
+
+(σe(en+1 ,l 
+
+us,h ), ε (en+1 ,l 
+
+us,h )) K + C X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l 
+
+us,h ]∥2
+
+L2(e),α X
+
+K∈K h
+
+(en+1 ,l ph , ∇ · en+1 ,l 
+
+us,h )K(5.19) 
+
+≤ α X
+
+K∈K h
+
+∥cnh en+1 ,l μh ∥L2(K)∥∇ · en+1 ,l 
+
+us,h ∥L2(K)
+
+≤ α(ϱC μ, max )2
+
+2γβ 2
+
+X
+
+K∈K h
+
+∥en+1 ,l ch ∥2
+
+L2(K) + αγ 
+
+2
+
+X
+
+K∈K h
+
+∥∇ · en+1 ,l 
+
+us,h ∥2
+
+L2(K),α X
+
+e∈E Ih
+
+⟨{ en+1 ,l ph ne}, [en+1 ,l 
+
+us,h ]⟩e(5.20) 
+
+≤ αC 2
+
+μ, max ϱ2
+
+2β2
+
+X
+
+K∈K h
+
+∥en+1 ,l ch ∥2
+
+L2(K) + αC X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l 
+
+us,h ]∥2
+
+L2(e).
+
+Substituting (5.18) and (5.19) into (5.17), we get 
+
+η X
+
+K∈K h
+
+∥ε(en+1 ,l 
+
+us,h )∥2
+
+L2(K) + ( 1 − α
+
+2 )γ X
+
+K∈K h
+
+∥∇ · (en+1 ,l 
+
+us,h )∥2
+
+L2(K)(5.21) + ( ς2 − (1 + α)C) X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l 
+
+us,h ]∥2
+
+L2(e)
+
+≤
+
+ α(1 + γ)( ϱC μ, max )2
+
+2γβ 2
+
+ X
+
+K∈K h
+
+∥en+1 ,l ch ∥2
+
+L2(K).
+
+By (5.21), it is straightforward to derive the following two inequalities: 
+
+X
+
+K∈K h
+
+∥∇ · (en+1 ,l 
+
+us,h )∥2
+
+L2(K) ≤ 1( 12 − α)γ
+
+ α(1 + γ)( ϱC μ, max )2
+
+2γβ 2
+
+ X
+
+K∈K h
+
+∥en+1 ,l ch ∥2
+
+L2(K),(5.22) 17 
+
+and 
+
+X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l 
+
+us,h ]∥2
+
+L2(e) ≤ 1(ς2 − (1 + α)C)
+
+ α(1 + γ)( ϱC μ, max )2
+
+2γβ 2
+
+ X
+
+K∈K h
+
+∥en+1 ,l ch ∥2
+
+L2(K).(5.23) Combining (5.16), (5.22) and (5.23), we obtain 
+
+X
+
+K∈K h
+
+∥en+1 ,l ϕh ∥2
+
+L2(K)(5.24) 
+
+≤ 1(1 − α − 12N )
+
+
+
+( 1( 12 − α)γ + αC 
+
+(ς2 − (1 + α)C) ) α(1 + γ)( ϱC μ, max )2
+
+2γβ 2
+
++ (ϱC μ, max )2
+
+2N β 2
+
+ X
+
+K∈K h
+
+∥en+1 ,l ch ∥2
+
+L2(K).
+
+Substituting (5.24) into (5.11), we can get 3Cϕ,min 
+
+4
+
+X
+
+K∈K h
+
+∥en+1 ,l +1 
+
+ch ∥2
+
+L2(K) + ( ς1Cμ,min − ϱ2Cβ2Cλ
+
+) X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l +1 
+
+ch ]∥2
+
+L2(e)(5.25) 
+
+≤ ϱ2
+
+β2Cϕ,min 
+
+(Cμ, max ϱ)2
+
+2β2
+
+1(1 − α − 12N )
+
+
+
+( α
+
+(1 − 2α)γ
+
++ αC 
+
+(ς2 − (1 + α)C) )( α(1 + γ)
+
+γ ) + 1
+
+N
+
+ X
+
+K∈K h
+
+∥en+1 ,l ch ∥2
+
+L2(K)
+
++ ϱ2C2
+
+μ,max Cβ2Cλ
+
+X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l ch ]∥2
+
+L2(e),
+
+where 0 < α < 1, and γ, ς1, ς2, N should be chosen to be sufficiently large such that 3Cϕ, min 
+
+4 > ϱ2
+
+β2Cϕ, min 
+
+(Cμ, max ϱ)2
+
+2β2
+
+1
+
+ 1 − α − 12N
+
+ α
+
+(1 − 2α)γ + αC ς2 − (1 + α)C
+
+ α(1 + γ)
+
+γ + 1
+
+N
+
+
+
+and 
+
+ς1Cμ, min − ϱ2Cβ2Cλ
+
+
+
+> ϱ2C2
+
+μ, max Cβ2Cλ
+
+.
+
+Now we define the constant Ccont as 
+
+Ccont = min 
+
+ϱ2
+
+β2Cϕ, min 
+
+(Cμ, max ϱ)2
+
+2β2
+
+1
+
+(1−α− 12N )
+
+h α
+
+(1 −2α)γ + αC ς2−(1+ α)C
+
+ α(1+ γ)
+
+γ + 1
+
+N
+
+i
+
+3Cϕ, min 
+
+4
+
+,
+
+ϱ2C2
+
+> μ, max
+
+Cβ2Cλ
+
+ς1Cμ, min − ϱ2Cβ2Cλ
+
+!
+
+< 1,
+
+then we can get the contraction estimate 3Cϕ,min 
+
+4
+
+X
+
+K∈K h
+
+∥en+1 ,l +1 
+
+ch ∥2
+
+L2(K) + ( ς1Cμ,min − ϱ2Cβ2Cλ
+
+) X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l +1 
+
+ch ]∥2
+
+L2(e)(5.26) 
+
+< C con 
+
+ 3Cϕ,min 
+
+4
+
+X
+
+K∈K h
+
+∥en+1 ,l ch ∥2
+
+L2(K) + ( ς1Cμ,min − ϱ2Cβ2Cλ
+
+) X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l ch ]∥2
+
+L2(e)
+
+ .
+
+The proof is completed. □18 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Theorem 5.2. There exists a unique solution ( un+1  
+
+> s,h
+
+, p n+1  
+
+> h
+
+, un+1  
+
+> f,h
+
+, c n+1  
+
+> h
+
+, μ n+1  
+
+> h
+
+, ϕ n+1  
+
+> h
+
+) which satisfies the nonlinear system (3.5) .Proof. Lemma 5.1 indicates that the mapping Fh is contraction. Moreover, the discrete solution spaces are obviously compact sets. Thus the existence of discrete solutions of the nonlinear system (3.5) can be obtained by the Banach fixed-point theorem, (5.10), (5.21) and (5.24), 
+
+un+1 ,l +1  
+
+> s,h
+
+→ un+1  
+
+> s,h
+
+in Vh,
+
+un+1 ,l +1  
+
+> f,h
+
+→ un+1  
+
+> f,h
+
+in U0 
+
+> h
+
+,pn+1 ,l +1  
+
+> h
+
+, ϕ n+1 ,l +1  
+
+> h
+
+, c n+1 ,l +1  
+
+> h
+
+→ pn+1  
+
+> h
+
+, ϕ n+1  
+
+> h
+
+, c n+1  
+
+> h
+
+in Qh.
+
+The proof is completed. □
+
+Theorem 5.3. Assume that the boundary condition (2.5) holds, 0 < ϵ ≤ cnh ≤ ϱβ < 1 
+
+> β
+
+. The stabilization parameter θn is taken as follow 
+
+θn = max 
+
+> K∈K h
+
+(
+
+1, (1 − βc nh )2
+
+χn 
+
+> 1
+
+(1 − χn 
+
+> 1
+
+βc nh )2 , (1 − βc nh )2
+
+χn 
+
+> 2
+
+(1 − χn 
+
+> 2
+
+βc nh )2
+
+)
+
+,(5.27) 
+
+where χn 
+
+> 1
+
+= 1 − δ1 (1 − βc nh )2, χn 
+
+> 2
+
+= 1 + δ2 (1 − βc nh )2. The total free energy generated by the scheme 
+
+(3.5) is dissipated as 
+
+Dτ En+1  
+
+> h
+
+≤ 0,
+
+where 
+
+En+1  
+
+> h
+
+= X
+
+> K∈K h
+
+Z
+
+> K
+
+
+
+ϕn+1  
+
+> h
+
+f (cn+1  
+
+> h
+
+) + 12 σe(un+1  
+
+> s,h
+
+) : ε(un+1  
+
+> s,h
+
+) + 12N |pn+1  
+
+> h
+
+|2
+
+
+
+dx(5.28) + X
+
+> e∈E Ih
+
+ς1
+
+2he
+
+⟨[un+1  
+
+> s,h
+
+], [un+1  
+
+> s,h
+
+]⟩e − X
+
+> e∈E Ih
+
+⟨{ σe(un+1  
+
+> s,h
+
+)ne}, [un+1  
+
+> s,h
+
+]⟩e.
+
+Proof. By the Taylor expansion and assuming that ξ is a number between cnh and cn+1  
+
+> h
+
+, we have 
+
+f  cn+1 
+
+> h
+
+ − f (cnh ) = μ (cnh )  cn+1  
+
+> h
+
+− cnh
+
+ + f ′′ (ξ)2
+
+ cn+1  
+
+> h
+
+− cnh
+
+2 .(5.29) In view of the stabilized chemical potential (3.1), we further obtain 
+
+f  cn+1 
+
+> h
+
+ − f (cnh ) = μn+1 
+
+> h
+
+ cn+1  
+
+> h
+
+− cnh
+
+ + f ′′ (ξ)2 − θnRT cnh (1 − βc nh )2
+
+!  cn+1  
+
+> h
+
+− cnh
+
+2 .(5.30) From the expression of f , we can obtain that f ′′ (ξ) can be split into two parts as 
+
+f ′′ (ξ) = f ′′  
+
+> ir
+
+(ξ) + f ′′ 
+
+> att
+
+(ξ),
+
+where 
+
+f ′′  
+
+> ir
+
+(ξ) = RT ξ(1 − βξ )2 > 0,(5.31) 
+
+f ′′  
+
+> att
+
+= a(T )2√2β
+
+(1 − √2) β
+
+1 + (1 − √2) βc − (1 + √2) β
+
+(1 + (1 + √2) βc )
+
+!
+
+(5.32) + a(T )2√2β
+
+(1 − √2) β
+
+(1 + (1 − √2) βc )2 − (1 + √2) β
+
+(1 + (1 + √2) βc )2
+
+!
+
+< 0.
+
+Differentiating (5.31) with respect to c, we obtain 
+
+f ′′′  
+
+> ir
+
+(ξ) = − RT (1 − βξ )(1 − 3βξ )
+
+ξ2(1 − βξ )4 = − RT (1 − 3βξ )
+
+ξ2(1 − βξ )3 ,19 
+
+we deduce that 
+
+f ′′′  
+
+> ir
+
+(ξ) ≤ 0, for ξ ≤ 13β ,(5.33) 
+
+f ′′′  
+
+> ir
+
+(ξ) > 0, for ξ > 13β .(5.34) By (5.31), (5.33) and (5.34), we get 
+
+cnh (1 − βc nh )2 f ′′  
+
+> ir
+
+(ξ)2 ≤ RT 
+
+2 sup 
+
+(
+
+1, cnh (1 − βc nh )2
+
+cn+1 
+
+> h
+
+ 1 − βc n+1 
+
+> h
+
+2
+
+)
+
+.
+
+Due to the relationship χn 
+
+> 1
+
+cnh ≤ cn+1  
+
+> h
+
+≤ χn 
+
+> 2
+
+cnh , we get the following estimate 1
+
+RT cnh (1 − βc nh )2 f ′′  
+
+> ir
+
+(ξ)2 ≤ 12 sup 
+
+(
+
+1, (1 − βc nh )2
+
+χn 
+
+> 1
+
+(1 − χn 
+
+> 1
+
+βc nh )2 , (1 − βc nh )2
+
+χn 
+
+> 2
+
+(1 − χn 
+
+> 2
+
+βc nh )2
+
+)
+
+= θn.(5.35) By (5.35) and the fact f ′′ 
+
+> att
+
+(ξ) < 0, we obtain that cnh (1 − βc nh )2 f ′′ (ξ) ≤ θnRT . Thus, (5.30) becomes 
+
+f  cn+1 
+
+> h
+
+ − f (cnh ) ≤ μn+1 
+
+> h
+
+ cn+1  
+
+> h
+
+− cnh
+
+ .(5.36) Due to (3.5b), (3.5c) and (5.36), we obtain that 1
+
+τ
+
+X
+
+> K∈K h
+
+Z
+
+> K
+
+ (ϕn+1  
+
+> h
+
+f (cn+1  
+
+> h
+
+) − ϕnh f (cnh )) + ( ϕn+1  
+
+> h
+
+− ϕnh , p n+1  
+
+> h
+
+) dx(5.37) 
+
+≤ 1
+
+τ
+
+X
+
+> K∈K h
+
+Z
+
+> K
+
+ f (cnh )( ϕn+1  
+
+> h
+
+− ϕnh ) + ϕn+1  
+
+> h
+
+μn+1  
+
+> h
+
+(cn+1  
+
+> h
+
+− cnh )+( cnh μn+1  
+
+> h
+
+− f (cnh ))( ϕn+1  
+
+> h
+
+− ϕnh ) dx
+
+= 1
+
+τ
+
+X
+
+> K∈K h
+
+Z
+
+> K
+
+μn+1 
+
+> h
+
+ ϕn+1  
+
+> h
+
+cn+1  
+
+> h
+
+− ϕnh cnh
+
+ dx
+
+= − X
+
+> e∈E Ih
+
+Z
+
+> e
+
+[μn+1  
+
+> h
+
+]cn∗ 
+
+> h
+
+un+1  
+
+> f,h
+
+· ne + [ μn+1  
+
+> h
+
+]2 dx
+
+= −
+
+ X
+
+> K∈K h
+
+Z
+
+> K
+
+λ−1(ϕnh )|un+1  
+
+> f,h
+
+|2 dx + X
+
+> e∈E Ih
+
+Z
+
+> e
+
+[μn+1  
+
+> h
+
+]2 dx
+
+ .
+
+As it is proved in [8], we can deduce that 12
+
+X
+
+> K∈K h
+
+Dτ (σe(un+1  
+
+> s,h
+
+), ε (un+1  
+
+> s,h
+
+)) K + X
+
+> e∈E Ih
+
+ς1
+
+2he
+
+Dτ ⟨[un+1  
+
+> s,h
+
+], [un+1  
+
+> s,h
+
+]⟩e(5.38) 
+
+− X
+
+> e∈E Ih
+
+⟨{ σe(un+1  
+
+> s,h
+
+)ne}, [un+1  
+
+> s,h
+
+]⟩e + X
+
+> e∈E Ih
+
+⟨{ σe(uns,h )ne}, [uns,h ]⟩e
+
+− X
+
+> K∈K h
+
+(Dτ ϕn+1  
+
+> h
+
+, p n+1  
+
+> h
+
+)K
+
+≤ 0.
+
+Combining (5.37)-(5.38), we get 
+
+Dτ En+1  
+
+> h
+
+≤ 0.
+
+The proof is completed. □20 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+6. Numerical examples 
+
+In this section, we present several numerical experiments to validate our theoretical analysis and demonstrate the superior performance of the numerical schemes. In all the numerical experiments, we consider the flow of methane in porous media, with its physical properties shown in Table 1. In numerical simulation, we take δ1 = δ2 = δ. For a fixed δ, the adaptive time step and stabilization terms are selected according to (4.4) and (5.27). In all the numerical examples, the viscosity is set to be η = 10 −5 Pa · s. For the two-dimensional example, we select the computational domain as Ω = [0 , L ]2 where L = 100 m, and use a quasi-uniform triangular mesh with 20 , 000 elements. For the three-dimensional numerical experiments, we employed a tetrahedral mesh consisting of 162,000 elements. Figure 1 illustrates the specific mesh used in our simulations. 
+
+Figure 1. Mesh: Left: Two-dimensional mesh. Right: Three-dimensional mesh. 
+
+Table 1. Physical properties of methane. 
+
+Pc(bar) Tc(K) Acentric factor Mw(g /mole) Temperature(K) 45.99 190.56 0.011 16.04 330 6.1. Example 1. To evaluate the accuracy of the proposed numerical scheme, we conduct both temporal and spatial convergence tests. Since the nonlinear porous media gas flow model does not possess an analytical solution, the reference solution is obtained using the finest temporal or spatial discretization. For the temporal refinement test, the computational domain [0 , 1] × [0 , 1] is discretized using a fixed 50 × 50 mesh. The time step sizes are chosen as: 
+
+τ ∈ 9.75 × 10 −5, 4.875 × 10 −5, 2.4375 × 10 −5, 1.21875 × 10 −5, 6.09375 × 10 −6, 1.5235375 × 10 −6 ,
+
+and the smallest time step τmin = 1 .5235375 × 10 −6 is taken as the reference temporal solution. The numerical errors of the molar density at a prescribed final time are computed by comparing the solutions obtained with larger time steps against the reference one. For the spatial refinement test, the time step is fixed to τ = 10 −2. The spatial mesh resolutions are selected as N ∈ { 10 , 20 , 40 , 80 , 160 , 640 }, and the finest mesh Nmax = 640 is adopted as the reference spatial solution. Table 2 presents the temporal convergence results of the molar density. As the time step size τ
+
+decreases, the L2-error exhibits a clear monotonic decay. The estimated convergence rates between successive refinements remain close to a first-order trend, and the fitted slope is approximately 1.45, which demonstrates that the proposed scheme achieves the expected temporal accuracy. Table 3 shows the spatial convergence behavior under mesh refinement. As the mesh is refined from h = 1 /10 to h = 1 /160, the numerical errors decrease steadily. The computed rates are close to first order, and 21 
+
+the fitted slope is approximately 1.01. indicating that the method maintains stable and consistent spatial accuracy. The corresponding log–log convergence plots are displayed in Figure 2, where the linear decay trends further validate the temporal and spatial convergence properties of the proposed scheme. Overall, these results demonstrate that the method possesses reliable accuracy with respect to both time and space discretizations. Time step τ L2-Error Rate 9.75e-5 1.330829e+00 1.4958 4.875e-5 4.718754e-01 1.4706 2.4375e-5 1.702673e-01 1.4263 1.21875e-5 6.335198e-02 1.4323 6.09375e-6 2.347375e-02 -Fitted slope: 1 .45 
+
+Table 2. The time-convergence results of the molar density c
+
+Mesh size h L2-Error Rate 1/10 9.61e-01 1.0099 1/20 4.77e-01 0.9700 1/40 2.44e-01 1.0430 1/80 1.18e-01 1.0353 1/160 5.77e-02 -Fitted slope: 1 .01 
+
+Table 3. The spatial convergence results of the molar density c
+
+Figure 2. Example 1: Convergence plots of the molar density c in space and time. Left: Spatial, Right: Temporal. 6.2. Example 2. In this example, we test a closed system to verify that the proposed numeri-cal scheme ensures properties such as mass conservation and energy dissipation. The Perlin noise method is adopted to generate spatially varying random permeability fields, aiming to mimic real-istic geological scenarios. The initial molar density is obtained using the following spatial random distribution method, 
+
+c0 = c0 + rand( x) · (c1 − c0) ,
+
+where rand( x) is a function for generating random numbers within the range [0,1], c0 = 100 mol/ m3,
+
+c1 = 300 mol/ m3. In this test, we choose N = 10 11 Pa, γ = 10 11 Pa , η = 10 8 Pa, δ = 0 .2. To evaluate the influence of the time-step size on the performance of the nonlinear solver, the iteration tolerance was set to e = 10 −11 , and the nonlinear iterations were terminated once the residual dropped below this threshold. Five different time-step sizes were tested, and for each ∆ t,five consecutive time levels were computed. The number of nonlinear iterations required at each time 22 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+step is summarized in Table 4. These results show that the nonlinear solver is almost insensitive with the time-step size and remains robust for different choices of τ .Figure 3 shows the initial molar density and permeability distribution. Figure 4 demonstrates that the proposed scheme preserves the dissipation property, conservation of the total moles and boundedness of the molar density. The graph on the left-hand side of Figure 5 depicts the adaptive values of stabilization parameter and the graph on the right-hand side of Figure 5 depicts the adaptive values of time step, which demonstrates the time step increases gradually as the system reaches steady state until the maximum set step τmax = 1000 is reached. In Figure 6, Figure 7 and Figure 8, we illustrate the distributions of molar density, chemical potential and pressure at different times. It can be seen that the molar density gradually reaches the equilibrium state driven by the chemical potential energy. 
+
+Table 4. Number of nonlinear iterations with different time steps 
+
+τ step 1 step 2 step 3 step 4 step 5 0.010000 7 7 6 6 60.005000 7 7 6 6 60.002500 7 7 6 6 60.001250 7 7 6 6 60.000625 7 7 6 6 6
+
+Figure 3. Example 2: Distributions of initial molar density and permeability. Left: Initial molar density. Right: Initial permeability. 
+
+Figure 4. Example 2: Left: Distributions of energy at different time steps. Middle: Mass conservation at different time steps. Right: Minimum and maximum values of molar density. 23 
+
+Figure 5. Example 2: Left: Adaptive values of the stabilization parameter at different time steps. Right: Adaptive values of the time step size. 
+
+Figure 6. Distributions of molar density at different times in Example 2. Top-left: 
+
+n = 10. Top-right: n = 30. Bottom-left: n = 40. Bottom-right: n = 100. 6.3. Example 3. In this example, we consider an injection problem where Dirichlet boundary conditions for molar density are applied at the left boundary of the domain, with a prescribed boundary value of 1000 mol /m3. For this test, the following parameters are chosen: δ = 0 .8, N =10 11 Pa, γ = 10 11 Pa, and η = 10 8 Pa. The permeability and porosity fields are assigned a random distribution, as illustrated in Figure 9, to simulate heterogeneous material properties commonly encountered in practical applications. Figures 11, 12, and 13 depict the spatial variations of molar density, chemical potential, and pressure, respectively. The results demonstrate that the Dirichlet boundary condition imposed on the left boundary induces a chemical potential gradient, which drives the injection of molar density from the left to the right side of the domain. This behavior is consistent with the physical mechanism of advection under a concentration gradient. Figure 10 shows the evolution of the stabilization parameter over time steps. It is observed that the stabilization parameter remains nearly constant throughout the time iteration process. This behavior can be attributed to the fixed concentration boundary condition applied at the left end of the domain. 24 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Figure 7. Distributions of chemical potential at different times in Example 2. Top-left: n = 10. Top-right: n = 30. Bottom-left: n = 40. Bottom-right: n = 100. 
+
+Figure 8. Distributions of pressure at different times in Example 2. Top-left: 
+
+n = 10. Top-right: n = 30. Bottom-left: n = 40. Bottom-right: n = 100. These results highlight the effectiveness of the proposed method in capturing the coupled dynam-ics of molar density, chemical potential, and pressure in a heterogeneous medium, while maintaining numerical stability and accuracy. The consistent performance of the stabilization parameter under-scores the reliability of the approach for long-time simulations. 6.4. Example 4. In the third example, we demonstrate the robustness of the proposed method in three-dimensional (3D) space. The initial distribution of permeability is generated using the 25 
+
+Figure 9. Example 3: Left: The initial distribution of permeability. Right: The initial distribution of porosity. 
+
+Figure 10. Example 3: Left: Adaptive values of the stabilization parameter at different time steps. Right: Adaptive values of the time step size. 
+
+Figure 11. Distributions of molar density at different times in Example 3. Top-left: n = 100. Top-right: n = 200. Bottom-left: n = 1000. Bottom-right: n = 2000. 26 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Figure 12. Distributions of chemical potential at different times in Example 3. Top-left: n = 100. Top-right: n = 200. Bottom-left: n = 1000. Bottom-right: 
+
+n = 2000. 
+
+Figure 13. Distributions of pressure at different times in Example 3. Top-left: 
+
+n = 100. Top-right: n = 200. Bottom-left: n = 1000. Bottom-right: n = 2000. following randomized approach: 
+
+κ0 = κ0 + rand( x) · (κ1 − κ0) ,
+
+where κ0 = 0 .5 md and κ1 = 10 md which represent the lower and upper bounds of the permeability, respectively. Here, rand( x) denotes a random function that generates spatially varying values be-tween 0 and 1. For this test, we set δ = 0 .5. The spatial discretization is performed using a uniform tetrahedral mesh with 162,000 elements, ensuring sufficient resolution for accurate 3D simulations. 27 
+
+Figure 14 demonstrates that the proposed scheme preserves key physical properties, including the dissipation property, conservation of total moles, and boundedness of molar density. These results confirm the numerical stability and physical consistency of the method. Figure 15 illustrates the adaptive values of the stabilization parameter and time steps, highlighting the dynamic adjustment of these parameters to maintain stability and accuracy throughout the simulation. Figure 16 shows the evolution of molar density over time, capturing the transient behavior of the system in 3D space. The numerical results demonstrate that the proposed scheme performs effectively for three-dimensional simulations, accurately capturing the complex dynamics of the system while maintaining stability and computational efficiency. The ability to handle spatially varying permeability fields and adaptively adjust stabilization parameters further underscores the robustness and versatility of the method for realistic 3D applications. 
+
+Figure 14. Example 4: Left: Distributions of energy at different time steps. Mid-dle: Mass conservation at different time steps. Right: Minimum and maximum values of molar density. 
+
+Figure 15. Example 4: Left: Adaptive values of the stabilization parameter at different time steps. Right: Adaptive values of the time step size. 7. Conclusion 
+
+In this work, we have developed and analyzed a linear, energy-stable numerical method for sim-ulating thermodynamically consistent gas flow in poroelastic media. The proposed approach ef-fectively addresses the inherent nonlinearity and strong coupling between gas dynamics and rock deformation while rigorously preserving key physical properties, including mass conservation, energy dissipation, and bounded molar density. By introducing a stabilization strategy that retains the orig-inal energy structure, we achieve a linear iterative scheme with provable convergence. The adaptive stabilization parameter and time-stepping strategy further enhance computational efficiency and robustness of the algorithm, particularly in highly dynamic or nonlinear regimes. The mixed finite element formulation, combined with upwind discretization, ensures stable and physically consistent 28 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Figure 16. Distributions of molar density at different times in Example 4. Top-left: n = 10. Top-right: n = 20. Bottom-left: n = 30. Bottom-right: n = 50. spatial resolution. Extensive numerical experiments demonstrate the accuracy, stability, and effi-ciency of the proposed method, confirming its potential as a reliable tool for simulating complex gas-poroelastic systems. Future work may explore its extension to multi-component gas mixtures or multi-phase flow problems in geomechanics and subsurface energy applications. 
+
+Acknowledgement 
+
+The work of Huangxin Chen is supported by National Key Research and Development Project of China (Grant No. 2023YFA1011702) and National Natural Science Foundation of China (Grant No. 12471345, 12122115). The work of Shuyu Sun is supported by National Key Research and Develop-ment Project of China (Grant No. 2023YFA1011701) and National Natural Science Foundation of China (Grant No. 12571466). 
+
+References 
+
+[1] G. Akrivis, B. Li, and D. Li. Energy-decaying extrapolated RK–SAV methods for the AllenCahn and Cahn–Hilliard equations, SIAM J. Sci. Comput., 41(6) (2019), A3703–A3727. [2] M. Biot, General theory of three-dimensional consolidation, J. Appl. Phys., 12 (1941), 155–164. [3] G. Beylkin, J. M. Keiser, and L. Vozovoi, A new class of time discretization schemes for the solution of nonlinear PDEs, J. Comput. Phys., 147 (1998), 362–387. [4] S. M. Cox and P. C. Matthews, Exponential time differencing for stiff systems, J. Comput. Phys., 176 (2002), 430–455. [5] W. Chen, C. Wang, X. Wang, S.M. Wise, Positivity-preserving, energy stable numerical schemes for the Cahn-Hilliard equation with logarithmic potential, J. Comput. Phys., 3 (2019), 100031. [6] Q. Cheng, J. Shen, A new Lagrange multiplier approach for constructing structure preserving schemes, I. Posi-tivity preserving, Comput. Methods Appl. Mech. Eng., 391 (6) (2022), 114585. [7] Q. Cheng, J. Shen, A new Lagrange multiplier approach for constructing structure-preserving schemes, II. Bound preserving, SIAM J. Numer. Anal. 60 (3) (2022), 970–998. [8] H. Chen, Y. Chen, J. Kou, Energy stable finite element approximations of gas flow in poroelastic media, Comput. Methods Appl. Mech. Engrg., 428 (2024), 117082. [9] Z. Chen, G. Huan, and Y. Ma, Computational Methods for Multiphase Flows in Porous Media, SIAM, Philadel-phia, 2006. [10] L. Dong, C. Wang, S.M. Wise, Z. Zhang, A positivity-preserving, energy stable scheme for a ternary Cahn-Hilliard system with the singular interfacial parameters, J. Comput. Phys., 442 (2021), 110451. [11] Q. Du, L. Ju, X. Li, Z. Qiao, Maximum bound principles for a class of semilinear parabolic equations and exponential time-differencing schemes, SIAM Review, 63 (2021), 317–359. 29 
+
+[12] M. F. El-Amin, J. Kou, and S. Sun, Mixed finite element simulation with stability analysis for gas transport in low-permeability reservoirs, Energies, 11 (2018), 208. [13] V. Joshi, R.K. Jaiman, A positivity preserving and conservative variational scheme for phase-field modeling of two-phase flows, J. Comput. Phys., 360 (2018), 137–166. [14] D. J. Eyre, Unconditionally gradient stable time marching the Cahn-Hilliard equation, in Computational and Mathematical Models of Microstructural Evolution (San Francisco, CA, 1998), Mater. Res. Soc. Sympos. Proc. 529, MRS, Warrendale, PA, 1998, 39–46. [15] A. Firoozabadi, Thermodynamics of Hydrocarbon Reservoirs, McGraw-Hill, New York, 1999. [16] C. Guo, B. Bai, M. Wei, X. He, and Y.S. Wu, Study on gas permeability in nano pores of shale gas reservoirs, in Proceedings of the SPE Unconventional Resources Conference, 2013, SPE-167179-MS. [17] L. Ju, X. Li, Z. Qiao, and H. Zhang, Energy stability and error estimates of exponential time differencing schemes for the epitaxial growth model without slope selection, Math. Comp., 87 (2021), pp. 1859–1885. [18] L. Ju, X. Li, and Z. Qiao, Generalized SAV–exponential integrator schemes for Allen–Cahn type gradient flows, SIAM J. Numer. Anal., 60(4) (2022), 1905–1931. [19] L. Ju, X. Li, and Z. Qiao, Stabilized exponential–SAV schemes preserving energy dissipation law and maximum bound principle for the Allen–Cahn type equations, J. Sci. Comput., 92(2) (2022). [20] J. Kou and S. Sun, Thermodynamically consistent modeling and simulation of multicomponent two-phase flow with partial miscibility, Comput. Methods Appl. Mech. Engrg., 331 (2018), 623–649. [21] J. Kou and S. Sun, Entropy stable modeling of non-isothermal multi-component diffuse-interface two-phase flows with realistic equations of state, Comput. Methods Appl. Mech. Eng., 341 (2018), 221–248. [22] J. Kou, S. Sun, X. Wang, A novel energy factorization approach for the diffuse-interface model with Peng-Robinson equation of state, SIAM J. Sci. Comput., 42 (2020), B30–B56. [23] J. Kou, X. H. Wang, S. G. Du, Energy stable and mass conservative numerical method for gas flow in porous media with rock compressibility, SIAM J. Sci. Comput., 44 (2022), B938–B963. [24] J. Kou, X. H. Wang, H. X. Chen, S. Sun, An efficient bound-preserving and energy stable algorithm for com-pressible gas flow in porous media, J. Comput. Phys., 473 (2023), 111751. [25] R. Lewis, B. Schrefler, The finite element method in the static and dynamic deformation and consolidation of porous media, In: Numerical Methods in Engineering. John Wiley (1998). [26] G. Lebon, D. Jou, J. Casas-V´ azquez, Understanding Non-equilibrium Thermodynamics, Springer-Verlag, Berlin Heidelberg, (2008). [27] D. Li, Z. Qiao, and T. Tang, Characterizing the stabilization size for semi-implicit Fourierspectral method to phase field equations, SIAM J. Numer. Anal., 54 (2016), 1653–1681. [28] P.J. Phillips, M. Wheeler, A coupling of mixed and discontinuous Galerkin finite-element methods for poroelas-ticity, Comput. Geosci., 12 (2008), 417–435. [29] O. Pol´ ıvka and J. Mikyˇ ska, Compositional modeling in porous media using constant volume flash and flux computation without the need for phase identification, J. Comput. Phys., 272 (2014), 149–169. [30] D. Peng and D. B. Robinson, A new two-constant equation of state, Ind. Eng. Chem. Fundamen., 15 (1976), 59–64. [31] Z. Qiao and S. Sun, Two-phase fluid simulation using a diffuse interface model with Peng-Robinson equation of state, SIAM J. Sci. Comput., 36 (2014), pp. B708–B728. [32] J. Shen, T. Tang, and J. Yang. On the maximum principle preserving schemes for the generalized Allen–Cahn equation, Commun. Math. Sci., 14(6) (2016), 1517–1534. [33] J. Shen, J. Xu, and J. Yang, The scalar auxiliary variable (SAV) approach for gradient flows, J. Comput. Phys., 353 (2018), 407–416. [34] J. Shen, J. Xu, and J. Yang, A new class of efficient and robust energy stable schemes for gradient flows, SIAM Rev., 61 (2019), 474–506. [35] J. Shen, J. Xu, Unconditionally positivity preserving and energy dissipative schemes for Poisson-Nernst-Planck equations, Numer. Math., 148 (2021), 671–697. [36] C. Schwab, p- and hp- Finite Element Methods: Theory and Applications in Solid and Fluid Mechanics, The Clarendon Press, Oxford University Press, New York, 1998. [37] T. Tang and J. Yang, Implicit–explicit scheme for the Allen–Cahn equation preserves the maximum principl, J. Comput. Math., 34(5) (2016), 451–461. [38] C. Xu and T. Tang, Stability analysis of large time-stepping methods for epitaxial growth models, SIAM J. Numer. Anal., 44 (2006), 1759–1779. [39] J. Yang, Z. Yuan, Z. Zhou, Arbitrarily high-order maximum bound preserving schemes with cut-off postprocessing for Allen-Cahn equations, J. Sci. Comput., 90 (2022), 76. [40] H. Yang, S. Sun, C. Yang, Nonlinearly preconditioned semismooth Newton methods for variational inequality solution of two-phase flow in porous media, J. Comput. Phys., 332 (2017), 1–20. [41] X. Yang and L. Ju, Efficient linear schemes with unconditionally energy stability for the phase field elastic bending energy model, Comput. Methods Appl. Mech. Eng., 315 (2017), 691–712. [42] X. Yang, J. Zhao, and Q. Wang, Numerical approximations for the molecular beam epitaxial growth model based on the invariant energy quadratization method, J. Comput. Phys., 333(2017), 104–127. [43] X. Zhang, C.-W. Shu, On positivity-preserving high order discontinuous Galerkin schemes for compressible Euler equations on rectangular meshes, J. Comput. Phys., 229 (23) (2010), 8918–8934. 30 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+School of Mathematical Sciences and Fujian Provincial Key Laboratory on Mathematical Modeling and High Performance Scientific Computing, Xiamen University, Fujian, 361005, China 
+
+Email address : chx@xmu.edu.cn 
+
+School of Mathematical Sciences and Fujian Provincial Key Laboratory on Mathematical Modeling and High Performance Scientific Computing, Xiamen University, Fujian, 361005, China 
+
+Email address : chenyuxiang@stu.xmu.edu.cn 
+
+State Key Laboratory of Intelligent Deep Metal Mining and Equipment, Shaoxing University, Shaox-ing 312000, Zhejiang, China 
+
+Email address : jishengkou@163.com 
+
+School of Mathematical Sciences, Tongji University, Shanghai 200092, China. 
+
+Email address : suns@tongji.edu.cn

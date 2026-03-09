@@ -1,0 +1,4725 @@
+Title: An Energy-Stable, Bound-Preserving and Locally Conservative Numerical Framework for Multicomponent Gas Flow in Poroelastic Media
+
+URL Source: https://arxiv.org/pdf/2602.10550v1
+
+Published Time: Thu, 12 Feb 2026 01:44:33 GMT
+
+Number of Pages: 36
+
+Markdown Content:
+AN ENERGY-STABLE, BOUND-PRESERVING AND LOCALLY CONSERVATIVE NUMERICAL FRAMEWORK FOR MULTICOMPONENT GAS FLOW IN POROELASTIC MEDIA 
+
+HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Abstract. In this paper, we propose a robust and efficient numerical framework for simulating multicomponent gas flow in poroelastic media, with a focus on preserving fundamental thermody-namic principles and ensuring computational reliability. The model captures the complex nonlinear coupling between multicomponent transport and solid deformation, while addressing critical nu-merical challenges such as mass conservation, energy stability, and molar density boundedness. To achieve this, we develop a stabilized discretization approach that guarantees the preservation of the original energy dissipation law and ensures the boundedness of each gas component’s molar density. Furthermore, the proposed method incorporates an adaptive time-stepping strategy that dynamically adjusts the time step size based on the system’s dynamics, significantly enhancing computational efficiency without compromising stability or accuracy. For spatial discretization, a mixed finite element method combined with an upwind scheme is employed for the flow and trans-port equations to ensure local mass conservation, while a discontinuous Galerkin (DG) method is utilized for discretizing the momentum equation of poroelasticity to effectively overcome numer-ical locking phenomena. Numerical experiments are presented to demonstrate the performance, robustness, and applicability of the method in simulating multicomponent gas flow under various scenarios. 
+
+1. Introduction 
+
+The flow of multicomponent gases through poroelastic media is a fundamental process in numerous geophysical and engineering applications, including carbon sequestration, hydrogen storage, natural gas recovery, and subsurface contaminant transport [16, 20, 38]. These processes are characterized by complex nonlinear couplings between multicomponent transport, phase behavior, and the mechanical response of the solid skeleton. A critical challenge in modeling such systems lies in the incorporation of the solid matrix deformation. Inspired by Biot’s poroelasticity theory, contemporary models often solve mechanical equilibrium equations to obtain solid displacements, from which porosity changes are derived. While significant advances have been made in modeling single-phase and two-phase flow in poroelastic media [10], the study of multicomponent compressible flow in poroelastic media remains relatively scarce. Moreover, the thermodynamic consistency of these models, particularly their adherence to the second law of thermodynamics, has often been overlooked, despite its critical role in ensuring model reliability and numerical stability [11, 26, 27, 35]. Beyond mechanical coupling, accurate description of diffusion in multicomponent mixtures is essential. The Maxwell-Stefan (MS) equations, which balance driving forces with inter-component friction, provide a robust framework for modeling diffusion [2, 19, 25, 33, 34, 41, 51]. Recent extensions have incorporated friction between fluid components and the solid matrix [31, 28, 14, 15]. In this work, we rigorously derive a novel generalized MS model that couples fluid transport with solid mechanics, ensuring that the resulting coefficients satisfy irreversible thermodynamics principles, which is a cornerstone of non-equilibrium thermodynamics and include the linear phenomenological assumption, Onsager’s reciprocal relations, the energy dissipation law, the minimum dissipation principle, Curie’s principle, and others. From a numerical perspective, the design of efficient and stable discretization methods for coupled nonlinear systems (e.g., those governing multiphysics processes in porous media) presents substan-tial challenges. An efficient scheme must concurrently satisfy several stringent requirements rooted in physical principles: it should preserve a discrete energy dissipation law to guarantee nonlinear 
+
+Key words and phrases. gas flow in porous media, poroelasticity model, energy stability, conservation of mass, adaptive time step, stabilized scheme.  
+
+> 1
+> arXiv:2602.10550v1 [math.NA] 11 Feb 2026 2HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN
+
+stability and thermodynamic conformity [18, 43], enforce the strict boundedness of physical quan-tities like molar density to preclude non-physical solutions [5, 48], ensure local mass conservation for all components, and retain high computational efficiency. As our physical model is derived from strict thermodynamic consistency, the numerical methods must also uphold this property to avoid unstable or non-physical results [11, 26]. Various established strategies exist for handling Helmholtz free energy in gradient flow type sys-tems. These range from the rigorously nonlinear convex splitting method [18, 40], which guarantees stability at the cost of solving nonlinear algebraic systems, to more efficient linear strategies. The latter category includes versatile stabilization methods [47, 21, 36], structure-preserving exponential time-differencing (ETD) schemes [3, 4], and the widely used invariant energy quadratization (IEQ) [50, 52] and scalar auxiliary variable (SAV) approaches [43, 44]. While the IEQ and SAV schemes offer linear, easily implementable energy-stable schemes, they typically preserve a modified energy functional rather than the original one [45]. Other notable methods, such as the energy factorization (EF) approach [29, 30], operate within an efficient linear framework while successfully preserving the dissipation characteristics of the original energy. Building upon this foundation, the present work employs a tailored stabilization approach [33] that enables a linear, energy-stable scheme while exactly preserving the original energy dissipation structure. Beyond energy stability, the boundedness of molar density is a fundamental requirement in simu-lating compressible flow in porous media. Designing numerical schemes that respect these bounds is crucial for obtaining physically reasonable solutions. The exploration of provably bound-preserving schemes has led to various strategies, including Lagrange multiplier [6, 7], variational inequality [17, 49], post-processing strategy [53], cut-off scheme [48], and nonlinear convex splitting approaches [5, 12, 45]. Recent advances have further yielded high-order methods that simultaneously ensure energy stability and solution boundedness, including stabilized linear schemes [46, 42] and SAV methods combined with cut-off operations [1, 44]. Notably, a significant advancement by Ju et al. [22, 23] ingeniously combined SAV method with stabilized ETD schemes to construct numerical methods preserving both the original energy-dissipation law and the maximum bound principle for a class of Allen-Cahn type gradient flows. However, in the specific context of advection-dominated transport in porous media, many overshoot/undershoot correction techniques may compromise nu-merical accuracy and critical properties like local mass conservation. To address the intertwined challenges of computational efficiency, exact discrete energy dissipa-tion, and strict solution boundedness, in this work we combine a robust adaptive time-stepping strategy with a modified linear stabilization method (cf. [33]). The boundedness requirement en-tails the simultaneous control of each component molar density and the total molar density. The key design is to use the total molar density c together with M − 1 component densities as primary variables, which allows us to enforce both the total and component-wise bounds in a unified man-ner. At each time step, the resulting nonlinear fully discrete system is solved by a stabilized linear fixed-point iteration. We prove that the iteration is contractive and hence converges to a unique limit. Furthermore, the unique limit coincides with the solution of the original nonlinear discrete system. The boundedness properties established at the iterative level are inherited by the converged solution. In particular, all molar density bounds and the discrete energy dissipation law hold for the final iterate. To enable an efficient and fully explicit time step size update, the velocity term in the mass conservation equation is treated explicitly within the linear iterations, which yields an explicit formula for computing the admissible adaptive time step. For spatial discretization, we employ a mixed finite element method combined with an upwind scheme to ensure local mass conservation and stability when handling advection-dominated trans-port. Furthermore, the momentum balance equation for the solid skeleton is discretized using a discontinuous Galerkin method to efficiently avoid numerical locking phenomena [37]. The resulting framework aims to provide a reliable, efficient, and physically faithful numerical tool for simulating complex coupled nonlinear processes in porous media. The remainder of this paper is organized as follows. In Section 2, we present the governing equations of our thermodynamically consistent model for multicomponent gas flow in poroelastic media. Section 3 elaborates the semi-discrete numerical scheme and shows the energy stability of the proposed scheme. Section 4 is devoted to the construction of a fully discrete numerical scheme, 3
+
+where its essential properties including energy dissipation and boundedness of molar densities are rigorously established, and an adaptive time-stepping algorithm is introduced. Numerical experi-ments in Section 5 validate the performance and robustness of the proposed method. Finally, we provide some concluding remarks in Section 6. 2. Mathematical Model 
+
+We consider a compressible fluid mixture composed of M components. The molar density vector is denoted as c = [ c1, c 2, . . . , c M ]T , with the total molar density given by c = PMi=1 ci. Assuming constant temperature T , we employ the Peng–Robinson equation of state to construct the Helmholtz free energy of the mixture. For each pure component, the energy parameters αi and βi are determined from its critical properties (2.1) αi = 0 .45724 R2T 2
+
+> c,i
+
+Pc,i 
+
+
+
+1 + χi
+
+
+
+1 −
+
+q
+
+T /T c,i 
+
+ 2
+
+, βi = 0 .07780 RT c,i 
+
+Pc,i 
+
+,
+
+where Tc,i and Pc,i are the critical temperature and pressure of component i, respectively. The parameter χi depends on the acentric factor ωi as follows (2.2) χi =
+
+(
+
+0.37464 + 1 .54226 ωi − 0.26992 ω2 
+
+> i
+
+, ωi ≤ 0.49 ,
+
+0.379642 + 1 .485030 ωi − 0.164423 ω2 
+
+> i
+
++ 0 .016666 ω3 
+
+> i
+
+, ωi > 0.49 .
+
+The parameters α(T ) and β are computed using the following mixing rules (2.3) α(T ) = 
+
+> M
+
+X
+
+> i=1
+> M
+
+X
+
+> j=1
+
+cicj
+
+c2 (αiαj )1/2 (1 − ιij ), β =
+
+> M
+
+X
+
+> i=1
+
+ci
+
+c βi,
+
+where ιij is the binary interaction parameter, satisfying ιii = 0 and ιij = ιji . The mixture parameter 
+
+β is a convex combination of the pure component parameters βi. Consequently, it is bounded by the minimum and maximum values of the βi
+
+(2.4) min  
+
+> i
+
+βi ≤ β ≤ max  
+
+> i
+
+βi.
+
+The Helmholtz free energy density determined by the Peng-Robinson equation of state f (c) is expressed as [39] (2.5) 
+
+f (c) = RT 
+
+> M
+
+X
+
+> i=1
+
+ci(ln ci − 1) − cRT ln(1 − βc )+ α(T )c
+
+2√2β ln 1 + (1 − √2) βc 
+
+1 + (1 + √2) βc 
+
+!
+
++ ζc(T )cRT, 
+
+where R is the universal gas constant, taken to be 8.314 J/(mol · K). The term ζc(T ) represents a temperature-dependent correction related to the heat capacity of the mixture. For isothermal systems, we assume ζc(T ) = 0. The chemical potential of component i is defined by μi := ∂f (c) 
+
+> ∂c i
+
+, and the pressure satisfies the thermodynamic identity (2.6) p =
+
+> M
+
+X
+
+> i=1
+
+ciμi − f (c).
+
+To account for the mechanical response of the poroelastic media, we also incorporate an elastic deformation model for the solid matrix. The solid displacement field is denoted by ws, and the associated strain tensor is given by (2.7) ε(ws) = 12
+
+ ∇ws + ∇wTs
+
+ .4 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Under the premise of infinitesimal skeleton deformations [8], mathematically represented by the condition |∇ ws| ≪ 1, Biot’s poroelasticity framework is adopted to model the resultant variations in rock volume as well as rock deformation. Assuming a linear isotropic elastic solid, the Cauchy stress tensor is expressed as (2.8) σe = γ tr( ε(ws)) I + 2 ηε(ws),
+
+where γ and η are Lam´ e first and second parameters, respectively, and tr( ·) denotes the trace operator. The governing equation for the quasi-static deformation of the solid is (2.9) −∇ · σ = fext ,
+
+where σ = σe − αp , and fext is the external body force. Here α is Biot’s constant, quantifying the degree of coupling between the volumetric deformation of the porous solid skeleton and the pore fluid pressure change. To more accurately describe mass transport in multicomponent mixtures, especially in poroelastic media, we adopt the Maxwell–Stefan–Darcy (MSD) framework as follows [33], rather than the classical Darcy model which cannot resolve interspecies interactions: 
+
+> M
+
+X 
+
+> j=1 ,j ̸=i
+
+cicj (ui − uj )
+
+c2ϕD i,j 
+
++ (1 − ϕ)ui
+
+ϕD i,s 
+
+= −ci∇μi, i = 1 , · · · , M. (2.10) The MSD model captures frictional forces arising between different components and between fluid and solid phases by introducing binary diffusion coefficients Di,j and fluid–solid interaction coef-ficients Di,s . These coefficients satisfy Di,j = Dj,i > 0 for all i̸ = j, and Di,s > 0, ensuring thermodynamic consistency and positive definiteness of diffusion. The model is consistent with On-sager’s reciprocal principle, which demands symmetric relations between fluxes and driving forces, as established in the analysis of the derived coefficient matrices [31]. To simplify the notation and facilitate the analysis, we rescale the MSD diffusion coefficients by introducing 
+
+Di,j = ϕD i,j , Di,s = ϕD i,s 
+
+1 − ϕ ,
+
+where ϕ ∈ (0 , 1) is the porosity of porous media. Based on the Darcy’s law, we define 
+
+Di,s = ϕD i,s 
+
+1 − ϕ = κ(ϕ)
+
+ηi
+
+K,
+
+where ηi is the viscosity of component i, K = KI is the absolute permeability, K is the scalar and 
+
+I is the identity matrix, the function κ(ϕ) is given by the Kozeny-Carman model as follows [11] (2.11) κ(ϕ) = 
+
+ ϕϕr
+
+3  1 − ϕr
+
+1 − ϕ
+
+2
+
+.
+
+Here, ϕr is the porosity at the reference pressure. Combining mass conservation, the MSD model, thermodynamic relations, and the momentum conservation law for the solid phase, the governing equations for the multicomponent transport 5
+
+system are given as follows: 
+
+∂ (ϕc i)
+
+∂t + ∇ · (ciui) = qi, i = 1 , · · · , M, in Ω t := Ω × (0 , t ),(2.12) 
+
+> M
+
+X 
+
+> j=1 ,j ̸=i
+
+cicj (ui − uj )
+
+c2Di,j 
+
++ ui
+
+Di,s 
+
+= −ci∇μi, i = 1 , · · · , M, in Ω t,(2.13) 
+
+p =
+
+> M
+
+X
+
+> i=1
+
+ciμi − f (c), in Ω t,(2.14) 
+
+∇ · σ(ws, p ) = 0 , in Ω t,(2.15) 
+
+∂ϕ ∂t = 1
+
+N∂p ∂t + α∇ · ∂ws
+
+∂t , in Ω t.(2.16) In this work, the computational domain is modeled as a closed system, i.e., no external forces are applied and no mass flux occurs across the boundary. Accordingly, pure Neumann boundary conditions are prescribed 
+
+σ(ws, p ) · n = 0 , on ∂Ω,(2.17) representing the traction-free condition for the solid mechanics part, and 
+
+ui · n = 0 , i = 1 , · · · , M, on ∂Ω,(2.18) representing the impermeable boundary condition for the fluid transport part. To close the system, initial conditions are prescribed for the porosity and the component concen-trations. At the initial time t = 0, we assume 
+
+ϕ(x, 0) = ϕ0(x), in Ω ,(2.19) 
+
+ci(x, 0) = ci, 0(x), i = 1 , · · · , M, in Ω .(2.20) The total free energy of the system (2.12)–(2.16) in Ω is defined as [10] 
+
+E(t) = 
+
+Z
+
+> Ω
+
+
+
+ϕf (c) + 12 σe(ws) : ε(ws) + 12N p2
+
+
+
+dx.
+
+Here ϕf (c) is the fluid free energy per unit bulk volume, weighted by the porosity ϕ since only the pore space is occupied by the fluid; 12 σe(ws) : ε(ws) is the recoverable elastic strain energy stored in the solid skeleton; and 12N p2 is the storage (compressibility) energy associated with the pore pressure, where N > 0 is a Biot-type storage modulus. To verify the thermodynamic consistency of (2.12)–(2.18), we derive the associated energy dissi-pation. Decompose the total energy into the fluid-mixture part Ψ f and the solid-skeleton part Ψ s
+
+(cf. [8]), 
+
+E = Ψ f + Ψ s, Ψf := 
+
+Z
+
+> Ω
+
+ϕf (c) dx, Ψs := 
+
+Z
+
+> Ω
+
+ 12 σe(ws) : ε(ws) + 12N p2
+
+
+
+dx.
+
+Differentiating with respect to time gives 
+
+dE dt = dΨf
+
+dt + dΨs
+
+dt .6 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Using the chain rule, the thermodynamic identity (2.6), the mass conservation law (2.12), and the impermeable boundary condition (2.18), we obtain 
+
+dΨf
+
+dt =
+
+Z
+
+> Ω
+
+∂(ϕf (c)) 
+
+∂t dx
+
+=
+
+Z
+
+> Ω
+
+f (c) ∂ϕ ∂t + ϕ
+
+> M
+
+X
+
+> i=1
+
+μi
+
+∂c i
+
+∂t 
+
+!
+
+dx
+
+=
+
+Z
+
+> Ω
+
+ MX
+
+> i=1
+
+ciμi − p
+
+ ∂ϕ ∂t + ϕ
+
+> M
+
+X
+
+> i=1
+
+μi
+
+∂c i
+
+∂t 
+
+!
+
+dx
+
+=
+
+Z
+
+> Ω
+> M
+
+X
+
+> i=1
+
+μi
+
+∂(ϕc i)
+
+∂t − p ∂ϕ ∂t 
+
+!
+
+dx
+
+=
+
+Z
+
+> Ω
+> M
+
+X
+
+> i=1
+
+μi
+
+
+
+qi − ∇ · (ciui)
+
+
+
+− p ∂ϕ ∂t 
+
+!
+
+dx
+
+=
+
+Z
+
+> Ω
+> M
+
+X
+
+> i=1
+
+μiqi +
+
+> M
+
+X
+
+> i=1
+
+ci∇μi · ui − p ∂ϕ ∂t 
+
+!
+
+dx.(2.21) Taking the dot product of the MSD relation (2.13) with ui and summing over i yields the nonnegative dissipation MX
+
+> i=1
+
+ci∇μi · ui = −
+
+> M
+
+X
+
+> i=1
+
+|ui|2
+
+Di,s 
+
+−
+
+> M
+
+X
+
+> i=1
+> M
+
+X 
+
+> j=1 ,j ̸=i
+
+cicj
+
+2c2Di,j 
+
+ui − uj
+
+> 2
+
+.
+
+Substituting this identity into (2.21) and recalling that the system is closed (thus qi ≡ 0) give 
+
+dΨf
+
+dt = −
+
+Z
+
+> Ω
+
+
+
+> M
+
+X
+
+> i=1
+
+|ui|2
+
+Di,s 
+
++
+
+> M
+
+X
+
+> i=1
+> M
+
+X 
+
+> j=1 ,j ̸=i
+
+cicj
+
+2c2Di,j 
+
+ui − uj 
+
+> 2
+
++ p ∂ϕ ∂t 
+
+ dx.(2.22) Let vs := ∂tws. By (2.15) and (2.16), we get 
+
+dΨs
+
+dt = ddt 
+
+Z
+
+> Ω
+
+ 12 σe(ws) : ε(ws) + 12N p2
+
+
+
+dx
+
+=
+
+Z
+
+> Ω
+
+σe(ws) : ε(vs) dx +
+
+Z
+
+> Ω
+
+1
+
+N p ∂ tp d x.(2.23) We now express the first term in (2.23) using the momentum equation (2.15) and the traction-free condition (2.17). Testing (2.15) by vs and integrating by parts, we get 0 = 
+
+Z
+
+> Ω
+
+(∇ · σ(ws, p )) · vs dx
+
+= −
+
+Z
+
+> Ω
+
+σ(ws, p ) : ∇vs dx +
+
+Z
+
+> ∂Ω
+
+(σ(ws, p )n) · vs ds 
+
+= −
+
+Z
+
+> Ω
+
+σ(ws, p ) : ε(vs) dx.
+
+Substituting σ = σe − αp I into the above equation, we obtain (2.24) 
+
+Z
+
+> Ω
+
+σe(ws) : ε(vs) dx = α
+
+Z
+
+> Ω
+
+p ∇ · vs dx.
+
+Next, using (2.16) we rewrite the storage term as (2.25) 1
+
+N p ∂ tp = p (∂tϕ − α∇ · vs) ,
+
+then, we get (2.26) 
+
+Z
+
+> Ω
+
+1
+
+N p ∂ tp d x =
+
+Z
+
+> Ω
+
+p ∂ tϕ d x − α
+
+Z
+
+> Ω
+
+p ∇ · vs dx.7
+
+Combining (2.23)–(2.26), the two α-terms cancel exactly, yielding (2.27) dΨs
+
+dt =
+
+Z
+
+> Ω
+
+p ∂ϕ ∂t dx.
+
+Adding (2.22) and (2.27) gives 
+
+dE dt = −
+
+Z
+
+> Ω
+
+
+
+> M
+
+X
+
+> i=1
+
+|ui|2
+
+Di,s 
+
++
+
+> M
+
+X
+
+> i=1
+> M
+
+X 
+
+> j=1 ,j ̸=i
+
+cicj
+
+2c2Di,j 
+
+ui − uj
+
+> 2
+
+ dx.
+
+In particular, for the closed system considered in this work, 
+
+dE dt = −
+
+Z
+
+> Ω
+
+
+
+> M
+
+X
+
+> i=1
+
+|ui|2
+
+Di,s 
+
++
+
+> M
+
+X
+
+> i=1
+> M
+
+X 
+
+> j=1 ,j ̸=i
+
+cicj
+
+2c2Di,j 
+
+ui − uj
+
+> 2
+
+ dx ≤ 0,
+
+which confirms that the model satisfies the second law of thermodynamics. 3. Semi-discrete Scheme 
+
+To develop a thermodynamically consistent numerical scheme, we now introduce a semi-discrete time approximation for the model (2.12)–(2.16). Let tn = Pnj=0 τj , where τj denotes the j-th time step, and denote the numerical approximation of a quantity ci at time tn by cni . cn = PMi=1 cni
+
+denotes the total molar density. For the chemical potential, we consider a first-order semi-implicit approximation inspired by the stabilization method of the free energy [32]. Specifically, the chemical potential at time level n + 1 is approximated by 
+
+μn+1  
+
+> i
+
+= μi(cn) + θnRT cn+1  
+
+> i
+
+− cni
+
+cn(1 − β∗cn) ,(3.1) 
+
+μn+1 =
+
+> M
+
+X
+
+> i=1
+
+μi(cn) + θnRT cn+1 − cn
+
+cn(1 − β∗cn) ,(3.2) where θn is a stabilization parameter, β∗ = max i βi. This formula provides a stabilized discrete approximation of the chemical potential based on the previous step and a stabilization term involving the change in molar density. To analyze the associated discrete energy behavior, we consider the Taylor expansion of the Helmholtz free energy density f (cn+1 ) around cn as follows: 
+
+f (cn+1 ) = f (cn) + μ(cn) · (cn+1 − cn) + 12 (cn+1 − cn)⊤f ′′ (κ)( cn+1 − cn),(3.3) where cn := [ cn 
+
+> 1
+
+, · · · , c nM ], μ(cn) := [ μ1(cn), · · · , μ M (cn)], and κ is a weighted average of the two vectors cn and cn+1 with a certain scalar weight. On the other hand, using the above definition of μn+1 , we obtain 
+
+μn+1 = μ(cn) + θnRT cn(1 − β∗cn) IM ×M (cn+1 − cn),(3.4) where IM ×M is the identity matrix in RM ×M . Then, substituting (3.4) into the energy expansion (3.3), we arrive at 
+
+f (cn+1 ) = f (cn) + μn+1 · (cn+1 − cn)+ ( cn+1 − cn)⊤
+
+ 12 f ′′ (κ) − θnRT cn(1 − β∗cn) IM ×M
+
+
+
+(cn+1 − cn).(3.5) By Gershgorin’s circle theorem [24], all eigenvalues of f ′′ (κ) − θnRT cn(1 −β∗cn) IM ×M lie within the union of intervals centered at the diagonal entries, with radii equal to the sum of the absolute values of the corresponding off-diagonal entries. If the stabilization parameter θn is chosen sufficiently large, each Gershgorin interval is shifted far enough to the left of the origin, ensuring that all eigenvalues are non-positive. Consequently, the matrix is negative semi-definite. As a result, the remaining 8 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+quadratic term in the Taylor expansion is non-positive, and the following discrete energy inequality holds 
+
+f (cn+1 ) − f (cn) ≤ μn+1 · (cn+1 − cn),(3.6) which guarantees that the discrete free energy does not increase in time. This property is essential for ensuring the thermodynamic consistency and stability of the numerical scheme. Based on the governing system (2.12)–(2.20) and the energy stability considerations discussed above, we now propose a semi-discrete-in-time numerical scheme. This scheme is constructed using a stabilized chemical potential formulation (3.1)-(3.2), ensuring the dissipation of a discrete energy functional. Let τn denote the time step size at step n, and we define the backward difference operator 
+
+Dτn an+1 := an+1 −an 
+
+> τn
+
+for any time-dependent quantity a. The semi-discrete system at time level n+1 is given as follows: 
+
+Dτn
+
+ ϕn+1 cn+1 
+
+> i
+
+ + ∇ ·  cni un+1 
+
+> i
+
+ = 0 , i = 1 , · · · , M, (3.7) 
+
+> M
+
+X 
+
+> j=1 ,j ̸=i
+
+cni cnj
+
+ un+1  
+
+> i
+
+− un+1 
+
+> j
+
+
+
+(cn)2Di,j 
+
++ un+1 
+
+> i
+
+Di,s 
+
+= −cni ∇μn+1  
+
+> i
+
+, i = 1 , · · · , M, (3.8) 
+
+pn+1 =
+
+> M
+
+X
+
+> i=1
+
+cni μn+1  
+
+> i
+
+− f (cn),(3.9) 
+
+∇ · σ(wn+1  
+
+> s
+
+, p n+1 ) = 0 ,(3.10) 
+
+Dτn ϕn+1 = 1
+
+N Dτn pn+1 + αD τn ∇ · wn+1  
+
+> s
+
+.(3.11) 
+
+Theorem 3.1. Consider the semi-discrete system (3.7) –(3.11) and the boundary condition (2.17) -
+
+(2.18) . The discrete total energy at time level n is defined as 
+
+En =
+
+Z
+
+> Ω
+
+
+
+ϕnf (cn) + 12 σe(wns ) : ε(wns ) + 12N (pn)2
+
+
+
+dx.
+
+Then the following inequality holds 
+
+En+1 − En ≤ − τn
+
+Z
+
+> Ω
+
+
+
+> M
+
+X
+
+> i=1
+
+|un+1  
+
+> i
+
+|2
+
+Di,s 
+
++
+
+> M
+
+X
+
+> i=1
+> M
+
+X 
+
+> j=1
+> j̸=i
+
+cni cnj |un+1  
+
+> i
+
+− un+1  
+
+> j
+
+|2
+
+2( cn)2Di,j 
+
+ dx ≤ 0.
+
+Hence, the discrete energy En is non-increasing with respect to n. It is strictly increasing unless flow and diffusion reaches equilibrium, i.e. all un+1  
+
+> i
+
+are zero, which is equivalent to the condition that the pressure as well as the chemical potentials of all components become spatially constants. Proof. The total energy consists of two parts 
+
+En = Ψ n 
+
+> f
+
++ Ψ n 
+
+> s
+
+,
+
+where Ψ n 
+
+> f
+
+= R 
+
+> Ω
+
+ϕnf (cn) dx, Ψn 
+
+> s
+
+= R 
+
+> Ω12
+
+σe(wns ) : ε(wns ) + 12N (pn)2 dx.
+
+By multiplying both sides of (3.7) by the corresponding chemical potential μn+1  
+
+> i
+
+, summing over all components i = 1 , . . . , M , and integrating over the domain Ω, and further applying boundary conditions (2.18), we obtain 1
+
+τn
+
+Z
+
+> Ω
+> M
+
+X
+
+> i=1
+
+μn+1  
+
+> i
+
+(ϕn+1 cn+1  
+
+> i
+
+− ϕncni ) dx = −
+
+Z
+
+> Ω
+> M
+
+X
+
+> i=1
+
+cni un+1  
+
+> i
+
+· ∇ μn+1  
+
+> i
+
+dx.(3.12) We multiply both sides of (3.8) by un+1  
+
+> i
+
+, then integrate over the domain Ω, Summing over all i, we get 
+
+Z
+
+> Ω
+> M
+
+X
+
+> i=1
+
+cni un+1  
+
+> i
+
+· ∇ μn+1  
+
+> i
+
+dx = −
+
+Z
+
+> Ω
+> M
+
+X
+
+> i=1
+
+ |un+1  
+
+> i
+
+|2
+
+Di,s 
+
++
+
+> M
+
+X 
+
+> j̸=i
+
+cni cnj |un+1  
+
+> i
+
+− un+1  
+
+> j
+
+|2
+
+2( cn)2Di,j 
+
+ dx.(3.13) 9
+
+By using (3.6), we can obtain 
+
+Z
+
+> Ω
+
+ (ϕn+1 f (cn+1 ) − ϕnf (cn)) + pn+1 (ϕn+1 − ϕn) dx(3.14) 
+
+≤ 1
+
+τn
+
+Z
+
+> Ω
+
+f (cn)( ϕn+1 − ϕn) + ϕn+1 μn+1 · (cn+1 − cn)+ ( 
+
+> M
+
+X
+
+> i=1
+
+cni μn+1  
+
+> i
+
+− f (cn))( ϕn+1 − ϕn)
+
+!
+
+dx
+
+= 1
+
+τn
+
+Z
+
+> Ω
+> M
+
+X
+
+> i=1
+
+μn+1 
+
+> i
+
+ ϕn+1 cn+1  
+
+> i
+
+− ϕncni
+
+ dx.
+
+By (3.12), (3.13) and (3.14), we get 1
+
+τn
+
+(Ψ n+1 f − Ψn 
+
+> f
+
++
+
+Z
+
+> Ω
+
+pn+1 (ϕn+1 − ϕn) dx)(3.15) 
+
+≤ − 
+
+Z
+
+> Ω
+
+
+
+> M
+
+X
+
+> i=1
+
+|un+1  
+
+> i
+
+|2
+
+Di,s 
+
++
+
+> M
+
+X 
+
+> j̸=i
+
+cni cnj |un+1  
+
+> i
+
+− un+1  
+
+> j
+
+|2
+
+2( cn)2Di,j 
+
+ dx.
+
+From the energy estimate derived from (3.10) and (3.11), we have 1
+
+τn
+
+
+
+η∥ε(wn+1  
+
+> s
+
+)∥2 
+
+> L2
+
+− η∥ε(wns )∥2 
+
+> L2
+
++ γ
+
+2 ∥∇ · wn+1  
+
+> s
+
+∥2 − γ
+
+2 ∥∇ · wns ∥2
+
+(3.16) + 12N ∥pn+1 ∥2 
+
+> L2
+
+− 12N ∥pn∥2 
+
+> L2
+
+− (pn+1 , ϕ n+1 − ϕn)
+
+
+
+≤ 0.
+
+Adding (3.15) and (3.16), we obtain 1
+
+τn
+
+(En+1 − En) ≤ − 
+
+Z
+
+> Ω
+
+
+
+> M
+
+X
+
+> i=1
+
+|un+1  
+
+> i
+
+|2
+
+Di,s 
+
++
+
+> M
+
+X 
+
+> j̸=i
+
+cni cnj |un+1  
+
+> i
+
+− un+1  
+
+> j
+
+|2
+
+2( cn)2Di,j 
+
+ dx.
+
+Since all coefficients in the dissipation term are nonnegative, En+1 = En implies un+1  
+
+> i
+
+≡ 0
+
+for all i. Conversely, if un+1  
+
+> i
+
+≡ 0, then (3.8) reduces to cni ∇μn+1  
+
+> i
+
+= 0, hence ∇μn+1  
+
+> i
+
+= 0 on 
+
+{cni > 0}. Using the Gibbs–Duhem relation at constant temperature, dp = PMi=1 ci dμ i, we obtain 
+
+∇pn+1 = PMi=1 cn+1  
+
+> i
+
+∇μn+1  
+
+> i
+
+= 0, i.e., pn+1 is spatially constant. This completes the proof. □
+
+4. Fully discrete Scheme 
+
+This section presents the fully discrete numerical scheme for the governing equation system. Temporal discretization is achieved using a semi-implicit discrete scheme. For spatial discretization, we employ a strategic combination of finite element methods tailored to the specific physics of each sub-problem. The mass conservation equations and the MSD model are discretized using a mixed finite element method. This approach allows for the accurate computation of molar density and velocity, ensuring local mass conservation. The momentum equation for the elastic solid is discretized using a discontinuous Galerkin (DG) method. This choice is particularly effective in mitigating numerical locking phenomena, a common issue in computational elasticity when modeling nearly incompressible materials. To rigorously enforce boundedness for multicomponent mixtures, a primary challenge stems from the need to satisfy a set of interdependent constraints: each molar density ci must satisfy the physical bound 0 <= βici < 1, and concurrently, the total molar density c = PMi=1 ci must obey the same strict bound 0 < βc < 1, a condition intrinsic to the form of the Helmholtz free energy. In the conventional formulation, the M component densities ( c1, . . . , c M ) are taken as independent primary variables, and the essential constraints, in particular the upper bounds on ci and the total density 
+
+c are implicit and strongly coupled. This makes it extremely challenging to design algorithms that can simultaneously and strictly enforce this complete set of bounds. To circumvent this limitation, 10 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+we develop a carefully tailored change of variables. A key observation is that the molar density of the M -th component can be algebraically eliminated, expressing it as a function of the remaining 
+
+M − 1 component densities and the total molar density c:(4.1) cM = c − 
+
+> M−1
+
+X
+
+> i=1
+
+ci.
+
+This simple yet pivotal relation allows us to reformulate the governing system, adopting the set (c1, . . . , c M −1, c ) as the new primary unknowns. Next, we introduce the finite element spaces and associated notation required for the discretization of the multicomponent flow system. Let Th be a family of conforming, shape-regular, and quasi-uniform triangulations of the domain Ω, where h denotes the maximum element diameter. For any element K ∈ T h, we denote by Eh the set of all facets (edges in 2D, faces in 3D) of the triangulation, and by EIh the subset of interior facets. For two adjacent elements K+, K − sharing a common facet 
+
+e = ∂K + ∩ ∂K − ∈ E Ih , we fix a unit normal vector ne pointing from K+ to K−.We define the average and jump operators for any piecewise smooth function ψ on an interior face e
+
+{ψ}e := 12
+
+ ψ+ + ψ− , [ψ]e := ψ+ − ψ−,
+
+where ψ± denote the traces of ψ from K± onto e, respectively. The L2 inner products over domains and facets are defined in the standard manner. For any domain D ⊆ Ω and functions ξ, ζ (scalar- or vector-valued), we define (ξ, ζ )D := 
+
+Z
+
+> D
+
+ξζd x, ⟨ξ, ζ ⟩e := 
+
+Z
+
+> e
+
+ξζds. 
+
+The corresponding norms are denoted by ∥ · ∥ L2(D) and ∥ · ∥ L2(e), respectively. We employ a mixed finite element approximation that uses different function spaces tailored to the specific physical fields, the solid displacement ws is approximated in the space of piecewise linear vector-valued functions 
+
+Vh := vh ∈ L2(Ω) d : vh|K ∈ [P1(K)] d, ∀K ∈ T h ,
+
+the Darcy velocity ui is discretized using the lowest-order Raviart-Thomas space to ensure exact mass conservation at the discrete level 
+
+Uh := {vh ∈ H(div; Ω) : vh|K ∈ RT 0(K), ∀K ∈ T h} ,
+
+where RT 0(K) := [ P0(K)] d + xP0(K) denotes the local Raviart-Thomas space on element K. We also define its subspace with homogeneous normal flux on the boundary 
+
+U0 
+
+> h
+
+:= {vh ∈ Uh : vh · n = 0 on ∂Ω} .
+
+The scalar unknowns, molar density ci, pressure p, and porosity ϕ, are approximated in the space of piecewise constant functions 
+
+Qh := qh ∈ L2(Ω) : qh|K ∈ P0(K), ∀K ∈ T h .
+
+To discretize the advective terms in the mass conservation equations, we employ an upwind scheme. The upwind value of a density ch on a facet e is defined based on the direction of the velocity flux 
+
+cn∗ 
+
+> h
+
+=
+
+(
+
+cnh |K+ , uni,h · ne ≥ 0,cnh |K− , uni,h · ne < 0.
+
+(4.2) The fully discrete problem seek ( wn+1  
+
+> s,h
+
+, un+1  
+
+> i,h
+
+|i=1 ,··· ,M , c n+1  
+
+> i,h
+
+|i=1 ,··· ,M −1, c n+1  
+
+> h
+
+, p n+1  
+
+> h
+
+, ϕn+1  
+
+> h
+
+) ∈ Vh
+
+×Uh ×Q h ×Q h ×Q h ×Q h such that the weak form of the governing equations is satisfied for all 11 
+
+admissible test functions in the corresponding discrete spaces. (Dτn (ϕn+1  
+
+> h
+
+cn+1  
+
+> h
+
+), q h) + X
+
+> e∈E Ih
+
+⟨X
+
+> i
+
+cn∗
+
+> i,h
+
+un+1  
+
+> i,h
+
+· n, [qh]⟩e + X
+
+> e∈E Ih
+
+ςhe
+
+⟨K e[μn+1  
+
+> h
+
+], [qh]⟩e = 0 ,(4.3a) (Dτn (ϕn+1  
+
+> h
+
+cn+1  
+
+> i,h
+
+), q h) + X
+
+> e∈E Ih
+
+⟨cn∗
+
+> i,h
+
+un+1  
+
+> i,h
+
+· n, [qh]⟩e(4.3b) + X
+
+> e∈E Ih
+
+ςhe
+
+⟨K e[μn+1  
+
+> i,h
+
+], [qh]⟩e = 0 , i = 1 , · · · , M − 1,
+
+> i
+
+X
+
+> j=1
+
+ cni,h cnj,h 
+
+
+
+un+1  
+
+> i,h
+
+− un+1 
+
+> j,h
+
+
+
+(cnh )2Di,j 
+
+, vh
+
+ +
+
+> M
+
+X
+
+> j=i+1
+
+ cni,h cnj,h 
+
+
+
+un+1  
+
+> i,h
+
+− un+1 
+
+> j,h
+
+
+
+(cnh )2Di,j 
+
+, vh
+
+(4.3c) + un+1 
+
+> i,h
+
+Di,s 
+
+, vh
+
+!
+
+= X
+
+> e∈E Ih
+
+⟨[μn+1  
+
+> i,h
+
+], c n∗
+
+> i,h
+
+vh · n⟩e, i = 1 , · · · , M, 
+
+(pn+1  
+
+> h
+
+, z h) = ( 
+
+> M
+
+X
+
+> i=1
+
+cni,h μn+1  
+
+> i,h
+
+− f (cnh ), z h),(4.3d) 
+
+A(wn+1  
+
+> s,h
+
+, p n+1  
+
+> h
+
+, υh) = 0 ,(4.3e) (Dτn ϕn+1  
+
+> h
+
+, φ h) = 1
+
+N (Dτn pn+1  
+
+> h
+
+, φ h) + α(Dτn (∇ · wn+1  
+
+> s,h
+
+), φ h)(4.3f) 
+
+− α X
+
+> e∈E Ih
+
+⟨{ φhne}, [Dτn wn+1  
+
+> s,h
+
+]⟩e,
+
+where Ke > 0 represents the average of the components of K on the edge e and A(ws,h , p h, vh) is the bilinear form defined as 
+
+A(ws,h , p h, vh) := X
+
+> K∈K h
+
+(σe(ws,h ), ε (vh)) K − X
+
+> e∈E Ih
+
+⟨{ σe(ws,h )ne}, [vh]⟩e(4.4) 
+
+− α X
+
+> K∈K h
+
+(ph, ∇ · vh)K + α X
+
+> e∈E Ih
+
+⟨{ phne}, [vh]⟩e
+
+− X
+
+> e∈E Ih
+
+⟨[ws,h ], {σe(vh)ne}⟩ e + X
+
+> e∈E Ih
+
+ς1
+
+he
+
+⟨[ws,h ], [vh]⟩e.
+
+.
+
+Remark 4.1. If PMi=1 cn+1  
+
+> i,h
+
+= cn+1  
+
+> h
+
+, then solving (4.3a) –(4.3b) is equivalent to solving the mass conservation equations individually for each of the M components. 
+
+Theorem 4.1. Assume the boundary condition (2.17) -(2.18) holds. Then, the total free energy defined by the fully discrete scheme is dissipated over time, i.e., 
+
+Dτn En+1  
+
+> h
+
+≤ 0,
+
+where the discrete energy En+1  
+
+> h
+
+is given by 
+
+En+1  
+
+> h
+
+= X
+
+> K∈T h
+
+Z
+
+> K
+
+
+
+ϕn+1  
+
+> h
+
+f (cn+1  
+
+> h
+
+) + 12 σe(wn+1  
+
+> s,h
+
+) : ε(wn+1  
+
+> s,h
+
+) + 12N |pn+1  
+
+> h
+
+|2
+
+
+
+dx(4.5) + X
+
+> e∈E Ih
+
+ς1
+
+2he
+
+⟨[wn+1  
+
+> s,h
+
+], [wn+1  
+
+> s,h
+
+]⟩e − X
+
+> e∈E Ih
+
+⟨{ σe(wn+1  
+
+> s,h
+
+)ne}, [wn+1  
+
+> s,h
+
+]⟩e.12 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Proof. The proof proceeds by estimating the difference in the total free energy between two consec-utive time steps. From (3.6) , we derive the following key estimate that 1
+
+τn
+
+X
+
+> K∈T h
+
+Z
+
+> K
+
+ (ϕn+1  
+
+> h
+
+f (cn+1  
+
+> h
+
+) − ϕnh f (cnh )) + ( ϕn+1  
+
+> h
+
+− ϕnh )pn+1 
+
+> h
+
+ dx(4.6) 
+
+≤ 1
+
+τn
+
+X
+
+> K∈T h
+
+Z
+
+> K
+
+ f (cnh )( ϕn+1  
+
+> h
+
+− ϕnh ) + ϕn+1  
+
+> h
+
+μn+1  
+
+> h
+
+· (cn+1  
+
+> h
+
+− cnh )+
+
+> M
+
+X
+
+> i=1
+
+cni,h μn+1  
+
+> i,h
+
+− f (cnh )
+
+!
+
+(ϕn+1  
+
+> h
+
+− ϕnh )
+
+!
+
+dx.
+
+Combining the right-hand side of the above inequality and (4.3b) allows us to rewrite it as follows: 1
+
+τn
+
+X
+
+> K∈T h
+
+Z
+
+> KM
+
+X
+
+> i=1
+
+μn+1 
+
+> i,h
+
+
+
+ϕn+1  
+
+> h
+
+cn+1  
+
+> i,h
+
+− ϕnh cni,h 
+
+
+
+dx
+
+= − X
+
+> e∈E Ih
+
+Z
+
+> eM
+
+X
+
+> i=1
+
+
+
+[μn+1  
+
+> i,h
+
+]cn∗ 
+
+> h
+
+un+1  
+
+> i,h
+
+· ne + ςhe
+
+Ke[μn+1  
+
+> i,h
+
+]2
+
+
+
+dx.
+
+Finally, employing (4.3c) allows us to express this solely as a negative dissipation term, thereby confirming the energy decay induced by the transport process 1
+
+τn
+
+X
+
+> K∈T h
+
+Z
+
+> KM
+
+X
+
+> i=1
+
+μn+1 
+
+> i,h
+
+
+
+ϕn+1  
+
+> h
+
+cn+1  
+
+> i,h
+
+− ϕnh cni,h 
+
+
+
+dx(4.7) = − X
+
+> e∈E Ih
+
+Z
+
+> eM
+
+X
+
+> i=1
+
+
+
+[μn+1  
+
+> i,h
+
+]cn∗ 
+
+> h
+
+un+1  
+
+> i,h
+
+· ne + ςhe
+
+Ke[μn+1  
+
+> i,h
+
+]2
+
+
+
+dx
+
+= −
+
+Z
+
+> Ω
+
+
+
+> M
+
+X
+
+> i=1
+
+|un+1  
+
+> i,h
+
+|2
+
+Di,s 
+
++
+
+> M
+
+X
+
+> i=1
+> M
+
+X 
+
+> j=1 ,j ̸=i
+
+cni,h cnj,h |un+1  
+
+> i,h
+
+− un+1  
+
+> j,h
+
+|2
+
+2( cnh )2Di,j 
+
+ dx − X
+
+> e∈E Ih
+
+Z
+
+> eM
+
+X
+
+> i=1
+
+ςhe
+
+Ke[μn+1  
+
+> i,h
+
+]2 dx.
+
+As established in [10] for the DG discretization of the momentum equation, the solid free energy evolution satisfies 12
+
+X
+
+> K∈T h
+
+Dτn (σe(wn+1  
+
+> s,h
+
+), ε (wn+1  
+
+> s,h
+
+)) K(4.8) + X
+
+> e∈E Ih
+
+ς1
+
+2he
+
+Dτn ⟨[wn+1  
+
+> s,h
+
+], [wn+1  
+
+> s,h
+
+]⟩e + 12N
+
+X
+
+> K∈T h
+
+Dτn (pn+1  
+
+> h
+
+, p n+1  
+
+> h
+
+)
+
+− X
+
+> e∈E Ih
+
+Dτn
+
+
+
+⟨{ σe(wn+1  
+
+> s,h
+
+)ne}, [wn+1  
+
+> s,h
+
+]⟩e
+
+
+
+− X
+
+> K∈T h
+
+(Dτn ϕn+1  
+
+> h
+
+, p n+1  
+
+> h
+
+)K
+
+≤ 0.
+
+Combining (4.7) with (4.8), we directly obtain the desired result 
+
+Dτn En+1  
+
+> h
+
+≤ 0.
+
+This completes the proof. □
+
+Furthermore, a linearized iterative strategy is employed within each time step to handle nonlin-earities, where the superscript l denotes the value at the l-th iteration. The fully discrete scheme is 13 
+
+given as follows (Dτn (ϕn+1 ,l h cn+1 ,l +1  
+
+> h
+
+), q h) + X
+
+> e∈E Ih
+
+⟨X
+
+> i
+
+cn∗
+
+> i,h
+
+un+1 ,l i,h · n, [qh]⟩e + X
+
+> e∈E Ih
+
+ςhe
+
+⟨K e[μn+1 ,l +1  
+
+> h
+
+], [qh]⟩e = 0 ,(4.9) (Dτn (ϕn+1 ,l h cn+1 ,l +1  
+
+> i,h
+
+), q h) + X
+
+> e∈E Ih
+
+⟨cn∗
+
+> i,h
+
+un+1 ,l i,h · n, [qh]⟩e(4.10) + X
+
+> e∈E Ih
+
+ςhe
+
+⟨K e[μn+1 ,l +1  
+
+> i,h
+
+], [qh]⟩e = 0 , i = 1 , · · · , M − 1,
+
+> i
+
+X
+
+> j=1
+
+ cni,h cnj,h 
+
+
+
+un+1 ,l +1  
+
+> i,h
+
+− un+1 ,l +1 
+
+> j,h
+
+
+
+(cnh )2Di,j 
+
+, vh
+
+ +
+
+> M
+
+X
+
+> j=i+1
+
+ cni,h cnj,h 
+
+
+
+un+1 ,l +1  
+
+> i,h
+
+− un+1 ,l j,h 
+
+
+
+(cnh )2Di,j 
+
+, vh
+
+(4.11) + un+1 ,l +1 
+
+> i,h
+
+Di,s 
+
+, vh
+
+!
+
+= X
+
+> e∈E Ih
+
+⟨[μn+1 ,l +1  
+
+> i,h
+
+], c n∗
+
+> i,h
+
+vh · n⟩e, i = 1 , · · · , M, 
+
+(pn+1 ,l +1  
+
+> h
+
+, z h) = ( 
+
+> M
+
+X
+
+> i=1
+
+cni,h μn+1 ,l +1  
+
+> i,h
+
+− f (cnh ), z h),(4.12) 
+
+A(wn+1 ,l +1  
+
+> s,h
+
+, p n+1 ,l +1  
+
+> h
+
+, υh) = 0 ,(4.13) (Dτn ϕn+1 ,l +1  
+
+> h
+
+, φ h) = 1
+
+N (Dτn pn+1 ,l +1  
+
+> h
+
+, φ h) + α(Dτn (∇ · wn+1 ,l +1  
+
+> s,h
+
+), φ h)(4.14) 
+
+− α X
+
+> e∈E Ih
+
+⟨{ φhne}, [Dτn wn+1 ,l +1  
+
+> s,h
+
+]⟩e.
+
+Theorem 4.2. The multicomponent numerical scheme (4.3a) –(4.3f) ensures both global and local conservation of mole numbers for each component i ∈ { 1, . . . , N }.Proof. Since the proof follows a standard procedure, we omit the detailed derivation here and refer interested readers to [10]. □
+
+Lemma 4.3. For two given real constants a, b and a < b , for any ch ∈ Q h, we define ch, − =min( ch + a, 0) , ch, + = max( ch − b, 0) . We have the following inequalities hold 
+
+X
+
+> e∈E Ih
+
+⟨[ch], [ch, −]⟩e ≥ X
+
+> e∈E Ih
+
+⟨[ch, −], [ch, −]⟩e,(4.15) 
+
+X
+
+> e∈E Ih
+
+⟨[ch], [ch, +]⟩e ≥ X
+
+> e∈E Ih
+
+⟨[ch, +], [ch, +]⟩e.(4.16) A detailed proof of Lemma 4.3 is provided in [9]. We now provide a rigorous proof demonstrating that the proposed numerical scheme, combined with the adaptive time-stepping strategy, preserves the physical bounds for all components. Specif-ically, we prove that the discrete molar densities satisfy 0 < c n+1  
+
+> h
+
+< 1 
+
+> β∗
+
+and 0 < c n+1  
+
+> i,h
+
+≤ cn+1  
+
+> h
+
+< 1
+
+> β∗
+
+for i = 1 , · · · , M .
+
+Theorem 4.4. Assume that 0 < β ∗cnh < 1 and the boundary condition (2.17) -(2.18) holds. For 
+
+n ≥ 0 and given constants 0 < δ i, 1, δ i, 2 < cni,h 
+
+> cnh
+
+< 1 and 0 < δ 1, δ 2 < 1, if the time step size τ l+1 
+
+> n
+
+satisfies 
+
+τ l+1  
+
+> n
+
+= min  
+
+> i
+
+min 
+
+> K∈T h
+
+ τ i,l +1  
+
+> ∗
+
+, τ i,l +1  
+
+> ⋆
+
+, τ max 
+
+ ,(4.17) 
+
+where 
+
+τ i,l +1  
+
+> ∗
+
+:= 
+
+
+
+ϕn+1 ,l h cnh (1 − β∗cnh ) δi, 1 − (ϕn+1 ,l h − ϕnh )cni,h 
+
+
+
+|K|
+
+P
+
+> e∈∂K +
+> ui,h
+
+cni,h un+1 ,l i,h · n|e| + P 
+
+> e∈∂K +
+> μi
+> ς1
+> he
+
+Ke[μi(cnh )] |e| + ϵ ,14 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+τ i,l +1 
+
+⋆ := 
+
+
+
+ϕn+1 ,l h cnh (1 − β∗cnh ) δi, 2 + ( ϕn+1 ,l h − ϕnh )cni,h 
+
+
+
+|K|−
+
+ P
+
+e∈∂K −
+
+> ui,h
+
+cn∗
+
+i,h un+1 ,l i,h · n|e| + P
+
+e∈∂K −
+
+> μi
+
+ς1
+
+he Ke[μi(cnh )] |e|
+
+ + ϵ.
+
+Here, ϵ > 0 is a very small constant to avoid zero denominator, τmax is the allowed maximum time step size to guarantee the accuracy of numerical solutions and ∂K +
+
+ui,h = {e ∈ ∂K : un+1 
+
+i,h · n|e >
+
+0, ∀K ∈ T h}, ∂K −
+
+ui,h = {e ∈ ∂K : un+1 
+
+i,h · n|e < 0, ∀K ∈ T h}, ∂K −
+
+μi = {e ∈ ∂K : [ μ(cnh )] < 0, ∀K ∈Th}, ∂K +
+
+μi = {e ∈ ∂K : [ μ(cnh )] > 0, ∀K ∈ T h}. Then cn+1 ,l +1 
+
+h , c n+1 ,l +1 
+
+i,h satisfies 
+
+0 < (1 − δ1 (1 − β∗cnh )) cnh ≤ cn+1 ,l +1 
+
+h ≤ (1 + δ2 (1 − β∗cnh )) cnh < 1
+
+β∗ < 1
+
+β ,(4.18) 0 < c n+1 ,l +1 
+
+i,h ≤ cn+1 ,l +1 
+
+h .(4.19) 
+
+Proof. Let us define ζn+1 ,l +1 
+
+i,h = cn+1 ,l +1  
+
+> i,h
+
+−cni,h 
+
+cnh (1 −β∗cnh ) , ζn+1 ,l +1 
+
+i,h, − = min( ζn+1 ,l +1 
+
+i,h + δi, 1, 0) and ζn+1 ,l +1 
+
+i,h, + =max( ζn+1 ,l +1 
+
+i,h − δi, 2, 0). Obviously ζn+1 ,l +1 
+
+i,h, − ≤ 0 and ζn+1 ,l +1 
+
+i,h, + ≥ 0. Taking qh = ζn+1 ,l +1 
+
+i,h, − in (4.10) and using (3.1), we can obtain 1
+
+τ ln
+
+
+
+ϕn+1 ,l h (cn+1 ,l +1 
+
+i,h − cni,h ), ζ n+1 ,l +1 
+
+i,h, −
+
+
+
++ 1
+
+τ ln
+
+
+
+(ϕn+1 ,l h − ϕnh )cni,h , ζ n+1 ,l +1 
+
+i,h, −
+
+
+
+(4.20) + X
+
+e∈E Ih
+
+⟨cn∗
+
+i,h un+1 ,l i,h · n, ζ n+1 ,l +1 
+
+i,h, − ⟩e + X
+
+e∈E Ih
+
+ς1
+
+he
+
+⟨K e[μi(cnh )] , [ζn+1 ,l +1 
+
+i,h, − ]⟩e
+
++ θnRT X
+
+e∈E Ih
+
+ς1
+
+he
+
+⟨K e[ζn+1 ,l +1 
+
+i,h ], [ζn+1 ,l +1 
+
+i,h, − ]⟩e = 0 .
+
+In terms of the definition of ζn+1 ,l +1 
+
+i,h, − , we deduce that 
+
+
+
+ϕn+1 ,l h (cn+1 ,l +1 
+
+i,h − cni,h ), ζ n+1 ,l +1 
+
+i,h, −
+
+
+
+=
+
+
+
+ϕn+1 ,l h cnh (1 − β∗cnh ) ζn+1 ,l +1 
+
+i,h , ζ n+1 ,l +1 
+
+i,h, −
+
+
+
+(4.21) =
+
+
+
+ϕn+1 ,l h cnh (1 − β∗cnh )
+
+
+
+ζn+1 ,l +1 
+
+i,h + δi, 1
+
+
+
+, ζ n+1 ,l +1 
+
+i,h, −
+
+
+
+−
+
+
+
+ϕn+1 ,l h cnh (1 − β∗cnh ) δi, 1, ζ n+1 ,l +1 
+
+i,h, −
+
+
+
+=
+
+
+
+ϕn+1 ,l h cnh (1 − β∗cnh ) ζn+1 ,l +1 
+
+i,h, − , ζ n+1 ,l +1 
+
+i,h, −
+
+
+
+−
+
+
+
+ϕn+1 ,l h cnh (1 − β∗cnh ) δi, 1, ζ n+1 ,l +1 
+
+i,h, −
+
+
+
+.
+
+Taking into account (4.17), ζn+1 ,l +1 
+
+i,h, − ≤ 0, and Lemma 4.3, we can get 
+
+X
+
+K∈T h
+
+X
+
+e∈∂K 
+
+⟨cn∗
+
+h un+1 ,l i,h · n, ζ n+1 ,l +1 
+
+i,h, − ⟩e − 1
+
+τ ln
+
+X
+
+K∈T h
+
+
+
+ϕn+1 ,l h cnh (1 − β∗cnh ) δi, 1, ζ n+1 ,l +1 
+
+i,h, −
+
+
+
+(4.22) + 1
+
+τ ln
+
+X
+
+K∈T h
+
+
+
+(ϕn+1 ,l h − ϕnh )cni,h , ζ n+1 ,l +1 
+
+i,h, −
+
+
+
++ X
+
+K∈T h
+
+X
+
+e∈∂K 
+
+ς1
+
+he
+
+⟨K e[μi(cnh )] , ζ n+1 ,l +1 
+
+i,h, − ⟩e
+
+= 1
+
+τ ln
+
+X
+
+K∈T h
+
+
+
+(ϕn+1 ,l h − ϕnh )cni,h , ζ n+1 ,l +1 
+
+i,h, −
+
+
+
+− 1
+
+τ ln
+
+X
+
+K∈T h
+
+
+
+ϕn+1 ,l h cnh (1 − β∗cnh ) δi, 1, ζ n+1 ,l +1 
+
+i,h, −
+
+
+
++ X
+
+K∈T h
+
+X
+
+e∈∂K −
+
+> ui,h
+
+⟨cn∗
+
+h un+1 ,l i,h · n, ζ n+1 ,l +1 
+
+i,h, − ⟩e + X
+
+K∈T h
+
+X
+
+e∈∂K +
+
+> ui,h
+
+⟨cn∗
+
+h un+1 ,l i,h · n, ζ n+1 ,l +1 
+
+i,h, − ⟩e
+
++ X
+
+K∈T h
+
+X
+
+e∈∂K −
+
+> μi
+
+ς1
+
+he
+
+⟨K e[μi(cnh )] , ζ n+1 ,l +1 
+
+i,h, − ⟩e + X
+
+K∈T h
+
+X
+
+e∈∂K +
+
+> μi
+
+ς1
+
+he
+
+⟨K e[μi(cnh )] , ζ n+1 ,l +1 
+
+i,h, − ⟩e15 
+
+= X
+
+> K∈T h
+
+
+
+(ϕn+1 ,l h − ϕnh )cni,h − ϕn+1 ,l h cnh (1 − β∗cnh ) δi, 1
+
+
+
+ζn+1 ,l +1  
+
+> i,h, −
+
+|K|
+
+τ ln
+
++ X
+
+> K∈T h
+
+X
+
+> e∈∂K −
+> ui,h
+
+cn∗ 
+
+> h
+
+un+1 ,l i,h · nζn+1 ,l +1  
+
+> i,h, −
+
+|e| + X
+
+> K∈T h
+
+X
+
+> e∈∂K +
+> ui,h
+
+cnh un+1 ,l i,h · nζn+1 ,l +1  
+
+> i,h, −
+
+|e|
+
++ X
+
+> K∈T h
+
+X
+
+> e∈∂K −
+> μi
+
+ς1
+
+he
+
+Ke[μi(cnh )] ζn+1 ,l +1  
+
+> i,h, −
+
+|e| + X
+
+> K∈T h
+
+X
+
+> e∈∂K +
+> μi
+
+ς1
+
+he
+
+Ke[μi(cnh )] ζn+1 ,l +1  
+
+> i,h, −
+
+|e| ≥ 0.
+
+Here, we assume that ϕn+1 ,l h (1 − β∗cnh ) δi, 1 > (ϕn+1 ,l h − ϕnh ), which means 
+
+ϕn+1 ,l h
+
+ϕnh
+
+< 11 − (1 − β∗cnh ) δi, 1
+
+.(4.23) We note that a rigorous proof of a similar inequality under comparable assumptions can be found in [9]. Combining (4.20)-(4.22), we get 
+
+
+
+ϕn+1 ,l h cnh (1 − β∗cnh ) ζn+1 ,l +1  
+
+> i,h, −
+
+, ζ n+1 ,l +1 
+
+> i,h, −
+
+
+
++ θnRT X
+
+> e∈E Ih
+
+ς1
+
+he
+
+⟨K e[ζn+1 ,l +1  
+
+> i,h, −
+
+], [ζn+1 ,l +1  
+
+> i,h, −
+
+]⟩e ≤ 0.(4.24) Due to 0 < c ni,h < 1 
+
+> β∗
+
+, we obtain 
+
+ζn+1 ,l +1  
+
+> i,h, −
+
+≡ 0,(4.25) Due to the assumption 0 < δ i, 1, δ i, 2 < cni,h 
+
+> cnh
+
+< 1, we get 
+
+cn+1 ,l +1  
+
+> i,h
+
+≥ (1 − δi, 1
+
+cnh
+
+cni,h 
+
+(1 − β∗cnh )) cni,h > 0.(4.26) The proof of Eq. (4.18) could be provided with reference to [9]. In the preceding proof, we have shown that the boundedness of the total molar density cn+1  
+
+> h
+
+and of each molar density cn+1  
+
+> i,h
+
+for 
+
+i = 1 , . . . , M − 1 follows from equations (4.3a)–(4.3b). According to Remark 4.1, if the condition 
+
+PMi=1 cn+1  
+
+> i,h
+
+= cn+1  
+
+> h
+
+holds, solving the system (4.3a)–(4.3b) is equivalent to solving the mass conser-vation equation individually for each of the M components. Consequently, the boundedness of cn+1 
+
+> M,h
+
+can be derived from its own mass conservation equation, thereby establishing the boundedness of all component densities c1, . . . , c M in a complete sense. Now we complete the proof. □
+
+Theorem 4.5. Assume that β∗cnh is bounded below and above by constants ϱ0 and ϱ, respectively, satisfying 0 < ϱ 0 ≤ β∗cnh ≤ ϱ < 1. Given that the stabilization parameter γ and the penalty parameter 
+
+ς1 are assigned sufficiently large values. Then there exists a constant Cϵ > 0 such that, for all l ≥ 0,
+
+0 < ϕ nh − Cϵ ≤ ϕn+1 ,l +1  
+
+> h
+
+≤ ϕnh + Cϵ < 1,(4.27) 
+
+Let Cϕ, min and Cϕ, max denote the minimum and maximum values of ϕn, respectively. Then the constant Cϵ depends only on these bounds and on the parameter δi.Proof. The proof is similar to that in [9]. We only outline the key idea here. Testing the DG momen-tum equation with un+1 ,l +1  
+
+> s,h
+
+−uns,h and using standard trace, Cauchy–Schwarz and Young inequalities yield an estimate that controls ∇· (un+1 ,l +1  
+
+> s,h
+
+−uns,h ) and the jump terms by P 
+
+> K∈T h
+
+∥pn+1 ,l +1  
+
+> h
+
+−pnh ∥L2 
+
+> K
+
+,provided the stabilization parameters are sufficiently large. Together with the discrete equation of state and the assumption 0 < ϱ 0 ≤ β∗cnh ≤ ϱ < 1, this gives a uniform bound for pn+1 ,l +1  
+
+> h
+
+and hence a one-step perturbation bound ∥ϕn+1 ,l +1  
+
+> h
+
+− ϕnh ∥L∞(Ω) ≤ Cϵ. Choosing Cϵ small enough so that 
+
+Cϵ < C ϕ, min and Cϵ < 1 − Cϕ, max implies 0 < ϕ nh − Cϵ ≤ ϕn+1 ,l +1  
+
+> h
+
+≤ ϕnh + Cϵ < 1, and the proof is complete. □
+
+Theorem 4.4 proves that, under the adaptive time-step restriction (4.17), the admissible bounds are preserved at each nonlinear iterate within a fixed time step. To transfer this iterate-wise bound preservation to the numerical solution at the time level tn+1 , it remains to show that the nonlinear 16 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+splitting iteration converges as l → ∞ . Once convergence is established, the limit inherits the same bounds. We now turn to the convergence analysis of the nonlinear splitting iteration. To this end, we first collect the error relations between two successive nonlinear iterates. Throughout the following analysis, the superscript l denotes the nonlinear iteration index within the fixed time step, and we define the iteration errors (increments) between the ( l + 1)-th and l-th iterates by 
+
+en+1 ,l +1  
+
+> ws,h
+
+:= un+1 ,l +1  
+
+> s,h
+
+− un+1 ,l s,h , en+1 ,l +1  
+
+> ph
+
+:= pn+1 ,l +1  
+
+> h
+
+− pn+1 ,l h , en+1 ,l +1  
+
+> ci,h
+
+:= cn+1 ,l +1  
+
+> i,h
+
+− cn+1 ,l i,h ,
+
+and similarly for en+1 ,l +1  
+
+> ui,h
+
+, en+1 ,l +1  
+
+> μi,h
+
+, and en+1 ,l +1  
+
+> ϕh
+
+. These iteration error variables satisfy the following coupled system, which will serve as the starting point for the energy estimates derived below: 
+
+A(en+1 ,l +1  
+
+> ws,h
+
+, e n+1 ,l +1  
+
+> ph
+
+, vh) = 0 ,(4.28a) 
+
+en+1 ,l ϕh cn+1 ,l i,h + ϕn+1 ,l h en+1 ,l +1 
+
+> ci,h
+
+τ , e n+1 ,l +1 
+
+> ci,h
+
+!
+
++ X
+
+> e∈E Ih
+
+⟨cn∗ 
+
+> h
+
+en+1 ,l  
+
+> ui,h
+
+· n, [en+1 ,l +1  
+
+> ci,h
+
+]⟩e(4.28b) + X
+
+> e∈E Ih
+
+ςhe
+
+⟨[en+1 ,l +1  
+
+> μi,h
+
+], [en+1 ,l +1  
+
+> ci,h
+
+]⟩e = 0 , i = 1 , . . . , M, 
+
+> i
+
+X
+
+> j=1
+
+ cni,h cnj,h 
+
+
+
+en+1 ,l +1  
+
+> ui,h
+
+− en+1 ,l +1 
+
+> uj,h
+
+
+
+(cnh )2Di,j 
+
+, vh
+
+ +
+
+> M
+
+X
+
+> j=i+1
+
+ cni,h cnj,h 
+
+
+
+en+1 ,l +1  
+
+> ui,h
+
+− en+1 ,l 
+
+> uj,h
+
+
+
+(cnh )2Di,j 
+
+, vh
+
+
+
++ en+1 ,l +1 
+
+> ui,h
+
+Di,s 
+
+, vh
+
+!
+
+= X
+
+> e∈E Ih
+
+⟨[en+1 ,l +1  
+
+> μi,h
+
+], c n∗ 
+
+> i,h
+
+vh · n⟩e, i = 1 , . . . , M, (4.28c) 
+
+en+1 ,l +1  
+
+> μi,h
+
+= θnRT cnh (1 − β∗cnh ) en+1 ,l +1  
+
+> ci,h
+
+,(4.28d) 
+
+en+1 ,l +1  
+
+> ph
+
+= cnhMX
+
+> i=1
+
+en+1 ,l +1  
+
+> μi,h
+
+,(4.28e) (en+1 ,l +1  
+
+> ϕh
+
+, φ h) = 1
+
+N (en+1 ,l +1  
+
+> ph
+
+, φ h) + α(∇ · en+1 ,l +1  
+
+> ws,h
+
+, φ h) − α X
+
+> e∈E Ih
+
+⟨{ φhne}, [en+1 ,l +1  
+
+> ws,h
+
+]⟩e.(4.28f) 
+
+Lemma 4.6. Assume that the total concentration satisfies 
+
+(4.29) 0 < ϱ 0 ≤ β∗cnh ≤ ϱ < 1,
+
+and the parameters Biot’s modulus N , penalty parameters ς, ς 1, the Lam ´e parameter γ are chosen sufficiently large and the MSD diffusion coefficients Di,s are chosen sufficiently small. Then there exists a nonnegative 2 × 2 matrix 
+
+A =
+
+a11 a12 
+
+a21 a22 
+
+
+
+, aij ≥ 0,
+
+such that the iteration errors satisfy the coupled recursion 
+
+(4.30) X l+1 ≤ A X l,
+
+where the error vector is defined by 
+
+(4.31) X l+1 := Xl+1 1
+
+Xl+1 2
+
+!
+
+:= 
+
+
+
+> M
+
+X
+
+> i=1
+
+X
+
+> K∈T h
+
+∥en+1 ,l +1  
+
+> ci,h
+
+∥2 
+
+> L2(K)
+
++
+
+> M
+
+X
+
+> i=1
+
+X
+
+> e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l +1  
+
+> ci,h
+
+]∥2
+
+> L2(e)
+> M
+
+X
+
+> i=1
+
+X
+
+> K∈T h
+
+∥en+1 ,l +1  
+
+> ui,h
+
+∥2
+
+> L2(K)
+
+
+
+.17 
+
+Moreover, the coefficients aij can be determined as 
+
+a11 = 4M Cϕ
+
+3Cϕ, min 
+
+,(4.32a) 
+
+a12 = 13 ,(4.32b) 
+
+a21 =
+
+ϱ2C2 
+
+> μ, max
+
+C
+
+(β∗)2Cmin MM Cϕ
+
+
+
+ςC μ, min − ϱ2C
+
+> (β∗)2Cϕ, min
+
+
+
+Υ ,(4.32c) 
+
+a22 =
+
+M C max 
+
+Cmin 
+
++ ϱ2C2 
+
+> μ, max
+
+C
+
+(β∗)2Cmin MCϕ, min 
+
+4
+
+
+
+ςC μ, min − ϱ2C
+
+> (β∗)2Cϕ, min
+
+
+
+Υ ,(4.32d) 
+
+where 
+
+(4.33) Υ := 
+
+ M C min 
+
+2 + 1
+
+Dmax 
+
+− M 2 Cmax 
+
+Cmin 
+
+
+
+> 0,
+
+and Cmax , C min are the maximum and minimum value of cni,h cnj,h   
+
+> (cnh)2Di,j
+
+, Cμ, max is the maximum of    
+
+> θnRT cnh(1 −βc nh)2
+
+, and 1 
+
+> Dmax
+
+is a lower bound of 1 
+
+> Di,s
+
+. The constant Cϕ is defined in (4.36) below. Proof. The objective is to derive a closed two-component recursion for the error vector Xl. The proof proceeds in two parts: (i) derive a concentration/porosity estimate yielding a bound for Xl+1 1 ,(ii) derive a velocity estimate yielding a bound for Xl+1 2 .Taking qh = en+1 ,l +1  
+
+> ci,h
+
+in the concentration error equation (4.28b), and applying the Cauchy-Schwarz inequality, Young’s inequality, we obtain the estimate (see, e.g., [9]): 3Cϕ, min 
+
+4
+
+X
+
+> K∈T h
+
+∥en+1 ,l +1  
+
+> ci,h
+
+∥2
+
+> L2(K)
+
+(4.34) +
+
+
+
+ςC μ, min − ϱ2C
+
+(β∗)2Cϕ, min 
+
+ X
+
+> e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l +1  
+
+> ci,h
+
+]∥2
+
+> L2(e)
+
+≤ ϱ2
+
+(β∗)2Cϕ, min 
+
+X
+
+> K∈T h
+
+∥en+1 ,l ϕh ∥2 
+
+> L2(K)
+
++ Cϕ, min 
+
+4
+
+X
+
+> e∈E Ih
+
+1
+
+he
+
+∥en+1 ,l  
+
+> ui,h
+
+∥2
+
+> L2(e)
+
+.
+
+Testing the porosity error equation (4.28f) with φh = en+1 ,l ϕh , and using the trace inequality together with Cauchy–Schwarz and Young inequalities, one obtains (cf. [9]) the estimate 
+
+X
+
+> K∈T h
+
+∥en+1 ,l ϕh ∥2 
+
+> L2(K)
+
+≤ 1(1 − α − 12N )
+
+ 1( 12 − α)γ + αC ς2 − (1 + α)C
+
+ α(1 + γ)( ϱC μ, max )2
+
+2γ(β∗)2
+
+(4.35) + (ϱC μ, max )2
+
+2N (β∗)2
+
+ MX
+
+> i=1
+
+X
+
+> K∈T h
+
+∥en+1 ,l ci,h ∥2
+
+> L2(K)
+
+.
+
+We now introduce the constant Cϕ collecting the coefficients in (4.35): 
+
+Cϕ := ϱ2
+
+(β∗)2Cϕ, min 
+
+1(1 − α − 12N )
+
+ 1( 12 − α)γ + αC ς2 − (1 + α)C
+
+
+
+(4.36) 
+
+α(1 + γ)( ϱC μ, max )2
+
+2γ(β∗)2 + (ϱC μ, max )2
+
+2N (β∗)2
+
+
+
+.18 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+For each i = 1 , . . . , M , substituting (4.35) into (4.34) yields 3Cϕ, min 
+
+4
+
+X
+
+K∈T h
+
+∥en+1 ,l +1 
+
+ci,h ∥2
+
+L2(K)(4.37) +
+
+
+
+ςC μ, min − ϱ2C
+
+(β∗)2Cϕ, min 
+
+ X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l +1 
+
+ci,h ]∥2
+
+L2(e)
+
+≤ C ϕMX
+
+j=1 
+
+X
+
+K∈T h
+
+∥en+1 ,l cj,h ∥2
+
+L2(K) + Cϕ, min 
+
+4
+
+X
+
+K∈T h
+
+∥en+1 ,l 
+
+ui,h ∥2
+
+L2(K).
+
+Summing (4.37) over i = 1 , . . . , M , we obtain 3Cϕ, min 
+
+4
+
+MX
+
+i=1 
+
+X
+
+K∈T h
+
+∥en+1 ,l +1 
+
+ci,h ∥2
+
+L2(K)(4.38) +
+
+
+
+ςC μ, min − ϱ2C
+
+(β∗)2Cϕ, min 
+
+ MX
+
+i=1 
+
+X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l +1 
+
+ci,h ]∥2
+
+L2(e)
+
+≤ M CϕMX
+
+i=1 
+
+X
+
+K∈T h
+
+∥en+1 ,l ci,h ∥2
+
+L2(K) + Cϕ, min 
+
+4
+
+MX
+
+i=1 
+
+X
+
+K∈T h
+
+∥en+1 ,l 
+
+ui,h ∥2
+
+L2(K).
+
+Next, we use the coercivity condition 
+
+ςC μ, min − ϱ2C
+
+(β∗)2Cϕ, min 
+
+> 0,
+
+which guarantees that the interior-penalty term provides sufficient control of the interelement jumps, and therefore allows us to bound the jump seminorm. Up to an equivalent rescaling of constants, the estimate (4.38) can be rewritten in the symmetric energy form consistent with the definition of Xl+1 1 :3Cϕ, min 
+
+4
+
+MX
+
+i=1 
+
+X
+
+K∈T h
+
+∥en+1 ,l +1 
+
+ci,h ∥2
+
+L2(K) + 3Cϕ, min 
+
+4
+
+MX
+
+i=1 
+
+X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l +1 
+
+ci,h ]∥2
+
+L2(e)
+
+≤ M CϕMX
+
+i=1 
+
+X
+
+K∈T h
+
+∥en+1 ,l ci,h ∥2
+
+L2(K) + Cϕ, min 
+
+4
+
+MX
+
+i=1 
+
+X
+
+K∈T h
+
+∥en+1 ,l 
+
+ui,h ∥2
+
+L2(K).(4.39) Dividing (4.39) by 3Cϕ, min 
+
+4 and noting that (Cϕ, min /4) (3 Cϕ, min /4) = 13 , we obtain the first recursion component (4.40) Xl+1 1 ≤ a11 Xl
+
+1 + a12 Xl
+
+2,
+
+where a11 , a 12 are given by (4.32a)–(4.32b). Letting vh = en+1 ,l +1 
+
+ui,h in (4.28c), and using the relation (4.28d) together with the Cauchy–Schwarz and Young inequalities, we obtain for each i = 1 , . . . , M 
+
+ M C min 
+
+2 + 1
+
+Dmax 
+
+ X
+
+K∈T h
+
+en+1 ,l +1 
+
+ui,h 
+
+2
+
+L2(K)
+
+(4.41) 
+
+≤ Cmax 
+
+Cmin 
+
+
+
+iX
+
+j=1 
+
+X
+
+K∈T h
+
+en+1 ,l +1 
+
+uj,h 
+
+2
+
+L2(K)
+
++
+
+MX
+
+j=i+1 
+
+X
+
+K∈T h
+
+en+1 ,l 
+
+ui,h 
+
+2
+
+L2(K)
+
+
+
++ ϱ2C2
+
+μ, max C
+
+(β∗)2Cmin M
+
+X
+
+e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l +1 
+
+ci,h ]∥2
+
+L2(e).19 
+
+Summing (4.41) over i = 1 , . . . , M yields the intermediate estimate 
+
+> M
+
+X
+
+> i=1
+
+M C min 
+
+2 + 1
+
+Dmax 
+
+− (M − i)Cmax 
+
+Cmin 
+
+! X
+
+> K∈T h
+
+en+1 ,l +1 
+
+> ui,h
+> 2
+> L2(K)
+
+(4.42) 
+
+≤
+
+> M
+
+X
+
+> i=1
+
+(i − 1) Cmax 
+
+Cmin 
+
+X
+
+> K∈T h
+
+en+1 ,l 
+
+> ui,h
+> 2
+> L2(K)
+
++ ϱ2C2 
+
+> μ, max
+
+C
+
+(β∗)2Cmin M
+
+> M
+
+X
+
+> i=1
+
+X
+
+> e∈E Ih
+
+1
+
+he
+
+[en+1 ,l +1  
+
+> ci,h
+
+] 2
+
+> L2(e)
+
+.
+
+To simplify the inequality into a form suitable for the coupled error recursion, we perform a uniform scaling of the coefficients. More precisely, we bound the i-dependent coefficients on both sides by i-independent constants: on the left-hand side, we use a uniform lower bound, while on the right-hand side, we use suitable upper bounds. This yields a simplified inequality with a single coercivity constant Υ > 0, namely, Υ
+
+> M
+
+X
+
+> i=1
+
+X
+
+> K∈T h
+
+en+1 ,l +1 
+
+> ui,h
+> 2
+> L2(K)
+
+≤ M C max 
+
+Cmin 
+
+> M
+
+X
+
+> i=1
+
+X
+
+> K∈T h
+
+en+1 ,l 
+
+> ui,h
+> 2
+> L2(K)
+
+(4.43) + ϱ2C2 
+
+> μ, max
+
+C
+
+(β∗)2Cmin M
+
+> M
+
+X
+
+> i=1
+
+X
+
+> e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l +1  
+
+> ci,h
+
+]∥2
+
+> L2(e)
+
+.
+
+The estimate (4.43) still contains the ( l+1) -level concentration jump term. To close the recursion, we bound this term using (4.37). Since the left-hand side of (4.37) is coercive and nonnegative, we can isolate the jump seminorm and obtain 
+
+X
+
+> e∈E Ih
+
+1
+
+he
+
+∥[en+1 ,l +1  
+
+> ci,h
+
+]∥2 
+
+> L2(e)
+
+≤ Cϕ
+
+
+
+ςC μ, min − ϱ2C
+
+> (β∗)2Cϕ, min
+
+
+
+> M
+
+X
+
+> i=1
+
+X
+
+> K∈T h
+
+∥en+1 ,l ci,h ∥2
+
+> L2(K)
+
+(4.44) + Cϕ, min 
+
+4
+
+
+
+ςC μ, min − ϱ2C
+
+> (β∗)2Cϕ, min
+
+ X
+
+> K∈T h
+
+∥en+1 ,l  
+
+> ui,h
+
+∥2
+
+> L2(e)
+
+.
+
+Substituting this bound into (4.43) yields the closed form Υ
+
+> M
+
+X
+
+> i=1
+
+X
+
+> K∈T h
+
+en+1 ,l +1 
+
+> ui,h
+> 2
+> L2(K)
+
+(4.45) 
+
+≤
+
+ M C max 
+
+Cmin 
+
++ ϱ2C2 
+
+> μ, max
+
+C
+
+(β∗)2Cmin MCϕ, min 
+
+4
+
+
+
+ςC μ, min − ϱ2C
+
+> (β∗)2Cϕ, min
+
+
+
+> M
+
+X
+
+> i=1
+
+X
+
+> K∈T h
+
+en+1 ,l 
+
+> ui,h
+> 2
+> L2(K)
+
++ ϱ2C2 
+
+> μ, max
+
+C
+
+(β∗)2Cmin MM Cϕ
+
+
+
+ςC μ, min − ϱ2C
+
+> (β∗)2Cϕ, min
+
+
+
+> M
+
+X
+
+> i=1
+
+X
+
+> K∈T h
+
+∥en+1 ,l ci,h ∥2
+
+> L2(K)
+
+.
+
+Dividing (4.45) by Υ and using the definition of Xl
+
+> 1
+
+, X l 
+
+> 2
+
+in (4.31), we obtain the second recursion component (4.46) Xl+1 2 ≤ a21 Xl 
+
+> 1
+
++ a22 Xl
+
+> 2
+
+,
+
+with a21 , a 22 defined in (4.32c)–(4.32d). Combining (4.40) and (4.46) yields 
+
+Xl+1 ≤ A Xl,
+
+with A defined in (4.32). This completes the proof. □20 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Lemma 4.7. Let A be the matrix defined in Lemma 4.6, and define the full iterative solution at time level tn+1 by 
+
+W lh :=  un+1 ,l s,h , p n+1 ,l h , {cn+1 ,l i,h , un+1 ,l i,h , μ n+1 ,l i,h }Mi=1 , ϕ n+1 ,l h
+
+.
+
+Assume that the following conditions hold: 
+
+a11 + a12 < 1, a21 + a22 < 1,(4.47a) 
+
+a11 + a21 < 1, a12 + a22 < 1.(4.47b) 
+
+Then we have ∥A∥∞ < 1 and ∥A∥1 < 1. Hence ρ(A) < 1, where ρ(A) denotes the spectral radius of 
+
+A. Moreover, the nonlinear splitting map at time level tn+1 admits a unique fixed point 
+
+W† 
+
+> h
+
+:=  un+1 ,† 
+
+> s,h
+
+, p n+1 ,† 
+
+> h
+
+, {cn+1 ,† 
+
+> i,h
+
+, un+1 ,† 
+
+> i,h
+
+, μ n+1 ,† 
+
+> i,h
+
+}Mi=1 , ϕ n+1 ,†
+
+> h
+
+,
+
+and the iterative solutions {W lh}l≥0 generated by the splitting scheme converge to W† 
+
+> h
+
+from any initial guess. Proof. Since aij ≥ 0, the induced matrix ∞-norm and 1-norm are given by the maximum row sum and the maximum column sum, respectively, i.e., 
+
+∥A∥∞ = max {a11 + a12 , a 21 + a22 }, ∥A∥1 = max {a11 + a21 , a 12 + a22 }.
+
+Assumption (4.47) implies ∥A∥∞ < 1 and ∥A∥1 < 1. For any consistent matrix norm ∥ · ∥ , it holds that ρ(A) ≤ ∥ A∥. Hence, ρ(A) < 1. Therefore, Lemma 4.6 yields the componentwise inequality (4.48) X l+1 ≤ A X l ≤ A l+1 X 0, l ≥ 0.
+
+Since ρ(A) < 1, we have A l → 0 as l → ∞ , and thus (4.49) X l → 0 as l → ∞ .
+
+Consequently, the iterative mapping is a contraction. By the Banach fixed-point theorem, there exists a unique fixed point  cn+1 ,† 
+
+> i,h
+
+, un+1 ,†
+
+> i,h
+
+ for all i = 1 , . . . , M such that 
+
+cn+1 ,l i,h → cn+1 ,† 
+
+> i,h
+
+in Qh, l → ∞ , i = 1 , . . . , M, 
+
+and 
+
+un+1 ,l i,h → un+1 ,† 
+
+> i,h
+
+in U h, l → ∞ , i = 1 , . . . , M. 
+
+Lemma 4.6 and the contraction above yield Xl 
+
+> 1
+
+→ 0 and Xl 
+
+> 2
+
+→ 0 as l → ∞ . The remaining error components are controlled by the concentration energy through the stability bounds proved in [9]. Concretely, there exists a constant C > 0, independent of l, such that 
+
+X
+
+> K∈T h
+> M
+
+X
+
+> i=1
+
+∥en+1 ,l +1  
+
+> μi,h
+
+∥2 
+
+> L2(K)
+
++ ∥en+1 ,l +1  
+
+> ph
+
+∥2 
+
+> L2(K)
+
++ ∥en+1 ,l +1  
+
+> ϕh
+
+∥2
+
+> L2(K)
+
+!
+
+(4.50) + X
+
+> K∈T h
+
+∥ε(en+1 ,l +1  
+
+> us,h
+
+)∥2 
+
+> L2(K)
+
++ X
+
+> K∈T h
+
+∥∇ · (en+1 ,l +1  
+
+> us,h
+
+)∥2 
+
+> L2(K)
+
+≤ C X l+1 1 ,
+
+so these components converge as well. Therefore, the full discrete vector W lh converges to W†
+
+> h
+
+strongly in all components, i.e., each component of W lh converges to the corresponding component of W† 
+
+> h
+
+in the associated discrete space as l → ∞ .
+
+□
+
+Remark 4.8. The contraction regime required in Lemma 4.7 is compatible with the intended phys-ical setting. In weakly compressible rocks (large Biot modulus N ), the porosity–pressure coupling is moderate, which reduces the coupling constant Cϕ in (4.36) . Moreover, in low-permeability forma-tions the mobility and multicomponent diffusion are small, corresponding to small MSD diffusion coefficients and thus weaker transport coupling. These features support the assumptions under which the entries of A become small enough to ensure ρ(A) < 1.21 
+
+Theorem 4.9. Assume that 0 < β ∗cnh < 1 and that the boundary conditions (2.17) –(2.18) hold. Let the time step size τn be chosen according to the adaptive strategy (4.17) . Suppose further that the nonlinear splitting iteration at the time level tn+1 is convergent, i.e., 
+
+(cn+1 ,l i,h , μ n+1 ,l i,h , ϕ n+1 ,l h ) −→ (cn+1 ,† 
+
+> i,h
+
+, μ n+1 ,† 
+
+> i,h
+
+, ϕ n+1 ,† 
+
+> h
+
+) as l → ∞ .
+
+Then the converged discrete molar densities satisfy the physical bounds 
+
+0 < c n+1 ,† 
+
+> h
+
+< 1
+
+β∗ , 0 < c n+1 ,† 
+
+> i,h
+
+≤ cn+1  
+
+> h
+
+, i = 1 , . . . , M. 
+
+0 < ϕ nh − Cϵ ≤ ϕn+1 ,† 
+
+> h
+
+≤ ϕnh + Cϵ < 1,
+
+Proof. By Theorem 4.4, for every nonlinear iterate l ≥ 0 the bounds (4.18)–(4.19), and (4.27) hold for ( cn+1 ,l h , c n+1 ,l i,h ), and ϕn+1 ,l h . Passing to the limit l → ∞ and using the convergence of the nonlinear splitting iteration yields the desired bounds for the limiting solution ( cn+1 ,† 
+
+> h
+
+, c n+1 ,† 
+
+> i,h
+
+) and ϕn+1 ,† 
+
+> h
+
+. □
+
+Theorem 4.10 (The fixed point solves the discrete weak problem) . Let W† 
+
+> h
+
+be the fixed point provided by Lemma 4.7. Then W† 
+
+> h
+
+satisfies the coupled discrete weak formulation at time level tn+1 ,i.e., it is a solution of the fully implicit nonlinear scheme (4.3) .Proof. By Lemma 4.7, the splitting sequence converges strongly in the discrete spaces as l → ∞ .Since all discrete spaces are finite dimensional, this convergence holds in any discrete norm. We now pass to the limit l → ∞ in (4.9)–(4.14). All terms are linear with respect to the unknowns at level l + 1 except the mixed-level products ϕn+1 ,l h cn+1 ,l +1  
+
+> i,h
+
+. Thus it suffices to justify the convergence of these terms; the remaining terms follow directly from strong convergence and continuity of the bilinear forms. Let qh ∈ Q h be arbitrary. For the total molar density we write 
+
+ϕn+1 ,l h cn+1 ,l +1  
+
+> i,h
+
+− ϕn+1 ,† 
+
+> h
+
+cn+1 ,† 
+
+> i,h
+
+= ( ϕn+1 ,l h − ϕn+1 ,† 
+
+> h
+
+)cn+1 ,l +1  
+
+> i,h
+
++ ϕn+1 ,† 
+
+> h
+
+(cn+1 ,l +1  
+
+> i,h
+
+− cn+1 ,† 
+
+> i,h
+
+).
+
+Hence, by H¨ older’s inequality, 
+
+(ϕn+1 ,l h cn+1 ,l +1  
+
+> i,h
+
+− ϕn+1 ,† 
+
+> h
+
+cn+1 ,† 
+
+> i,h
+
+, q h)
+
+≤ X
+
+> K∈T h
+
+∥ϕn+1 ,l h − ϕn+1 ,† 
+
+> h
+
+∥L2(K) ∥cn+1 ,l +1  
+
+> i,h
+
+∥L∞(Ω) 
+
+X
+
+> K∈T h
+
+∥qh∥L2(K)
+
++ ∥ϕn+1 ,† 
+
+> h
+
+∥L∞(Ω) 
+
+X
+
+> K∈T h
+
+∥cn+1 ,l +1  
+
+> i,h
+
+− cn+1 ,† 
+
+> i,h
+
+∥L2(K)
+
+X
+
+> K∈T h
+
+∥qh∥L2(K).
+
+By the boundedness assumptions and the discrete maximum principle established earlier, ∥cn+1 ,l +1  
+
+> i,h
+
+∥L∞(Ω) 
+
+is uniformly bounded in l, and ∥ϕn+1 ,† 
+
+> h
+
+∥L∞(Ω) < ∞. Together with the strong convergence ϕn+1 ,l h →
+
+ϕn+1 ,† 
+
+> h
+
+and cn+1 ,l +1  
+
+> i,h
+
+→ cn+1 ,† 
+
+> i,h
+
+in L2(Ω), we obtain (4.51) (ϕn+1 ,l h cn+1 ,l +1  
+
+> i,h
+
+, q h) → (ϕn+1 ,† 
+
+> h
+
+cn+1 ,† 
+
+> i,h
+
+, q h), ∀ qh ∈ Q h.
+
+Recall that the discrete time difference operator Dτn is linear. Therefore, by (4.51), (Dτn (ϕn+1 ,l h cn+1 ,l +1  
+
+> i,h
+
+), q h) → (Dτn (ϕn+1 ,† 
+
+> h
+
+cn+1 ,† 
+
+> i,h
+
+), q h), ∀ qh ∈ Q h.
+
+All other terms in (4.9)–(4.10) are linear in the level-( l + 1) unknowns, and their coefficients are uni-formly bounded and converge strongly; hence, they pass to the limit by continuity of the associated forms. Therefore, letting l → ∞ in (4.9)–(4.10) gives the transport equations at the fixed point. Since (4.11)–(4.14) are linear with respect to the level-( l + 1) unknowns, we can pass to the limit 
+
+l → ∞ term by term using strong convergence and continuity. The limiting identities coincide with the fully coupled discrete weak formulation at time level tn+1 . Consequently, W† 
+
+> h
+
+is a solution of the nonlinear system (4.3). 
+
+□22 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+5. Numerical Examples 
+
+In this section, we present a series of numerical experiments to validate the proposed numerical method for multicomponent gas flow in poroelastic media. The tests are designed to verify key properties of the scheme, including: mass conservation for each component; the bounds-preserving property for all molar densities (0 < β ∗ch < 1); the discrete energy dissipation law; and the ro-bustness and efficiency of the adaptive time-stepping strategy. We consider a ternary gas mixture consisting of Methane (CH 4), Carbon Dioxide (CO 2), and Ethane (C 2H6) flowing through a porous reservoir. The physical parameters and Peng-Robinson equation of state (PR-EoS) parameters for each component are summarized in Table 1. The computational domain is set to Ω = [0 , L ]d with 
+
+L = 100 m. A quasi-uniform triangular mesh with approximately 20 , 000 elements is used for 2D simulations. The parameter δi, 1 = δi, 2 = δ1 = δ2 = 0 .3, and the time step is dynamically adjusted based on the criterion given in Eq. (4.17). 
+
+Table 1. Physical properties of CH 4, C 2H6 and CO 2
+
+Parameter CH 4 C2H6 CO 2
+
+Pc(bar) 45.99 48.72 73.75 
+
+Tc( K) 190.56 305.32 304.14 Acentric factor 0.011 0.099 0.239 Molar weight (g / mole ) 16.04 30.07 44.01 5.1. Example 1. This example tests a closed binary gas system (CO 2 and CH 4) to verify the proposed numerical scheme’s capability to preserve fundamental physical properties, including indi-vidual species mass conservation, energy dissipation, and the bounds-preserving nature of all molar densities. A spatially heterogeneous permeability field, as illustrated on the left-hand side of Figure 1, is generated using the Perlin noise method to mimic realistic geological conditions. The initial molar density distributions are defined to create a strong contrast between two distinct square regions. Let the central square domain be Ω 1 = [30 m , 70 m] × [30 m , 70 m]. The initial conditions are set as follows 
+
+c0CO 2 (x) = 
+
+(
+
+300 mol/m 3, x ∈ Ω1,
+
+10 mol/m 3, x /∈ Ω1.c0CH 4 (x) = 
+
+(
+
+10 mol/m 3, x ∈ Ω1,
+
+300 mol/m 3, x /∈ Ω1.
+
+This configuration creates a high molar density of CO 2 in the center against a background rich in CH 4, and vice versa, establishing sharp initial gradients that will drive the subsequent diffusion and mixing processes. The mechanical parameters are chosen as N = 10 11 Pa, γ = 10 15 Pa, η = 10 15 
+
+Pa ·s. Figure 1 shows the initial distributions of the molar densities for both CO 2 and CH 4. Figure 2 demonstrates the performance of the proposed scheme: the total free energy decays monotonically, confirming the energy dissipation property; the total mass of each component remains constant over time, verifying discrete mass conservation for each individual species; and the molar densities for both CO 2 and CH 4 remain strictly within their physical bounds throughout the simulation. The graph on the right-hand side shows the adaptive time step size, which increases gradually as the sharp initial gradients smooth out and the system evolves toward a homogeneous equilibrium, eventually reaching the prescribed maximum step size τmax = 1000 s. In Figures 4 and 6, we illustrate the spatial evolution of the molar densities of CO 2 and CH 4
+
+at different time steps: n = 100 , 200 , 300 , 400. The sequence clearly shows the mutual diffusion process: CO 2 diffuses outward from the high-density central region, while CH 4 diffuses inward from the surrounding. Figures 5 and 7 present the corresponding chemical potential distributions for both components at different time steps: n = 100 , 200 , 300 , 400. Initially, significant chemical potential gradients exist at the interface between Ω 1 and the outer domain, which serve as the primary driving 23 
+
+force for the diffusion process. As the system evolves, these gradients gradually diminish until the chemical potentials become uniform throughout the domain at equilibrium, indicating no further net diffusion to occur. Figure 8 shows the evolution of the total pressure field. The initial pressure is non-uniform due to the compositional heterogeneity. The pressure field evolves dynamically as the components interdiffuse, and eventually reaches a homogeneous state at equilibrium. Figure 9 presents the evolution of porosity. Porosity adjusts dynamically with the pressure field (Figure 8), increasing where pressure rises and decreasing where pressure drops, following the transient pressure gradients. 
+
+Figure 1. Example 1: Left: Initial distributions of permeability. Middle: Initial distributions of molar density of CO 2. Right: Initial distributions of molar density of CH 4.
+
+Figure 2. Example 1: Left: Distributions of energy at different time steps. Middle: Minimum and maximum values of molar density. Right: Adaptive values of the time step size. 5.2. Example 2. In this numerical experiment, we simulate a multicomponent gas injection process in a poroelastic medium. The model considers a ternary mixture of CO 2, CH 4, and C 2H6. The initial conditions are defined by a uniform molar density of gas, with values of C0CH 4 = C0C2H6 = 100 mol /m3 and C0CO 2 = 10 mol /m3. A Dirichlet boundary condition for the molar density of CO 2
+
+is prescribed at the left boundary ( x = 0), driving the injection and displacement process. The permeability field is characterized by a highly heterogeneous, as illustrated on the left-hand side of Figure 10, featuring two high-permeability zones ( K = 200 md) within [0 m , 80 m] × [65 m , 70 m] and [0 m , 80 m] × [35 m , 40 m], embedded within a low-permeability matrix ( K = 1 md) that constitutes the remainder of the domain. As shown on the right-hand side of Figure 10, the adaptive time step values at different computational stages are presented. It can be observed that the time step continues to increase, which can be attributed to the fact that the system has not yet reached an equilibrium state. Figures 11, 12, and 13 depict the spatial distributions of molar density for CO 2,CH 4, and C 2H6, respectively, at different time steps n = 50 , 150 , 350 , 500. The results demonstrate 24 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Figure 3. Example 1: Left: Mass conservation of CO 2 at different time steps. Right: Mass conservation of CH 4 at different time steps. 
+
+Figure 4. Distributions of molar density of CO 2 at different times in Example 1. Top-left: n = 100. Top-right: n = 200. Bottom-left: n = 300. Bottom-right: 
+
+n = 400. that the Dirichlet boundary condition on the left boundary induces a chemical potential gradient, which drives the transport of CO 2 into the domain. The advancing CO 2 front efficiently displaces the native CH 4 and C 2H6 mixtures towards the production outlet. The flow dynamics are dominantly channeled through the high-permeability layers, showcasing a clear bypassing effect characteristic of heterogeneous media. Figure 15 presents the evolution of porosity at time steps n = 50 , 150 , 350 , 500. Driven by poroelastic coupling, changes in fluid pressure during injection alter the local effective stress, resulting in dynamic porosity adjustments. The variations are most pronounced within the high-permeability layers, where fluid flow and pressure transients are concentrated. 5.3. Example 3. In this three-dimensional numerical experiment, we investigate the multicompo-nent gas flow process within a highly heterogeneous porous medium. The computational domain is extracted from the benchmark SPE10 geological model, which provides realistic spatial distributions of permeability and porosity representative of actual reservoir formations. The original SPE10 do-main extends over x ∈ [0 , 60] m, y ∈ [0 , 220] m, and z ∈ [0 , 85] m. To construct the present example, we extract the permeability and porosity data along the x-direction from the SPE10 model, forming 25 
+
+Figure 5. Distributions of chemical potential of CO 2 at different times in Example 1. Top-left: n = 100. Top-right: n = 200. Bottom-left: n = 300. Bottom-right: 
+
+n = 400. 
+
+Figure 6. Distributions of molar density of CH 4 at different times in Example 1. Top-left: n = 100. Top-right: n = 200. Bottom-left: n = 300. Bottom-right: 
+
+n = 400. a three-dimensional subregion defined by 
+
+x ∈ [15 , 45] m , y ∈ [95 , 125] m , z ∈ [0 , 30] m .
+
+The computational mesh consists of 40 × 40 × 40 tetrahedral elements, providing adequate spatial resolution to represent the fine-scale heterogeneity of the extracted subdomain. The permeability field in the selected subdomain spans several orders of magnitude, ranging from approximately 26 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Figure 7. Distributions of chemical potential of CH 4 at different times in Example 1. Top-left: n = 100. Top-right: n = 200. Bottom-left: n = 300. Bottom-right: 
+
+n = 400. 
+
+Figure 8. Distributions of pressure at different times in Example 1. Top-left: 
+
+n = 100. Top-right: n = 200. Bottom-left: n = 300. Bottom-right: n = 400. 0.038 md to 2 .0 × 10 4 md, reflecting a highly heterogeneous medium. The corresponding porosity field, obtained from the same dataset, exhibits spatial variability correlated with the permeability structure. The initial permeability and porosity distributions are illustrated in Figures 16 and 17. The simulated system involves a binary gas mixture composed of carbon dioxide (CO 2) and methane (CH 4). Initially, the domain is fully saturated with methane, with a uniform molar 27 
+
+Figure 9. Distributions of porosity at different times in Example 1. Top-left: 
+
+n = 100. Top-right: n = 200. Bottom-left: n = 300. Bottom-right: n = 400. 
+
+Figure 10. Example 2: Left: Initial distributions of permeability. Right: Adaptive values of the time step size. concentration of C0 
+
+> CH 4
+
+= 50 mol /m3, while C0 
+
+> CO 2
+
+= 10 mol /m3. A Dirichlet boundary condi-tion is prescribed for the molar concentration of CO2 at the bottom boundary ( z = 0), where 
+
+CCO 2 = 50 mol /m3, representing a continuous CO 2 injection process. All remaining boundaries are treated as impermeable (no-flux) conditions. The initial molar concentration distributions of both gas components are shown in Figure 19. As the simulation progresses, the injected CO 2 migrates upward, displacing the resident CH 4.Figures 20 and 22 depict the temporal evolution of the molar concentration fields for CO 2 and CH 4, respectively, at representative time steps ( n = 50 , 500 , 1000, and 2000). The results clearly demonstrate that CO 2 preferentially propagates along high-permeability channels. The corresponding chemical potential fields of CO 2 and CH 4, presented in Figures 21 and 23, reveal the dominant thermodynamic gradients driving both advective and diffusive transport mech-anisms. The evolution of the pressure field is illustrated in Figure 24. As illustrated in Figure 18, the time step size fluctuates dynamically throughout the computation because the system does not reach a steady state within the simulated time frame. The spatial distributions of CO 2 and CH 4
+
+from the displacement process at time step n = 5000 are shown in Figure 25, using both clip and slice views. 28 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Figure 11. Distributions of molar density of CO 2 at different times in Example 2. Top-left: n = 50. Top-right: n = 150. Bottom-left: n = 350. Bottom-right: 
+
+n = 500. 
+
+Figure 12. Distributions of molar density of CH 4 at different times in Example 2. Top-left: n = 50. Top-right: n = 150. Bottom-left: n = 350. Bottom-right: 
+
+n = 500. Overall, this three-dimensional numerical example demonstrates the capability of the proposed framework to accurately capture multicomponent gas transport in highly heterogeneous porous media. 29 
+
+Figure 13. Distributions of molar density of C 2H6 at different times in Example 2. Top-left: n = 50. Top-right: n = 150. Bottom-left: n = 350. Bottom-right: 
+
+n = 500. 
+
+Figure 14. Distributions of pressure at different times in Example 2. Top-left: 
+
+n = 50. Top-right: n = 150. Bottom-left: n = 350. Bottom-right: n = 500. 6. Conclusions 
+
+In this work, we have developed a robust and efficient numerical framework for simulating mul-ticomponent gas flow in poroelastic media. The proposed model systematically integrates mul-ticomponent transport with the poroelastic response of the media. By introducing a stabilized discretization strategy and an adaptive time-stepping scheme, the numerical method ensures both 30 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Figure 15. Distributions of porosity at different times in Example 2. Top-left: 
+
+n = 50. Top-right: n = 150. Bottom-left: n = 350. Bottom-right: n = 500. 
+
+Figure 16. Example 3: Left: Initial distributions of permeability. Right: Initial distributions of porosity. 
+
+Figure 17. Example 3: Left: Slice of the initial permeability distribution. Right: Slice of the initial porosity distribution. numerical stability and computational efficiency. The use of a mixed finite element method with up-wind stabilization for flow and transport, together with a discontinuous Galerkin formulation for the poroelastic momentum equation, further enhances accuracy and effectively mitigates numerical lock-ing phenomena. Numerical experiments confirm the robustness and applicability of the framework, 31 
+
+Figure 18. Example 3: Adaptive values of the time step size. 
+
+Figure 19. Example 3: Left: Initial molar distribution of CO 2. Right: Initial molar distribution of CH 4.
+
+Figure 20. Distributions of molar density of CO 2 at different times in Example 3. Top-left: n = 50. Top-right: n = 500. Bottom-left: n = 1000. Bottom-right: 
+
+n = 2000. 32 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Figure 21. Distributions of chemical potential of CO 2 at different times in Ex-ample 3. Top-left: Top-left: n = 50. Top-right: n = 500. Bottom-left: n = 1000. Bottom-right: n = 2000. 
+
+Figure 22. Distributions of molar density of CH 4 at different times in Example 3. Top-left: Top-left: n = 50. Top-right: n = 500. Bottom-left: n = 1000. Bottom-right: n = 2000. demonstrating its capability to handle complex multicomponent transport processes in poroelastic media. The proposed numerical framework provides a thermodynamically consistent discretization that ensures numerical stability and boundedness of molar densities, while the adaptive time-stepping strategy significantly improves computational efficiency. Together, these features result in a robust and reliable numerical scheme for simulating multicomponent transport in poroelastic media. 33 
+
+Figure 23. Distributions of chemical potential of CH 4 at different times in Ex-ample 3. Top-left: Top-left: n = 50. Top-right: n = 500. Bottom-left: n = 1000. Bottom-right: n = 2000. 
+
+Figure 24. Distributions of pressure at different times in Example 3. Top-left: 
+
+n = 50. Top-right: n = 500. Bottom-left: n = 1000. Bottom-right: n = 2000. 
+
+Acknowledgments 
+
+Huangxin Chen was supported by the National Key Research and Development Project of China (Grant No. 2023YFA1011702) and the National Natural Science Foundation of China (Grant No. 12471345). Shuyu Sun was supported by the National Key Research and Development Project of China (Grant No. 2023YFA1011701), the National Natural Science Foundation of China (Grant No. 12571466), the Fundamental Research Funds for the Central Universities, the Shanghai Magnolia 34 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+Figure 25. Distributions of molar densities of CO 2 and CH 4 at time step n = 5000. Top-left: CO 2 clip view. Top-right: CO 2 slice view. Bottom-left: CH 4 clip view. Bottom-right: CH 4 slice view. Talent Fund (Innovation Talent Category) of Shanghai Municipal Human Resources and Social Security Bureau, and the Chang Jiang Scholars Program of the Ministry of Education of China. 
+
+References 
+
+[1] G. Akrivis, B. Li, and D. Li. Energy-decaying extrapolated RK–SAV methods for the AllenCahn and Cahn–Hilliard equations, SIAM J. Sci. Comput., 41(6) (2019), A3703–A3727. [2] D. Bothe, On the Maxwell-Stefan Approach to Multicomponent Diffusion. Progress in Nonlinear Differential Equations and Their Applications, 80: 81–93, 2011. [3] G. Beylkin, J. M. Keiser, and L. Vozovoi, A new class of time discretization schemes for the solution of nonlinear PDEs, J. Comput. Phys., 147 (1998), 362–387. [4] S. M. Cox and P. C. Matthews, Exponential time differencing for stiff systems, J. Comput. Phys., 176 (2002), 430–455. [5] W. Chen, C. Wang, X. Wang, S.M. Wise, Positivity-preserving, energy stable numerical schemes for the Cahn-Hilliard equation with logarithmic potential, J. Comput. Phys., 3 (2019), 100031. [6] Q. Cheng, J. Shen, A new Lagrange multiplier approach for constructing structure preserving schemes, I. Posi-tivity preserving, Comput. Methods Appl. Mech. Eng., 391 (6) (2022), 114585. [7] Q. Cheng, J. Shen, A new Lagrange multiplier approach for constructing structure-preserving schemes, II. Bound preserving, SIAM J. Numer. Anal. 60 (3) (2022), 970–998. [8] O. Coussy, Poromechanics, John Wiley & sons, England, 2004. [9] Chen H., Chen, Y., Kou J., Sun S.: An Energy-Stable Adaptive Time-Stepping Method for Modeling Compress-ible Gas Flow in Poroelastic Media. Preprint, 2025 [10] H. Chen, Y. Chen, J. Kou, Energy stable finite element approximations of gas flow in poroelastic media, Comput. Methods Appl. Mech. Engrg., 428 (2024), 117082. [11] Z. Chen, G. Huan, and Y. Ma, Computational Methods for Multiphase Flows in Porous Media, SIAM, Philadel-phia, 2006. [12] L. Dong, C. Wang, S.M. Wise, Z. Zhang, A positivity-preserving, energy stable scheme for a ternary Cahn-Hilliard system with the singular interfacial parameters, J. Comput. Phys., 442 (2021), 110451. [13] Q. Du, L. Ju, X. Li, Z. Qiao, Maximum bound principles for a class of semilinear parabolic equations and exponential time-differencing schemes, SIAM Review, 63 (2021), 317–359. [14] E. Leonardi and C. Angeli, On the Maxwell-Stefan Approach to Diffusion: A General Resolution in the Transient Regime for One-Dimensional Systems, J. Phys. Chem. B, 114 ( 2010), 151–164. [15] F. Lipnizki, G. Tragardh, Modelling of pervaporation: Models to analyze and predict the mass transport in pervaporation, Separation and Purification Methods, 30 (2001) 49–125. [16] M. F. El-Amin, J. Kou, and S. Sun, Mixed finite element simulation with stability analysis for gas transport in low-permeability reservoirs, Energies, 11 (2018), 208. 35 
+
+[17] V. Joshi, R.K. Jaiman, A positivity preserving and conservative variational scheme for phase-field modeling of two-phase flows, J. Comput. Phys., 360 (2018), 137–166. [18] D. J. Eyre, Unconditionally gradient stable time marching the Cahn-Hilliard equation, in Computational and Mathematical Models of Microstructural Evolution (San Francisco, CA, 1998), Mater. Res. Soc. Sympos. Proc. 529, MRS, Warrendale, PA, 1998, 39–46. [19] K. Fowler, P. J. Connolly, D. O. Topping, and Simon O’Meara, Maxwell-Stefan diffusion: a framework for predicting condensed phase diffusion and phase separation in atmospheric aerosol, Atmos. Chem. Phys., 18: 1629–1642, 2018. [20] C. Guo, B. Bai, M. Wei, X. He, and Y.S. Wu, Study on gas permeability in nano pores of shale gas reservoirs, in Proceedings of the SPE Unconventional Resources Conference, 2013, SPE-167179-MS. [21] L. Ju, X. Li, Z. Qiao, and H. Zhang, Energy stability and error estimates of exponential time differencing schemes for the epitaxial growth model without slope selection, Math. Comp., 87 (2021), pp. 1859–1885. [22] L. Ju, X. Li, and Z. Qiao, Generalized SAV–exponential integrator schemes for Allen–Cahn type gradient flows, SIAM J. Numer. Anal., 60(4) (2022), 1905–1931. [23] L. Ju, X. Li, and Z. Qiao, Stabilized exponential–SAV schemes preserving energy dissipation law and maximum bound principle for the Allen–Cahn type equations, J. Sci. Comput., 92(2) (2022). [24] R.A. Horn and C.R. Johnson, Matrix Analysis, 2nd ed., Cambridge University Press, Cambridge, UK, 2003. [25] H. Hoteit, Modeling diffusion and gas-oil mass transfer in fractured reservoirs, Journal of Petroleum Science and Engineering, 105: 1–17, 2013. [26] J. Kou and S. Sun, Thermodynamically consistent modeling and simulation of multicomponent two-phase flow with partial miscibility, Comput. Methods Appl. Mech. Engrg., 331 (2018), 623–649. [27] J. Kou and S. Sun, Entropy stable modeling of non-isothermal multi-component diffuse-interface two-phase flows with realistic equations of state, Comput. Methods Appl. Mech. Eng., 341 (2018), 221–248. [28] R. Krishna, A Maxwell-Stefan-Glueckauf description of transient mixture uptake in microporous adsorbents, Separation and Purification Technology, 191: 392–399, 2018. [29] J. Kou, S. Sun, X. Wang, A novel energy factorization approach for the diffuse-interface model with Peng-Robinson equation of state, SIAM J. Sci. Comput., 42 (2020), B30–B56. [30] J. Kou, X. Wang, S. Du, Energy stable and mass conservative numerical method for gas flow in porous media with rock compressibility, SIAM J. Sci. Comput., 44 (2022), B938–B963. [31] J. Kou, X. Wang, H. Chen, S. Sun, An energy-stable and conservative numerical method for multicomponent Maxwell-Stefan model with rock compressibility. Physics of Fluids, 35, (2023), 096116. [32] J. Kou, X. Wang, H. Chen, S. Sun, An efficient bound-preserving and energy stable algorithm for compressible gas flow in porous media, J. Comput. Phys., 473 (2023), 111751. [33] J. Kou, A. Salama, and X. Wang, Thermodynamically consistent phase-field modelling of activated solute trans-port in binary solvent fluids, Journal of Fluid Mechanics, 955, A41, 2023. [34] A. Leahy-Dios and A. Firoozabadi, Unified Model for Nonideal Multicomponent Molecular Diffusion Coefficients, AIChE Journal, 53(11): 2932–2939, 2007. [35] G. Lebon, D. Jou, J. Casas-V´ azquez, Understanding Non-equilibrium Thermodynamics, Springer-Verlag, Berlin Heidelberg, (2008). [36] D. Li, Z. Qiao, and T. Tang, Characterizing the stabilization size for semi-implicit Fourierspectral method to phase field equations, SIAM J. Numer. Anal., 54 (2016), 1653–1681. [37] P.J. Phillips, M. Wheeler, A coupling of mixed and discontinuous Galerkin finite-element methods for poroelas-ticity, Comput. Geosci., 12 (2008), 417–435. [38] O. Pol´ ıvka and J. Mikyˇ ska, Compositional modeling in porous media using constant volume flash and flux computation without the need for phase identification, J. Comput. Phys., 272 (2014), 149–169. [39] D. Peng and D. B. Robinson, A new two-constant equation of state, Ind. Eng. Chem. Fundamen., 15 (1976), 59–64. [40] Z. Qiao and S. Sun, Two-phase fluid simulation using a diffuse interface model with Peng-Robinson equation of state, SIAM J. Sci. Comput., 36 (2014), pp. B708–B728. [41] A. Runstedtler, On the modified Stefan-Maxwell equation for isothermal multicomponent gaseous diffusion, Chemical Engineering Science, 61: 5021–5029, 2006. [42] J. Shen, T. Tang, and J. Yang. On the maximum principle preserving schemes for the generalized Allen–Cahn equation, Commun. Math. Sci., 14(6) (2016), 1517–1534. [43] J. Shen, J. Xu, and J. Yang, The scalar auxiliary variable (SAV) approach for gradient flows, J. Comput. Phys., 353 (2018), 407–416. [44] J. Shen, J. Xu, and J. Yang, A new class of efficient and robust energy stable schemes for gradient flows, SIAM Rev., 61 (2019), 474–506. [45] J. Shen, J. Xu, Unconditionally positivity preserving and energy dissipative schemes for Poisson-Nernst-Planck equations, Numer. Math., 148 (2021), 671–697. [46] T. Tang and J. Yang, Implicit–explicit scheme for the Allen–Cahn equation preserves the maximum principl, J. Comput. Math., 34(5) (2016), 451–461. [47] C. Xu and T. Tang, Stability analysis of large time-stepping methods for epitaxial growth models, SIAM J. Numer. Anal., 44 (2006), 1759–1779. [48] J. Yang, Z. Yuan, Z. Zhou, Arbitrarily high-order maximum bound preserving schemes with cut-off postprocessing for Allen-Cahn equations, J. Sci. Comput., 90 (2022), 76. 36 HUANGXIN CHEN, YUXIANG CHEN, JISHENG KOU, AND SHUYU SUN 
+
+[49] H. Yang, S. Sun, C. Yang, Nonlinearly preconditioned semismooth Newton methods for variational inequality solution of two-phase flow in porous media, J. Comput. Phys., 332 (2017), 1–20. [50] X. Yang and L. Ju, Efficient linear schemes with unconditionally energy stability for the phase field elastic bending energy model, Comput. Methods Appl. Mech. Eng., 315 (2017), 691–712. [51] J.A. Wesselingh and R. Krishna, Mass transfer in multicomponent mixtures, Delft University Press, Delft, The Netherlands, 2000. [52] X. Yang, J. Zhao, and Q. Wang, Numerical approximations for the molecular beam epitaxial growth model based on the invariant energy quadratization method, J. Comput. Phys., 333(2017), 104–127. [53] X. Zhang, C.-W. Shu, On positivity-preserving high order discontinuous Galerkin schemes for compressible Euler equations on rectangular meshes, J. Comput. Phys., 229 (23) (2010), 8918–8934. 
+
+School of Mathematical Sciences and Fujian Provincial Key Laboratory on Mathematical Modeling and High Performance Scientific Computing, Xiamen University, Fujian, 361005, China 
+
+Email address : chx@xmu.edu.cn 
+
+School of Mathematical Sciences and Fujian Provincial Key Laboratory on Mathematical Modeling and High Performance Scientific Computing, Xiamen University, Fujian, 361005, China 
+
+Email address : chenyuxiang@stu.xmu.edu.cn 
+
+State Key Laboratory of Intelligent Deep Metal Mining and Equipment, Zhejiang Key Laboratory of Rock Mechanics and Geohazards, School of Civil Engineering, Shaoxing University, Shaoxing 312000, Zhejiang, China 
+
+Email address : jishengkou@163.com 
+
+School of Mathematical Sciences, Tongji University, Shanghai 200092, China. 
+
+Email address : suns@tongji.edu.cn

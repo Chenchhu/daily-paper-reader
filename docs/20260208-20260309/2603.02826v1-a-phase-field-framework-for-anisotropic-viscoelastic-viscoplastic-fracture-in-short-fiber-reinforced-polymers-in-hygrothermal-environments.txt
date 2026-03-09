@@ -1,0 +1,1288 @@
+Title: A phase-field framework for anisotropic viscoelastic-viscoplastic fracture in short fiber-reinforced polymers in hygrothermal environments
+
+URL Source: https://arxiv.org/pdf/2603.02826v1
+
+Published Time: Wed, 04 Mar 2026 02:07:31 GMT
+
+Number of Pages: 48
+
+Markdown Content:
+# A phase-field framework for anisotropic viscoelastic-viscoplastic fracture in short fiber-reinforced polymers in hygrothermal environments 
+
+Behrouz Arash a,b, ∗, Shadab Zakavati a, Timon Rabczuk c
+
+> aDepartment of Mechanical, Electrical and Chemical Engineering, Oslo Metropolitan University, Pilestredet 35, 0166 Oslo, Norway
+> bGreen Energy Lab, Department of Mechanical, Electrical and Chemical Engineering, OsloMet - Oslo Metropolitan University, Oslo, Norway
+> cInstitute of Structural Mechanics, Bauhaus-Universität Weimar, Marienstraße 15, 99423 Weimar, Germany
+
+Abstract 
+
+This work presents a comprehensive phase-field framework for modeling anisotropic viscoelastic-viscoplastic fracture in short fiber-reinforced polymer (SFRP) composites under hygrother-mal environments at finite deformation. The constitutive model employs a multiplicative decomposition of the deformation gradient into viscoelastic and viscoplastic components. An anisotropic phase-field formulation is developed using structural tensors to capture orientation-dependent fracture energy induced by multiple fiber families. Hygrothermal effects are in-corporated through moisture-dependent swelling, thermal expansion, and temperature- and moisture-sensitive material parameters within the coupled framework. Numerical investi-gations demonstrate the framework’s capability to capture complex fracture phenomena in SFRPs. Results reveal that fiber orientation fundamentally governs the spatial distribution of crack driving force, with maximum energy accumulation along fiber directions persisting throughout viscous relaxation. The anisotropy parameter controlling directional fracture re-sistance significantly influences crack path deflection. Hygrothermal degradation substantially reduces both peak load and fracture energy, with moisture absorption and elevated temper-ature each contributing to decreased mechanical performance. The framework captures the influence of fiber mechanical properties on global load-bearing capacity and crack propagation resistance. This unified computational framework advances the predictive modeling of damage evolution in SFRPs subjected to realistic environmental and mechanical loading conditions. 
+
+Keywords: Short fiber/Epoxy Composites, Hygrothermal Conditions, Phase-field Modeling,     
+
+> ∗Corresponding author
+> Email addresses: behrouza@oslomet.no (Behrouz Arash), timon.rabczuk@uni-weimar.de (Timon Rabczuk)
+> arXiv:2603.02826v1 [cs.CE] 3 Mar 2026
+
+Viscoelastic-Viscoplastic Model, Finite Deformation 
+
+1. Introduction 
+
+Short fiber-reinforced polymer (SFRP) composites have emerged as critical materials in modern engineering applications, finding extensive use in automotive, aerospace, renewable energy, and structural engineering sectors [1–3]. Glass fiber (GF)-reinforced epoxy compos-ites, in particular, represent a substantial segment of the market due to their favorable cost-performance ratio and well-established processing technologies [3–5]. However, their structural integrity under service loading conditions remains critically dependent on understanding and predicting complex failure mechanisms, particularly fracture initiation and propagation under realistic environmental and mechanical loading scenarios. The mechanical response of SFRPs exhibits pronounced anisotropy stemming from fiber orientation distributions. This microstructural anisotropy fundamentally governs not only the elastic properties but also the inelastic deformation mechanisms and fracture behav-ior [3, 6, 7]. Furthermore, polymer matrices demonstrate rate-dependent behavior character-ized by coupled viscoelastic and viscoplastic mechanisms [8–10], while hygrothermal conditions induce substantial property degradation through moisture absorption and thermal cycling [10– 12]. The interplay between these multi-physical phenomena–mechanical anisotropy, rate-dependent inelasticity, environmental degradation, and damage evolution–presents formidable challenges for predictive modeling frameworks. Traditional computational approaches for fracture mechanics in SFRPs have predomi-nantly relied on cohesive zone models [13, 14], element deletion techniques [15], and extended finite element (FE) methods [16, 17]. While these methods have demonstrated success in specific scenarios, they encounter limitations when addressing complex crack patterns, crack nucleation in initially undamaged domains, and mesh-independent crack path prediction. Phase-field modeling has emerged as a variational framework for fracture mechanics that fundamentally addresses limitations of classical approaches [18–20]. The phase-field method regularizes sharp crack interfaces through continuous damage field representation, thereby eliminating the need for explicit crack tracking, enabling nucleation in intact material, and providing mesh-independent solutions [21, 22]. The approach has been successfully extended to encompass complex fracture phenomena including brittle [23, 24], ductile [25, 26], and cohesive fracture [27, 28], while recent developments have incorporated anisotropic fracture 2energy [29–31], dynamic effects [32], and multi-field coupling [10, 33, 34]. The modeling of anisotropic fracture in fiber-reinforced composites introduces additional complexity beyond that encountered in isotropic materials. The fracture energy itself be-comes directionally dependent, reflecting the preferential crack propagation paths influenced by fiber orientation [35–37]. Several anisotropic phase-field formulations have been proposed employing structural tensors to capture orientation-dependent fracture resistance [29, 30], while alternative approaches utilize preferential fracture directions aligned with material sym-metries [31, 38]. Dean and coworkers [37, 39, 40] developed multi-phase-field frameworks to simultaneously capture intralaminar matrix cracking and interlaminar delamination in lami-nated composites, incorporating cohesive zone behavior at ply interfaces through interfacial gradient terms. Recent advances have also addressed the multiscale nature of composite frac-ture, with homogenization-based phase-field models bridging microscale fiber-matrix debond-ing to macroscale crack propagation [37, 41]. The influence of manufacturing-induced fiber orientation distributions on fracture patterns has been investigated through coupled process-structure-property phase-field frameworks [37, 42], while hygrothermal degradation effects in composite phase-field models have been addressed through environment-dependent fracture energy and stiffness degradation [43, 44]. However, most existing anisotropic phase-field mod-els for composites consider either elastic or small-strain elasto-plastic behavior [45, 46], with limited attention to the coupled viscoelastic-viscoplastic response characteristic of polymer matrices at finite deformation [47, 48]. For polymer-based materials, several studies have developed phase-field frameworks incor-porating viscoelastic behavior [49–52], recognizing the critical role of rate-dependent mecha-nisms in fracture processes. The time-dependent nature of polymer fracture has been cap-tured through various approaches, including integral formulations coupled with phase-field damage [50], and representative crack element frameworks for efficient time integration [49]. Specifically for polymer nanocomposites, Arash and coworkers [9, 53, 54] developed phase-field formulations to investigate nonlinear viscoelastic fracture at finite deformation, accounting for hygrothermal conditions and nanoparticle reinforcement effects through moisture-dependent material parameters and thermal expansion coupling. Their work demonstrated the signifi-cance of viscoelastic relaxation in determining fracture toughness under different loading rates and environmental conditions. Recent experimental evidence indicates that epoxy resins and their composites exhibit irreversible viscoplastic strains, particularly under sustained loading or thermal cycling [8, 55]. Arash et al. [10] developed a finite deformation phase-field formu-3lation to investigate the viscoelastic–viscoplastic fracture behavior of epoxy nanocomposites under cyclic and monolithic loading. However, the combination of viscoelastic and viscoplastic mechanisms within phase-field fracture frameworks remains unexplored for anisotropic SFRPs. In addition, hygrothermal effects constitute another critical consideration for polymer composite durability [10, 56]. Moisture absorption induces swelling, plasticization, and degradation of matrix-dominated properties, while thermal fluctuations affect glass transition behavior and time-dependent re-sponse [10, 57]. Phase-field models incorporating hygro-mechanical coupling have emerged [10, 43], though their extension to anisotropic fiber-reinforced systems with comprehensive viscoelastic-viscoplastic constitutive descriptions remains limited. Despite substantial progress in individ-ual aspects (i.e., anisotropic phase-field modeling, viscoelastic-viscoplastic constitutive frame-works, hygrothermal coupling, and finite deformation mechanics), a comprehensive framework unifying these elements for SFRPs remains absent from the literature. Motivated by these considerations, the present work develops an integrated phase-field framework for modeling anisotropic viscoelastic-viscoplastic fracture in SFRPs under hy-grothermal environments at finite deformation. The principal contributions and novel as-pects of this study encompass several key developments. First, a comprehensive constitutive model is formulated that decomposes the deformation into viscoelastic and viscoplastic com-ponents, thereby extending the framework of Arash et al. [9, 53] to incorporate viscoplastic flow. Second, an anisotropic phase-field fracture formulation is developed employing struc-tural tensors to capture orientation-dependent fracture energy induced by multiple fiber fam-ilies, enabling the prediction of preferential crack paths in layered and randomly distributed fiber architectures. Third, hygrothermal effects are integrated through moisture-dependent swelling, thermal expansion, and temperature-sensitive material parameters within the cou-pled viscoelastic-viscoplastic-damage framework. Finally, systematic numerical investigations are conducted demonstrating the model’s capability to capture the influence of fiber orienta-tion, distribution and performance on the fracture behavior, the role of anisotropic fracture energy in crack deflection, and hygrothermal degradation effects on fracture resistance. The remainder of this paper is organized as follows. Section 2 presents the viscoelastic-viscoplastic constitutive model for SFRPs, detailing the kinematics, stress decomposition, fiber family representation, and hygrothermal coupling. Sec. 3 introduces the anisotropic phase-field formulation. Sec. 4 demonstrates the model through representative numerical examples examining the effects of fiber orientation, anisotropy parameters, and hygrothermal 4conditions on fracture evolution. Finally, Section 5 summarizes the key findings and discusses future research directions. 
+
+2. Constitutive model for short fiber-reinforced epoxy composites 
+
+In this section, a viscoelastic-viscoplastic constitutive model is presented for SFRPs at finite deformation. The model captures the nonlinear rate-dependent behavior of the matrix phase combined with the anisotropic reinforcement provided by multiple fiber families. The constitutive framework also includes hygrothermal effects. A schematic representation of the rheological model is shown in Fig. 1. In the current formulation, temperature θ and mois-ture content ww are treated as prescribed uniform parameters rather than independent field variables. Governing equations for heat transfer or moisture diffusion are not solved; instead, spatially uniform and temporally constant values are assumed, representing steady-state envi-ronmental conditions. This approach captures the essential hygrothermal degradation mech-anisms while maintaining computational tractability.   
+
+> (a) (b)
+> Figure 1: (a) One-dimensional schematic of the viscoelastic-viscoplastic constitutive model, and (b) repre-sentative volume element of SFRPs.
+
+2.1. Kinematics 
+
+The total deformation gradient is multiplicatively decomposed into volumetric and devia-toric parts as 
+
+F = J1/3 ¯F, (1) 5where J = det[ F] and ¯F represent the volumetric and deviatoric deformation gradients, re-spectively. The volumetric deformation is further decomposed to account for mechanical compressibility, thermal dilatation, and moisture-induced swelling as 
+
+J = JmJθJw , (2) where 
+
+Jθ = 1 + αθ (θ − θ0), (3) and 
+
+Jw = 1 + αw ww . (4) Here, αθ and αw denote the thermal expansion and moisture swelling coefficients [53], respectively, θ is the absolute temperature, θ0 = 296 K is the reference temperature, and ww
+
+represents the moisture content. The material response is decomposed into viscoelastic and viscoplastic components. The viscoelastic behavior is further split into equilibrium (hyperelastic) and non-equilibrium (vis-cous) contributions. Accordingly, the deviatoric deformation gradient is multiplicatively de-composed as [58] ¯F = ¯Fve ¯Fvp , (5) where ¯Fve and ¯Fvp represent the viscoelastic and viscoplastic deformation gradients, respec-tively. The viscoelastic deformation gradient is further decomposed into elastic and viscous parts as ¯Fve = ¯Fe ¯Fv . (6) The corresponding left Cauchy-Green deformation tensors are defined as ¯B = ¯F ¯FT , (7) ¯Be = ¯Fe( ¯Fe)T , (8) ¯Bve = ¯Fve ( ¯Fve )T . (9) The total velocity gradient of the viscoelastic network, ¯Lve = ˙¯Fve ( ¯Fve )−1, is additively decomposed into elastic and viscous components: ¯Lve = ¯Le + ¯Fe ¯Lv ( ¯Fe)−1 = ¯Le + ˜Lv , (10) where ˜Lv = ˙¯Fv ( ¯Fv )−1 = ˜Dv + ˜Wv. (11) 6Here, a tilde ( ∼) denotes quantities in the intermediate configuration, ˜Dv represents the rate of viscous deformation, and ˜Wv is the skew-symmetric spin tensor. Following standard practice [59], the intermediate configuration is made unique by prescribing ˜Wv = 0.The rate of viscoelastic flow is described [60] as ˜Dv = ˙εv
+
+τneq 
+
+dev 〈σ′
+
+> neq
+
+〉, (12) where τneq = ‖dev[ σneq ]‖F represents the Frobenius norm of the driving stress, ˙ εv is the viscous strain rate, and σ′ 
+
+> neq
+
+= RTe σneq Re represents the stress acting on the viscous component in its relaxed configuration. The viscous strain rate is defined by the Argon model [61] as ˙εv = ˙ ε0 exp 
+
+ï ∆H
+
+kbT
+
+ÅÅ τneq 
+
+τ0
+
+ãm
+
+− 1
+
+ãò 
+
+, (13) where kb is the Boltzmann constant, ˙ ε0 is a pre-exponential factor, ∆ H is the activation energy, 
+
+τ0 is the athermal yield stress, and m is an exponential material parameter that captures the moisture- or temperature-dependency of the stiffness [12]. From Eqs. (11) and (12), the evolution of the viscous deformation gradient is given by ˙¯Fv = ( ¯Fe)−1 ˙εv
+
+τneq 
+
+dev 〈σ′
+
+> neq
+
+〉 ¯Fve . (14) Similarly, the total velocity gradient of the overall network, ¯L = ˙¯F( ¯F)−1, can be expanded to ¯L = ¯Lve + ¯Fve ¯Lvp ( ¯Fve )−1 = ¯Lve + ˜Lvp . (15) The viscoplastic velocity gradient is additively decomposed into symmetric and skew-symmetric parts as ˜Lvp = ˙¯Fvp ( ¯Fvp )−1 = ˜Dvp + ˜Wvp , (16) with ˜Wvp = 0. The rate of viscoplastic deformation is defined by ˜Dvp = ˙εvp 
+
+τtot 
+
+dev[ σ], (17) where dev[ σ] is the deviatoric part of the total Cauchy stress and τtot = ‖dev[ σ]‖F .To characterize the viscoplastic flow, a simple phenomenological representation is adopted as ˙εvp =
+
+
+
+0 if τtot < σ 0,a(ε − ε0)b ˙ε if τtot ≥ σ0,
+
+(18) 7where a, b, and σ0 are material parameters, ε0 is the strain at which viscoplastic flow is activated, represented by the Frobenius norm of the Green strain tensor ε = ‖E‖F with 
+
+E = 1
+
+2 (FT F − I), (19) and ˙ ε is the strain rate, introducing a simple strain-rate dependency of the viscoplastic flow. Analogous to Eq. (14), the evolution of the viscoplastic deformation gradient is ˙¯Fvp = ( ¯Fve )−1 ˙εvp 
+
+τtot 
+
+dev[ σtot ] ¯F. (20) 
+
+2.2. Implicit time integration 
+
+The evolution equations (14) and (20) for ¯Fv and ¯Fvp are first-order nonlinear ordinary differential equations whose right-hand sides depend on the Cauchy stress at the current time, which is itself a function of the unknown internal variables at tn+1 . Two numerical challenges therefore arise. First, naive additive updates of the form ¯Fvn+1 = ¯Fvn + ∆ t ˙¯Fv do not preserve the isochoric constraints det ( ¯Fv ) = det ( ¯Fvp ) = 1. Second, the implicit dependence of the viscous and viscoplastic flow directions on the unknown stress at tn+1 requires an iterative solution within each time step. Both issues are resolved by adopting an exponential map integrator for the deviatoric internal deformation gradients. For a generic deviatoric velocity gradient ¯L (either ¯Lv or ¯Lvp ), the update reads ¯Fn+1 = exp (∆t ¯Ln+1 
+
+) ¯Fn. (21) Because the flow rules prescribe traceless velocity gradients, tr( ¯Lv ) = tr( ¯Lvp ) = 0, the ma-trix exponential satisfies det (exp (∆t ¯L)) = exp (∆t tr ¯L) = 1. Accordingly, The isochoric constraint is preserved exactly at every iteration. Since ¯Ln+1 depends on the stress at tn+1 , the update in Eq. (21) is implicit. We solve it by means of a fixed-point iteration in the spirit of return-mapping algorithms [62]. This procedure is detailed in Algorithm 1. The rotation tensor Re appearing in the algorithm is obtained from the polar decomposition of the elastic part of the deviatoric deformation gradient, ¯Fe = Re Ue, (22) where Re is proper orthogonal and Ue is symmetric positive definite. 8Algorithm 1 Implicit time integration over [ tn, t n+1 ] with fixed-point iteration.  
+
+> 1:
+
+Given: F n+1 , ¯Fvn, ¯Fvp n , Hn, time step ∆ t. 
+
+> 2:
+
+Initialize: ¯Fv = ¯Fvn, ¯Fvp = ¯Fvp n , tolerance εtol , converged = false.  
+
+> 3:
+
+while converged = false do  
+
+> 4:
+
+Kinematics: J = det( Fn+1 ), ¯F = J−1/3Fn+1 , ¯Fve = ¯F ( ¯Fvp )−1, ¯Fe = ¯Fve ( ¯Fv )−1. 
+
+> 5:
+
+Stress: Compute Cauchy stress σ using the constitutive model (Section 2.3).  
+
+> 6:
+
+Polar decomposition: ¯Fe = ReUe with Re orthogonal, Ue symmetric.  
+
+> 7:
+
+Rotated non-equilibrium stress: σ′ 
+
+> neq
+
+= RTe σneq Re. 
+
+> 8:
+
+Viscous flow: τneq = ‖ dev[ σneq ]‖F , ˙ ǫv from Eq. (13), ¯Dv = ˙ǫv
+
+τneq 
+
+dev[ σ′
+
+> neq
+
+], ¯Lv = ¯Dv
+
+(irrotational flow), ¯Fv 
+
+> new
+
+= exp (∆t ¯Lv ) ¯Fv. 
+
+> 9:
+
+Viscoplastic flow: τtot = ‖ dev[ σ]‖F , E = 1 
+
+> 2
+
+(FTn+1 Fn+1 − I), ǫ = ‖E‖F , 
+
+> 10:
+
+if τtot ≥ σ0 then  
+
+> 11:
+
+˙ǫvp from Eq. (18), ¯Dvp = ˙ǫvp 
+
+τtot 
+
+dev[ σ], ¯Lvp = ¯Dvp , ¯Fvp  
+
+> new
+
+= exp (∆t ¯Lvp ) ¯Fvp . 
+
+> 12:
+
+else  
+
+> 13:
+
+¯Fvp  
+
+> new
+
+= ¯Fvp . 
+
+> 14:
+
+end if  
+
+> 15:
+
+Convergence check: ∆v = ‖ ¯Fv 
+
+> new
+
+− ¯Fv ‖F , ∆ vp = ‖ ¯Fvp  
+
+> new
+
+− ¯Fvp ‖F . 
+
+> 16:
+
+if ∆v + ∆ vp < ε tol then  
+
+> 17:
+
+¯Fvn+1 = ¯Fv
+
+> new
+
+, ¯Fvp n+1 = ¯Fvp 
+
+> new
+
+, converged = true.  
+
+> 18:
+
+else  
+
+> 19:
+
+¯Fv = ¯Fv
+
+> new
+
+, ¯Fvp = ¯Fvp 
+
+> new
+
+. 
+
+> 20:
+
+end if  
+
+> 21:
+
+end while 
+
+It is required to rotate the non-equilibrium Cauchy stress σneq to the intermediate (stress-free) configuration, yielding 
+
+σ′ 
+
+> neq
+
+= RTe σneq Re, (23) consistent with the objective flow rule in Eq. (12) and with the requirement that the inter-mediate configuration be made unique by setting the viscous spin to zero [63]. The algorithm guarantees exact satisfaction of the isochoric constraints det ( ¯Fvn+1 
+
+) = det ( ¯Fvp n+1 
+
+) = 1 at con-vergence, and produces a stress state that is fully consistent with the viscous and viscoplastic evolution equations at tn+1 .92.3. Helmholtz free energy and stress response 
+
+Following the additive decomposition proposed in previous work [64], the Helmholtz free energy is decomposed into equilibrium, non-equilibrium, and volumetric contributions as 
+
+ψ( ¯Bve , ¯Be, J, φ ) = g(φ) [ψeq ( ¯Bve ) + ψneq ( ¯Be)] + ψvol (J), (24) where g(φ) is the energetic degradation function capturing the evolution of strain energy with respect to the phase-field variable φ ∈ [0 , 1]. The degradation function satisfies 
+
+g(0) = 1 , g(1) = 0 , g′(φ) ≤ 0, g′(1) = 0 . (25) A monotonically decreasing function satisfying the conditions in Eq. (25) is adopted as 
+
+g(φ) = (1 − φ)2 + k, (26) where k is a small positive parameter introduced to ensure numerical stability and prevent complete loss of stiffness at fully damaged material points [23]. For SFRPs, the equilibrium and non-equilibrium parts of the free energy account for both matrix and fiber contributions. The strain energy density for each fiber family is based on a hyperelastic model that captures the anisotropic mechanical response. The equilibrium and non-equilibrium free energies are defined [3] as 
+
+ρ0ψeq =
+
+> Nf
+
+∑
+
+> i=1
+
+v(i)
+
+> f
+
+îψmatrix eq ( ¯Bve ) + ψfiber( i)eq ( ¯Cve , a(i)0 )ó , (27) 
+
+ρ0ψneq =
+
+> Nf
+
+∑
+
+> i=1
+
+v(i)
+
+> f
+
+îψmatrix neq ( ¯Be) + ψfiber( i)neq ( ¯Ce, a(i)0 )ó , (28) where Nf is the number of fiber families, v(i) 
+
+> f
+
+is the volume fraction of the i-th fiber family, a(i)0
+
+is the unit vector defining the fiber direction in the reference configuration, ¯Cve = ( ¯Fve )T ¯Fve 
+
+and ¯Ce = ( ¯Fe)T ¯Fe are the right Cauchy-Green deformation tensors, and ρ0 is the initial density. The free energy density is expressed using both left and right Cauchy-Green tensors to reflect the different physical origins of the contributions. The matrix material, being isotropic, is naturally described using the left Cauchy-Green tensor ¯B in the current configuration. The fiber reinforcement, with its directional dependence defined in the reference configuration, requires the right Cauchy-Green tensor ¯C because the squared fiber stretch is correctly given by ¯I(i)4 = a(i)0 · ¯Ca (i)0 .10 The matrix contribution is modeled using a neo-Hookean hyperelastic model as 
+
+ψmatrix eq/neq = 1
+
+2 μeq/neq (θ, w w )(tr[ ¯Bve/e ] − 3) , (29) where μeq and μneq are temperature- and moisture-dependent shear moduli. The temperature dependence is captured using a modified Kitagawa model [65]: 
+
+μeq (θ, w w ) = μ0eq [2 − exp( α(θ − θ0))][1 − 9.5ww + 0 .057 w2
+
+> w
+
+], (30) 
+
+μneq (θ, w w ) = μ0neq [2 − exp( α(θ − θ0))][1 − 9.5ww + 0 .057 w2
+
+> w
+
+], (31) where μ0eq and μ0neq are reference shear moduli at room temperature and dry conditions, and 
+
+α is a temperature sensitivity parameter. The fiber contribution is based on a strain energy function that accounts for fiber stretching and shearing. The fiber energy for each family is expressed in terms of fiber-specific invariants as 
+
+ψ(i)fiber = 1
+
+2 μ
+
+ï
+
+(vm + v(i) 
+
+> f
+
+f ( ¯I(i)4 ))( ¯I(i)4 + 2( ¯I(i)4 )−1/2 − 3) + g1( ¯I(i)4 )( ¯I(i)5 − ( ¯I(i)4 )2) ¯I(i)4 −1 + g2( ¯I(i)4 )( ¯I1 − ( ¯I(i)5 + 2( ¯I(i)4 )1/2) ¯I(i)4 −1)
+
+ò
+
+, (32) where vm = 1 − ∑Nf 
+
+> i=1
+
+v(i) 
+
+> f
+
+is the matrix volume fraction, μ is the shear modulus (either μeq 
+
+or μneq ), and the fiber-specific invariants are ¯I(i)4 = a(i)0 · ¯Ca (i)0 , (33) ¯I(i)5 = a(i)0 · ¯C2a(i)0 , (34) representing the squared fiber stretch and a higher-order fiber invariant, respectively. The functions f , g1, and g2 in Eq. (32) are defined as 
+
+f ( ¯I4) = a1 + a2 exp [a3( ¯I4 − 1) ], (35) 
+
+g1( ¯I4) = (1 + v(i) 
+
+> f
+
+)f ( ¯I4) + (1 − v(i) 
+
+> f
+
+)
+
+(1 − v(i) 
+
+> f
+
+)f ( ¯I4) + 1 + v(i)
+
+> f
+
+, (36) 
+
+g2( ¯I4) = (1 + 0 .4v(i) 
+
+> f
+
+)f ( ¯I4) + 0 .4(1 − v(i) 
+
+> f
+
+)
+
+(1 − v(i) 
+
+> f
+
+)f ( ¯I4) + 0 .4 + v(i)
+
+> f
+
+, (37) where a1, a2, and a3 are material parameters characterizing the fiber response. The volumetric part of the free energy is defined as 
+
+ρ0ψvol = 1
+
+2 kv
+
+Å J2 
+
+> m
+
+− 1
+
+2 − ln[ Jm]
+
+ã
+
+, (38) 11 where the bulk modulus kv is temperature- and moisture-dependent given by 
+
+kv = k0 
+
+> v
+
+[2 − exp( α(θ − θ0))][1 − 9.5ww + 0 .057 w2
+
+> w
+
+], (39) with k0 
+
+> v
+
+being the reference bulk modulus. The Cauchy stress is obtained from the free energy as 
+
+σ = g(φ)( σdev + σvol ), (40) where the deviatoric stress is 
+
+σdev = J−1
+
+> Nf
+
+∑
+
+> i=1
+
+v(i)
+
+> f
+
+îσmatrix + σ(i)fiber 
+
+ó , (41) and the volumetric stress is 
+
+σvol = 1
+
+2 kvJ−1
+
+Å
+
+Jm − 1
+
+Jm
+
+ã
+
+I. (42) The matrix contribution to the deviatoric stress follows from the neo-Hookean model as 
+
+σmatrix = μeq dev[ ¯Bve ] + μneq dev[ ¯Be], (43) where dev[ ·] denotes the deviatoric part. The fiber contribution to the stress for each family is derived from the strain energy func-tion and involves derivatives with respect to the fiber invariants. The fiber stress contribution is 
+
+σ(i)fiber = 2
+
+J
+
+ï
+
+W (i)1 dev[ ¯B] + W (i)4 ¯I(i)4 (a ⊗ a − 1
+
+3 I)+ W (i)5 ¯I(i)4 (a ⊗ ¯Ba + ¯Ba ⊗ a − 2
+
+3 ¯I(i)5 I)
+
+ò
+
+, (44) where a = ¯Fa (i)0 /(J2/3 ¯I(i)4 )1/2 is the current fiber direction, and the coefficients W (i)1 , W (i)4 ,and W (i)5 are 
+
+W (i)1 = 1
+
+2 μg 2, (45) 
+
+W (i)4 = 1
+
+2 μ
+
+ï
+
+v(i) 
+
+> f
+
+f ′( ¯I4 + 2( ¯I4)−1/2 − 3) + ( vm + v(i) 
+
+> f
+
+f )(1 − ( ¯I4)−3/2)
+
+− g1( ¯I5( ¯I4)−2 + 1) + g2( ¯I5( ¯I4)−2 + ( ¯I4)−3/2)+ ( ¯I5 − ( ¯I4)2)
+
+2 ¯I4
+
+g′ 
+
+> 1
+
++ 1
+
+2
+
+Ç
+
+¯I1 − ¯I5 + 2( ¯I4)1/2
+
+¯I4
+
+å
+
+g′
+
+> 2
+
+ò
+
+, (46) 
+
+W (i)5 = μ
+
+2 ¯I4
+
+(g1 − g2), (47) where primes denote derivatives with respect to ¯I(i)4 .12 2.4. Fiber orientation and multiple fiber families 
+
+In short fiber-reinforced composites, fibers are typically distributed with varying orienta-tions throughout the material. To characterize this orientation distribution in a computation-ally tractable manner, the fiber microstructure is represented using a second-order orientation tensor A.The second-order orientation tensor is constructed by averaging over all individual fibers in the representative volume element as 
+
+A =
+
+> Nfibers
+
+∑
+
+> k=1
+
+wk ak ⊗ ak, (48) where Nfibers is the total number of fibers in the RVE, ak is the unit vector along the direction of the k-th fiber, and wk = 1 /N fibers are equal weighting factors such that ∑Nfibers  
+
+> k=1
+
+wk = 1. This tensor represents the homogenized internal orientation state of the material and captures the anisotropy induced by the fiber distribution. The orientation tensor A is symmetric and positive semi-definite, with its eigenvalues providing information about the degree of alignment along different spatial directions. For a fully random (isotropic) fiber distribution in 3D, A = 1 
+
+> 3
+
+I, whereas for perfectly aligned fibers in a single direction n, A = n ⊗ n.To incorporate the fiber orientation into the constitutive model, the orientation tensor is decomposed using eigenvalue decomposition as 
+
+A =
+
+> ndim
+
+∑
+
+> i=1
+
+λi ni ⊗ ni, (49) where λi are the eigenvalues, ni are the corresponding orthonormal eigenvectors, and ndim 
+
+is the spatial dimension (2 for plane problems, 3 for general 3D problems). The eigenvalues satisfy ∑ndim  
+
+> i=1
+
+λi = 1 and represent the relative concentration of fibers along each principal direction. The eigenvectors ni define the principal fiber directions, which represent the dominant orientational axes in the material. This decomposition effectively reduces the complex multi-fiber orientation distribution to a small number of principal fiber families, each characterized by a principal direction: a(i)0 = ni/‖ni‖ and an orientation parameter, λi.Given the total fiber volume fraction vf in the composite and the eigenvalues from the orientation tensor decomposition, the volume fraction assigned to each principal fiber family 13 is determined as 
+
+v(i) 
+
+> f
+
+= vf · λi
+
+∑Nf 
+
+> j=1
+
+λj
+
+, (50) where v(i) 
+
+> f
+
+represents the effective volume fraction of the i-th fiber family. This distribution ensures that Nf
+
+∑
+
+> i=1
+
+v(i) 
+
+> f
+
+= vf , (51) preserving the total fiber content in the material. The matrix volume fraction is then computed as 
+
+vm = 1 −
+
+> Nf
+
+∑
+
+> i=1
+
+v(i) 
+
+> f
+
+= 1 − vf . (52) This fiber family decomposition has several important implications for the constitutive model. First, the material response exhibits directional dependence, with enhanced stiffness and strength along principal fiber directions having larger eigenvalues λi. Second, rather than explicitly tracking thousands of individual fibers with different orientations, the model captures the essential anisotropy through a small number of principal families (2 or 3), signifi-cantly reducing computational cost while preserving the key mechanical characteristics. Third, the framework can represent any fiber orientation distribution, from fully random states to highly aligned configurations (where one eigenvalue approaches 1 and others approach 0), or intermediate states with partial alignment. Finally, the total strain energy density is com-puted as a weighted sum over fiber families according to Eqs. (27) and (28), where each family contributes proportionally to its volume fraction v(i) 
+
+> f
+
+. The orientation tensor approach thus provides a rigorous homogenization framework that bridges the microscopic fiber distribution and the macroscopic anisotropic constitutive behavior, enabling accurate prediction of the di-rectionally dependent mechanical response and fracture characteristics of short fiber-reinforced polymer composites. 
+
+3. Phase-field model at finite deformation 
+
+To evaluate the predictive capability of the proposed constitutive model, we incorporate it within a phase-field fracture framework for short fiber-reinforced polymer composites. This section presents the variational phase-field formulation for quasi-brittle fracture at finite de-formation, along with the continuum mechanics incremental scheme and FE equations. 14 3.1. Problem field description 
+
+The strong form of the boundary value problem in the spatial form for the coupled dis-placement u and phase-field variable φ can be written as 
+
+∇x · σ + b = 0 in Ω t, (53) 
+
+σ · n = ¯ t on Γ t, (54) 
+
+Gc
+
+l0
+
+φ − Gcl0∇x · ( ˆA · ∇ xφ) = −g′(φ)H in Ω t, (55) 
+
+∇xφ · n = 0 on Γ t, (56) where σ is the Cauchy stress, l0 is the length scale parameter controlling the width of the diffuse crack, b represent the body force vectors in the spatial configurations, n is the outward unit normal vectors on the boundary Γ t of the body Ω t, and ¯ t is the traction force. The tensor ˆA is the anisotropic tensor that accounts for the directional dependence of crack resistance due to fiber orientation. This tensor is defined as [22] ˆA = I + ˆ αA, (57) where I is the identity tensor, ˆα is a dimensionless parameter controlling the degree of anisotropy. The parameter ˆ α quantifies how much the fiber orientation influences the crack propagation resistance, with ˆ α = 0 recovering the isotropic phase-field model. The anisotropic formulation in Eq. (55) ensures that cracks preferentially propagate per-pendicular to the fiber alignment direction, reflecting the enhanced toughness along fiber directions. This physically represents the fact that crack propagation requires more energy when traversing across fibers compared to propagating parallel to them. The crack resistance is highest in directions where fibers are aligned, as indicated by larger eigenvalues of the orientation tensor. The energy release rate Gc represents the critical energy required to create a unit area of crack surface. For fiber-reinforced composites, this material parameter can be calibrated from experimental fracture tests and may depend on the fiber content and orientation. 
+
+3.2. Energy-based crack driving force 
+
+To account for the anisotropic and rate-dependent fracture behavior of fiber-reinforced composites, an energy-based crack driving force is adopted. The crack driving force H is 15 defined as the maximum strain energy density attained during the loading history by 
+
+H(t) = max   
+
+> τ∈[0 ,t ]
+
+Y(τ ), (58) where Y represents the strain energy density that drives crack propagation. The strain energy density is computed from the equilibrium and non-equilibrium contributions to the free energy as 
+
+Y = ψeq ( ¯Bve ) + ψneq ( ¯Be) + 〈ψvol (J)〉+, (59) where 〈·〉 + = ( ·+|·| )/2 denotes the positive part operator. The positive part of the volumetric energy is used to distinguish between tension and compression states, preventing crack growth under purely compressive loading. The volumetric energy contribution is split based on the Jacobian as 
+
+〈ψvol (J)〉+ =
+
+
+
+ψvol (J) if J ≥ 1,
+
+0 if J < 1,
+
+(60) where J ≥ 1 corresponds to tension (volume expansion) and J < 1 corresponds to compression (volume contraction). This formulation ensures that (1) crack propagation is driven by both elastic (equilibrium) and viscous (non-equilibrium) energy contributions, (2) fracture occurs only under tensile load-ing conditions, and (3) the maximum energy attained during the loading history is preserved through the history variable H, ensuring irreversibility of crack growth. The history variable H in Eq. (61) ensures the positive evolution of the phase-field variable, preventing crack healing. 
+
+Hn+1 = max( Hn, Yn+1 ), (61) where n denotes the time step. 
+
+3.3. Weak form and finite element discretization 
+
+To obtain the weak form of the governing equations, the weighted residual approach is used. Eqs. (53) and (55) are multiplied by weight functions and integrated over Ω t. Using the divergence theorem and imposing the boundary conditions, the weak form of the governing equations can be derived as 
+
+∫
+
+> Ωt
+
+σ : ∇xηu dv −
+
+∫
+
+> Ωt
+
+ρtb · ηu dv −
+
+∫
+
+> Γt
+
+¯t · ηu da = 0 ∀ηu ∈ H10 (Ω) , (62) 16 and 
+
+∫
+
+> Ωt
+
+ï
+
+J−1g′(φ)Hηφ + J−1 Gc
+
+l0
+
+φη φ + J−1Gcl0∇xφ · ˆA · ∇ xηφ
+
+ò
+
+dv = 0 ∀ηφ ∈ H10 (Ω) . (63) 
+
+3.4. Consistent incremental-iterative scheme 
+
+Assuming that only deformation-independent loads act on the body, Eqs. (62) and (63) can be expressed in terms of external and internal nodal forces as 
+
+ru = f u 
+
+> int
+
+− f u 
+
+> ext
+
+= 0, (64) 
+
+rφ = f φ 
+
+> int
+
+− f φ 
+
+> ext
+
+= 0, (65) where 
+
+f u 
+
+> int
+
+=
+
+∫
+
+> Ωt
+
+σ : ∇xηu dv, (66) 
+
+f u 
+
+> ext
+
+=
+
+∫
+
+> Ω
+
+ρtb · ηu dv +
+
+∫
+
+> Γt
+
+¯t · ηu da, (67) 
+
+f φ 
+
+> int
+
+=
+
+∫
+
+> Ωt
+
+ï
+
+J−1g′(φ)Hηφ + J−1 Gc
+
+l0
+
+φη φ + J−1Gcl0∇xφ · ˆA · ∇ xηφ
+
+ò
+
+dv, (68) 
+
+f φ 
+
+> ext
+
+= 0. (69) By linearizing Eqs. (64) and (65) at iteration i + 1 with respect to the previous iteration 
+
+i, a consistent tangent stiffness is obtained 
+
+rui+1 = rui + ∆ ru = 0, (70) 
+
+rφi+1 = rφi + ∆ rφ = 0, (71) where ∆ru = Durui · ∆u + Dφrui · ∆φ, (72) ∆rφ = Durφi · ∆u + Dφrφi · ∆φ. (73) The linearization of Eqs. (62) and (63) in spatial formulation yields 
+
+∫
+
+> Ωt
+
+(∇x∆u · σ · ∇ xηu + ∇sxηu : ˆ c : ∇sx∆u) dv 
+
++
+
+∫
+
+> Ωt
+
+(∇sxηu : Dφσ · ∆φ) dv = f u 
+
+> ext
+
+− f u
+
+> int ,i
+
+, (74) 17 and 
+
+∫
+
+> Ωt
+
+J−1g′(φ)2 ∂H
+
+∂g · ∇ x∆u ηφ dv 
+
++
+
+∫
+
+> Ωt
+
+ï
+
+J−1g′′ (φ)H∆φ η φ + J−1 Gc
+
+l0
+
+∆φ η φ + J−1Gcl0∇x∆φ · ˆA · ∇ xηφ
+
+ò
+
+dv 
+
+= f φ 
+
+> ext
+
+− f φ
+
+> int ,i
+
+,
+
+(75) where ˆ c is the spatial tangent modulus defined as the Piola push-forward of the material tangent ∂S 
+
+> ∂C
+
+, S is the second Piola-Kirchhoff stress, and ∂(·) 
+
+> ∂g
+
+= F ∂(·) 
+
+> ∂C
+
+FT .
+
+3.5. Finite element formulation 
+
+The linearized equilibrium and phase-field equations are assembled into the following sys-tem Kuu i Kuφ i
+
+Kφu i Kφφ i
+
+∆ui+1 
+
+∆φi+1 
+
+ =
+
+f u
+
+> ext
+
+f φ
+
+> ext
+
+ −
+
+f u
+
+> int ,i
+
+f φ
+
+> int ,i
+
+ , (76) where 
+
+Kuu i =
+
+∫
+
+> Ω
+
+BTu ˆcB u dΩ + 
+
+∫
+
+> Ω
+
+BTu σBu dΩ, (77) 
+
+Kuφ i =
+
+∫
+
+> Ω
+
+BTu
+
+Å ∂σ
+
+∂φ 
+
+ã
+
+Nφ dΩ, (78) 
+
+Kφu i =
+
+∫
+
+> Ω
+
+NTφ J−1g′(φ)2 ∂H
+
+∂g Bu dΩ, (79) 
+
+Kφφ i =
+
+∫
+
+> Ω
+
+J−1
+
+ï
+
+NTφ
+
+Å
+
+g′′ (φ)H + Gc
+
+l0
+
+ã
+
+Nφ + Gcl0BTφ ˆAB φ
+
+ò
+
+dΩ, (80) where Nu and Nφ are the shape function matrices interpolating the nodal values of u and φ,respectively, and Bu and Bφ are the gradient operators for the displacement and phase-field, respectively. The coupled phase-field fracture problem is solved using a staggered algorithm [20]. In this approach, the displacement and phase-field equations are solved sequentially within each load step. 
+
+3.6. Consistent tangent moduli based on the Jaumann-Zaremba stress rate 
+
+When dealing with large rotations in finite deformation analysis, the material derivative of stress tensors does not transform properly under superposed rigid body motion. To ensure objectivity of the stress rate, the formulation uses the Jaumann-Zaremba rate. The spatial 18 tangent modulus ˆ c, required by the FE weak form in Eq. (77), is defined as the Piola push-forward of the material tangent ∂S/∂ C,ˆc = 1
+
+J (F ⊗ F) : ∂S
+
+∂C : (FT ⊗ FT ) . (81) A closed-form evaluation of Eq. (81) is not straightforward for the complex viscoelastic-viscoplastic-damage model. Instead, ˆ c is obtained in two steps: first, the Jaumann tangent 
+
+CσJ is computed numerically via finite differences [66]; second, ˆ c is recovered analytically from CσJ using the correction derived below. The Jaumann rate of the Cauchy stress is expressed as 
+
+> ∇
+
+σ = ˙ σ − Wσ − σWT = CσJ : D, (82) where D is the rate of deformation tensor and W is the spin tensor. To numerically compute 
+
+CσJ , small perturbations are applied to components of the deformation gradient. For a perturbation in the ( i, j ) component, ∆Fij = ǫ
+
+2
+
+(ei ⊗ ej F + ej ⊗ ei F), (83) where ǫ = 10 −5 is the perturbation parameter and ei are Cartesian basis vectors. The corre-sponding perturbations in the spin and rate-of-deformation tensors are ∆Wij = 0, (84) ∆Dij = ǫ
+
+2
+
+(ei ⊗ ej + ej ⊗ ei
+
+). (85) The perturbed deformation gradient and the resulting stress increment are ˆFij = F + ∆ Fij , (86) ∆σ ≈ σÄ ˆFij 
+
+ä − σ(F). (87) Since ∆ Wij = 0, the linearized incremental form of Eq. (82) reduces to ∆ σ = CσJ : ∆ D, so the components of CσJ follow directly as 
+
+CσJ ij = 1
+
+ǫ
+
+[
+
+σÄ ˆFij 
+
+ä − σ(F)
+
+]
+
+. (88) Algorithm 2 summarizes the step-by-step method for computing the consistent tangent modulus required for the FE analysis. 19 Algorithm 2 Algorithm for computing the consistent tangent modulus. 
+
+1. Define perturbation parameter: ǫ = 10 −5
+
+2. Compute the right Cauchy-Green tensor: C = FT F3. Calculate the Cauchy stress σ using equations from Section 2 
+
+4. for k = 1 , . . . , 3 do 5. for l = 1 , . . . , 3 do 6. Initialize ˆF = F7. Perturb: ˆFkl = ˆFkl + ǫ/ 2
+
+8. Perturb: ˆFlk = ˆFlk + ǫ/ 2
+
+9. Calculate perturbed stress response: ∆ σ using Eq. (87) 
+
+10. for i = 1 , . . . , 3 do 11. for j = 1 , . . . , 3 do 12. Compute and store CσJ ijkl and CσJ ijlk using Eq. (88) 
+
+13. end 14. end 15. end 16. end 17. Determine the material tangent: CσJ 
+
+18. Store the tangent tensor in Voigt notation 
+
+19. Solve the system of equations using a staggered algorithm 
+
+The Jaumann tangent CσJ and the spatial tangent ˆ c are conjugate to the Jaumann rate and the Truesdell (Lie) rate, respectively. Recovering ˆ c from CσJ gives ˆc = CσJ − 1
+
+> 2
+
+(I ⊗ σ + I ⊗ σ + σ ⊗ I + σ ⊗ I) + σ ⊗ I. (89) The numerical approximation of the tangent modulus is computationally efficient and accurate for the complex constitutive behavior of fiber-reinforced composites with coupled viscoelasticity, viscoplasticity, and damage. 
+
+4. Numerical simulations 
+
+A comprehensive set of numerical simulations is presented to demonstrate the predictive capability of the proposed framework and to reveal the complex interplay between viscoelastic-20 viscoplastic constitutive behavior, anisotropic crack propagation, and hygrothermal environ-mental effects in SFRPs. All simulations examine GF-reinforced epoxy composites under quasi-static loading. The material parameters for the viscoelastic-viscoplastic constitutive model and phase-field fracture formulation are summarized in Table 1, with values calibrated from experimental data reported in the literature for the same composite material. The nu-merical investigations explore the influence of fiber orientation, volume fraction, environmental conditions (moisture and temperature), fiber mechanical properties, and laminate architecture on both the global mechanical response and crack path evolution. In the following simulations, the saturated moisture condition refers to 1 wt% moisture content.                                                                                                
+
+> Table 1: Material parameters used in the numerical simulations.
+> Parameter Symbol Value Equation References
+> Equilibrium shear modulus μ0eq (MPa) 760 (29) [55] Non-equilibrium shear modulus μ0neq (MPa) 790 (29) [55] Volumetric bulk modulus k0
+> v(MPa) 1154 (38) [55] Viscoelastic pre-factor ˙ε0(s −1)1.0447 ×10 12 (13) [55] Activation energy ∆H(J) 1.977 ×10 −19 (13) [55] Stress exponent m0.657 (13) [55] Athermal yield stress τ0(MPa) 40 (13) [55] Viscoplastic parameter a22 ωw+ 0.8 (18) –Viscoplastic exponent b1.1 (18) –Viscoplastic threshold σ0(MPa) 30 (18) –Critical energy release rate Gc(N/mm) 0.19 (55) [53] Length scale parameter l0(mm) 0.02 (55) [53] Moisture swelling coefficient αw0.039 (4) [53] Thermal expansion coefficient αθ(K −1)4.19 ×10 −5(3) [53] Temperature sensitivity α(K −1)0.01093 (30)-(31) [55] Fiber stiffness parameter a19(35) –Fiber stiffness parameter a21(35) –Fiber stiffness parameter a31(35) –
+
+We first explore how viscoelastic and viscoplastic energy storage mechanisms contribute differently to the crack driving force in the composites. Figs. 2 and 3 present polar plots of the crack driving force H at four time instants following the application of an instantaneous tensile load for GF (50 wt%)/epoxy composites with different fiber distributions. Fig. 2 examines a balanced distribution with 50 wt% aligned at 45 ◦ and 50 wt% at −45 ◦, while Fig. 3 investigates 21 an unbalanced configuration with 30 wt% at 45 ◦ and 70 wt% at −45 ◦. An initial tensile load is applied by prescribing an initial deformation gradient, after which the crack driving force is recorded as the system undergoes viscous relaxation at four time instants– t = 10 −6 s, 0 .005 s, 0.05 s, and 0 .1 s–representing the initial elastic response, early viscous relaxation, intermediate relaxed state, and near-equilibrium state, respectively. The total crack driving force (black curve), equilibrium (blue curve), non-equilibrium (green curve), and volumetric (red curve) energy components are shown separately to reveal their individual contributions. For the balanced fiber distribution (Fig. 2), the polar representation reveals a four-lobed pattern with maximum energy accumulation occurring along 0 ◦ and 90 ◦ directions rather than along the fiber orientations. This behavior arises because the symmetric ±45 ◦ fiber ar-rangement creates a quasi-isotropic material response. At the initial stage ( t = 10 −6 s), the total crack driving force reaches approximately 0.5 MPa along these directions, decreasing to approximately 0.3 MPa at quasi-equilibrium ( t = 0 .1 s)–a 40% reduction due to viscous dissipation. The equilibrium energy (blue curve) remains relatively constant throughout re-laxation, while the non-equilibrium energy (green curve) shows dramatic reduction as viscous mechanisms redistribute stored energy, and the volumetric component (red curve) increases monotonically to become the dominant contribution at later stages. In contrast, the unbal-anced distribution (Fig. 3) produces an asymmetric pattern reflecting the directional bias introduced by the 70-30 fiber distribution. The crack driving force exhibits higher magnitude lobes in directions influenced by the dominant −45 ◦ fiber family, demonstrating how fiber dis-tribution asymmetry breaks the quasi-isotropic behavior and creates preferential directions for crack propagation. The temporal evolution follows similar trends as the balanced case, with viscous relaxation causing approximately 40% reduction in total driving force over the same time scale, but the directional anisotropy persists throughout the loading history, confirming that fiber architecture fundamentally controls both the magnitude and spatial distribution of energy available to drive fracture. 22 045 90 135 180 225 315 0 0.2 0.4 0.6
+
+> (a)
+
+045 90 135 180 225 315 0 0.2 0.4 0.6
+
+> (b)
+
+045 90 135 180 225 315 0 0.2 0.4 0.6
+
+> (c)
+
+045 90 135 180 225 315 0 0.2 0.4 0.6
+
+> (d)
+
+Figure 2: Spatial distribution of crack driving force components during viscous relaxation for GF (50 wt%)/epoxy with balanced fiber families oriented at ±45 ◦ under moisture-saturated conditions at 300 K. The contours show (a) initial response at t = 10 −6 s, (b) early relaxation at t = 0 .005 s, (c) intermediate relaxation at t = 0 .05 s, and (d) near-equilibrium at t = 0 .1 s. Color coding: total (black), equilibrium (blue), non-equilibrium (green), and volumetric (red) energy contributions. 
+
+23 045 90 135 180 225 315 0 0.2 0.4 0.6
+
+> (a)
+
+045 90 135 180 225 315 0 0.2 0.4 0.6
+
+> (b)
+
+045 90 135 180 225 315 0 0.2 0.4 0.6
+
+> (c)
+
+045 90 135 180 225 315 0 0.2 0.4 0.6            
+
+> (d)
+> Figure 3: Spatial distribution of crack driving force components during viscous relaxation for moisture-saturated GF (50 wt%)/epoxy with unbalanced fiber distribution (70 wt% at −45 ◦and 30 wt% at +45 ◦) at 300 K. The contours show (a) initial response at t= 10 −6s, (b) early relaxation at t= 0 .005 s, (c) intermediate relaxation at t= 0 .05 s, and (d) near-equilibrium at t= 0 .1 s. Color coding: total (black), equilibrium (blue), non-equilibrium (green), and volumetric (red) energy contributions.
+
+The temporal decomposition of energy contributions provides further insight into the rate-dependent fracture mechanisms. Fig. 4 shows the evolution of total crack driving force H and its constituent components–equilibrium, non-equilibrium (viscous), and volumetric energies– for the unbalanced fiber distribution. The initial tensile load is applied along 45 ◦. The total driving force exhibits rapid initial increase followed by more gradual evolution as time-dependent viscous processes activate. The equilibrium energy remains constant after initial 24 loading, reflecting the elastic storage capacity, while the non-equilibrium energy decreases from an initial peak as viscous relaxation occurs through chain sliding and fiber-matrix in-terfacial effects. The volumetric energy contribution increases monotonically and becomes the dominant component at later loading stages. This decomposition reveals a fundamental characteristic of fracture in viscoelastic-viscoplastic composites that cannot be captured by elastic phase-field models: the crack driving force comprises time-varying contributions from multiple physical mechanisms, with viscous energy dominating at early times (reflecting rate-dependent resistance) and volumetric energy becoming predominant near failure (indicating transition toward tensile fracture). The ability to track these individual contributions pro-vides unprecedented insight into the relative importance of different deformation mechanisms throughout the loading history and enables identification of which physical processes control fracture initiation versus propagation.          
+
+> 00.02 0.04 0.06 0.08 0.1 00.10.20.30.40.5
+> Time (s)
+> H (MPa)
+> Total
+> Equilibrium
+> Volumetric
+> Non-equilibrium
+> Figure 4: Temporal evolution of crack driving force components for moisture-saturated GF (50 wt%)/epoxy with unbalanced fiber distribution (70 wt% at −45 ◦and 30 wt% at +45 ◦) at 300 K under uniaxial tensile loading applied at 45 ◦to the horizontal axis.
+
+The proposed phase-field model’s ability to predict fracture patterns is evaluated by con-ducting single-edge notched tensile tests. The geometry and boundary conditions of the tests are shown in Figure 5. The tensile load is applied at a deformation rate of ˙ u = 1 mm/min with constant displacement increments of 10 −6 mm. 25 Figure 5: Geometry and boundary conditions of single edge notched specimens. 
+
+The influence of fiber family distribution on fracture behavior is examined in Figs. 6 and 7 for saturated GF(50 wt%)/epoxy composites at 300 K, comparing two distinct bimodal fiber configurations with the aisotropic parameter ˆ α = 10. Fig. 6a shows a balanced distribution with 50 wt% fibers aligned at −45 ◦ and 50 wt% at 45 ◦, representing a symmetric reinforcement architecture. In contrast, Fig. 6b presents an unbalanced distribution with 70 wt% fibers at 
+
+−45 ◦ and only 30 wt% at 45 ◦, creating directional asymmetry in the composite’s mechanical response. These configurations enable investigation of how the relative proportions of fiber families–rather than total fiber content or orientation angles themselves–affect crack path evolution and load-bearing capacity. The crack path visualizations reveal pronounced sensitivity to fiber family distribution. For the balanced 50-50 configuration (Fig. 6a), the crack propagates in a straight horizontal path perpendicular to the loading direction. This behavior reflects the symmetric reinforcement where neither fiber family dominates the crack deflection tendency, resulting in a compromise trajectory that minimizes the total energy required for propagation through the competing orientations. In contrast, the unbalanced 70-30 distribution (Fig. 6b) produces substantial crack deflection toward the direction perpendicular to the dominant fiber family ( −45 ◦). The crack path curves noticeably, deviating by approximately 20 ◦ from the horizontal as it prefer-entially propagates through regions of lower fracture resistance. This deflection occurs because the higher concentration of fibers at −45 ◦ creates a stronger resistance to crack propagation perpendicular to this orientation, forcing the crack to seek paths that minimize intersection with the dominant fiber family. 26 −45 ◦(50%) +45 ◦(50%)       
+
+> (a)
+> −45 ◦(70%)
+> +45 ◦(30%)
+> (b)
+> Figure 6: Effect of fiber family members on the crack path in moisture-saturated GF(50 wt%)/epoxy at 300 K: (a) balanced fiber distribution (50-50 at ∓45 ◦), and (b) unbalanced distribution (70 wt% at −45 ◦and 30 wt% at +45 ◦).
+
+The mechanical consequences of fiber family distribution are quantified in Fig. 7, which compares force-displacement responses for both configurations. The balanced 50-50 distri-bution achieves a peak load of approximately 28 N at 0.022 mm displacement, representing superior load-carrying capacity. In contrast, the unbalanced 70-30 configuration reaches only about 26 N peak load at 0.024 mm displacement–roughly a 7% reduction in strength accom-panied by an increase in ductility. Both curves exhibit similar initial stiffness, confirming that elastic properties are primarily determined by total fiber content rather than distribu-tion. However, the onset of damage and subsequent softening behavior differ significantly. The balanced distribution demonstrates more abrupt failure after peak load, with a steep drop indicating rapid crack propagation once the critical threshold is exceeded. This brittle post-peak response reflects the difficulty of crack deflection in a symmetric architecture where both fiber families provide comparable resistance. Conversely, the unbalanced distribution ex-hibits more gradual post-peak softening with an extended tail, suggesting stable crack growth through progressive damage accumulation. 27 0 0.5 1 1.5 2 2.5 3
+
+·10 −2
+
+0510 15 20 25 30 35 
+
+Displacement (mm) Force (N)            
+
+> 50% at −45 ◦and 50% at 45 ◦
+> 70% at −45 ◦and 30% at 45 ◦
+> Figure 7: Effect of fiber family members on the force–displacement response of moisture-saturated GF(50 wt%)/epoxy at T= 300 K.
+
+The quantitative relationships between material anisotropy and crack path deflection through the anisotropic phase-field formulation is explored in Figs 8a–8d. The anisotropy parameter ˆ α in Eq. (57) controls the degree to which fiber orientation influences crack prop-agation resistance, providing a direct link between microstructural architecture and macro-scopic fracture behavior. Fig. 8 illustrates this relationship for GF(50 wt%)/epoxy composites with fibers predominantly aligned at 30 ◦ to the horizontal direction, examining four values, ˆα = 1 , 2, 5, and10. For the lowest anisotropy, the crack propagates in a relatively straight path perpendicular to loading, exhibiting only minor deflection. As ˆ α increases to 2, more pronounced deflection toward the fiber direction emerges, resulting in crack path deviation of approximately 10-15° from horizontal. At ˆ α = 5, substantial deflection occurs with the path curving to align more closely perpendicular to fibers. For the highest anisotropy (ˆ α = 10), maximum deflection closely follows the direction of weakest resistance imposed by the fiber architecture. The progressive increase in deflection angle with ˆ α confirms the physical inter-pretation of this parameter as controlling the strength of fiber-induced directional toughening, and the systematic nature of this relationship provides quantitative guidance for calibrating ˆα from experimental fracture tests on composites with known fiber orientations. 28 30 ◦, ˆα = 1             
+
+> (a)
+> 30 ◦,ˆα= 2
+> (b)
+> 30 ◦,ˆα= 5
+> (c)
+> 30 ◦,ˆα= 10
+> (d)
+> Figure 8: Effect of ˆ αon the crack path in moisture-saturated GF(50 wt%)/epoxy with fibers aligned at 30 ◦
+> at 300 K: (a) ˆ α= 1, (b) ˆ α= 2, (c) ˆ α= 5, and (d) ˆ α= 10.
+
+The mechanical consequences of crack path deflection are quantified in the correspond-ing force-displacement responses in Fig. 9. All curves exhibit similar initial stiffness since the anisotropy parameter affects crack propagation resistance rather than elastic properties. However, both peak load and displacement at failure increase systematically with ˆ α: from approximately 24 N at 0.016 mm for ˆ α = 1, to 25 N for ˆ α = 2, 26 N for ˆ α = 5, and 27 N at 0.017 mm for ˆ α = 10. The monotonic increase in area under each curv e—representing total fracture energy—with ˆα confirms that stronger anisotropy enhances composite toughness by forcing cracks along energetically unfavorable paths. 29 0 0.5 1 1.5 2 2.5
+
+·10 −2
+
+0510 15 20 25 30 
+
+Displacement (mm) Force (N)          
+
+> ˆα= 1
+> ˆα= 2
+> ˆα= 5
+> ˆα= 10
+> Figure 9: Effect of ˆ αon the force–displacement response of moisture-saturated GF(50 wt%)/epoxy with fibers aligned at 30 ◦at T= 300 K.
+
+To further demonstrate the generality of the anisotropic phase-field formulation across dif-ferent fiber orientations, Figs. 10 and 11 examine GF(50 wt%)/epoxy composites with fibers predominantly aligned at 60 ◦ to the horizontal direction under saturated conditions at 300 K. Fig. 10 illustrates crack path evolution for four anisotropy parameters: ˆα = 1 , 2, 5, and 10 .For the lowest anisotropy ( ˆα = 1 ), the crack maintains an approximately horizontal trajectory perpendicular to loading, showing minimal deflection despite the steep fiber orientation. As 
+
+ˆα increases to 2, noticeable deflection emerges with the crack path deviating approximately 
+
+20 −25 ◦ from horizontal–more pronounced than the 30 ◦ fiber orientation case at the same anisotropy parameter, reflecting stronger geometric incompatibility. At ˆα = 5 , substantial deflection manifests with the crack curving significantly to propagate nearly perpendicular to the fiber orientation, exhibiting pronounced waviness and broader damage zones. For maxi-mum anisotropy ( ˆα = 10 ), extreme deflection occurs, demonstrating the phase-field model’s capability to capture spontaneous path selection driven purely by anisotropic material prop-erties. 30 60 ◦, ˆα = 1             
+
+> (a)
+> 60 ◦,ˆα= 2
+> (b)
+> 60 ◦,ˆα= 5
+> (c)
+> 60 ◦,ˆα= 10
+> (d)
+> Figure 10: Effect of the anisotropy parameter (ˆ α) on the crack path in moisture-saturated GF(50 wt%)/epoxy with fibers aligned at 60 ◦at 300 K: (a) ˆ α= 1, (b) ˆ α= 2, (c) ˆ α= 5, and (d) ˆ α= 10.
+
+The mechanical consequences quantified in Fig. 11 reveal systematic trends consistent with the 30 ◦ orientation results but with quantitative differences reflecting the steeper fiber angle. Peak loads increase progressively with ˆα from approximately 25 N at 0.016 mm for ˆα = 1 ,to 27 N at 0.017 mm for ˆα = 2 , reaching 30 N at 0.018 mm for ˆα = 5 , and achieving 32 N at 0.019 mm for ˆα = 10 . These peak loads are higher than observed for the 30 ◦ orientation at equivalent anisotropy levels, reflecting the geometric advantage where 60 ◦ fiber alignment provides more effective load transfer through direct fiber stretching. 31 0 0.5 1 1.5 2 2.5
+
+·10 −2
+
+0510 15 20 25 30 35 
+
+Displacement (mm) Force (N)         
+
+> ˆα= 1
+> ˆα= 2
+> ˆα= 5
+> ˆα= 10
+> Figure 11: Effect of the anisotropy parameter (ˆ α) on the force–displacement response of moisture-saturated GF(50 wt%)/epoxy with fibers aligned at 60 ◦at T= 300 K.
+
+In the following, the multiphysics coupling between fiber reinforcement, hygrothermal en-vironment, and fracture behavior is investigated. Fig. 12 examines the effect of fiber content on the force-displacement response for randomly distributed short fiber/epoxy composites. GF(10 wt%)/epoxy, GF(30 wt%)/epoxy, and GF(50 wt%)/epoxy composites are under sat-urated condition at T = 300 K. The force-displacement curves reveal enhancement of both stiffness and peak load with increasing fiber content, from approximately 21 N at 0.019 mm for 10 wt%, to 23 N at 0.018 mm for 30 wt%, and 25 N at 0.017 mm for 50 wt%. Notably, dis-placement at peak load decreases with fiber content, indicating that while higher fiber loading enhances load-carrying capacity, it also promotes more brittle fracture with reduced ductility. This trend reflects competing effects: short fibers increase stiffness and strength through load transfer to the stiffer reinforcing phase, but also introduce stress concentration sites at fiber ends and interfaces that promote earlier crack initiation. Nevertheless, fracture energy (area under curves) increases with fiber content despite reduced ductility, confirming the net tough-ening effect of short fiber reinforcement and demonstrating the model’s capability to capture stiffness-toughness-ductility trade-offs inherent in particulate reinforcement. 32 0 0.5 1 1.5 2 2.5
+
+·10 −2
+
+0510 15 20 25 
+
+Displacement (mm) Force (N)   
+
+> GF(10 wt%)/epoxy
+> GF(30 wt%)/epoxy
+> GF(50 wt%)/epoxy
+> Figure 12: Effect of fiber content on the force–displacement response of randomly distributed GF/epoxy at
+> T= 300 K and moisture-saturated condition.
+
+Moisture absorption effects are quantified in Fig. 13, comparing dry and saturated condi-tions for both GF(10 wt%)/epoxy and GF(50 wt%)/epoxy at 300 K. For the 10 wt% system, moisture reduces peak force from approximately 26 N (dry) to 21 N (saturated)—a 19% degradation—while shifting failure to slightly higher displacement (0.019 mm vs. 0.017 mm), indicating increased matrix ductility through plasticization. For the 50 wt% composite, mois-ture causes smaller relative degradation (27 N dry to 25 N saturated, approximately 7% reduction), suggesting that fiber reinforcement provides some moisture resistance. However, the absolute force reduction is comparable for both compositions (5-6 N), indicating moisture primarily affects matrix-dominated properties. The post-peak behavior changes significantly: saturated specimens exhibit more gradual softening with extended tails, while dry specimens show sharper load drops, reflecting competing effects of matrix plasticization (increasing duc-tility) and fiber-matrix interface degradation (promoting debonding and distributed damage). The model captures these moisture effects through temperature- and moisture-dependent mod-uli in Eqs. (30), (31) and (39), accounting for experimentally observed property reductions with increasing moisture content and demonstrating the critical importance of considering environmental conditions in composite design and certification. 33 0 0.5 1 1.5 2 2.5
+
+·10 −2
+
+0510 15 20 25 30 35 
+
+Displacement (mm) Force (N)    
+
+> Dry (10 wt% GF)
+> Saturated (10 wt% GF)
+> Dry (50 wt% GF)
+> Saturated (50 wt% GF)
+> Figure 13: Effect of moisture content on the force–displacement response of randomly distributed GF/epoxy at T= 300 K.
+
+Progressive damage evolution is visualized in Figs. 14a–14d, showing four snapshots of phase-field variable distribution in randomly distributed GF(50 wt%)/epoxy at displacements 0.015, 0.0165, 0.017, and 0.0173 mm, spanning from pre-peak loading through post-peak soft-ening as shown by four markers in Fig. 13. At the earliest stage corresponding to approximately the peak load, a small localized damage zone initiates at the notch tip with phase-field variable reaching only moderate values ( φ ≈ 0.2-0.3), indicating stress concentration without signifi-cant crack advance. Slightly past peak load, a fully developed crack propagates horizontally across the specimen width, maintaining a straight path perpendicular to loading consistent with mode-I fracture, though minor irregularities reflect local interactions with random fiber distribution. Well into post-peak regime, the crack has propagated nearly to the opposite edge, leaving only a small ligament. This sequence demonstrates that crack propagation in randomly oriented short fiber-reinforced composites is similar to idealized straight cracks in isotropic materials. 34 (a) (b)    
+
+> (c) (d)
+> Figure 14: Crack propagation in randomly distributed GF(50 wt%)/epoxy at displacements: (a) 0.015 mm, (b) 0.0165 mm, (c) 0.017 mm, and (d) 0.0173 mm. The snapshots are marked at the force-displacement response in Fig. 5.
+
+Temperature dependence of viscoelastic-viscoplastic behavior is examined in Fig. 15 for randomly distributed GF(50 wt%)/epoxy under saturated conditions at 253, 300, and 323 K. Results reveal strong temperature sensitivity consistent with thermal activation processes em-bedded in the constitutive model. At the lowest temperature, the composite exhibits highest stiffness and peak force (approximately 29 N at 0.015 mm), reflecting reduced molecular mo-bility and increased resistance to viscous flow, with relatively brittle behavior and sharp post-peak softening indicating limited energy dissipation through viscous mechanisms. At room temperature, intermediate stiffness and peak force (approximately 25 N at 0.016 mm) are 35 observed with more gradual post-peak softening, representing a transition regime where both elastic and viscous mechanisms contribute significantly. At elevated temperature, noticeably reduced stiffness and lowest peak force (approximately 20 N at 0.017 mm) are observed, but displacement at failure increases substantially demonstrating enhanced ductility, with much more gradual post-peak behavior and extended tail indicating significant energy dissipation through thermally activated viscous processes. The temperature dependence arises from the modified Kitagawa model (Eqs. (30) and (31)) for shear moduli and Argon viscous flow rate (Eq. (13)), ensuring that as temperature increases, the matrix becomes softer and viscous relaxation accelerates, leading to observed trends. The approximately 30% reduction in peak load from 253 to 323 K demonstrates the critical importance of temperature compensation in composite structures operating over wide environmental ranges, and suggests the model could be extended to predict creep and stress relaxation at elevated temperatures—phenomena of practical importance for long-term structural integrity assessments. 
+
+0 0.5 1 1.5 2 2.5
+
+·10 −2
+
+0510 15 20 25 30 
+
+Displacement (mm) Force (N)      
+
+> T= 253 K
+> T= 300 K
+> T= 323 K
+> Figure 15: Effect of temperature on the force–displacement response of randomly distributed GF (50 wt%)/epoxy at moisture-saturated condition.
+
+The influence of fiber mechanical properties is investigated through parameter a1 in the fiber strain energy function (Eq. (35)), which controls the initial stiffness contribution of fiber families. Figure 16 compares three values: a1 = 1 (low fiber stiffness), a1 = 9 (baseline), and 
+
+a1 = 20 (high fiber stiffness) for randomly distributed GF(50 wt%)/epoxy at 300 K under 36 dry conditions, with fiber volume fraction and orientation distribution held constant to isolate intrinsic fiber property effects. Increasing a1 systematically enhances both initial stiffness and peak load: from approximately 21 N at 0.018 mm for a1 = 1 , to 25 N at 0.016 mm for a1 = 9 ,and 30 N at 0.015 mm for a1 = 20 . The force-displacement curves diverge immediately from loading onset, confirming that a1 directly affects elastic response rather than just influencing damage evolution or post-peak behavior. Interestingly, post-peak softening also depends on 
+
+a1: higher fiber stiffness leads to more abrupt failure after peak load, suggesting more brittle fracture behavior attributable to increased stress concentration at fiber ends when stiffer fibers carry higher loads, promoting localized matrix cracking and fiber-matrix debonding. The practical implication is that while using higher-modulus fibers increases strength and stiffness, it may reduce damage tolerance and fracture toughness if fiber-matrix interface properties are not correspondingly improved. These simulations demonstrate the model’s capability to assess trade-offs between different reinforcement choices and guide material selection for applications requiring either high strength (favor high a1) or high toughness (favor moderate a1 with good interfacial adhesion). 
+
+0 0.5 1 1.5 2 2.5
+
+·10 −2
+
+0510 15 20 25 30 35 
+
+Displacement (mm) Force (N)     
+
+> a1= 1
+> a1= 9
+> a1= 20
+> Figure 16: Effect of fiber performance on the force–displacement response of randomly distributed GF (50 wt%)/epoxy at 300 K and dry condition.
+
+The crack propagation through layered composite architectures with varying fiber orientations– a configuration widely employed in structural laminates–is investigated in the following figures. 37 Figs. 17 and 18 examine bi-layer GF(50 wt%)/epoxy at 300 K under dry conditions where top and bottom halves have distinct fiber alignment, investigating how the anisotropy parameter 
+
+ˆα influences crack path deflection at layer interfaces by comparing ˆα = 2 and ˆα = 10 . The force-displacement response shows that increasing anisotropy significantly enhances both peak load (from approximately 25 N to 28 N) and displacement at peak load (from 0.015 mm to 0.018 mm). More importantly, post-peak behavior differs dramatically: for ˆα = 2 , catas-trophic failure occurs shortly after peak with steep load drop, whereas ˆα = 10 exhibits more gradual softening with a pronounced plateau region around 27 N extending over approximately 0.002 mm displacement range. This plateau indicates stable crack propagation through the layered structure, with the crack repeatedly deflecting and reorienting as it encounters layer interfaces with different fiber orientations—a phenomenon unique to layered composites with strong anisotropic toughness. 
+
+0 0.5 1 1.5 2 2.5
+
+·10 −2
+
+0510 15 20 25 30 
+
+Displacement (mm) Force (N)    
+
+> ˆα= 2
+> ˆα= 10
+> Figure 17: Force–displacement response of a layered GF (50 wt%)/epoxy composite at 300 K and dry condition.
+
+38 45 ◦, ˆα = 2 −45 ◦, ˆα = 2         
+
+> (a)
+> 45 ◦,ˆα= 10 −45 ◦,ˆα= 10
+> (b)
+> Figure 18: Crack propagation in the layered GF(50 wt%)/epoxy composite: (a) ˆ α= 2, and (b) ˆ α= 10. The dashed green line indicates the layer interface.
+
+The crack path visualizations reveal underlying mechanisms. For ˆα = 2 (Fig. 18a), the crack propagates in a relatively smooth path showing only modest deflection when crossing the layer interface, maintaining an approximately horizontal trajectory as weak anisotropy allows penetration through layers without significant resistance from fiber orientation mismatch. In contrast, for ˆα = 10 (Fig. 18b), the crack path exhibits pronounced deflection, curving upward in the top layer and downward in the bottom layer to align with the preferred propagation direction dictated by fiber orientation in each layer. A second layered configuration exam-ined in Fig. 19 and 20 demonstrates similar trends with moderate deflection for ˆα = 2 and substantial deviation including possible crack arrest and reinitiation for ˆα = 10 . Notably, in the high anisotropy case, the crack appears to temporarily arrest at the layer interface before reinitiating in the second layer, resulting in discontinuous damage patterns. This crack ar-rest phenomenon contributes to the force plateau as applied load must increase to overcome additional energy barrier for crack reinitiation across interfaces. 39 0 0.5 1 1.5 2 2.5
+
+·10 −2
+
+0510 15 20 25 30 35 
+
+Displacement (mm) Force (N) 
+
+ˆα = 2 
+
+ˆα = 10 
+
+Figure 19: Force–displacement response of a layered GF (50 wt%)/epoxy composite at 300 K and dry condition.         
+
+> 45 ◦,ˆα= 2
+> 0◦,ˆα= 2
+> (a)
+> 45 ◦,ˆα= 10
+> 0◦,ˆα= 10
+> (b)
+
+Figure 20: Crack propagation in the layered GF(50 wt%)/epoxy composite: (a) ˆ α = 2, and (b) ˆ α = 10. The dashed green line indicates the layer interface. 
+
+5. Summary and conclusions 
+
+This work presented a comprehensive phase-field framework for modeling anisotropic viscoelastic-viscoplastic fracture in short fiber-reinforced polymer composites under hygrothermal envi-40 ronments at finite deformation. The framework unifies several critical aspects traditionally treated separately: anisotropic crack propagation induced by fiber orientation, rate-dependent inelastic deformation through coupled viscoelastic-viscoplastic behavior, and environmental degradation through moisture- and temperature-sensitive material parameters. In the phase-field fracture formulation, the anisotropic mechanical response from multiple fiber families is captured through second-order orientation tensor decomposition, reducing complex multi-fiber distributions to principal fiber families characterized by eigenvectors and eigenvalues. Hygrothermal effects are incorporated through moisture-induced swelling, ther-mal expansion, and environment-dependent material parameters. Numerical investigations on glass fiber-reinforced epoxy composites demonstrate the framework’s capabilities: 
+
+• The crack driving force decomposition reveals fiber orientation fundamentally governs spatial energy distribution. Temporal evolution shows approximately 25% reduction in total driving force over relaxation timescales, demonstrating critical time-dependent influences. 
+
+• Balanced fiber distributions (50-50) produce straight crack propagation with higher peak loads and brittle failure, while unbalanced distributions (70-30) cause substantial deflec-tion with reduced strength but enhanced ductility. The anisotropy parameter ˆα exhibits systematic relationships with crack deflection, with increases from 1 to 10 progressively enhancing deflection angles, and fracture energy. 
+
+• Moisture absorption causes 19% strength degradation for 10 wt% composites and 7% for 50 wt% composites, with plasticization producing gradual softening. Temperature variation from 253 K to 323 K produces approximately 30% peak load reduction, with elevated temperatures increasing ductility through enhanced viscous dissipation. 
+
+• Strong anisotropy ( ˆα = 10 ) in bi-layer laminates produces crack deflection and layer reinitiation. The framework advances predictive modeling of SFRPs by providing: (1) unified multi-physics coupling within a phase-field fracture model, (2) decomposition of rate-dependent fracture mechanisms, and (3) quantitative microstructure-property relationships through ori-entation tensor formalism. Future investigations should address explicit fiber-matrix interface modeling through cohesive phase-field formulations, multiscale homogenization incorporating manufacturing-induced fiber distributions, and fatigue damage under cyclic loading. From 41 a methodological standpoint, the unified variational damage model of Ren et al. [67] of-fers a length scale insensitive phase-field formulation that could improve the objectivity of crack predictions with respect to mesh and regularization parameters in the current viscoelas-tic–viscoplastic setting. Furthermore, the adaptive deep energy minimization approach [68] presents a compelling alternative to the staggered Newton–Raphson solver employed here, po-tentially reducing computational cost through physics-informed neural network-based adap-tivity in the phase-field solution. 
+
+Acknowledgements 
+
+The authors acknowledge the resources and support provided by the Norwegian Research Infrastructure Services (NRIS). The computational work was performed on resources provided through the Sigma2 national e-infrastructure, project NN10041K. 
+
+References 
+
+[1] J. Holbery, D. Houston, Natural-fiber-reinforced polymer composites in automotive ap-plications, Jom 58 (11) (2006) 80–86. [2] C. Soutis, Carbon fiber reinforced plastics in aircraft construction, Materials Science and Engineering: A 412 (1-2) (2005) 171–176. [3] B. Arash, W. Exner, R. Rolfes, Viscoelastic damage behavior of fiber reinforced nanoparticle-filled epoxy nanocomposites: Multiscale modeling and experimental vali-dation, Composites Part B: Engineering 174 (2019) 107005. [4] J. Thomason, The influence of fibre length and concentration on the properties of glass fibre reinforced polypropylene: 5. injection moulded long and short fibre pp, Composites Part A: Applied Science and Manufacturing 33 (12) (2002) 1641–1652. [5] W. Nsengiyumva, S. Zhong, X. Chen, A. M. Makin, L. Chen, L. Wu, L. Zheng, Toward tailoring the mechanical and dielectric properties of short glass fiber-reinforced epoxy composites, Polymer Composites 45 (1) (2024) 535–554. [6] A. A. Gusev, Finite element estimates of viscoelastic stiffness of short glass fiber reinforced composites, Composite Structures 171 (2017) 53–62. 42 [7] Z. Wang, D. E. Smith, Numerical analysis on viscoelastic creep responses of aligned short fiber reinforced composites, Composite Structures 229 (2019) 111394. [8] X. Poulain, A. Benzerga, R. Goldberg, Finite-strain elasto-viscoplastic behavior of an epoxy resin: Experiments and modeling in the glassy regime, International Journal of Plasticity 62 (2014) 138–161. [9] B. Arash, R. Unger, W. Exner, R. Rolfes, A finite deformation gradient-enhanced damage model for nanoparticle/polymer nanocomposites: An atomistically-informed multiscale approach, Composite Structures 258 (2021) 113211. [10] B. Arash, S. Zakavati, B. Bahtiri, M. Jux, R. Rolfes, Phase-field modeling of fracture in viscoelastic–viscoplastic thermoset nanocomposites under cyclic and monolithic loading, Engineering with Computers 41 (1) (2025) 681–701. [11] Y. Zhou, F. Pervin, L. Lewis, S. Jeelani, Experimental study on the thermal and me-chanical properties of multi-walled carbon nanotube-reinforced epoxy, Materials Science and Engineering: A 452 (2007) 657–664. [12] B. Bahtiri, B. Arash, S. Scheffler, M. Jux, R. Rolfes, A machine learning-based viscoelastic–viscoplastic model for epoxy nanocomposites with moisture content, Com-puter Methods in Applied Mechanics and Engineering 415 (2023) 116293. [13] M. Ortiz, A. Pandolfi, Finite-deformation irreversible cohesive elements for three-dimensional crack-propagation analysis, International journal for numerical methods in engineering 44 (9) (1999) 1267–1282. [14] S. Li, M. Thouless, A. Waas, J. Schroeder, P. Zavattieri, Use of a cohesive-zone model to analyze the fracture of a fiber-reinforced polymer–matrix composite, Composites science and technology 65 (3-4) (2005) 537–549. [15] I. Lapczyk, J. A. Hurtado, Progressive damage modeling in fiber-reinforced materials, Composites Part A: Applied science and manufacturing 38 (11) (2007) 2333–2341. [16] M. G. Pike, C. Oskay, Xfem modeling of short microfiber reinforced composites with cohesive interfaces, Finite Elements in Analysis and Design 106 (2015) 16–31. 43 [17] M. Kästner, S. Müller, F. Hirsch, J.-S. Pap, I. Jansen, V. Ulbricht, Xfem modeling of interface failure in adhesively bonded fiber-reinforced polymers, Advanced Engineering Materials 18 (3) (2016) 417–426. [18] G. A. Francfort, J.-J. Marigo, Revisiting brittle fracture as an energy minimization prob-lem, Journal of the Mechanics and Physics of Solids 46 (8) (1998) 1319–1342. [19] B. Bourdin, G. A. Francfort, J.-J. Marigo, Numerical experiments in revisited brittle fracture, Journal of the Mechanics and Physics of Solids 48 (4) (2000) 797–826. [20] C. Miehe, M. Hofacker, F. Welschinger, A phase field model for rate-independent crack propagation: Robust algorithmic implementation based on operator splits, Computer Methods in Applied Mechanics and Engineering 199 (45-48) (2010) 2765–2778. [21] M. Ambati, T. Gerasimov, L. De Lorenzis, A review on phase-field models of brittle fracture and a new fast hybrid formulation, Computational Mechanics 55 (2) (2015) 383– 405. [22] J.-Y. Wu, V. P. Nguyen, C. T. Nguyen, D. Sutula, S. Sinaie, S. P. Bordas, Phase-field modeling of fracture, Advances in applied mechanics 53 (2020) 1–183. [23] C. Miehe, F. Welschinger, M. Hofacker, Thermodynamically consistent phase-field mod-els of fracture: Variational principles and multi-field fe implementations, International journal for numerical methods in engineering 83 (10) (2010) 1273–1311. [24] M. J. Borden, C. V. Verhoosel, M. A. Scott, T. J. Hughes, C. M. Landis, A phase-field description of dynamic brittle fracture, Computer Methods in Applied Mechanics and Engineering 217 (2012) 77–95. [25] M. Ambati, T. Gerasimov, L. De Lorenzis, Phase-field modeling of ductile fracture, Com-putational Mechanics 55 (2015) 1017–1040. [26] C. Miehe, S. Mauthe, Phase field modeling of fracture in multi-physics problems. part iii. crack driving forces in hydro-poro-elasticity and hydraulic fracturing of fluid-saturated porous media, Computer Methods in Applied Mechanics and Engineering 304 (2016) 619–655. [27] C. V. Verhoosel, R. De Borst, A phase-field model for cohesive fracture, International Journal for numerical methods in Engineering 96 (1) (2013) 43–62. 44 [28] S. Conti, M. Focardi, F. Iurlano, Phase field approximation of cohesive fracture models, in: Annales de l’Institut Henri Poincaré C, Analyse non linéaire, Vol. 33, Elsevier, 2016, pp. 1033–1067. [29] B. Li, C. Peco, D. Millán, I. Arias, M. Arroyo, Phase-field modeling and simulation of fracture in brittle materials with strongly anisotropic surface energy, International Journal for Numerical Methods in Engineering 102 (3-4) (2015) 711–727. [30] S. Teichtmeister, D. Kienle, F. Aldakheel, M.-A. Keip, Phase field modeling of fracture in anisotropic brittle solids, International Journal of Non-Linear Mechanics 97 (2017) 1–21. [31] J. Clayton, J. Knap, Phase field modeling of directional fracture in anisotropic polycrys-tals, Computational Materials Science 98 (2015) 158–169. [32] M. Hofacker, C. Miehe, A phase field model of dynamic fracture: Robust field updates for the analysis of complex crack patterns, International Journal for Numerical Methods in Engineering 93 (3) (2013) 276–301. [33] Z. A. Wilson, M. J. Borden, C. M. Landis, A phase-field model for fracture in piezoelectric ceramics, International Journal of Fracture 183 (2) (2013) 135–153. [34] C. Miehe, L.-M. Schaenzel, H. Ulmer, Phase field modeling of fracture in multi-physics problems. part i. balance of crack surface and failure criteria for brittle crack propagation in thermo-elastic solids, Computer Methods in Applied Mechanics and Engineering 294 (2015) 449–485. [35] J. Bleyer, R. Alessi, Phase-field modeling of anisotropic brittle fracture including several damage mechanisms, Computer Methods in Applied Mechanics and Engineering 336 (2018) 213–236. [36] O. Gültekin, H. Dal, G. A. Holzapfel, A phase-field approach to model fracture of arterial walls: theory and finite element analysis, Computer methods in applied mechanics and engineering 312 (2016) 542–566. [37] A. Dean, P. A. V. Kumar, J. Reinoso, C. Gerendt, M. Paggi, E. Mahdi, R. Rolfes, A multi phase-field fracture model for long fiber reinforced composites based on the puck theory of failure, Composite Structures (2020) 112446. 45 [38] E. C. Bryant, W. Sun, A mixed-mode phase field fracture model in anisotropic rocks with consistent kinematics, Computer Methods in Applied Mechanics and Engineering 342 (2018) 561–584. [39] A. Dean, J. Reinoso, N. Jha, E. Mahdi, R. Rolfes, A phase field approach for ductile fracture of short fibre reinforced composites, Theoretical and Applied Fracture Mechanics 106 (2020) 102495. [40] A. Dean, J. Mavani, B. Bahtiri, B. Arash, R. Rolfes, A hybrid electromechanical phase-field and deep learning framework for predicting fracture in dielectric nanocomposites, arXiv preprint arXiv:2508.07469 (2025). [41] T. T. Nguyen, J. Yvonnet, Q.-Z. Zhu, M. Bornert, C. Chateau, A phase field method to simulate crack nucleation and propagation in strongly heterogeneous materials from direct imaging of their microstructure, Engineering Fracture Mechanics 139 (2015) 18–39. [42] E. Tanné, T. Li, B. Bourdin, J.-J. Marigo, C. Maurini, Crack nucleation in variational phase-field models of brittle fracture, Journal of the Mechanics and Physics of Solids 110 (2018) 80–99. [43] K. Au-Yeung, A. Quintanas-Corominas, E. Martínez-Pañeda, W. Tan, Hygroscopic phase field fracture modelling of composite materials, Engineering with Computers 39 (6) (2023) 3847–3864. [44] P. J. Loew, B. Peters, L. A. Beex, Fatigue phase-field damage modeling of rubber using viscous dissipation: Crack nucleation and propagation, Mechanics of Materials 142 (2020) 103282. [45] F. P. Duda, A. Ciarbonetti, P. J. Sánchez, A. E. Huespe, A phase-field/gradient damage model for brittle fracture in elastic–plastic solids, International Journal of Plasticity 65 (2015) 269–296. [46] J. Ulloa, P. Rodríguez, C. Samaniego, E. Samaniego, Phase-field modeling of fracture for quasi-brittle materials, Underground Space 4 (1) (2019) 10–21. [47] F. Dammaß, K. A. Kalina, M. Ambati, M. Kästner, Phase-field modelling and analysis of rate-dependent fracture phenomena at finite deformation, Computational Mechanics (2023) 1–25. 46 [48] P. K. A. V. Kumar, A. Dean, J. Reinoso, M. Paggi, Nonlinear thermo-elastic phase-field fracture of thin-walled structures relying on solid shell concepts, Computer Methods in Applied Mechanics and Engineering 396 (2022) 115096. [49] B. Yin, J. Storm, M. Kaliske, Viscoelastic phase-field fracture using the framework of representative crack elements, International Journal of Fracture 237 (1-2) (2022) 139– 163. [50] R. Shen, H. Waisman, L. Guo, Fracture of viscoelastic solids modeled with a modified phase field method, Computer Methods in Applied Mechanics and Engineering 346 (2019) 862–890. [51] P. J. Loew, B. Peters, L. A. Beex, Rate-dependent phase-field damage modeling of rubber and its experimental parameter identification, Journal of the Mechanics and Physics of Solids 127 (2019) 266–294. [52] R. Brighenti, T. Rabczuk, X. Zhuang, Phase field approach for simulating failure of viscoelastic elastomers, European Journal of Mechanics-A/Solids 85 (2021) 104092. [53] B. Arash, W. Exner, R. Rolfes, Effect of moisture on the nonlinear viscoelastic fracture behavior of polymer nanocompsites: a finite deformation phase-field model, Engineering with Computers 39 (1) (2023) 773–790. [54] B. Arash, W. Exner, R. Rolfes, A finite deformation phase-field fracture model for the thermo-viscoelastic analysis of polymer nanocomposites, Computer Methods in Applied Mechanics and Engineering 381 (2021) 113821. [55] B. Bahtiri, B. Arash, S. Scheffler, M. Jux, R. Rolfes, A machine learning-based viscoelastic–viscoplastic model for epoxy nanocomposites with moisture con-tent, Computer Methods in Applied Mechanics and Engineering 415 (2023) 116293. 
+
+doi:https://doi.org/10.1016/j.cma.2023.116293 .[56] J.-X. Liew, P. Zhang, M.-F. Kai, J.-G. Dai, An experimental study of the moisture-induced degradation characteristics of gfrp-concrete interface, Materials & Design (2025) 114183. [57] E. Botelho, L. Pardini, M. Rezende, Hygrothermal effects on the shear properties of carbon fiber/epoxy composites, Journal of Materials Science 41 (21) (2006) 7111–7118. 47 [58] S. Govindjee, S. Reese, A presentation and comparison of two large deformation viscoelas-ticity models, Journal of engineering materials and technology 119 (3) (1997) 251–255. [59] H. Qi, M. Boyce, Stress–strain behavior of thermoplastic polyurethanes, Mechanics of Materials 37 (8) (2005) 817–839. [60] M. C. Boyce, D. M. Parks, A. S. Argon, Large inelastic deformation of glassy polymers. part i: rate dependent constitutive model, Mechanics of Materials 7 (1) (1988) 15–33. [61] E. M. Arruda, M. C. Boyce, A three-dimensional constitutive model for the large stretch behavior of rubber elastic materials, Journal of the Mechanics and Physics of Solids 41 (2) (1993) 389–412. [62] J. C. Simo, Algorithms for static and dynamic multiplicative plasticity that preserve the classical return mapping schemes of the infinitesimal theory, Computer Methods in Applied Mechanics and Engineering 99 (1) (1992) 61–112. [63] S. Reese, S. Govindjee, A theory of finite viscoelasticity and numerical aspects, Interna-tional journal of solids and structures 35 (26-27) (1998) 3455–3482. [64] M. Ambati, R. Kruse, L. De Lorenzis, A phase-field model for ductile fracture at finite strains and its experimental verification, Computational Mechanics 57 (1) (2016) 149–167. [65] R. Unger, B. Arash, W. Exner, R. Rolfes, Effect of temperature on the viscoelastic damage behaviour of nanoparticle/epoxy nanocomposites: Constitutive modelling and experimental validation, Polymer 191 (2020) 122265. [66] W. Sun, E. L. Chaikof, M. E. Levenston, Numerical approximation of tangent moduli for finite element implementations of nonlinear hyperelastic material models, Journal of biomechanical engineering 130 (6) (2008). [67] H. Ren, X. Zhuang, H. Zhu, T. Rabczuk, Variational damage model: A novel consistent approach to fracture, Computers & Structures 305 (2024) 107518. [68] S. Goswami, C. Anitescu, S. Chakraborty, T. Rabczuk, Transfer learning enhanced physics informed neural network for phase-field modeling of fracture, Theoretical and Applied Fracture Mechanics 106 (2020) 102447. 48
