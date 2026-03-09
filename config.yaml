@@ -25,3 +25,72 @@ subscriptions:
     stage: A
     diff_threshold_pct: 15
   keyword_recall_mode: or
+  intent_profiles:
+    - tag: PF ROC
+      description: 相场在蠕变中的应用
+      enabled: true
+      keywords:
+        - keyword: phase field method
+          keyword_cn: 相场法
+          query: phase field modeling of fracture and damage
+        - keyword: rock mechanics
+          keyword_cn: 岩石力学
+          query: mechanical behavior and failure of rock materials
+        - keyword: multi-field coupling
+          keyword_cn: 多场耦合
+          query: multiphysics coupling in porous media
+        - keyword: thermo-hydro-mechanical
+          keyword_cn: 热-水-力耦合
+          query: THM coupling in rock mass using phase field
+        - keyword: crack propagation
+          keyword_cn: 裂纹扩展
+          query: numerical simulation of crack initiation and propagation
+        - keyword: porous media
+          keyword_cn: 多孔介质
+          query: fluid flow and deformation in saturated porous rocks
+        - keyword: constitutive model
+          keyword_cn: 本构模型
+          query: constitutive laws for rock damage and plasticity
+        - keyword: creep
+          keyword_cn: 蠕变
+          query: creep deformation mechanisms
+        - keyword: viscoplasticity
+          keyword_cn: 粘塑性
+          query: crystal plasticity and viscoplastic phase field
+      intent_queries:
+        - query: phase field modeling of multi physical coupling in rock fracture
+          query_cn: 岩石断裂多物理场耦合的相场模拟
+          enabled: true
+          source: manual
+          note: ''
+        - query: numerical simulation of hydraulic fracturing in rocks using phase field method
+          query_cn: 基于相场法的岩石水力压裂数值模拟
+          enabled: true
+          source: manual
+          note: ''
+        - query: thermo hydro mechanical coupling in porous rock mass fracture
+          query_cn: 多孔岩体断裂的热 水 力耦合研究
+          enabled: true
+          source: manual
+          note: ''
+        - query: application of phase field method in geomechanics and rock engineering
+          query_cn: 相场法在岩土力学与岩石工程中的应用
+          enabled: true
+          source: manual
+          note: ''
+        - query: phase field approach for crack propagation in heterogeneous rock materials
+          query_cn: 非均匀岩石材料裂纹扩展的相场方法
+          enabled: true
+          source: manual
+          note: ''
+        - query: phase field simulation of creep deformation in metals
+          query_cn: 金属蠕变变形的相场模拟
+          enabled: true
+          source: manual
+          note: ''
+        - query: coupling phase field with crystal plasticity for creep analysis
+          query_cn: 相场与晶体塑性耦合的蠕变分析
+          enabled: true
+          source: manual
+          note: ''
+      updated_at: '2026-03-09T05:16:32.631Z'
