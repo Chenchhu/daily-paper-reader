@@ -1,0 +1,279 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-03-10T19:29:01.600721+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 6,
+    "quick_skim_target": 11,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2603.07396v1",
+      "title": "A Consistent Interface Reconstruction and Coupling Method for Multiphysics Simulations",
+      "abstract": "Accurate representation of interfaces and flux exchange is vital for coupled multiphysics simulations across a broad range of applications. Currently, coupling approaches are limited by the underlying discretization or to specific physical problems, restricting their generality. To remove these constraints, a consistent interface reconstruction and coupling method has been developed to bridge multiphysical computational domains. The proposed numerical framework contains two complementary steps. The first step reconstructs a continuous bounding surface from discretized spatial data using a weighted interpolation and marching-grid approach that preserves geometric fidelity across a wide range of resolutions. The second step consists of a conservative flux mapping algorithm that projects surface quantities such as aerodynamic loads, heat fluxes, or mass transfer onto nearby discrete elements while maintaining global conservation of flux quantities. This new numerical formulation allows for integration of the various partitioned domains and ensures consistent data transfer between them. The framework is tested on various geometries, and surface containment errors below 2.5% and flux-transfer errors below 1% are obtained. Transient simulations of uniform surface recession further confirm accuracy in coupled evolution, with predicted volume loss agreeing with analytical solutions to within 1%. The proposed method establishes a general and extensible framework for consistent interface reconstruction and coupling in multiphysics environments, providing a pathway toward unified treatment of discrete-continuum interactions for a wide range of systems.",
+      "authors": [
+        "Ethan Huff",
+        "Savio J. Poovathingal"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "physics.comp-ph"
+      ],
+      "published": "2026-03-08T00:57:59+00:00",
+      "link": "https://arxiv.org/pdf/2603.07396v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Consistent interface reconstruction and coupling for multiphysics simulations",
+      "llm_evidence_cn": "多物理场模拟的一致界面重构与耦合",
+      "llm_evidence": "多物理场模拟的一致界面重构与耦合",
+      "canonical_evidence": "多物理场模拟的一致界面重构与耦合",
+      "llm_tldr_en": "Develops a general numerical framework for interface reconstruction and flux exchange in coupled multiphysics systems.",
+      "llm_tldr_cn": "开发了一个通用的数值框架，用于耦合多物理场系统中的界面重构和通量交换。",
+      "llm_tldr": "开发了一个通用的数值框架，用于耦合多物理场系统中的界面重构和通量交换。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "multiphysics coupling in porous media",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2603.06892v1",
+      "title": "On the coupled geometrical-mechanical origin of the earthquake b-value in fault networks",
+      "abstract": "The Gutenberg-Richter law is a fundamental empirical law in seismology describing earthquake frequency-magnitude distributions, with one of its key parameters, the so-called b-value, quantifying the relative frequency of small versus large events. While the b-value is commonly interpreted as reflecting crustal heterogeneity and regional stress conditions, its underlying physical origin remains poorly understood, particularly the relative roles of geometrical versus mechanical controls. Here, we develop analytical and numerical models to elucidate the origin of the b-value in three-dimensional fault networks subject to mainshock-aftershock sequences. We demonstrate that the b-value emerges from the power-law scaling of fault rupture area together with the scaling of slip magnitude. Our results reveal a two-branch frequency-magnitude distribution, with the regime transition governed by fault criticality and fracture energy dissipation, while the transition magnitude reflects the finite population of faults triggered during the sequence. Our findings provide a physically grounded interpretation of earthquake b-values, establishing a link between fault mechanics and earthquake statistics.",
+      "authors": [
+        "Wenbo Pan",
+        "Zixin Zhang",
+        "Bjorn Lund",
+        "Qinghua Lei"
+      ],
+      "primary_category": "physics.geo-ph",
+      "categories": [
+        "physics.geo-ph"
+      ],
+      "published": "2026-03-06T21:28:04+00:00",
+      "link": "https://arxiv.org/pdf/2603.06892v1",
+      "tags": [
+        "query:PF ROC"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "mechanical origin of earthquake b-value in fault networks",
+      "llm_evidence_cn": "断层网络中地震 b 值的力学起源",
+      "llm_evidence": "断层网络中地震 b 值的力学起源",
+      "canonical_evidence": "断层网络中地震 b 值的力学起源",
+      "llm_tldr_en": "Models the physical origin of earthquake frequency-magnitude distributions in 3D fault networks.",
+      "llm_tldr_cn": "模拟了三维断层网络中地震频率-震级分布的物理起源。",
+      "llm_tldr": "模拟了三维断层网络中地震频率-震级分布的物理起源。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "mechanical behavior and failure of rock materials",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2603.05161v1",
+      "title": "A Geometry-Adaptive Deep Variational Framework for Phase Discovery in the Landau-Brazovskii Model",
+      "abstract": "The discovery of ordered structures in pattern-forming systems, such as the Landau-Brazovskii (LB) model, is often limited by the sensitivity of numerical solvers to the prescribed computational domain size. Incompatible domains induce artificial stress, frequently trapping the system in high-energy metastable configurations. To resolve this issue, we propose a Geometry-Adaptive Deep Variational Framework (GeoDVF) that jointly optimizes the infinite-dimensional order parameter, which is parameterized by a neural network, and the finite-dimensional geometric parameters of the computational domain. By explicitly treating the domain size as trainable variables within the variational formulation, GeoDVF naturally eliminates artificial stress during training. To escape the attraction basin of the disordered phase under small initializations, we introduce a warmup penalty mechanism, which effectively destabilizes the disordered phase, enabling the spontaneous nucleation of complex three-dimensional ordered phases from random initializations. Furthermore, we design a guided initialization protocol to resolve topologically intricate phases associated with narrow basins of attraction. Extensive numerical experiments show that GeoDVF provides a robust and geometry-consistent variational solver capable of identifying both stable and metastable states without prior knowledge.",
+      "authors": [
+        "Yuchen Xie",
+        "Jianyuan Yin",
+        "Lei Zhang"
+      ],
+      "primary_category": "cond-mat.mtrl-sci",
+      "categories": [
+        "cond-mat.mtrl-sci",
+        "cs.LG"
+      ],
+      "published": "2026-03-05T13:32:23+00:00",
+      "link": "https://arxiv.org/pdf/2603.05161v1",
+      "tags": [
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Deep variational framework for phase discovery and order parameters",
+      "llm_evidence_cn": "用于相发现和序参数的深度变分框架",
+      "llm_evidence": "用于相发现和序参数的深度变分框架",
+      "canonical_evidence": "用于相发现和序参数的深度变分框架",
+      "llm_tldr_en": "Proposes a geometry-adaptive deep variational framework to optimize order parameters and domain size in phase models.",
+      "llm_tldr_cn": "提出了一种几何自适应深度变分框架，用于优化相模型中的序参数和计算域尺寸。",
+      "llm_tldr": "提出了一种几何自适应深度变分框架，用于优化相模型中的序参数和计算域尺寸。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "phase field modeling of fracture and damage",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.08161v1",
+      "title": "Unexpected Planar Dislocation Boundary Formation in FCC Metals Captured by Dark-Field X-ray Microscopy and Continuum Dislocation Dynamics",
+      "abstract": "Validating dislocation patterning models against in situ imaging experiments is a longstanding goal in materials physics. Here, we provide the first direct morphological comparison of such models. Using in situ Dark-Field X-ray Microscopy (DFXM), we map the local orientations in high-purity aluminium deformed along [100] and find unexpected planar dislocation boundaries aligned with {111} slip planes that form prior to the development of a conventional dislocation cell structure. To explain this behaviour, we generate synthetic DFXM contrast images from a continuum dislocation dynamics (CDD) simulation. This mesoscale model, using nickel as a high stacking fault energy (SFE) FCC analogue, independently predicts the formation of the same {111} planar boundary types. This correspondence demonstrates that state-of-the-art CDD and DFXM experimental data can be used synergistically - despite differences in strain rates and length scales - as a practical route for refining continuum theories of plasticity.",
+      "authors": [
+        "Adam André William Cretton",
+        "Khaled SharafEldin",
+        "Axel Henningsson",
+        "Felix Frankus",
+        "Can Yıldırım",
+        "Carsten Detlefs",
+        "Flemming Bjerg Grumsen",
+        "Albert Zelenika",
+        "Anter El-Azab",
+        "Grethe Winther",
+        "Henning Friis Poulsen"
+      ],
+      "primary_category": "cond-mat.mtrl-sci",
+      "categories": [
+        "cond-mat.mtrl-sci"
+      ],
+      "published": "2026-03-09T09:42:04+00:00",
+      "link": "https://arxiv.org/pdf/2603.08161v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Continuum dislocation dynamics and dislocation patterning in FCC metals",
+      "llm_evidence_cn": "面心立方金属中的连续位错动力学与位错构型",
+      "llm_evidence": "面心立方金属中的连续位错动力学与位错构型",
+      "canonical_evidence": "面心立方金属中的连续位错动力学与位错构型",
+      "llm_tldr_en": "Uses continuum dislocation dynamics to explain planar dislocation boundary formation in deformed metals.",
+      "llm_tldr_cn": "利用连续位错动力学解释了变形金属中平面位错边界的形成。",
+      "llm_tldr": "利用连续位错动力学解释了变形金属中平面位错边界的形成。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "crystal plasticity and viscoplastic phase field",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2603.07321v1",
+      "title": "Averaging Molecular Dynamics simulations to study the slow-strain rate behavior of metals",
+      "abstract": "The application of molecular dynamics (MD) simulations to quasistatic loading is severely limited by the large separation between atomic vibration timescales and experimentally relevant deformation rates. In this work we employ the Practical Time Averaging (PTA) framework to overcome this limitation and enable atomistic simulations of crystalline solids under quasistatic loading conditions. PTA exploits the intrinsic separation of timescales by defining slow variables as time-averaged observables of the fast atomistic dynamics and their evolution on the slow loading timescale, thereby avoiding explicit integration of the fast dynamics.   Using this approach, we simulate uniaxial deformation, in both tension and compression, of 4 to 20 nm cubic specimens of face centered cubic aluminum nanocrystals at applied strain rates approaching quasistatic conditions. We define slow variables as the averaged kinetic energy, potential energy, and normal stress in the loading direction, and track their evolution on the slow timescale. The stress-strain curves show yielding close to the theoretical stress for homogeneous nucleation, followed by successive load drops and rises caused by dislocation nucleation, motion, and exit from free surfaces. The \"smaller is harder\" effect is evident from the stress-strain response and from the variation of yield stress with sample size. Serrations in the response are more pronounced for smaller samples. The effects of applied strain rate and initial temperature are also studied. The method also captures the evolution of intricate dislocation microstructures on the slow timescale by tracking time-averaged atomic positions. The PTA framework enables simulations at strain rates several orders of magnitude lower than those accessible to conventional MD, demonstrating significant speedup in computational time while retaining full atomistic resolution.",
+      "authors": [
+        "Sarthok Kumar Baruah",
+        "Sabyasachi Chatterjee",
+        "Amit Acharya",
+        "Gerald J. Wang"
+      ],
+      "primary_category": "cond-mat.mtrl-sci",
+      "categories": [
+        "cond-mat.mtrl-sci"
+      ],
+      "published": "2026-03-07T19:45:35+00:00",
+      "link": "https://arxiv.org/pdf/2603.07321v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Molecular dynamics for slow-strain rate behavior and quasistatic loading of metals",
+      "llm_evidence_cn": "金属慢应变率行为和准静态加载的分子动力学",
+      "llm_evidence": "金属慢应变率行为和准静态加载的分子动力学",
+      "canonical_evidence": "金属慢应变率行为和准静态加载的分子动力学",
+      "llm_tldr_en": "Introduces a time-averaging framework to enable atomistic simulations of crystalline solids under slow deformation rates.",
+      "llm_tldr_cn": "引入了一种时间平均框架，以实现慢变形速率下晶体固体的原子尺度模拟。",
+      "llm_tldr": "引入了一种时间平均框架，以实现慢变形速率下晶体固体的原子尺度模拟。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "creep deformation mechanisms",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.08586v1",
+      "title": "Glassy phase transition in immiscible steady-state two-phase flow in porous media",
+      "abstract": "Two-phase flow in porous media is a ubiquitous phenomenon that has been studied for well over a century. However, we still lack a successful theory that predicts flow on a macroscopic length scale (the so-called Darcy scale) on the basis of a \"microscopic\" model. Here we show that the characteristic features of two-phase flow on the Darcy scale can be predicted by mapping the distribution of droplets in 2-phase flow onto the distribution of spins in a spin-glass model. The success of this approach is surprising, as two-phase flow is a non-equilibrium phenomenon, whereas the properties of the spin glass are obtained using equilibrium statistical mechanics. To obtain this mapping, we follow the approach of Meshulam and Bialek (Rev. Mod. Phys. 97, 045002 (2025)) and use the Jaynes maximum entropy principle to derive the spin-glass Hamiltonian using machine learning trained on many realizations of the two-phase flow pattern in a dynamic pore network model. With this mapping, we can construct a \"phase diagram\" for the 2-phase flow system. We find that the critical line separating the paramagnetic phase from a spin glass phase coincides with the transition where the dependence of the rate of two-phase flow on the imposed pressure gradient changes from linear to non-linear. The glassy phase of the spin model coincides with a flow regime characterized by hysteresis and strong fluctuations over a wide range of time scales. It is tempting to identify this flow regime as a dynamic glass state.",
+      "authors": [
+        "Santanu Sinha",
+        "Humberto Carmona",
+        "José S. Andrade",
+        "Alex Hansen"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "physics.comp-ph"
+      ],
+      "published": "2026-03-09T16:38:14+00:00",
+      "link": "https://arxiv.org/pdf/2603.08586v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "two-phase flow in porous media at the Darcy scale",
+      "llm_evidence_cn": "达西尺度的多孔介质两相流",
+      "llm_evidence": "达西尺度的多孔介质两相流",
+      "canonical_evidence": "达西尺度的多孔介质两相流",
+      "llm_tldr_en": "Predicts macroscopic two-phase flow in porous media by mapping droplet distribution to spin-glass models.",
+      "llm_tldr_cn": "通过将液滴分布映射到自旋玻璃模型，预测多孔介质中的宏观两相流。",
+      "llm_tldr": "通过将液滴分布映射到自旋玻璃模型，预测多孔介质中的宏观两相流。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "fluid flow and deformation in saturated porous rocks",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2603.07352v1",
+      "title": "Microstructural origins of energy storage during plastic deformation of 310S TWIP steel",
+      "abstract": "The microstructural mechanisms governing energy storage during plastic deformation of twinning-induced plasticity (TWIP) steels remain insufficiently understood, particularly under conditions of strain localization. This study provides a crystallographic-scale interpretation of energy storage in 310S TWIP steel exhibiting complex deformation mechanisms. Electron backscatter diffraction (EBSD) was used to characterize the evolution of local crystallographic orientation and microtexture during uniaxial tensile deformation using two complementary approaches: tracking the same surface region at successive strain levels and analysing regions corresponding to known local plastic strain. Deformation was initially dominated by dislocation slip, while twinning activity increased significantly beyond an equivalent plastic strain of approximately 0.3. Progressive deformation produced pronounced lattice rotations and the development of a dual-fibre texture consisting of a dominant 111 parallel to RD component and a secondary 100 parallel to RD component associated with deformation twinning. Correlation with previously quantified energy storage behaviour obtained from coupled digital image correlation and infrared thermography measurements reveals that intensified twinning and texture evolution in strain-localized regions are accompanied by a marked reduction in the energy storage rate. The results indicate that twin-matrix refinement and lattice rotation progressively reduce the material's capacity to store deformation energy and create favourable conditions for shear-band-mediated deformation.",
+      "authors": [
+        "Sandra Musiał",
+        "Michał Maj",
+        "Marcin Nowak"
+      ],
+      "primary_category": "cond-mat.mtrl-sci",
+      "categories": [
+        "cond-mat.mtrl-sci"
+      ],
+      "published": "2026-03-07T21:36:55+00:00",
+      "link": "https://arxiv.org/pdf/2603.07352v1",
+      "tags": [
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Crystallographic-scale interpretation of plastic deformation and dislocation slip",
+      "llm_evidence_cn": "塑性变形和位错滑移的晶体学尺度解释",
+      "llm_evidence": "塑性变形和位错滑移的晶体学尺度解释",
+      "canonical_evidence": "塑性变形和位错滑移的晶体学尺度解释",
+      "llm_tldr_en": "Analyzes microstructural mechanisms and energy storage during plastic deformation of TWIP steel using EBSD.",
+      "llm_tldr_cn": "利用 EBSD 分析了 TWIP 钢塑性变形过程中的微观结构机制和能量存储。",
+      "llm_tldr": "利用 EBSD 分析了 TWIP 钢塑性变形过程中的微观结构机制和能量存储。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "crystal plasticity and viscoplastic phase field",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

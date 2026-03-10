@@ -1,0 +1,251 @@
+Title: On the coupled geometrical-mechanical origin of the earthquake b-value in fault networks
+
+URL Source: https://arxiv.org/pdf/2603.06892v1
+
+Published Time: Tue, 10 Mar 2026 00:17:34 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+# On the coupled geometrical–mechanical origin of the earthquake 
+
+# b-value in fault networks 
+
+## Wenbo Pan 1,2 , Zixin Zhang 1* , Bj¨ orn Lund 2, Qinghua Lei 2* 
+
+> 1
+
+Department of Geotechnical Engineering, College of Civil Engineering, Tongji University, Shanghai, P.R. China. 
+
+> 2
+
+Department of Earth Sciences, Uppsala University, Uppsala, Sweden. *Corresponding author(s). E-mail(s): zxzhang@tongji.edu.cn; qinghua.lei@geo.uu.se; 
+
+Abstract 
+
+The Gutenberg–Richter law is a fundamental empirical law in seismology describing earthquake fre-quency–magnitude distributions, with one of its key parameters, the so-called b-value, quantifying the relative frequency of small versus large events. While the b-value is commonly interpreted as reflect-ing crustal heterogeneity and regional stress conditions, its underlying physical origin remains poorly understood, particularly the relative roles of geometrical versus mechanical controls. Here, we develop analytical and numerical models to elucidate the origin of the b-value in three-dimensional fault net-works subject to mainshock-aftershock sequences. We demonstrate that the b-value emerges from the power-law scaling of fault rupture area together with the scaling of slip magnitude. Our results reveal a two-branch frequency–magnitude distribution, with the regime transition governed by fault criticality and fracture energy dissipation, while the transition magnitude reflects the finite population of faults triggered during the sequence. Our findings provide a physically grounded interpretation of earthquake 
+
+b-values, establishing a link between fault mechanics and earthquake statistics. 
+
+# Introduction 
+
+The Gutenberg–Richter (GR) law describes a fundamental empirical relationship in seismology, whereby the frequency of earthquakes decreases exponentially with increasing magnitude [1]. This relationship is characterized by two key parameters: the a-value, reflecting the overall seismic productivity, and the b-value, governing the relative proportion of small versus large events. The b-value is widely used as a diagnostic indicator of crustal conditions and tectonic settings [2–6], with reported b-values in general ranging from 0.8 to 1.2 for regional tectonic seismicity [7]. Variability in the b-value across different tectonic settings and regions raises a fundamental question about its physical origin and controlling mechanisms. Two broad schools of thought have been developed to explain the physical origin of the b-value. One relates the b-value to the geometry of fault systems, which often exhibit fractal patterns and power-law scaling [8–12]. In this view, the b-value is linked to the fractal dimension [13–15] or the power-law length exponent of fault populations [13, 16, 17]. The other attributes the b-value to mechanical factors, including stress conditions, frictional properties, and rupture dynamics [8, 18–25]. However, no consensus has been reached yet. Here, we derive analytical formulations showing that the b-value originates from the interplay between the geometric scaling of fault rupture areas and the mechanical scaling of fault slip with rupture size. We further perform direct numerical simulations of mainshock–aftershock sequences in three-dimensional (3D) fault systems, and analyze the resulting aftershock statistics, thereby providing quantitative validation of our analytical framework. We report a two-branch frequency–magnitude distribution and demonstrate that it emerges from the interplay between fault criticality and fracture energy dissipation. 1
+
+> arXiv:2603.06892v1 [physics.geo-ph] 6 Mar 2026
+
+# Results 
+
+## Analytical formulation 
+
+We analytically derive the b-value from the statistical properties of fault patterns and slips. Extensive field observations suggest that fault systems commonly obey a power-law length distribution [16, 17, 26, 27] with the probability density function written as: 
+
+p (l) ∝ l−α, (1) where l is the fault length and α is the power-law exponent. Furthermore, field data have revealed that the maximum fault slip magnitude δmax scales with the fault length according to a power-law relationship [28, 29]: 
+
+δmax ∝ lβ , (2) where β is the exponent that is related to the rupture mode and energy dissipation characteristics. We further relate these statistical properties to earthquake magnitudes. The seismic moment M0 is defined as [30]: 
+
+M0 = G¯δA r, (3) where G is the shear modulus of host rock, ¯δ is the slip magnitude averaged over the rupture area Ar,and it is expected [30, 31] that ¯δ ∝ δmax . Assuming faults have a circular shape and are fully ruptured, the rupture area equals to the fault area A such that Ar = A ∝ l2, which yields a moment–length scaling relation M0 ∝ l(β+2) . Applying the conservation of probability under the change of variables [32] from l to 
+
+M0, the probability density function of seismic moment M0 is derived as: 
+
+p(M0) ∝ M (1 −α)/(β+2) −10 . (4) Since the moment magnitude Mw is related to M0 through [33]: 
+
+Mw = 23 log 10 M0 − 6.07 , (5) we obtain: 
+
+p (Mw) ∝ 10 32 Mw (1 −α)/(β+2) . (6) The cumulative frequency–magnitude distribution N (Mw) = R +∞ 
+
+> Mw
+
+p(Mw) dM w, defined as the number of earthquakes with magnitude greater than or equal to Mw, takes the following form: 
+
+N (Mw) ∝ 10 32 Mw (1 −α)/(β+2) . (7) By further comparing with the GR law: 
+
+N (Mw) ∝ 10 −bM w , (8) we can relate the b-value to α and β as: 
+
+b = 32
+
+ α − 1
+
+β + 2 
+
+
+
+. (9) Extensive field observations of two-dimensional outcrop maps of fault traces [17, 34–36] reveal that their power-law length exponents typically range from 1.5 to 3.0, with a dominant peak around 2.0. Stereological analysis [17, 34, 37] further yields that the corresponding exponent α for 3D fault systems lies between 2.5 and 4.0, with a concentration around 3.0. In addition, field data suggest that the exponent β commonly falls between 0.5 and 2.0, with many faults displaying nearly linear slip–length scaling (i.e., β ≈ 1.0) [17, 28, 29, 38]. Substituting the typical values of α = 3 .0 and β = 1 .0 into Eq. (9) yields a b-value of 1.0, consistent with commonly reported b-values of around 1.0 in earthquake catalogues [39–42]. Our analytical solution highlights the fundamental roles of fault network geometry and fault slip behavior, encapsulated by the exponents α and β, respectively, in governing earthquake statistics. 2Numerical simulation 
+
+In natural systems, however, earthquakes develop within a dynamically evolving fault network, where reacti-vation is governed by multiple interacting processes, such as static and dynamic stress changes [43], triggering cascades [44, 45], and time-dependent frictional state [46, 47]. As a result, faults may not necessarily be fully ruptured, implying conditions that differ from those assumed in the above analytical derivation. To account for these effects and to assess the robustness of our analytical framework for more realistic conditions, we develop numerical models of three-dimensional fault systems undergoing mainshock–aftershock sequences. Although the GR law was originally established from empirical observations of regional seismicity, it has also been shown to hold for aftershock sequences [15, 40, 48], for which reported b-values [8, 40, 41, 49] typically span a broader range of 0.6–1.5. We simulate a mainshock resulting from the dynamic rupture along a 50 km-long strike-slip fault that extends vertically from the ground surface to a depth of 20 km (Fig. 1a). The primary fault is surrounded by a network of 3,000 randomly oriented secondary faults following a power-law size distribution (Figs. 1b and 1c), with the exponent α = 3 .0. The secondary faults are disk-shaped, with diameters ranging from 1 to 40 km. The entire fault system is embedded in a crustal rock formation characterized by a Young’s modulus 
+
+E of 70 GPa, a Poisson’s ratio ν of 0.25, and a density ρ of 2,700 kg/m 3. Both primary and secondary faults are governed by a linear slip-weakening friction law (Fig. 1d), in which shear failure occurs when the shear-to-normal stress ratio reaches the static friction coefficient ( μs = 0 .6), after which the friction coefficient linearly decreases to the dynamic value ( μd = 0 .4) over a critical slip distance dc. The primary fault is assigned with dc = 1 .5 m, while dc for secondary faults is systematically varied from 0.005 m to 5 m across simulations to assess its influence on aftershock behavior. The model is subject to a depth-dependent far-field stress loading (see Methods), which produces a maximum shear stress oriented parallel to the strike of the primary fault, thereby promoting left-lateral slip on the primary fault. The shear-to-normal stress ratio on the primary fault is 0.5. Rupture initiates from a nucleation zone centered on the hypocenter due to stress drop and propagates spontaneously along the fault at a sub-Rayleigh speed, reaching approximately 70% of the shear wave velocity and generating a left-lateral strike-slip mainshock with magnitude Mw = 7 .6. Secondary faults under coseismic stress changes could be either statically and/or dynamically triggered to rupture once failure conditions are met. Reactivated secondary faults rupture completely only if the shear stress concentration at the advancing rupture front remains above the local frictional strength until the front reaches the fault boundaries; otherwise, rupture arrests when the stress concentration falls below the strength, leaving only part of the fault ruptured. Coseismic stress perturbations in the crustal formation induced by the mainshock rupture on the vertical primary fault are quantified using Coulomb failure stress changes (∆CFS) [50], defined as ∆CFS= ∆ τ −
+
+μs ∆σn, where ∆ τ and ∆ σn represent changes in shear and normal stresses, respectively, resolved at each grid point in the numerical model based on the orientation of the primary fault plane (see Fig. 2a for a representative case with a critical slip distance dc = 0 .5 m for secondary faults). Positive ∆CFS values tend to promote aftershock occurrence, whereas negative values are commonly associated with stress shadows and reduced seismicity. In our simulations, the mainshock modifies the surrounding stress field through both static triggering (in which permanent stress redistribution creates localized stress concentrations and relaxations) and dynamic triggering (in which radiated seismic waves induce transient stress fluctuations) (Fig. 2a; Supplementary Video 1). These coseismic stress changes reactivate portions of the secondary fault network (Fig. 2b; Supplementary Video 2), giving rise to aftershocks. Fig. 2c illustrates the spatial pattern of aftershocks for the representative case with dc = 0 .5 m. In this scenario, the mainshock has triggered slip on 274 secondary faults, among which 58 undergo complete rupture with three events exceeding magnitude 
+
+Mw 6.0, while others are partially ruptured (Fig. 2c). The aftershocks show a strong depth-dependent distribution, with more than 60 % occurring above 5 km and over 75 % above 10 km. We project the hypocenters of aftershocks onto a horizontal plane that is superimposed on ∆CFS contours (Supplementary Fig. 1a; Supplementary Video 3). Stress-shadow regions (∆CFS < 0) in the direction perpendicular to the primary fault predominantly host small events associated with partially ruptured faults. A limited number of moderate-to-large aftershocks also occur within stress shadows but are closely aligned with the primary fault; these events are likely promoted by strong stress perturbations at intersections between the primary and secondary faults. In contrast, positive ∆CFS lobes near fault tips can trigger fully ruptured faults and generate moderate-to-large events. Notably, moderate-to-large events also occur outside the positive static ∆CFS lobes, where some faults can still rupture fully, due to the triggering by coseismic dynamic waves. Once secondary faults rupture, they further modify the surrounding stress field through dynamically radiated waves and statically changed stress fields (Fig. 2a; Supplementary Fig. 1a; 3Fig. 1 Numerical model setup and fault network characteristics. a Model geometry showing a vertical 50 km × 20 km primary fault surrounded by a network of circular, disk-shaped secondary faults. Probability density functions of b fault diameters and c fault areas, both following power-law scaling. d Fault slip governed by a linear slip-weakening friction law. 
+
+Supplementary Videos 1 and 3), which may trigger cascading failures or produce localized shadows. We also analyze the case with a smaller critical slip distance, dc = 0 .005 m (Supplementary Fig. 1b), where the mainshock triggers 339 aftershocks, including 113 on fully ruptured faults. Moderate-to-large events are preferentially concentrated within the positive ∆CFS lobes near fault tips, whereas stress-shadow regions remain comparatively quiescent. Dynamic stresses can further promote seismicity, as evidenced by more aftershocks occurring within regions of negative static ∆CFS. Notably, some faults that remain inactive or are only weakly activated in the case of dc = 0 .5 m become fully ruptured in this case of dc = 0 .005 m, with larger events generated. This comparative analysis illuminates the strong control of dc on earthquake triggering. A smaller dc yields a narrower breakdown zone and stronger stress concentration at the rupture front (Supplementary Fig. 2), thereby facilitating rupture propagation and promoting the development of fully ruptured faults. 
+
+## Two-branch earthquake frequency–magnitude distribution 
+
+The cumulative frequency–magnitude distributions of simulated aftershocks for varying dc are shown in Fig. 3a. These distributions generally conform to the GR law but reveal a distinct scaling break at moment magnitudes MT ≈ 4.0–4.5, thereby exhibiting a two-branch behavior. Here, MT denotes the transition mag-nitude over which aftershock magnitudes follow the higher-magnitude branch. The lower-magnitude branch has a gentler slope, denoted by the b′-value, whereas the higher-magnitude branch follows a steeper slope corresponding to the conventional b-value. The two branches are also characterized by distinct intercepts, denoted by a′ and a, respectively. We estimate the parameters b, b′, a, and a′ using the maximum likelihood estimation method, with results shown in Figs. 3b–e. We first analyze the trends in the numerical simulation results. As dc increases, the b-value exhibits a gradual increase at small dc followed by a more pronounced rise once a threshold of around 1 m is exceeded. This reflects a shift in rupture dynamics: beyond this threshold, rupture and slip 4Fig. 2 Coseismic stress changes and aftershock patterns triggered by the mainshock. a Coulomb failure stress changes (∆CFS) in the crustal formation induced by the mainshock (through static and dynamic triggering) and further modified locally by aftershock ruptures. b Slip distribution within the fault network. c Spatial distribution of aftershock moment magnitudes, where each marker represents a fault rupture event, with marker size proportional to moment magnitude Mw,marker center indicating the hypocenter, and marker color reflecting the rupture ratio η = Ar/A (where A is total fault area and Ar is rupture area). All panels show the case with critical slip distance dc = 0 .5 m. Aftershocks represent the cumulative events up to 28 s after mainshock initiation, selected as a representative late-time snapshot when the simulated aftershock sequence has converged. 
+
+on all faults in the system become increasingly constrained due to insufficient driving energy, restricting their potential to propagate and grow (see Supplementary Note 1). A similar behavior is observed for the corresponding a-value, which initially shows relatively small fluctuations but grows substantially beyond such a threshold. For the lower-magnitude branch, the b′-value increases slightly before plateauing, whereas the a′-value continuously declines with increasing dc, indicating a progressive reduction in the total number of aftershocks. The numerical results further show that rupture area scales with cumulative frequency and that slip scales with rupture area following two-branch power-law relations, from which we extract the exponents α′ and β′
+
+for the lower-magnitude branch, and α and β for the higher-magnitude branch (Supplementary Note 2 and 5Fig. 3 Two-branch earthquake frequency–magnitude distributions for different values of critical slip distance                              
+
+> dc. a Cumulative distributions of moment magnitude Mwfor different dc. Curves and data points are color-coded by the value of dc, as indicated by the accompanying color map. bb-value and ca-value of the higher-magnitude branch versus dc.
+> db′-value and ea′-value of the lower-magnitude branch versus dc. In b–e , numerical estimates are compared with analytical predictions obtained from the measured scaling exponents: band aderived from αand β, and b′and a′derived from α′and β′.
+
+Supplementary Figs. 3–5). Although the fault network geometry is fixed (including the prescribed power-law length exponent of 3.0), the rupture statistics are not. Varying dc alters rupture arrest and propagation, thereby modifying the emergent distributions of rupture area and slip, and yielding distinct values of α′,
+
+β′, α, and β. Substituting these measured exponents into our analytical formulation (Eq. (9) and Eq. (S4)) yields a′, b′, a, and b values that closely match those obtained directly from the frequency–magnitude fits (Figs. 3b–e). The robustness of our results is confirmed by additional simulations in fault networks with different power-law length exponents (Supplementary Figs. 6 and 7). Collectively, these results indicate that the b-value is controlled by the geometrical scaling of fault rupture area and the mechanical scaling of slip with rupture area. The two-branch scaling observed in the cumulative frequency–magnitude distribution can be mecha-nistically explained by the interplay of two fundamental controlling parameters (Fig. 4a). The first is the 
+
+S -value [51–53], defined as S = (¯ τs − ¯τ0)/(¯ τ0 − ¯τf ), where ¯ τs, ¯ τ0, and ¯ τf respectively denote the static, initial, and final shear stresses averaged over the rupture area. The S -value quantifies fault criticality, character-izing how close the initial shear stress ¯ τ0 is with respect to the static shear strength ¯ τs, normalized by the static stress drop ¯ τ0 − ¯τf . The second parameter is the energy ratio Gc/∆W0, which quantifies the fraction of the available energy ∆ W0 dissipated as fracture energy Gc during rupture propagation. The available energy ∆ W0 represents the portion of the total released elastic strain energy WF that is not dissipated as frictional heat EH and is therefore available to drive rupture growth [30, 47, 54, 55]. It can be expressed as ∆W0 = WF − EH = 1 /2(¯ τ0 + ¯ τf − 2¯ τd) ¯δA r (Supplementary Fig. 8), where ¯ τd is the dynamic shear stress averaged over the rupture area. The fracture energy itself is given by Gc = 1 /2(¯ τs − ¯τd) dc Ar. Notably, the 
+
+S -value and the energy ratio Gc/∆W0 are related. Under an assumption of ¯ τd = ¯ τf , one can obtain: 
+
+Gc
+
+∆W0
+
+= ( S + 1) dc
+
+¯δ , (10) indicating that more critically stressed faults (lower S -values) dissipate a smaller fraction of the available energy as fracture energy, thereby favoring more extensive rupture propagation. Substituting the equation 
+
+M0 = G¯δA r along with the relation between ¯δ and Ar (see Eq. (S3) in Supplementary Note 2) into Eq. (10) yields: 
+
+Gc
+
+∆W0
+
+= ( S + 1) dc
+
+GM0K2/β 
+
+> 2
+
+!β/ (β+2) 
+
+, (11) where K2 is the scaling coefficient in the relation between ¯δ and Ar (see Supplementary Note 2). 6Fig. 4 Transitions in rupture regimes in the fault network. a Energy ratio Gc/∆W0, which quantifies the proportion of available energy dissipated as fracture energy, plotted against the S -value that characterizes fault stress criticality. Symbols show simulation results for critical slip distance dc = 0 .005 m. The dashed curve marks the regime boundary given by the stress–energy formulation, Eq. (11). Here, we identify the transition magnitude MT from the cumulative frequency–magnitude distribution of this simulation case ( MT = 4 .5), convert it to the corresponding seismic moment ( M0 = 7 .16 × 10 15 N·m), and substitute this M0 into Eq. (11) to obtain the delineation. b Relationship between fault area A and moment magnitude    
+
+> Mwfor dc= 0 .005 m, revealing a transition from fault area-independent behavior in the lower-magnitude branch to a fault area-dependent behavior in the higher-magnitude branch.
+
+We then construct a phase diagram using the S -value and energy ratio Gc/∆W0 (Fig. 4a), where two distinct rupture regimes are identified. The regime boundary (dashed curve) corresponds to the transition magnitude MT that marks the break in the frequency–magnitude scaling. For the higher-magnitude branch, faults are more critically stressed (low S -values) and require less energy to initiate and sustain rupture propagation (low Gc/∆W0). Under such conditions, rupture propagates spontaneously and self-sustains, enabling large, cascading events. In this regime, aftershock magnitude Mw scales systematically with fault area A, reflecting strong geometrical control exerted by the fault network (Fig. 4b). Conversely, faults in the lower-magnitude branch are generally less critically stressed (high S -value), and a substantial portion of the available energy is consumed in overcoming fracture energy barriers to propagate rupture (high Gc/∆W0). In many cases, the energy budget is insufficient to sustain rupture growth, leading to premature arrest and limited rupture extent. As a consequence, ruptures in this regime are not geometrically constrained, and aftershock magnitudes show little dependence on fault area (Fig. 4b). This transition between rupture regimes gives rise to the break in the frequency–magnitude distribution, marking a crossover between two distinct scaling branches. 
+
+# Discussion 
+
+Prior studies [11, 13, 15, 56] have proposed a geometrical interpretation of the b-value, linking it to the fractal dimension D through the relation D = 3 b/c , where c is the slope of log 10 M0 versus Mw and is typically close to 1.5.[57] This relationship can be recovered as a special case of our more general analytical expression, 
+
+b = 32
+
+ α−1
+
+> β+2
+
+
+
+, by assuming self-similar fault systems with D = α − 1,[11, 17, 27, 58–60] and a linear slip behavior with β = 1 .0.[17, 28, 38] Notably, seismological observations indicate c ≈ 1.0 for smaller events [15, 56], implying β ≈ 2.5, consistent with the range of 2.0–2.7 obtained from our simulations for the lower-magnitude branch (see Supplementary Fig. 5b). Hence, our analytical model provides a unified formulation for the b-value, incorporating both geometrical and mechanical effects. This formulation naturally accounts for datasets that depart from a strictly positive D–b correlation, including reported negative correlations [14, 61]. According to our framework, a relatively small fractal dimension D together with a sufficiently small β can still produce a large b-value, explaining why high b-values were observed in fault networks with small D.[14, 61] In parallel, other studies have derived the b-value from mechanical principles using Burridge-Knopoff-type models with velocity-weakening friction [24, 25, 62–65]. In such spring-block systems, stick-slip 7instabilities can self-organize into a critical state, producing scale-invariant event-size distributions consis-tent with the GR law [24, 25]. However, when frictional weakening is pronounced, these systems rupture more coherently, giving rise to quasi-periodic large events rather than a power-law distribution [25, 64, 65]. This limitation likely arises from the lack of fractal heterogeneity in idealized block-spring models, which otherwise suppress coherent rupture. By integrating geometric power-law scaling with frictional instabil-ity, we show that the GR-like behavior persists across fault systems with both strong and weak frictional instability. Taken together, our results indicate that the b-value reflects the combined influence of fault geometry and rupture mechanics, rather than either control alone. We further suggest that the two-branch frequency– magnitude scaling behavior may arise from the interplay between fault criticality and rupture dynamics. We also note that the transition magnitude MT, which delineates the two branches, scales with a characteristic fault area Amin (Supplementary Note 3; Supplementary Figs. 9 and 10). This area may represent the lower bound associated with the smallest faults within the finite reactivated population that can be triggered by the mainshock [44, 45]. 
+
+# Methods 
+
+## Numerical modeling framework 
+
+Dynamic rupture simulations are performed using the 3D distinct element code (3DEC) [66] that explic-itly resolves fault interactions, rupture propagation, and stress transfer in faulted rock masses, and has been extensively validated and applied to modeling seismic and coseismic processes [67, 68]. The model domain (Fig. 1a) is discretized into deformable polyhedral blocks, each further subdivided into tetrahedral constant-strain finite-difference elements to resolve the internal stress–strain evolution. Faults are explicitly represented as assemblies of contact interfaces between adjacent blocks, which are discretized into multiple sub-contacts to resolve both normal and shear deformation along fault surfaces; these sub-contacts coin-cide with the faces of the finite-difference elements. At the block scale, relative motion is resolved using the discrete element method, with block translation and rotation governed by Newton’s second law. The translational motion of a block centroid is described by: 
+
+m¨x = F − mζ ˙x, (12) where x is the centroid displacement vector, m is the block mass, ζ is a mass-proportional damping coef-ficient, and F denotes the resultant force acting on the block, including contact interactions, externally applied loads, and gravitational body forces. Rotational motion follows: 
+
+I ˙ωωω = M − Iζω ωω, (13) where ωωω is the angular velocity vector, M is the resultant torque, and I is the effective moment of inertia. Within each block, internal deformation is resolved using the finite difference method [66, 69]. The motion of gridpoints (vertices of tetrahedral elements) obeys: 
+
+m¨u =
+
+Z
+
+> ∂Ω
+
+σσσ · n ds + F, (14) where u is the gridpoint displacement vector, σσσ is the Cauchy stress tensor, n is the outward unit normal to the boundary ∂Ω of the control volume Ω, and the surface integral represents the resultant internal force arising from stress tractions within adjacent tetrahedral elements. The force term F includes external loads, sub-contact forces acting on boundary gridpoints, and gravitational contributions. Strain increments within each element are computed from gridpoint velocity gradients as: ∆εεε = ∆t
+
+2
+
+h
+
+∇ ˙u + ( ∇ ˙u)Ti
+
+, (15) where ∆ t denotes the time step in the numerical simulation. Stress increments are evaluated using a linear isotropic elastic constitutive relation: ∆σσσ = λ∆εv I + 2 G∆εεε, (16) 8where λ and G are respectively the first and second Lam´ e constants, εv = tr( εεε) is the volumetric strain, and 
+
+I is the second-order identity tensor. Normal displacement along fault interfaces (Supplementary Fig. 11a) is described by a linear stress–displacement relation with a tensile cutoff: 
+
+σn =
+
+(
+
+0, un < 0,knun, un ≥ 0, (17) where σn is the normal stress, kn is the normal stiffness, and un is the normal displacement (positive for closure). Shear displacement (Supplementary Fig. 11b) follows a Coulomb-type relation: 
+
+τ =
+
+
+
+0, un < 0,ksus, un ≥ 0, u s < u p,μσ n, un ≥ 0, u s ≥ up,
+
+(18) where τ is the shear stress, ks is the shear stiffness, us is the shear displacement, and up is the peak elastic displacement. The friction coefficient μ follows a linear slip-weakening law: 
+
+μ(δ) = 
+
+(
+
+μs − (μs − μd) δ/d c, δ < d c,μd, δ ≥ dc, (19) where δ = us − up is the slip magnitude, μs and μd are the static and dynamic friction coefficients, respec-tively, and dc is the critical slip distance. An explicit time-marching scheme [66] is adopted to ensure consistent coupling between contact forces and internal stresses computed using the discrete element and finite difference methods, respectively. The model employs mesh sizes ranging from 200 m (minimum) to 500 m (maximum), balancing numerical accuracy and computational efficiency. Apart from the free upper surface representing the ground surface, non-reflecting boundary conditions are applied to all sides of the model to absorb outgoing seismic waves and minimize artificial reflections [67], approximating an unbounded medium. 
+
+## Simulation workflow and dynamic rupture calculation 
+
+The simulations proceed in two stages: (i) establishing an initial stress equilibrium and (ii) modeling the mainshock rupture and subsequent aftershock triggering. In the first stage, a far-field tectonic stress state is imposed at model boundaries and a static calculation is carried out to attain mechanical equilibrium. A left-lateral strike-slip event along the primary fault is simulated by imposing the following symmetric stress tensor:  σxx τxy τxz 
+
+σyy τyz 
+
+sym . σzz 
+
+ =
+
+ ρgz 0.5ρgz 0
+
+ρgz 0sym . ρgz 
+
+ , (20) where σii (i = x, y, z ) are the normal stresses, τij (i̸ = j) are the shear stresses, ρ is the rock density, g
+
+is the gravitational acceleration, and z is the depth below the ground surface. Under the far-field stress loading, faults with different orientations are subjected to heterogeneous shear-to-normal stress ratios, and thus exhibit variable stress criticality ( S -values). Interactions among neighboring faults further enhance this variability within the fault system. In the second stage, dynamic rupture nucleation and propagation are governed by the linear slip-weakening friction law (Eq. (19)). Rupture is initiated by imposing a localized 0.5 MPa stress drop at a predefined hypocenter within a 3 km-radius critically-stressed nucleation zone [70] (Supplementary Fig. 12), where the shear stress is set equal to the shear strength by assigning a static friction coefficient of 0.5, matching the primary fault’s initial shear-to-normal stress ratio. The rupture then propagates spontaneously along the primary fault plane and arrests at the fault boundaries. To avoid spurious rupture arrest near the primary fault tips, both μs and μd are increased linearly to 1.0 within the outermost 5 km of the primary fault, reducing stress concentrations and ensuring a physically consistent rupture termination associated with the mainshock. Secondary faults are reactivated when their local shear-to-normal stress ratio reaches the failure criterion ( τ /σ n = μs), either directly from mainshock-induced stress changes or indirectly through stress transfer from neighboring faults. These secondary fault ruptures propagate spontaneously under slip-weakening friction, and arrest either at fault boundaries (corresponding 9to the fully ruptured scenario) or when the driving force is insufficient to overcome the resisting force (corresponding to the partially ruptured scenario). 
+
+# References 
+
+[1] Gutenberg, B. & Richter, C. F. Frequency of earthquakes in California. Bull. Seismol. Soc. Am. 34 ,185–188 (1944). [2] de Arcangelis, L., Godano, C., Grasso, J. R. & Lippiello, E. Statistical physics approach to earthquake occurrence and forecasting. Phys. Rep. 628 , 1–91 (2016). [3] Schorlemmer, D., Wiemer, S. & Wyss, M. Variations in earthquake-size distribution across different stress regimes. Nature 437 , 539–542 (2005). [4] Scholz, C. H. On the stress dependence of the earthquake b value. Geophys. Res. Lett. 42 , 1399–1402 (2015). [5] Petruccelli, A. et al. The influence of faulting style on the size-distribution of global earthquakes. Earth Planet. Sci. Lett. 527 , 115791 (2019). [6] Herrmann, M., Piegari, E. & Marzocchi, W. Revealing the spatiotemporal complexity of the magnitude distribution and b-value during an earthquake sequence. Nat. Commun. 13 , 5087 (2022). [7] Frohlich, C. & Davis, S. D. Teleseismic b values; Or, much ado about 1.0. J. Geophys. Res. Solid Earth 
+
+98 , 631–644 (1993). [8] von Seggern, D. A random stress model for seismicity statistics and earthquake prediction. Geophys. Res. Lett. 7, 637–640 (1980). [9] Andrews, D. A stochastic fault model: 1. Static case. J. Geophys. Res. Solid Earth 85 , 3867–3877 (1980). [10] Sornette, D., Vanneste, C. & Sornette, A. Dispersion of b-values in Gutenberg-Richter law as a consequence of a proposed fractal nature of continental faulting. Geophys. Res. Lett. 18 , 897–900 (1991). [11] King, G. The accommodation of large strains in the upper lithosphere of the earth and other solids by self-similar fault systems: the geometrical origin of b-value. Pure Appl. Geophys. 121 , 761–815 (1983). [12] Scholz, C. H. in Earthquakes and faulting: Self-organized critical phenomena with a characteristic dimension (eds Riste, T. & Sherrington, D.) Spontaneous Formation of Space Time Structure and Criticality 41–56 (Kluwer Acad., Norwell, Mass., 1991). [13] Aki, K. in A probabilistic synthesis of precursory phenomena (eds Simpson, D. W. & Richards, P. G.) Earthquake Prediction: An International Review , Vol. 4 of Maurice Ewing Ser. 566–574 (AGU, Washington, D. C., 1981). [14] Hirata, T. A correlation between the b value and the fractal dimension of earthquakes. J. Geophys. Res. Solid Earth 94 , 7507–7514 (1989). [15] Chen, C. C., Wang, W. C., Chang, Y. F., Wu, Y. M. & Lee, Y. H. A correlation between the b-value and the fractal dimension from the aftershock sequence of the 1999 Chi-Chi, Taiwan, earthquake. Geophys. J. Int. 167 , 1215–1219 (2006). [16] Turcotte, D. L. Fractals and Chaos in Geology and Geophysics 2nd edn (Cambridge Univ. Press, Cambridge, 1997). [17] Bonnet, E. et al. Scaling of fracture systems in geological media. Rev. Geophys. 39 , 347–383 (2001). 10 [18] Hanks, T. C. b values and ω−γ seismic source models: Implications for tectonic stress variations along active crustal fault zones and the estimation of high-frequency strong ground motion. J. Geophys. Res. Solid Earth 84 , 2235–2242 (1979). [19] Scholz, C. The frequency-magnitude relation of microfracturing in rock and its relation to earthquakes. 
+
+Bull. Seismol. Soc. Am. 58 , 399–415 (1968). [20] McEvilly, T. & Casaday, K. The earthquake sequence of September, 1965 near Antioch, California. 
+
+Bull. Seismol. Soc. Am. 57 , 113–124 (1967). [21] Main, I. G., Meredith, P. G. & Jones, C. A reinterpretation of the precursory seismic b-value anomaly from fracture mechanics. Geophys. J. Int. 96 , 131–138 (1989). [22] Goebel, T. H., Kwiatek, G., Becker, T. W., Brodsky, E. E. & Dresen, G. What allows seismic events to grow big?: Insights from b-value and fault roughness analysis in laboratory stick-slip experiments. 
+
+Geology 45 , 815–818 (2017). [23] Nanjo, K. & Yoshida, A. A b map implying the first eastern rupture of the nankai trough earthquakes. 
+
+Nat. Commun. 9, 1117 (2018). [24] Bak, P. & Tang, C. Earthquakes as a self-organized critical phenomenon. J. Geophys. Res. Solid Earth 
+
+94 , 15635–15637 (1989). [25] Carlson, J. M. & Langer, J. Properties of earthquakes generated by fault dynamics. Phys. Rev. Lett. 
+
+62 , 2632 (1989). [26] Lei, Q., Latham, J., Tsang, C., Xiang, J. & Lang, P. A new approach to upscaling fracture network models while preserving geostatistical and geomechanical characteristics. J. Geophys. Res. Solid Earth 
+
+120 , 4784–4807 (2015). [27] Lei, Q. & Wang, X. Tectonic interpretation of the connectivity of a multiscale fracture system in limestone. Geophys. Res. Lett. 43 , 1551–1558 (2016). [28] Schultz, R. A., Soliva, R., Fossen, H., Okubo, C. H. & Reeves, D. M. Dependence of displacement– length scaling relations for fractures and deformation bands on the volumetric changes across them. J. Struct. Geol. 30 , 1405–1411 (2008). [29] Walsh, J. J. & Watterson, J. Analysis of the relationship between displacements and dimensions of faults. J. Struct. Geol. 10 , 239–247 (1988). [30] Scholz, C. H. The Mechanics of Earthquakes and Faulting (Cambridge Univ. Press, 2019). [31] Wesnousky, S. G. Displacement and geometrical characteristics of earthquake surface ruptures: Issues and implications for seismic-hazard analysis and the process of earthquake rupture. Bull. Seismol. Soc. Am. 98 , 1609–1632 (2008). [32] Sornette, D. Critical Phenomena in Natural Sciences: Chaos, Fractals, Selforganization and Disorder: Concepts and Tools (Springer, 2006). [33] Hanks, T. C. & Kanamori, H. A moment magnitude scale. J. Geophys. Res. Solid Earth 84 , 2348–2350 (1979). [34] Berkowitz, B. & Adler, P. M. Stereological analysis of fracture network structure in geological formations. J. Geophys. Res. Solid Earth 103 , 15339–15360 (1998). [35] Piggott, A. R. Fractal relations for the diameter and trace length of disc-shaped fractures. J. Geophys. Res. Solid Earth 102 , 18121–18125 (1997). [36] Bour, O. & Davy, P. On the connectivity of three-dimensional fault networks. Water Resour. Res. 34 ,2611–2622 (1998). 11 [37] Darcel, C., Bour, O. & Davy, P. Stereological analysis of fractal fracture networks. J. Geophys. Res. Solid Earth 108 (2003). [38] Cowie, P. A. & Scholz, C. H. Physical explanation for the displacement-length relationship of faults using a post-yield fracture mechanics model. J. Struct. Geol. 14 , 1133–1148 (1992). [39] Taroni, M. & Akinci, A. Good practices in PSHA: declustering, b-value estimation, foreshocks and aftershocks inclusion; a case study in Italy. Geophys. J. Int. 224 , 1174–1187 (2021). [40] Shcherbakov, R., Goda, K., Ivanian, A. & Atkinson, G. M. Aftershock statistics of major subduction earthquakes. Bull. Seismol. Soc. Am. 103 , 3222–3234 (2013). [41] Knopoff, L., Kagan, Y. Y. & Knopoff, R. b Values for foreshocks and aftershocks in real and simulated earthquake sequences. Bull. Seismol. Soc. Am. 72 , 1663–1676 (1982). [42] Guo, Z. & Ogata, Y. Statistical relations between the parameters of aftershocks in time, space, and magnitude. J. Geophys. Res. Solid Earth 102 , 2857–2873 (1997). [43] Freed, A. M. Earthquake triggering by static, dynamic, and postseismic stress transfer. Annu. Rev. Earth Planet. Sci. 33 , 335–367 (2005). [44] Palgunadi, K. H., Gabriel, A. A., Garagash, D. I., Ulrich, T. & Mai, P. M. Rupture dynamics of cas-cading earthquakes in a multiscale fracture network. J. Geophys. Res. Solid Earth 129 , e2023JB027578 (2024). [45] Gabriel, A. A., Garagash, D. I., Palgunadi, K. H. & Mai, P. M. Fault size–dependent fracture energy explains multiscale seismicity and cascading earthquakes. Science 385 , eadj9587 (2024). [46] Ikari, M. J., Marone, C., Saffer, D. M. & Kopf, A. J. Slip weakening as a mechanism for slow earthquakes. 
+
+Nat. Geosci. 6, 468–472 (2013). [47] Cocco, M. et al. Fracture energy and breakdown work during earthquakes. Annu. Rev. Earth Planet. Sci. 51 , 217–252 (2023). [48] Gulia, L. & Wiemer, S. Real-time discrimination of earthquake foreshocks and aftershocks. Nature 
+
+574 , 193–199 (2019). [49] Yamashita, T. Regularity and complexity of aftershock occurrence due to mechanical interactions between fault slip and fluid flow. Geophys. J. Int. 152 , 20–33 (2003). [50] Harris, R. A. Introduction to special section: Stress triggers, stress shadows, and implications for seismic hazard. J. Geophys. Res. Solid Earth 103 , 24347–24358 (1998). [51] Andrews, D. Rupture velocity of plane strain shear cracks. J. Geophys. Res. 81 , 5679–5687 (1976). [52] Das, S. & Aki, K. A numerical study of two-dimensional spontaneous rupture propagation. Geophys. J. Int. 50 , 643–668 (1977). [53] Liu, C., Bizzarri, A. & Das, S. Progression of spontaneous in-plane shear faults from sub-rayleigh to compressional wave rupture speeds. J. Geophys. Res. Solid Earth 119 , 8331–8345 (2014). [54] Kaneko, Y., Fukuyama, E. & Hamling, I. J. Slip-weakening distance and energy budget inferred from near-fault ground deformation during the 2016 Mw7.8 Kaik¯ oura earthquake. Geophys. Res. Lett. 44 ,4765–4773 (2017). [55] Kammer, D. S. et al. Earthquake energy dissipation in a fracture mechanics framework. Nat. Commun. 
+
+15 , 4736 (2024). [56] Legrand, D. Fractal dimensions of small, intermediate, and large earthquakes. Bull. Seismol. Soc. Am. 
+
+92 , 3318–3320 (2002). 12 [57] Kanamori, H. Quantification of earthquakes. Nature 271 , 411–414 (1978). [58] Turcotte, D. L. A fractal model for crustal deformation. Tectonophysics 132 , 261–269 (1986). [59] Bour, O., Davy, P., Darcel, C. & Odling, N. A statistical scaling model for fracture network geometry, with validation on a multiscale mapping of a joint network (Hornelen Basin, Norway). J. Geophys. Res. Solid Earth 107 , ETG–4 (2002). [60] Davy, P. et al. A likely universal model of fracture scaling and its consequence for crustal hydromechanics. J. Geophys. Res. Solid Earth 115 (2010). [61] Henderson, J., Main, I., Meredith, P. & Sammonds, P. The evolution of seismicity at Parkfield: observation, experiment and a fracture-mechanical interpretation. J. Struct. Geol. 14 , 905–913 (1992). [62] Burridge, R. & Knopoff, L. Model and theoretical seismicity. Bull. Seismol. Soc. Am. 57 , 341–371 (1967). [63] Carlson, J. M., Langer, J. S., Shaw, B. E. & Tang, C. Intrinsic properties of a Burridge-Knopoff model of an earthquake fault. Phys. Rev. A 44 , 884 (1991). [64] Mori, T. & Kawamura, H. Simulation study of the one-dimensional Burridge-Knopoff model of earthquakes. J. Geophys. Res. Solid Earth 111 (2006). [65] Kawamura, H., Ueda, Y., Kakui, S., Morimoto, S. & Yamamoto, T. Statistical properties of the one-dimensional Burridge-Knopoff model of earthquakes obeying the rate-and state-dependent friction law. 
+
+Phys. Rev. E 95 , 042122 (2017). [66] 3DEC. 3-dimensional distinct element code version 7.00 . (ICG, 2020). [67] F¨ alth, B. et al. Simulating earthquake rupture and off-fault fracture response: Application to the safety assessment of the Swedish nuclear waste repository. Bull. Seismol. Soc. Am. 105 , 134–151 (2015). [68] Cappa, F., Guglielmi, Y., Nussbaum, C., De Barros, L. & Birkholzer, J. Fluid migration in low-permeability faults driven by decoupling of fault slip and opening. Nat. Geosci. 15 , 747–751 (2022). [69] Cundall, P. A. Formulation of a three-dimensional distinct element model—part I. A scheme to detect and represent contacts in a system composed of many polyhedral blocks. Int. J. Rock Mech. Min. Sci. Geomech. Abstr. 25 , 107–116 (1988). [70] Ohnaka, M. A physical scaling relation between the size of an earthquake and its nucleation zone size. 
+
+Pure Appl. Geophys. 157 , 2259–2282 (2000). 
+
+# Acknowledgements 
+
+Z.Z. acknowledges support from the National Natural Science Foundation of China (grant no. 42377146). Q.L. is grateful for support from the European Research Council (ERC) under the European Union’s Horizon Europe programme (ERC Consolidator Grant, grant no. 101232311) for the project “Unified framework for modelling progressive to catastrophic failure in fractured media (FORECAST)”. 
+
+# Author contributions 
+
+W.P. contributed to conceptualization, methodology, software, formal analysis, investigation, and drafted the manuscript. Z.Z., B.L., and Q.L. contributed to conceptualization, investigation, resources, supervision, project administration, and critically revised the manuscript. Q.L. contributed to methodology and co-wrote the original draft. Z.Z. and Q.L. acquired funding. 13 Competing interests 
+
+The authors declare no competing interests. 14

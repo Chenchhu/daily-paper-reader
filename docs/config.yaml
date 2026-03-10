@@ -27,7 +27,7 @@ subscriptions:
   keyword_recall_mode: or
   intent_profiles:
     - tag: PF ROC
-      description: 相场在蠕变中的应用
+      description: COMSOL Multiphysics 仿真软件相关技术文档与教程
       enabled: true
       keywords:
         - keyword: phase field method
@@ -93,4 +93,4 @@ subscriptions:
           enabled: true
           source: manual
           note: ''
-      updated_at: '2026-03-09T05:16:32.631Z'
+      updated_at: '2026-03-10T01:06:09.210Z'

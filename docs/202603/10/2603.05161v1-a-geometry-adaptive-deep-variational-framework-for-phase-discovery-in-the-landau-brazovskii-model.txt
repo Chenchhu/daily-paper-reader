@@ -1,0 +1,677 @@
+Title: A Geometry-Adaptive Deep Variational Framework for Phase Discovery in the Landau-Brazovskii Model
+
+URL Source: https://arxiv.org/pdf/2603.05161v1
+
+Published Time: Fri, 06 Mar 2026 02:01:17 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+# A Geometry-Adaptive Deep Variational Framework for Phase Discovery in the Landau–Brazovskii Model 
+
+Yuchen Xie a, Jianyuan Yin b, ∗, Lei Zhang a,c,1, ∗
+
+> aSchool of Mathematical Sciences, Peking University, Beijing, 100871, China
+> bSchool of Mathematical Sciences, Laboratory of Mathematics and Complex Systems, Ministry of Education, Beijing Normal University, Beijing, 100875, China
+> cSchool of Mathematical Sciences, Beijing International Center for Mathematical Research, Center for Quantitative Biology, Center for Machine Learning Research, Peking University, Beijing, 100871, China
+
+Abstract 
+
+The discovery of ordered structures in pattern-forming systems, such as the Landau–Brazovskii (LB) model, is often limited by the sensitivity of numerical solvers to the prescribed computational domain size. Incompatible domains in-duce artificial stress, frequently trapping the system in high-energy metastable configurations. To resolve this issue, we propose a Geometry-Adaptive Deep Variational Framework (GeoDVF) that jointly optimizes the infinite-dimensional order parameter, which is parameterized by a neural network, and the finite-dimensional geometric parameters of the computational domain. By explicitly treating the domain size as trainable variables within the variational formulation, GeoDVF naturally eliminates artificial stress during training. To escape the attraction basin of the disordered phase under small initializations, we introduce a warmup penalty mechanism, which e ff ectively destabilizes the disordered phase, enabling the spontaneous nucleation of complex three-dimensional ordered phases from random initializa-tions. Furthermore, we design a guided initialization protocol to resolve topologically intricate phases associated with narrow basins of attraction. Extensive numerical experiments show that GeoDVF provides a robust and geometry-consistent variational solver capable of identifying both stable and metastable states without prior knowledge. 
+
+Keywords: Landau–Brazovskii model, Geometry-adaptive, Deep variational framework, Warmup penalty mechanism, Domain size optimization 
+
+1. Introduction 
+
+The Landau–Brazovskii (LB) model is a prototypical continuum framework for describing phase transitions driven by short-wavelength instabilities in systems that undergo ordering at a finite wavenumber. Originally proposed by Brazovskii to describe the transition from an isotropic liquid to a nonuniform state [1], this model has become a standard theoretical framework for investigating ordered patterns in diverse physical systems. Its applications span multiple systems, ranging from microphase separation in block copolymers [2, 3] and liquid-crystal ordering [4, 5] to biological pattern formation such as viral capsids, and nuclear pasta structures in neutron stars [6, 7]. The LB framework is closely related to the Swift–Hohenberg equation [8] and to Landau theory near a Lifshitz point [9]. It provides a standard variational setting for analyzing periodic minima, energy-scaling laws, and pattern-selection mechanisms [10]. The inclusion of a cubic interaction term in the free-energy functional breaks the inversion symmetry of the order parameter, thereby enabling the model to capture asymmetric ordered phases and describe first-order phase transitions [1, 11, 12]. By characterizing the competition between local nonlinear interactions and long-range ordering e ff ects, the LB framework predicts a rich variety of three-dimensional (3D) periodic structures.      
+
+> ∗Corresponding author
+> Email addresses: jyyin@bnu.edu.cn (Jianyuan Yin), zhangl@math.pku.edu.cn (Lei Zhang)
+> 1This work was supported by the National Natural Science Foundation of China (No. 12225102, T2321001, 12288101) and National Key Research and Development Program of China (No. 2024YFA0919500).
+> arXiv:2603.05161v1 [cond-mat.mtrl-sci] 5 Mar 2026
+
+Beyond classical lamellar (LAM), hexagonally-packed cylinder (HEX), and body-centered cubic (BCC) phases [13], the model also admits topologically complex phases such as face-centered cubic (FCC), double gyroid (DG), and Frank–Kasper phases including A15 and σ [14, 15]. The numerous local minima of this energy landscape pose significant challenges for comprehensively exploring the configuration space and resolving these intricate spatial structures, thereby making it a rigorous testbed for advanced numerical methods. Because of the strong nonlinearity of the LB energy functional and the presence of multiple local minima, the development of e ffi cient numerical algorithms for computing stationary states remains a central challenge. Existing numerical approaches can be broadly classified into three categories. The first category considers directly solving the Euler–Lagrange (E-L) equations associated with the free-energy functional. The second category comprises gradient flow approaches that describe the dynamical relaxation of ordered structures toward equilibrium states. To enhance numerical stability and allow for large time steps, various temporal discretization strategies have been developed, including semi-implicit methods [16], exponential time di ff erencing schemes [17], and operator-splitting techniques [18]. To achieve nonlinear energy stability while retaining linear solvability at each time step, numerical techniques such as convex splitting schemes [19, 20] and the scalar auxiliary variable (SAV) method [21] have been systemati-cally developed and widely applied in phase-field models. Complementary to temporal discretization, e ffi cient spatial schemes are equally essential. Spectral and pseudospectral methods [22] are particularly e ff ective for periodic systems such as diblock copolymers, while finite di ff erence [23] and finite element methods [24] are also widely employed. In contrast to dynamical evolution approaches, the third category formulates the problem as a direct optimization task, seeking stationary states through minimization of the discretized free-energy functional. Recent studies indicate that optimization-based algorithms can exhibit superior computational e ffi ciency compared with traditional gradient flow methods when computing stationary states in phase-field models [25]. Representative examples include the Broyden–Fletcher–Goldfarb–Shanno (BFGS) algorithm applied to spherical harmonics discretizations [26], as well as the adaptive accelerated Bregman proximal gradient (AA-BPG) method [25, 27], which accelerates convergence in phase-field crystal models through optimization-based acceleration strategies. The numerous local minima in this en-ergy landscape pose significant challenges for systematically exploring the configuration space and resolving intricate spatial structures, thereby rendering the LB model a stringent testbed for advanced numerical optimization methods. Despite the e ffi ciency of these algorithms, a fundamental physical challenge comes from the spatial discretiza-tion. To simulate infinite-space LB theory, traditional numerical methods mainly rely on the Crystalline Approximant Method (CAM) [3, 28], which restricts the system to a finite computational domain Ω with periodic boundary con-ditions, treating the structure as a periodic crystal. However, this creates a critical constraint: the ordered phases in the LB model have a natural characteristic length scale. If the size and shape of the computational domain do not strictly match this natural periodicity, the system is forced into a stressed state. Consequently, to remove this artificial stress and find the true equilibrium, the domain geometry cannot be treated as a fixed background; instead, it must be optimized together with the order parameter. To solve this coupled problem, traditional strategies typically use an alternating iterative scheme: optimizing the density field while fixing the domain Ω, and then adjusting Ω based on the order parameter [3, 29]. This separated process makes the solver highly sensitive to the initial configuration. Without precise prior knowledge to construct a good initial guess, these solvers may easily get trapped in metastable states, hindering the discovery of complex or unknown ordered structures. Physics-informed deep learning techniques, including Physics-Informed Neural Networks (PINNs) [30] and the Deep Ritz Method (DRM) [31], have recently emerged as e ff ective frameworks for approximating solutions to par-tial di ff erential equations and variational problems. However, classical PDE-based approaches like PINNs are often limited when discovering ordered structures in pattern-forming systems, because PINNs minimize the residual of the E-L equation, which only guarantees convergence to a stationary point. Since local minima, local maxima, and saddle points all satisfy the E-L equation, a PINN-based approach lacks the intrinsic driving force to distinguish true energy minimizers from high-energy saddle points. Among these approaches, variational formulations such as the DRM are particularly well suited for energy minimization problems. By parameterizing the order parameter with a continuous neural network, these methods reduce the infinite-dimensional functional minimization problem to a finite-dimensional optimization problem over network parameters. More importantly, this neural representation per-mits the domain geometry Ω to be incorporated as trainable variables instead of being prescribed before optimization. However, directly applying the standard DRM to the LB model encounters a fundamental di ffi culty arising from the optimization dynamics of deep neural networks. Neural networks are typically initialized with small random weights to facilitate stable training [32, 33], while in the LB free-energy landscape, a near-zero order parameter corresponds to 2the disordered phase (a trivial solution), which can act as a strong local attractor. Consequently, when initialized with small weights, the network is prone to converge to the disordered phase during the early stages of training, thereby failing to explore nontrivial ordered structures. Furthermore, when the disordered phase is unstable, the standard DRM often fails to explore the energy landscape su ffi ciently and identify multiple ordered phases. Without addi-tional regularization, the optimization often becomes biased toward a certain metastable configuration, leaving other physically relevant solutions undiscovered. To address these challenges, we propose a Geometry-Adaptive Deep Variational Framework (GeoDVF) to discover complex ordered structures. The central component of this framework is a neural network representation of the order parameter field, and we treat the geometric parameters of the computational domain as learnable variables and embed them, together with the network parameters, into a unified computational graph. This architecture enables the simultaneous variational optimization of both the physical field and the domain geometry through gradient-based training. To mitigate the strong attraction of the disordered phase induced by small-weight initialization and enlarge the range of attainable metastable states, we introduce a warmup penalty strategy. By incorporating an additional penalty term into the loss function, the disordered phase is destabilized during the early stages of training, thereby driving the optimization trajectory toward ordered structures. Numerical experiments demonstrate that GeoDVF can discover complex 3D phases, including BCC, FCC, and A15, starting from random initializations. Furthermore, our method successfully identifies both stable and metastable states without requiring any prior structural information. The remainder of this paper is organized as follows. Section 2 introduces the LB model and reviews traditional numerical methods, highlighting how the alternating iterative strategies lead to strong dependence on initializations. Section 3 presents the proposed framework, including the network architecture and the training strategy, and provides a theoretical analysis showing that the warmup penalty destabilizes the disordered phase. Section 4 presents extensive numerical studies that assess the accuracy, robustness, and discovery capability of the proposed framework. Section 5 concludes the paper and discusses perspectives for further development. 
+
+2. Landau–Brazovskii model 
+
+We focus on the nondimensionalized form of the LB free energy, which describes the phase behavior of systems undergoing short-wavelength ordering. The system is characterized by a scalar order parameter ϕ(x), representing the local density variation. By rescaling the length and energy scales to eliminate redundant parameters, the e ff ective free-energy functional is given by [14] 
+
+E(ϕ) =
+
+Z 12 |(∆ + 1) ϕ|2 + τ
+
+2 ϕ2 − γ
+
+6 ϕ3 + 124 ϕ4
+
+!
+
+dx, (1) subject to the mass-conservation constraint Z
+
+ϕ dx = 0. (2) Here, τ represents the reduced temperature, and γ characterizes the asymmetry of the ordered phases, which is essen-tial for describing first-order phase transitions. Formally, the scalar order parameter ϕ is defined on the entire space Rd (d = 2, 3). To enable numerical imple-mentations, we utilize the CAM [3, 28] and approximate di ff erent phases with periodic crystal structures on finite domains. Specifically, we consider the order parameter ϕ on a box domain Ω with periodic boundary conditions to characterize each crystalline phase. Consequently, our analysis focuses on the free-energy density f (ϕ), defined as the energy per unit volume 
+
+f (ϕ) = 1
+
+|Ω|
+
+Z
+
+> Ω
+
+12 |(∆ + 1) ϕ|2 + τ
+
+2 ϕ2 − γ
+
+6 ϕ3 + 124 ϕ4
+
+!
+
+dx, (3) where |Ω| denotes the volume of the domain. Thus, the problem of finding local minima is reduced to minimizing this free-energy density f on a finite periodic domain Ω.We introduce some notations to facilitate the subsequent analysis. The mass conservation (2) implies that the order parameter ϕ should be constrained to the manifold M,
+
+ϕ ∈ M =
+
+(
+
+ψ ∈ H2per (Ω)
+
+Z
+
+> Ω
+
+ψ dx = 0
+
+)
+
+, (4) 3where H2per (Ω) denotes the Sobolev space of periodic functions with square-integrable second derivatives. To enforce this constraint, we introduce the projection operator P, which maps a function onto the zero-mean subspace 
+
+Pψ = ψ − 1
+
+|Ω|
+
+Z
+
+> Ω
+
+ψ dx. (5) Our objective is to find the equilibrium configuration ϕ∗ that minimizes the LB free-energy density on this manifold 
+
+ϕ∗ = arg min 
+
+> ϕ∈M
+
+f (ϕ).
+
+To explicitly incorporate the domain geometry into the variational framework, we map the physical domain to a fixed reference domain. The computational domain Ω is assumed to be an orthogonal box in Rd defined by Ω = 
+
+Qdi=1[0 , Li]. We introduce the normalized coordinates ˜ xi = xi/Li, which map Ω to the unit hypercube D = [0 , 1] d.Accordingly, the order parameter on the fixed unit domain is ˜ ϕ( ˜ x) = ϕ(x). In the following discussions, we drop the tilde for brevity. It is important to note that the Jacobian determinant of this transformation, J = Q Li = |Ω|,exactly cancels the volume normalization factor 1 /|Ω| in the free-energy density (3). Consequently, the rescaled free-energy density is an integral over the fixed unit domain, with the geometric dependence transferred explicitly into the di ff erential operator, 
+
+f (ϕ, ω) =
+
+Z
+
+> D
+
+12 |(∆ω + 1) ϕ|2 + τ
+
+2 ϕ2 − γ
+
+6 ϕ3 + 124 ϕ4
+
+!
+
+dx, (6) where ω = (L1, . . . , Ld) represents the geometric parameters. The geometry-adapted Laplacian ∆ω is defined as 
+
+∆ω =
+
+> d
+
+X
+
+> i=1
+
+1
+
+L2
+
+> i
+
+· ∂2
+
+∂x2
+
+> i
+
+.
+
+Specifically, for a two-dimensional (2D) domain, ω = (L1, L2) and ∆ω = L−21 ∂xx + L−22 ∂yy ; for a 3D domain, ω =
+
+(L1, L2, L3) and ∆ω = L−21 ∂xx + L−22 ∂yy + L−23 ∂zz . This reformulation reveals that the domain parameters ω act as coe ffi cients within the di ff erential operator. Therefore, finding the equilibrium state corresponds to minimizing f (ϕ, ω)simultaneously with respect to the order parameter ϕ (on the fixed domain D) and the geometry parameters ω.For each ordered structure, the free-energy density f explicitly depends on the domain geometry ω. Consequently, the computational domain must be adjusted adaptively to relax the stress and minimize the free-energy density. The optimization process typically follows an alternating iterative scheme [29]. 
+
+Step 1 With fixed domain parameters ωk, evolve the order parameter ϕ to a local minimum: 
+
+ϕk+1 = arg min 
+
+> ϕ∈M
+
+f (ϕ, ωk). (7) 
+
+Step 2 With the fixed profile ϕk+1, optimize the domain parameters ω to minimize the free-energy density 
+
+ωk+1 = arg min 
+
+> ω
+
+f (ϕk+1, ω). (8) 
+
+Step 3 Repeat Step 1 and Step 2 until the error falls below a prescribed tolerance. To e ffi ciently solve the first subproblem (7), one can employ the Allen-Cahn gradient flow with mass conservation 
+
+∂ϕ ∂t = −P δ f
+
+δϕ = −L ωk ϕ − P g(ϕ),
+
+where the linear operator Lω and a nonlinear term g(ϕ) are defined as 
+
+Lω = (∆ω + 1) 2 + τ, g(ϕ) = − γ
+
+2 ϕ2 + 16 ϕ3.
+
+4For temporal discretization, a semi-implicit scheme can be adopted to ensure stability with large time step sizes [22] 
+
+ϕn+1 − ϕn
+
+∆t = −L ωk ϕn+1 − P g(ϕn). (9) Let F and F −1 denote the discrete Fourier transform and its inverse, respectively, and denote the Fourier coe ffi cients as ˆ ϕ(k) = F (ϕ)( k). In the Fourier space, the di ff erential operator Lωk is diagonalized, so applying F to (9) allows for a fast pointwise update based on pseudospectral methods: ˆϕn+1(k) = ˆϕn(k) − ∆t · F (Pg(ϕn))( k)1 + ∆ t
+
+ 1 − | k|2
+
+> ωk
+
+2
+
++ τ
+
+ ,
+
+where the geometry-dependent wave vector magnitude is |k|2 
+
+> ω
+
+= Pi(2 πki/Li)2. The solution to (7) should satisfy the E-L equation Lωk ϕn+1 + Pg(ϕn+1) = 0. For the second subproblem (8), the domain parameters ω = (L1, . . . , Ld) are typically updated via gradient descent. While the minimization of f with respect to ω theoretically admits an analytic solution for a fixed ϕ, directly imposing this exact geometric solution at each step may cause numerical instability. The exact solution derived from a transient non-equilibrium ϕ, particularly during early iterations, can force the domain to change rapidly, leading to oscillation or failure. Therefore, gradient-based updates act as a relaxation mechanism to ensure that the domain geometry evolves smoothly together with the order parameter ϕ. It is important to note that the bulk energy terms are invariant under domain scaling when ϕ is fixed on the reference domain D, so the gradient arises solely from the elastic energy term. By Parseval’s identity, the gradient with respect to the i-th domain length Li (i = 1, . . . , d) is derived analytically as 
+
+∂ f
+
+∂Li
+
+= 2
+
+Li
+
+X
+
+> k
+
+1 − | k|2
+
+> ω
+
+ 2πki
+
+Li
+
+!2
+
+| ˆϕ(k)|2,
+
+where ki denotes the i-th component of the wave vector k.This alternating strategy highlights the fundamental dependency on initialization: the solver requires not only an initial configuration ϕ0 when solving (7), but also a compatible initial domain size ω0. We denote this coupled deterministic solver process as (ϕ∗, ω∗) = Solver( ϕ0, ω0). (10) To explicitly demonstrate the sensitivity of the alternating iterative scheme to initial guesses ( ϕ0, ω0), we conduct a series of numerical experiments on the 2D LB model. Apart from the disordered phase, which is the trivial solution 
+
+ϕ = 0, the 2D LB model admits two primary periodic ordered structures: LAM and HEX, as visualized in Figure 1. Theoretically, both the LAM and HEX phases can share the same optimal computational domain Ωopt = [0 , 8π] ×
+
+[0 , 16 π/ √3], i.e., ωopt = (8 π, 16 π/ √3). We utilize the standard initialization to construct the initial profiles for these phases [34], 
+
+ϕ0(x) = a1 cos( k1 · x) + a2(cos( k2 · x) + cos( k3 · x)) ,
+
+where the wave vectors are k1 = (1 , 0), k2 = (−1/2, √3/2), and k3 = (−1/2, − √3/2). We set ( a1, a2) = (1 , 0) for LAM ( ϕ0LAM ) and ( a1, a2) = (1 , 1) for HEX ( ϕ0HEX ). We consider two parameter sets: ( τ, γ ) = (0 .001 , 0.6), where HEX is the global minimum and the disordered phase is metastable; and ( τ, γ ) = (−0.4, 0.3), where LAM is the global minimum. To test the robustness of the solver defined in (10), we introduce a non-optimal square domain Ωs = [0 , 20] 2 (i.e., ωs = (20 , 20)) and a random initialization 
+
+ϕ0randn (x) ∼ N (0 , 1) sampled independently at each grid point. We evaluate the solver’s performance using various combinations of initial fields and domain geometries, and the convergence results are summarized in Table 1. The experiments reveal a significant dependency on the initialization. Even when initialized with the correct topological structure ( ϕ0HEX ), starting with a non-optimal domain ωs can prevent the alternating solver from reaching the stress-free ground state. Instead, it gets trapped in a distorted hexagonal phase (denoted as HEX*, see Figure 1(d)), which is a metastable state with higher energy caused by the domain mismatch stress. When starting from random noise ϕ0randn ,the solver often fails to identify the global minimum if the domain size is not pre-tuned. For instance, in the HEX-stable regime with ωs, the system collapses into the disordered phase rather than evolving into ordered structures. These results highlight that without precise prior knowledge of both the pattern periodicity and the domain size, the traditional alternating iterative strategy may struggle to identify the global energy minimum. 5(a) (b) (c) (d) Figure 1: Representative stationary states of the 2D LB model. (a) The disordered phase. (b) LAM phase. (c) HEX phase obtained within an optimal computational domain. (d) A distorted hexagonal phase (denoted as HEX*). This is a high-energy metastable state where the lattice structure is deformed due to the artificial stress caused by domain mismatch. Table 1: Convergence outcomes for the alternating iterative solver under di ff erent parameter sets ( τ, γ ) and initial guesses. 
+
+(τ, γ ) Initial guess ( ϕ0, ω 0)(ϕ0HEX , ω opt ) (ϕ0HEX , ω s) (ϕ0LAM , ω opt ) (ϕ0LAM , ω s) (ϕ0randn , ω opt ) (ϕ0randn , ω s)(0.001, 0.6) HEX HEX* disorder disorder HEX disorder (-0.4, 0.3) HEX LAM LAM LAM LAM LAM 
+
+3. Geometry-Adaptive Deep Variational Framework 
+
+To mitigate the heavy dependence on the initial guess inherent in the alternating iteration method, we propose GeoDVF to optimize the order parameter ϕ and the geometry parameter ω simultaneously. An overview of our proposed method is presented in Figure 2. Central to this framework, we employ a neural network to parameterize the order parameter ϕ, denoted as ϕθ, while we treat the domain geometry as learnable parameters jointly optimized with the network weights θ. Specifically, for a d-dimensional box domain with side lengths ω = (L1, . . . , Ld), we introduce the inverse geometric parameters 
+
+β = (β1, . . . , β d), defined element-wise as βi = 1/Li. This reparameterization o ff ers two key advantages: first, it naturally maps the domain sizes Li (typically > 1) to a bounded range βi ∈ (0 , 1), which stabilize training; second, it simplifies the backpropagation process, as the free-energy density depends on the geometric parameters solely through inverse square terms (i.e., 1 /L2 
+
+> i
+
+= β2 
+
+> i
+
+), transforming rational functions into polynomial terms with respect to the trainable variables. Consequently, the complete set of trainable parameters for the framework is defined as 
+
+Θ = (θ, β). 
+
+3.1. Neural network architecture 
+
+To e ff ectively parameterize the spatially continuous order parameter ϕ(x), we adopt a neural network inspired by the Fourier Neural Operator (FNO) [35]. Unlike traditional convolutional neural networks [36] that rely on local operations on fixed grids, the Fourier architecture operates in the spectral domain, o ff ering a natural representation for periodic structures and enabling resolution-independent optimization. The proposed architecture comprises three sequential components: an embedding layer, stacked Fourier layers, and a projection layer. The Fourier and projection layers follow the standard FNO design. The lifting layer in a standard FNO is designed to embed a low-dimensional input function into a high-dimensional latent space, while our embedding layer P acts as a coordinate embedding, mapping the spatial coordinates x ∈ D directly to a high-dimensional hidden feature field v0(x) = P(x). Although both are implemented via a pointwise a ffi ne transformation, our embedding operation initializes the neural representation directly from the domain geometry itself, rather than from an external function. The core building block of the subsequent deep processing is the Fourier layer. Let vl−1 : D → Rdv be the input feature field to the l-th layer and vl be the output. The update rule is defined as 
+
+vl(x) = σ (W(vl−1)( x) + K(vl−1)( x)) , x ∈ D,
+
+6element-wise inverse energy density +Strategy I: warmup penalty Strategy II: guided initialization zero-mean projection ×domain geometry order parameter input coordinate joint optimization of backpropagation (a) Geometry-Adaptive Deep Variational Framework -th Fourier layer (b) Network architecture embedding projection stacked Fourier layers Figure 2: An overview of GeoDVF. (a) The workflow of GeoDVF. The system takes spatial coordinates x as input and simultaneously optimizes the network parameters θ (for the order parameter field ϕθ) and the inverse geometric parameters β (for the domain geometry). The zero-mean projection enforces the mass conservation constraint, converting the raw network output Nθ(x) into the physical order parameter ϕθ. The total loss 
+
+L(Θ) integrates the physical free-energy density f with auxiliary terms from the warmup penalty or guided initialization. The dashed line indicates that the unified parameter set Θ = (θ, β) is updated jointly via backpropagation. (b) Detailed architecture of the neural network Nθ. The coordinate embedding layer P maps the input coordinates x directly into a high-dimensional feature function. This representation evolves through a stack of Fourier layers Hl and is mapped back to the unconstrained scalar field Nθ by the projection layer Q. The inset illustrates the operations within a single Fourier layer. 
+
+where σ is a nonlinear activation function, and W is a pointwise a ffi ne transformation. The key component is the global spectral convolution operator K, defined by 
+
+K(v)( x) = F −1R · F (v)(x).
+
+Here, F and F −1 denote the Fourier transform and its inverse, respectively. Following the standard FNO formulation, we implement an e ffi cient spectral truncation by defining the set of active Fourier modes as the box region Zkmax =
+
+{k ∈ Zd : |k j| ⩽ kmax , j, for j = 1, . . . , d}. The term R is then parameterized as a learnable complex-valued tensor that performs linear transformations exclusively on the modes k ∈ Zkmax .Finally, a projection layer Q, also implemented as a pointwise a ffi ne transformation, maps the high-dimensional features vL(x) of the last Fourier layer back to an unconstrained scalar field Nθ(x). To provide a unified representation of the network architecture, let us define the operator for the l-th Fourier layer as Hl(v) : = σ (Wv + Kv). The complete network parameterization can thus be expressed as the composition of the coordinate embedding, L stacked Fourier layers, and the final projection: 
+
+Nθ(x) = (Q ◦ H L ◦ · · · ◦ H 1 ◦ P) ( x), (11) 7where ◦ denotes function composition. It serves as the structural precursor to the physical order parameter ϕθ, as discussed in the subsequent section. This spectral parameterization is particularly well suited for minimizing the LB free energy due to its intrinsic mathematical structure. By operating directly in the frequency domain, the network achieves a global receptive field within a single layer. This enables the e ffi cient capture of long-range spatial correlations and interactions that are essential for resolving complex phase topologies. Furthermore, reliance on the Fourier basis automatically enforces periodic boundary conditions, ensuring that the generated field remains physically consistent with the assumptions of CAM without imposing additional constraints. Finally, since the weight parameters R are learned in the spectral domain, the resulting representation is continuous and mesh-invariant, which enables the model to be evaluated on computational grids of arbitrary resolution, thereby resolving fine interfacial structures without retraining. 
+
+3.2. Mass-conservation constraint 
+
+Relying on soft constraints, i.e., penalty terms in the loss function, introduces additional hyperparameters, which often leads to complex optimization landscapes and requires delicate tuning of penalty coe ffi cients [37, 38]. To ad-dress these challenges and ensure physical consistency, we enforce the constraint of the feasible manifold M in (4) directly through the network architecture. Recall that a valid solution ϕ ∈ M must satisfy both periodic boundary conditions and mass conservation, and the periodic boundary condition is inherently guaranteed by our choice of the Fourier-based architecture. As detailed in the previous section, the network operates on the basis of trigonomet-ric functions, which naturally imposes periodicity on the generated field without the need for padding strategies or auxiliary boundary loss terms. To strictly enforce the mass-conservation constraint (2), we employ a zero-mean projection strategy at the network output. Recalling the unconstrained network output Nθ(x) defined in (11), the final physical order parameter ϕθ(x) is obtained by applying the mass-conservation projection P (5) 
+
+ϕθ(x) = PNθ(x) = Nθ(x) − 1
+
+|Ω|
+
+Z
+
+> Ω
+
+Nθ(y) d y. (12) In the discrete setting, the integral is replaced by the spatial average. This operation ensures that the total integral of 
+
+ϕθ vanishes strictly throughout the training process, e ff ectively constraining the optimization search space within M.
+
+3.3. Loss function and training strategies 
+
+Our training objective is based on the DRM [31], which reformulates the variational problem as an optimization problem over the function space of neural networks. For the unified trainable parameters Θ = (θ, β), the primary physical loss function is defined as 
+
+LDRM (Θ) = f (ϕθ, β−1), (13) where β−1 (element-wise inverse) reconstructs the physical domain lengths required for the energy computation in (6). A distinct advantage of our network architecture is its natural generation of solutions on uniform periodic grids, which facilitates the use of pseudospectral methods. By computing derivatives in the frequency domain, we achieve high accuracy while e ff ectively avoiding the discretization errors of finite di ff erence schemes or the computational cost of automatic di ff erentiation [39, 30] for high-order derivatives. Beyond the DRM loss (13), we introduce two specialized training strategies to address the challenges of nonconvex optimization and to target specific equilibrium configurations. 
+
+Strategy I: Warmup penalty for phase discovery 
+
+When training from scratch with random initializations, the network parameters are typically small, resulting in an output ϕθ close to zero. Because the disordered phase ( ϕ = 0) is a local minimum for the reduced temperature 
+
+τ > 0, the optimization can easily get trapped in the disordered phase. To mitigate this, we propose a warmup penalty strategy. The central idea is to drive the order parameter to acquire energy at the physically critical length scale during the early stages of training. We construct a penalty term based on the projection of the order parameter onto the critical sphere in the reciprocal space. Consider the test functions in the physical space as ψn(x) = cos( n · x), where n ∈ Sd−1 is a unit vector. In the computational domain ˜ x ∈ D, utilizing the 8inverse geometric parameter β, the e ff ective test function in the reference domain D becomes ˜ ψn( ˜ x) = cos( n·(β−1 ⊙ ˜x)), where ⊙ denotes elementwise multiplication. The penalty term is defined as 
+
+Lp(Θ) = −
+
+Z
+
+> Sd−1
+
+Z
+
+> D
+
+ϕθ( ˜ x) ˜ ψn( ˜ x) d ˜ x dn − C
+
+!2
+
+, d = 2, 3,
+
+where −
+
+R 
+
+> Sd−1
+
+denotes the averaged integral over the unit sphere, and C > 0 is a hyperparameter. This term penalizes the deviation of the order parameter’s projection on the critical sphere. The time-dependent total loss for this strategy is given by 
+
+L(Θ, t) = LDRM (Θ) + wp(t)Lp(Θ),
+
+where wp(t) is a scheduler function. We set wp(t) > 0 for the initial Twarm steps to seed the correct mode structure and drive the geometric parameters toward a stress-free configuration. Subsequently, we set wp(t) = 0 for the remainder of the training to allow the physics to dominate the relaxation process. 
+
+Strategy II: Guided initialization for targeted search 
+
+Although the warmup penalty facilitates the spontaneous discovery of various minima, this exploration may not be exhaustive, as certain topologically complex phases can reside in extremely narrow basins of attraction that are inaccessible from random initializations. This limitation parallels traditional numerical iterative schemes, which typically require carefully constructed initial guesses to converge to specific target phases. To deal with this issue, we employ a guided initialization strategy. Similar to imposing an initial condition in classical solvers, this strategy serves to map an order-parameter initialization directly into the network’s parameter space by introducing a data-fidelity term Ld as 
+
+Ld(Θ) = ∥ϕθ − ϕinit ∥2 
+
+> L2
+
+,
+
+where ϕinit is a pre-calculated specific initial guess. Then, the total loss for this strategy is given by 
+
+L(Θ, t) = LDRM (Θ) + wd(t)Ld(Θ).
+
+Similar to the warmup strategy, the weighting coe ffi cient wd(t) acts as a time-dependent scheduler. We maintain 
+
+wd(t) > 0 during the initial Tguide steps to drive the optimization trajectory towards the target phase ϕinit ,. In the subsequent training stage, we set wd(t) = 0 to release the constraint on data matching, allowing the network to fine-tune the solution and converge solely according to the physical free energy, thereby ensuring the final state is physically accurate. Additionally, the successful stabilization of these phases after removing the guidance provides strong evidence of the expressivity of our proposed method. This observation indicates that the failure to discover these phases spontaneously arises from the nonconvex optimization landscape, rather than from any intrinsic limitation of the network architecture. Our numerical experiments further confirm that, once initialized within the appropriate basin of attraction, the neural network has su ffi cient representational capacity to accurately capture and stably preserve these intricate topological structures. 
+
+3.4. Theoretical analysis of the warmup penalty 
+
+To theoretically validate the warmup penalty strategy introduced in Section 3.3, we analyze the local stability of the disordered phase ϕ = 0 under the modified loss landscape. We formally establish that although the disordered phase constitutes a local minimum of the free energy, the incorporation of the penalty term destabilizes it by inducing a strict descent direction. For clarity, let us define the projection intensity functional S(ϕ) and the total penalized energy density fp(ϕ) as 
+
+S(ϕ) = −
+
+Z
+
+> Sd−1
+
+1
+
+|Ω|
+
+Z
+
+> Ω
+
+ϕ(x) · ψn(x) d x dn, fp(ϕ) = f (ϕ) + wp(S(ϕ) − C)2,
+
+where ψn(x) are the test functions on the unit spectral shell defined in the previous subsection. We present the following theorem to demonstrate this destabilization e ff ect. 9Theorem 3.1 (Local instability of the disordered phase) . Consider the Landau–Brazovskii free-energy functional f (ϕ)
+
+with τ > 0 subject to the mass-conservation constraint, and then the disordered phase ϕ = 0 is a local minimum of the free energy f (ϕ). For w p > 0 and C > 0, the disordered phase is strictly unstable for the penalized energy f p(ϕ).Specifically, any mass-conserving direction ϕ0 with a non-vanishing projection intensity (i.e., S(ϕ0) > 0) constitutes a descent direction. Proof. To analyze the stability, we compute the one-sided Gateaux derivative of the functional at ϕ = 0 along a perturbation direction ϕ0. Define the directional derivative of a functional J(ϕ) as 
+
+δJ(0; ϕ0) = lim 
+
+> ε→0+
+
+J(εϕ 0) − J(0) 
+
+ε .
+
+Crucially, to respect the mass-conservation constraint, the perturbation direction must lie in the tangent space of the manifold M at ϕ = 0, which requires ϕ0 to be a zero-mean function. The free-energy density functional f (ϕ) is Fréchet di ff erentiable, and thus Gateaux di ff erentiable on the Sobolev space H2(Ω). ϕ = 0 is a local minimum of the physical energy f (ϕ) along the subspace M for τ > 0, and δ f (0; ϕ0) vanishes identically for any admissible perturbation ϕ0.Therefore, the energy scales quadratically near ϕ = 0, i.e., f (εϕ 0) − f (0) = O(ε2). Now consider the penalty term Jp(ϕ) = wp(S(ϕ) − C)2. The projection intensity S(ϕ) satisfies positive homogene-ity: S(εϕ 0) = εS(ϕ0) for ε > 0. Let A = S(ϕ0) ⩾ 0 be the projection intensity of the perturbation, and the value of the penalty term at the perturbed state is 
+
+Jp(εϕ 0) = wp(εA − C)2 = wp(C2 − 2AC ε + A2ε2).
+
+At the disordered phase ϕ = 0, we have S(0) = 0 and Jp(0) = wpC2, so the directional derivative is calculated as 
+
+δJp(0; ϕ0) = lim 
+
+> ε→0+
+
+wp(C2 − 2AC ε + A2ε2) − wpC2
+
+ε = −2wp AC .
+
+The directional derivative of the total penalized energy is the sum of the physical and penalty contributions 
+
+δ fp(0; ϕ0) = δ f (0; ϕ0) + δJp(0; ϕ0) = 0 − 2wp AC = −2wp AC .
+
+This result implies that if there exists a direction ϕ0 ∈ M such that S(ϕ0) > 0, the training loss will strictly decrease along this direction when wp, C > 0. To complete the proof, we explicitly construct a fundamental mode ϕ0(x) = cos(2 πx1/L1) aligned with the first spatial dimension, which is periodic and satisfies the mass conservation. We now verify that the projection intensity 
+
+S(ϕ0) is strictly positive. For a unit vector n = (n1, . . . , nd), we evaluate the projection integral 
+
+I(n) = 1
+
+|Ω|
+
+Z
+
+> Ω
+
+ϕ0(x) · ψn(x) d x = 2n1 L1
+
+n21 L21 − 4π2 · cos 12 n · ω
+
+!
+
+·
+
+> d
+
+Y
+
+> i=1
+
+sin( ni Li/2) 
+
+ni Li/2 ,
+
+and we consider a generic n such that the denominator is nonzero. Observe that I(n) is a real-analytic function of 
+
+n restricted to the unit sphere Sd−1, so its zero set is determined by the roots of the sine and cosine factors (e.g., 
+
+ni Li/2 = kπ). Geometrically, these conditions define a union of lower-dimensional hypersurfaces rather than the entire sphere, so the set of directions where I(n) = 0 has measure zero on Sd−1. This implies that |I (n)| > 0 almost everywhere, so the total projection intensity 
+
+S(ϕ0) = −
+
+Z
+
+> Sd−1
+
+|I (n)| dn
+
+is strictly positive. Finally, we obtain δ fp(0; ϕ0) < 0, and the existence of a negative directional derivative proves that 
+
+ϕ = 0 is not a local minimum in the penalized loss landscape. 
+
+Remark 3.1 . The instability arises from the di ff erence in scaling behaviors near the disordered phase. The physical energy f (ϕ) scales quadratically ( ∼ ε2) due to variational stability, whereas the penalty term introduces a negative linear scaling ( ∼ − 2wp AC ε) due to the penalty term. For su ffi ciently small ε, the linear term dominates, e ff ectively creating a slope that pushes the optimization trajectory away from the disordered phase. 10 Remark 3.2 . It is worth noting that the absolute value operation in the definition of S(ϕ) introduces a singularity of the gradient at the disordered phase. In classical linear instability, the driving force vanishes as ϕ → 0, while the singularity here implies a discontinuous jump in the derivative, resulting in a nonvanishing, constant driving force for infinitesimal perturbations. In numerical implementation, since ϕ is never strictly zero, this property allows the system to escape the zero attractor significantly faster. 
+
+4. Numerical experiments 
+
+In this section, we conduct systematic numerical experiments to validate the e ff ectiveness, accuracy, and explo-ration capability of our proposed method. 
+
+Implementation details. Unless otherwise stated, the neural network employed in our experiments is constructed with four stacked Fourier layers with 64 hidden channels. We adopt GELU [40] as the nonlinear activation function σ. The frequency spectrum is truncated in each layer by retaining the lowest kmax = 16 modes along each spatial dimension. The network is implemented in PyTorch and trained using the AdamW optimizer [41]. The initial learning rate is set to 0 .001, while other optimizer hyperparameters remain at their default values. The optimization process is typically conducted for a maximum of Tmax = 2000 iterations. We adopt distinct training strategies depending on the experimental goal. For phase discovery, we employ strategy I to facilitate escape the disordered phase. Specifically, we set C = 10 and define the penalty weight wp(t) as a linear decay schedule 
+
+wp(t) =
+
+
+
+wmax , t < 250 ,
+
+wmax · 500 −t 
+
+> 250
+
+, 250 ⩽ t < 500 ,
+
+0, t ⩾ 500 ,
+
+where wmax = 0.1. When the objective is to locate a specific configuration, we utilize strategy II, and the guidance weight wd(t) is maintained at a constant value of 0 .1 for the initial 500 steps to anchor the solution, after which it is set to 0 for the remaining iterations to enable purely physical relaxation. 
+
+Phase identification and statistics. To statistically analyze the model’s capability to discover various metastable phases, we adopt an energy-based identification protocol. Prior to training, we generate a library of reference ground truth solutions by considering a predefined set of candidate phases S tailored to the spatial dimension. For 2D systems, the candidate set is S = {LAM , HEX }, whereas for 3D systems, it encompasses a broader spectrum of complex struc-tures, S = {LAM , HEX , DG , BCC , FCC , A15 , σ }. For each phase s ∈ S , we construct the initial guess ( ϕ0s , ω 0s ) based on reciprocal vectors [15] and compute the converged stationary state ( ϕs, ω s) using the high-precision numerical solvers (10) to obtain the reference free-energy density f (s)ref = f (ϕs, ω s). For a predicted solution ( ϕθ, β−1) obtained from the neural network training, we identify its phase by comparing its energy density with the reference library. We define the relative energy di ff erence E(s)di ff with respect to phase s as 
+
+E(s)di ff = f (ϕθ, β−1) − f (s)ref 
+
+f (s)ref 
+
+.
+
+If there exists a reference phase subject to E(s)di ff < 10 −5, we classify the prediction as the corresponding phase s. To ensure statistical robustness, for general phase discovery tasks, we conduct 100 independent training runs with random initializations. 
+
+Evaluation metrics. To quantitatively assess the accuracy and physical validity of the predicted solutions, we further introduce three distinct evaluation metrics. First, since any local minimum must satisfy the stationary condition, we evaluate the residual of the E-L equation, 
+
+Eres = P δ f
+
+δϕ 
+
+> 2
+
+= 1
+
+|Ω|
+
+Z
+
+> Ω
+
+P δ f
+
+δϕ 
+
+!2
+
+dx,
+
+11 (a) (b) (c) (d) Figure 3: Comparison of phase discovery results on the 2D LB model. (a) The standard DRM gets trapped in the disordered phase. (b) Our method successfully nucleates the hexagonal phase ϕpred . (c) The high-precision reference solution ϕref . Panels (a)–(c) share the common colorbar located to the right of panel (c). (d) The pointwise di ff erence map ϕpred − ϕref , showing the spatial distribution of the signed error with a magnitude of 
+
+> O(10 −4), corresponding to the colorbar on the far right.
+
+which measures the physical consistency of the network output. Next, to assess the convergence accuracy relative to the ground truth, we use the traditional numerical solver as a refinement tool. We take the network’s prediction (ϕθ, β−1) as an initial guess and run the solver (10) to convergence, obtaining a refined reference solution ( ϕ∗, ω∗). The state approximation error Eϕ is defined as the L2 distance between the prediction and this refined state 
+
+Eϕ = ∥ϕθ − ϕ∗∥2 = 1
+
+|Ω|
+
+Z
+
+> Ω
+
+(ϕθ − ϕ∗)2 dx.
+
+Finally, we measure the accuracy of the optimized domain geometry compared to the refined domain parameters ω∗
+
+using the relative domain error Edom ,
+
+Edom = ∥β−1 − ω∗∥22
+
+∥β−1∥22
+
+.
+
+4.1. Escaping the disordered phase 
+
+We validate our proposed GeoDVF on the 2D LB model with parameters ( τ, γ ) = (0 .001 , 0.6), where the disordered phase ϕ = 0 is a local minimum, and the HEX phase corresponds to the global minimum. This setup serves as a benchmark to evaluate the method’s capability to destabilize and escape the basin of attraction of the disordered phase. We compare our proposed method against the standard DRM and traditional numerical solvers. The results are summarized in Figure 3. First, we employ the standard DRM by setting the penalty weight wp = 0. As expected, the optimization from small random initialization rapidly stagnates at the disordered phase ϕ = 0, failing to nucleate an ordered phase (see Figure 3(a)). As discussed in Section 2, traditional iterative solvers are highly sensitive to the initial domain size. When the computational domain is incommensurate with the proper periodicity, these methods typically fail to con-verge to the global HEX minimum but get trapped in metastable states (see Figure 1 and Table 1). By comparison, our GeoDVF equipped with the warmup penalty successfully escapes from the disordered phase. Driven by the joint optimization mechanism, the system consistently converges to the HEX phase and achieves the theoretical minimum energy, demonstrating robustness against random initializations and domain constraints (see Figure 3(b)). We em-phasize that the primary objective of GeoDVF is spontaneous phase discovery rather than accelerating a single static simulation. Although training a neural network from scratch may require more wall-clock time than running a tradi-tional solver from a given initial guess on a fixed grid, GeoDVF completely eliminates the need to construct initial guesses and domain sizes. This paradigm shift significantly enhances the overall exploration e ffi ciency for discovering complex ordered phases without a priori knowledge. Furthermore, since machine learning approaches and traditional numerical algorithms typically operate at di ff erent precision levels, GeoDVF is best utilized as a powerful structural predictor. Quantitatively, the final state of our model reaches a low E-L residual of Eres = 7.1 × 10 −3, indicating that the network has e ff ectively converged to a stationary point of the LB energy. To precisely measure the pattern, the output of GeoDVF can be e ff ortlessly fed as an initial condition into the high-precision numerical solver (10). The solution then converges to a high-precision 12 (a) Hard cutoff (b) Linear decay  
+
+> training step training step Figure 4: Illustration of two scheduler functions. (a) Hard cuto ff . (b) Linear decay. The blue regions indicate when the spectral forcing is active.
+
+reference solution ϕ∗ within a few iterations (see Figure 3(c)). To visually inspect the prediction quality, we plot the pointwise di ff erence map in Figure 3(d), and the errors are uniformly distributed with a magnitude of O(10 −4), indicating excellent local agreement. This accuracy is further confirmed by the global relative errors Eϕ = 2.1 × 10 −9
+
+and Edom = 2.6 × 10 −10 .
+
+4.2. Ablation study 
+
+To investigate the e ffi ciency of the scheduler function wp(t) and its peak magnitude wmax , we conduct an ablation study on the 2D LB model with parameters ( τ, γ ) = (0 .001 , 0.6). We compare two distinct scheduler functions: 1. Hard cuto ff : The penalty weight is held constant at wp(t) = wmax for the first 500 steps, and then abruptly dropped to zero. This represents a sudden removal of the external forcing (see Figure 4(a)). 2. Linear decay: The penalty weight remains constant at wp(t) = wmax for the initial 250 steps, then linearly decays to zero between steps 250 and 500. This provides a smoother transition for the optimization landscape (see Figure 4(b)). For each scheduler type and values of wmax , we conduct 100 independent training runs with random initializations. Table 2 reports the success rate, defined as the percentage of runs that correctly converge to the global HEX phase. In addition to the standard solution errors ( Eres , Eϕ, Edom ), we specifically report the relative energy di ff erence Edi ff for the successful cases (i.e., the HEX phase) to verify that the converged solutions indeed achieve the theoretical minimum free-energy density. The baseline case ( wmax = 0) consistently fails to escape the disordered phase (100% failure rate), while introducing the penalty term significantly improves the success rate for both schedules. However, a distinct performance gap appears as wmax increases. While the hard-cuto ff scheduler performs comparably to the linear-decay scheduler at low magnitudes ( wmax ⩽ 0.01), it su ff ers a catastrophic performance drop at higher magnitudes. For instance, at wmax = 0.1, the success rate of hard cuto ff drops to 18%, whereas linear decay achieves its peak performance of 71%. We attribute this to the optimization shock caused by the abrupt removal of the penalty in the hard cuto ff . When a large forcing term is immediately removed, the sudden shift in the loss landscape can eject the trajectory from the attraction basin of the HEX phase back to the disordered phase. In contrast, the linear-decay scheduler gradually relaxes the system, allowing it to settle stably into the global minimum even with strong initial forcing. Based on these findings, we observe that the linear decay o ff ers superior robustness, particularly at larger 
+
+wmax . Consequently, we adopt the linear-decay scheduler with wmax = 0.1 as the default setting for all subsequent experiments, as it yields a high success rate and good accuracy. Furthermore, we investigate the impact of the warmup strategy when the disordered phase is unstable. We conduct numerical experiments in the regime ( τ, γ ) = (−0.4, 0.4), where the HEX phase is stable and the LAM phase is metastable. In the absence of the warmup penalty (i.e., standard DRM, wmax = 0), the method consistently fails to locate the HEX phase within 100 independent runs using small random initializations. Although the metastable LAM phase can be identified, the computational domain often becomes elongated, reflecting the translational invariance of the LAM phase along one direction. In contrast, employing the warmup penalty with a linear-decay scheduler of 
+
+wmax = 0.1, our proposed method successfully identifies both the HEX phase and the LAM phase with a geometrically 13 Table 2: Comparison of phase discovery success rates and error metrics under di ff erent penalty schedules and peak magnitudes. 
+
+Schedule wmax 
+
+Convergence rate Error metrics HEX HEX * disorder Edi ff Eres Eϕ Edom 
+
+Baseline 0 0% 0% 100% - - - -Hard cuto ff 
+
+0.0001 0% 3% 97% - - - -0.001 56% 44% 0% 3.7 × 10 −6 5.1 × 10 −4 4.1 × 10 −8 2.4 × 10 −11 
+
+0.01 70% 30% 0% 1.8 × 10 −6 1.3 × 10 −3 6.6 × 10 −10 3.7 × 10 −11 
+
+0.1 18% 0% 82% 9.5 × 10 −6 7.4 × 10 −2 6.1 × 10 −8 2.8 × 10 −10 
+
+0.5 0% 0% 100% - - - -Linear decay 0.0001 0% 0% 100% - - - -0.001 56% 44% 0% 1.2 × 10 −5 5.7 × 10 −4 3.5 × 10 −7 2.4 × 10 −10 
+
+0.01 70% 30% 0% 1.5 × 10 −6 1.1 × 10 −3 1.7 × 10 −10 2.2 × 10 −11 
+
+0.1 71% 28% 1% 4.9 × 10 −6 1.2 × 10 −2 8.6 × 10 −9 2.0 × 10 −10 
+
+0.5 62% 22% 16% 6.6 × 10 −6 1.5 × 10 −2 6.8 × 10 −9 2.0 × 10 −10 
+
+> The symbol ‘-’ indicates that the metrics are not applicable for these cases.
+
+regular domain size, demonstrating enhanced exploration capability. These results indicate that the warmup penalty enhances robustness by facilitating the escape from the disordered phase, enlarging the range of attainable metastable states, and promoting geometric regularization through the enforcement of a characteristic length scale during training. 
+
+4.3. Global minimum selection 
+
+We further investigate the behavior of GeoDVF in a competitive regime where the disordered phase is unstable, and the 2D LB model competes between two ordered phases: the LAM and HEX phases. Specifically, we vary the parameters ( τ, γ ) across the phase boundary such that the global minimum transitions from LAM to HEX. Notably, we find that our method exhibits a strong preference for converging to the global minimum, e ff ectively avoiding a trap in the local minimum. To explain the physical mechanism behind this selectivity, we employ the LBSD method [42] to compute the tran-sition pathway and the transition state connecting the LAM and HEX phases. These calculations are conducted on a fixed computational domain Ω = [0 , 8π] × [0 , 16 π/ √3], which is chosen to properly accommodate the periodicities of both phases. The transition pathways and corresponding energy landscapes are visualized in Figure 5. A crucial phys-ical insight is observed as the system moves away from the phase boundary—either by decreasing γ (favoring LAM, see Figure 5(a)) or increasing γ (favoring HEX, see Figure 5(d)). In both scenarios, the transition state structurally converges to the local minimum, di ff ering only by a localized region highlighted by the white circles in Figure 5. This di ff erence characterizes the critical nucleus required to initiate the phase transition. When the transition state is grad-ually close to the local minimum, it implies that the critical nucleus for the global minimum is small and localized, so the energetic barriers for nucleation are significantly reduced. Our method with the warmup penalty, driven by the spectral forcing, induces su ffi cient fluctuations to form this small critical nucleus, thereby helping the system to cross the saddle point and settle into the global minimum basin. This mechanism is quantitatively supported by the statistical results in Table 3, as a correlation between the nucleation energy barrier ∆ f and the phase discovery rate is observed. As γ increases from 0.3 to 0.45, the barrier for forming the HEX phase decreases from 1 .6 × 10 −2 to 4 .9 × 10 −4. Correspondingly, the success rate of discovering the HEX phase surges from 1% to nearly 72% (including HEX*). In contrast, at γ = 0.3, the LAM phase is the global minimum with a low energy barrier, and our method successfully identifies it in 97% of the runs. These findings suggest that GeoDVF is particularly e ff ective in locating the global minimum when the critical nucleation barrier is relatively small, e ff ectively leveraging the easy nucleation pathways inherent in the energy landscape. 
+
+4.4. Discovery of complex 3D ordered structures 
+
+We extend our investigation to the 3D LB model to demonstrate the representation capability of our proposed method on a complicated energy landscape. Various 3D ordered structures are visualized in Figure 6, where the red 14 transition pathway (a) (b) transition pathway         
+
+> (c) transition pathway
+> (d) transition pathway
+> HEX LAM LAM HEX HEX LAM LAM HEX TS TS TS TS Figure 5: Transition pathways between the LAM and HEX phases for (a) ( τ, γ )=(−0.4,0.3), (b) ( −0.4,0.35), (c) ( −0.4,0.4), and (d) ( −0.4,0.45). In each plot, the vertical axis denotes the free-energy density f, and the pathway connects the local minimum (left), the transition state (TS, middle), and the global minimum (right). Note that in (a) and (b), the LAM phase is the global minimum, whereas in (c) and (d), the HEX phase becomes the global minimum. The white circles highlight the critical nucleus region within the transition states.
+
+regions represent where the order parameter ϕ is high in the identified phases. Using the warmup penalty starting from random initializations, GeoDVF successfully identifies the stable phases LAM, HEX, BCC, and FCC phases. Remarkably, beyond these phases, our method is able to spontaneously nucleate the A15 phase without prior knowledge. The discovery of this spherical packing structure, which consists of 8 spheres per unit cell, highlights the e ffi ciency of the warmup penalty in guiding the system out of simple metastable traps to organize complex multi-particle packing. Quantitatively, as reported in Table 4, the relative energy di ff erences Edi ff for these phases are on the order of 10 −7 to 10 −6, confirming that the nucleated structures have converged to the theoretical ground states with high fidelity. However, certain exotic phases, such as DG and the Frank–Kasper σ phase, possess narrow basins of attraction far away from the disordered phase. It is important to note that the di ffi culty in locating these phases is inherent to the energy landscape rather than a limitation of the optimizer; indeed, traditional numerical solvers also fail to nucleate these complex topologies from random noises and invariably require specific initializations. To capture these topologically intricate structures, we employ guided initialization by utilizing the approximations provided in [15] as initial guesses. These phases present distinct challenges: the DG phase is a bicontinuous network characterized by two interpenetrating but non-intersecting labyrinths, while the σ phase is a complex packing featuring a unit cell with 15 Table 3: Quantitative analysis of phase selection. A lower energy barrier for nucleation associates with a higher success rate of locating the global minimum. 
+
+Property (τ, γ )(−0.4, 0.3) (−0.4, 0.35) (−0.4, 0.4) (−0.4, 0.45) 
+
+Energy landscape 
+
+Global minimum LAM LAM HEX HEX Energy barrier ∆ f (LAM → HEX) 1.6 × 10 −2 7.7 × 10 −3 2.4 × 10 −3 4.9 × 10 −4
+
+HEX critical nucleus large −−−−−−−−−−−−−−−−−−−−→ small Energy barrier ∆ f (HEX → LAM) 1.0 × 10 −3 2.8 × 10 −3 7.9 × 10 −3 1.7 × 10 −2
+
+LAM critical nucleus small −−−−−−−−−−−−−−−−−−−−→ large 
+
+Numerical convergence (100 runs) 
+
+HEX phase a 1% 18% 38% ( +7%) 58% ( +14%) LAM phase 97% 77% 45% 20% Failure / others b 2% 5% 10% 8%  
+
+> a
+
+Values in brackets indicate the percentage of distorted hexagonal phases (HEX*).  
+
+> b
+
+Fail to converge or converge to other high-energy metastable states. 
+
+> Table 4: Quantitative evaluation of the discovered 3D phases.
+
+Phase (τ, γ ) Edi ff Eres Eϕ Edom 
+
+Strategy I: warmup penalty 
+
+LAM (−0.4, 0.22) 1.8 × 10 −7 2.1 × 10 −1 6.9 × 10 −11 5.7 × 10 −12 
+
+HEX (−0.3, 0.8) 3.8 × 10 −7 3.2 × 10 −1 2.4 × 10 −10 1.0 × 10 −11 
+
+BCC (−0.008 , 0.8) 6.9 × 10 −6 2.6 × 10 −2 6.7 × 10 −10 8.7 × 10 −10 
+
+FCC (0 .1, 1.6) 1.3 × 10 −6 1.5 × 10 −2 7.2 × 10 −10 4.6 × 10 −11 
+
+A15 (−0.008 , 1.2) 3.2 × 10 −6 6.7 × 10 −3 7.4 × 10 −10 2.1 × 10 −11 
+
+HCP (−0.008 , 0.8) 5.7 × 10 −6 2.6 × 10 −3 5.2 × 10 −8 1.6 × 10 −10 
+
+Strategy II: guided initialization 
+
+DG (−0.4, 0.4) 8.6 × 10 −7 3.1 × 10 −3 9.8 × 10 −11 6.0 × 10 −13 
+
+σ (−0.008 , 1.0) 1.5 × 10 −6 7.9 × 10 −4 2.0 × 10 −10 1.5 × 10 −12 
+
+up to 30 spheres. Our results demonstrate that our network successfully locates high-precision stationary points from low-quality initializations. Table 4 shows that even for these complex inputs, the method achieves Edi ff ∼ 10 −6 and Eϕ ∼ 10 −10 ,indicating that the final solutions are not merely reproductions of the initial guesses but have been optimized to the precise energetic minima. The ability of the neural network to accurately resolve the continuous curvature of the DG interfaces and the precise packing arrangement of the σ phase confirms that our architecture possesses su ffi cient representational capacity to approximate high-frequency features and complex topologies in 3D configuration spaces. While the primary focus of the LB model is the identification of global minima, GeoDVF also exhibits a strong capability to explore the rich energy landscape of the LB model and identify distinct metastable states. Capturing these local minima is crucial for understanding the energy landscape of the LB model. By employing strategy I with random initializations, our method successfully stabilizes the hexagonal close-packed (HCP) phase, which shares identical coordination numbers and very similar energies compared to the FCC phase. To assess the numerical accuracy of this result, we evaluate the solution against high-precision reference states which are obtained by initializing the numerical solver (10) with the network’s predicted solutions ϕpred (see Table 4). The obtained HCP phase achieves a relative energy di ff erence of Edi ff = 4.9 × 10 −6, a state approximation error of 
+
+Eϕ = 1.1 × 10 −7, and a relative domain error of Edom = 2.1 × 10 −10 , indicating exceptional agreement with the theoretical ground state. Furthermore, the residual error converges to Eres = 3.3 × 10 −3, confirming that the discovered state is a valid, stationary local minimum on the energy landscape. 16 LAM HEX BCC FCC A15 DG HCP Figure 6: 3D ordered structures identified by our GeoDVF. The gallery displays a diverse set of local minima in the 3D LB model: (top row) LAM, HEX, BCC, FCC; (bottom row) A15, DG, σ, and HCP. The red volumetric regions correspond to where the order parameter is high. The LAM, HEX, BCC, FCC, A15 and HCP phases can be successfully nucleated from random initializations using strategy I. Table 5: Comparison of free-energy densities f for the competing BCC, FCC, and HCP phases. 
+
+(τ, γ ) Energy density f Global minimum BCC FCC HCP (−0.008 , 0.8) −0.02081 −0.01948 −0.02001 BCC (−0.008 , 1.0) −0.05159 −0.05149 −0.05169 σ
+
+(−0.008 , 1.2) −0.1104 −0.1126 −0.1125 A15 
+
+Bold values indicate the lowest energy among these three phases. 
+
+To quantitatively analyze the competition between these simple crystalline phases (BCC, FCC, and HCP), we conducted experiments with fixed τ = −0.008 and varying γ, and the refined energy densities f are reported in Table 5. Although in certain regimes these phases are metastable relative to complex structures (e.g., the σ phase at 
+
+γ = 1.0 and the A15 phase at γ = 1.2, see Table 4), our method accurately resolves the energetic hierarchy among the BCC, FCC, and HCP phases. As shown in Table 5, we observe a clear transition in relative stability: At γ = 0.8, the BCC phase has the lowest energy among the three. At γ = 1.0, the HCP phase becomes more stable than BCC and FCC. At γ = 1.2, the FCC phase takes precedence. This observed sequence of stability is in excellent agreement with the phase diagrams of the 3D phase-field crystal model reported in [43, 44]. This consistency confirms that our method not only locates the global minimum but also correctly captures the subtle energetic competition characteristic of the physical model. 
+
+5. Conclusion and discussion 
+
+In this work, we proposed GeoDVF for discovering ordered structures in the LB model. By parameterizing the order parameter through a neural network and treating the domain geometry as a set of learnable variables, our 17 method enables the simultaneous variational optimization of the physical field and the computational domain. This joint optimization approach e ff ectively eliminates the artificial stress caused by domain mismatch, removing the heavy dependence on precise geometric initial guesses that limits traditional alternating iterative solvers. Another key contribution of this study is the warmup penalty strategy. Our analysis and experiments show that this strategy e ff ectively destabilizes the disordered phase and promotes geometric regularization to prevent uncontrolled domain stretching during the early stage of training, which allows the automatic formation of complex 3D phases start-ing purely from random initializations. Beyond identifying global minima, we successfully found distinct metastable states, and the ability to resolve these structures highlights the method’s strength in exploring diverse solutions within a complex energy landscape. However, limitations remain regarding the exploration of extremely narrow attraction basins. For topologically intricate phases such as the DG and σ phases, spontaneous nucleation from random initializations remains challeng-ing. Although we demonstrated that a guided initialization strategy can successfully refine rough approximations of these phases into higher precision stationary states, achieving their spontaneous discovery without prior knowledge requires further research. Furthermore, the reliance on discrete Fourier transforms restricts the current framework to orthogonal domains with uniform grids. where the system is trapped by the orthogonality of the computational box, preventing full relaxation to non-orthogonal lattice symmetries. This geometric constraint can also introduce additional local minima, such as the HEX* phase. The joint optimization of the infinite-dimensional order parameter and the finite-dimensional geometric parameters occurs in a wide class of pattern-forming systems with intrinsic length scales. Beyond the LB model, GeoDVF is applicable to other continuum theories where stress relaxation is critical, such as the self-consistent field theory for block copolymers [45], the phase-field crystal models [46], and Landau-de Gennes theory for liquid crystals [47]. Extending our GeoDVF to these complex systems represents a promising direction for future investigation. 
+
+CRediT authorship contribution statement Yuchen Xie: Conceptualization, Formal analysis, Investigation, Methodology, Software, Validation, Visualiza-tion, Writing - original draft. Jianyuan Yin: Conceptualization, Formal analysis, Methodology, Writing - review & editing. Lei Zhang: Conceptualization, Funding acquisition, Resources, Supervision, Writing - review & editing. 
+
+Declaration of competing interest 
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. 
+
+Data availability 
+
+The codes are available from the authors upon reasonable request. 
+
+References 
+
+[1] S. Brazovskii, Phase transition of an isotropic system to a nonuniform state, Sov. Phys. JETP 41 (1975) 85. URL https://cir.nii.ac.jp/crid/1370579814655413777 
+
+[2] A.-C. Shi, J. Noolandi, R. C. Desai, Theory of anisotropic fluctuations in ordered block copolymer phases, Macromolecules 29 (20) (1996) 6487–6504. doi:10.1021/ma960411t .[3] P. Zhang, X. Zhang, An e ffi cient numerical method of Landau-Brazovskii model, J. Comput. Phys. 227 (11) (2008) 5859–5870. doi:10.1016/j.jcp.2008.02.021 .[4] E. Kats, V. Lebedev, A. Muratov, Weak crystallization theory, Phys. Rep. 228 (1) (1993) 1–91. doi:10.1016/ 0370-1573(93)90119-X .18 [5] W. Wang, L. Zhang, P. Zhang, Modelling and computation of liquid crystals, Acta Numer. 30 (2021) 765–851. 
+
+doi:10.1017/S0962492921000088 .[6] D. Andelman, R. E. Rosensweig, Modulated phases: Review and recent results, J. Phys. Chem. B 113 (12) (2009) 3785–3798. doi:10.1021/jp807770n .[7] M. E. Caplan, C. J. Horowitz, Colloquium: Astromaterial science and nuclear pasta, Rev. Mod. Phys. 89 (2017) 041002. doi:10.1103/RevModPhys.89.041002 .[8] J. Swift, P. C. Hohenberg, Hydrodynamic fluctuations at the convective instability, Phys. Rev. A 15 (1977) 319–328. doi:10.1103/PhysRevA.15.319 .[9] N. Goldenfeld, Lectures On Phase Transitions And The Renormalization Group, Vol. 85 of Frontiers in Physics, CRC Press, Boca Raton, FL, 1992. doi:10.1201/9780429493492 .[10] L. A. Peletier, W. C. Troy, Spatial Patterns: Higher Order Models in Physics and Mechanics, Progress in Nonlinear Di ff erential Equations and Their Applications, Birkhäuser Boston, Boston, MA, 2001. doi: 10.1007/978-1-4612-0135-9 .[11] G. H. Fredrickson, E. Helfand, Fluctuation e ff ects in the theory of microphase separation in block copolymers, J. Chem. Phys. 87 (1) (1987) 697–705. doi:10.1063/1.453566 .[12] H. Zhang, K. Jiang, P. Zhang, Dynamic transitions for Landau-Brazovskii model, Discrete Contin. Dyn. Syst. Ser. B 19 (2) (2014) 607–627. doi:10.3934/dcdsb.2014.19.607 .[13] V. E. Podneks, I. W. Hamley, Landau-Brazovskii theory for the Ia ¯3d structure, J. Exp. Theor. Phys. Lett. 64 (8) (1996) 617–624. doi:10.1134/1.567271 .[14] A.-C. Shi, Nature of anisotropic fluctuation modes in ordered systems, J. Phys.: Condens. Matter 11 (50) (1999) 10183. doi:10.1088/0953-8984/11/50/311 .[15] D. McClenagan, Landau theory of complex ordered phases, Master’s thesis, McMaster University (2019). URL http://hdl.handle.net/11375/24890 
+
+[16] S. Aland, A. Rätz, M. Röger, A. Voigt, Buckling instability of viral capsids—a continuum approach, Multiscale Model. Simul. 10 (1) (2012) 82–110. doi:10.1137/110834718 .[17] Q. Du, L. Ju, X. Li, Z. Qiao, Maximum bound principles for a class of semilinear parabolic equations and exponential time-di ff erencing schemes, SIAM Rev. 63 (2) (2021) 317–359. doi:10.1137/19M1243750 .[18] H. G. Lee, J. Shin, J.-Y. Lee, First and second order operator splitting methods for the phase field crystal equation, J. Comput. Phys. 299 (2015) 82–91. doi:10.1016/j.jcp.2015.06.038 .[19] P. Vignal, L. Dalcin, D. L. Brown, N. Collier, V. M. Calo, An energy-stable convex splitting for the phase-field crystal equation, Comput. Struct. 158 (2015) 355–368. doi:10.1016/j.compstruc.2015.05.029 .[20] D. Zhang, L. Zhang, Spectral deferred correction method for Landau–Brazovskii model with convex splitting technique, J. Comput. Phys. 491 (2023) 112348. doi:10.1016/j.jcp.2023.112348 .[21] J. Shen, J. Xu, J. Yang, The scalar auxiliary variable (SAV) approach for gradient flows, J. Comput. Phys. 353 (2018) 407–416. doi:10.1016/j.jcp.2017.10.021 .[22] L. Q. Chen, J. Shen, Applications of semi-implicit Fourier-spectral method to phase field equations, Comput. Phys. Commun. 108 (2) (1998) 147–158. doi:10.1016/S0010-4655(97)00115-X .[23] Z. Hu, S. M. Wise, C. Wang, J. S. Lowengrub, Stable and e ffi cient finite-di ff erence nonlinear-multigrid schemes for the phase field crystal equation, J. Comput. Phys. 228 (15) (2009) 5323–5339. doi:10.1016/j.jcp.2009. 04.020 .19 [24] Q. Du, J. Zhang, Adaptive finite element method for a phase field bending elasticity model of vesicle membrane deformations, SIAM J. Sci. Comput. 30 (3) (2008) 1634–1657. doi:10.1137/060656449 .[25] K. Jiang, W. Si, C. Chen, C. Bao, E ffi cient numerical methods for computing the stationary states of phase field crystal models, SIAM J. Sci. Comput. 42 (6) (2020) B1350–B1377. doi:10.1137/20M1321176 .[26] Y. Luo, L. Maibaum, Phase diagrams of multicomponent lipid vesicles: E ff ects of finite size and spherical geometry, J. Chem. Phys. 149 (17) (2018) 174901. doi:10.1063/1.5045499 .[27] B. Chenglong, C. Chang, J. Kai, An adaptive block Bregman proximal gradient method for computing stationary states of multicomponent phase-field crystal model, CSIAM Trans. Appl. Math. 3 (2022) 133–171. doi:10. 4208/csiam-am.SO-2021-0002 .[28] K. Jiang, S. Li, P. Zhang, On the approximation of quasiperiodic functions with Diophantine frequencies by periodic functions, SIAM J. Math. Anal. 57 (1) (2025) 951–978. doi:10.1137/24M165925X .[29] K. Jiang, C. Wang, Y. Huang, P. Zhang, Discovery of new metastable patterns in diblock copolymers, Commun. Comput. Phys. 14 (2) (2013) 443–460. doi:10.4208/cicp.150811.111012a .[30] M. Raissi, P. Perdikaris, G. E. Karniadakis, Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial di ff erential equations, J. Comput. Phys. 378 (2019) 686–707. doi:10.1016/j.jcp.2018.10.045 .[31] W. E, B. Yu, The deep Ritz method: A deep learning-based numerical algorithm for solving variational problems, Commun. Math. Stat. 6 (1) (2018) 1–12. doi:10.1007/s40304-018-0127-z .[32] X. Glorot, Y. Bengio, Understanding the di ffi culty of training deep feedforward neural networks, in: Y. W. Teh, M. Titterington (Eds.), Proceedings of the Thirteenth International Conference on Artificial Intelligence and Statistics, Vol. 9 of Proceedings of Machine Learning Research, PMLR, Chia Laguna Resort, Sardinia, Italy, 2010, pp. 249–256. URL https://proceedings.mlr.press/v9/glorot10a.html 
+
+[33] K. He, X. Zhang, S. Ren, J. Sun, Delving deep into rectifiers: Surpassing human-level performance on imagenet classification, in: Proceedings of the 2015 IEEE International Conference on Computer Vision, IEEE Computer Society, USA, 2015, pp. 1026–1034. doi:10.1109/ICCV.2015.123 .[34] R. A. Wickham, A.-C. Shi, Z.-G. Wang, Nucleation of stable cylinders from a metastable lamellar phase in a diblock copolymer melt, J. Chem. Phys. 118 (22) (2003) 10293–10305. doi:10.1063/1.1572461 .[35] Z. Li, N. Kovachki, K. Azizzadenesheli, B. Liu, K. Bhattacharya, A. Stuart, A. Anandkumar, Fourier neural operator for parametric partial di ff erential equations, in: International Conference on Learning Representations, 2021. URL https://openreview.net/forum?id=c8P9NQVtmnO 
+
+[36] K. O’shea, R. Nash, An introduction to convolutional neural networks, arXiv preprint arXiv:1511.08458 (2015). 
+
+doi:10.48550/arXiv.1511.08458 .[37] L. Sun, H. Gao, S. Pan, J.-X. Wang, Surrogate modeling for fluid flows based on physics-constrained deep learning without simulation data, Comput. Methods Appl. Mech. Eng. 361 (2020) 112732. doi:10.1016/j. cma.2019.112732 .[38] S. Wang, Y. Teng, P. Perdikaris, Understanding and mitigating gradient flow pathologies in physics-informed neural networks, SIAM J. Sci. Comput. 43 (5) (2021) A3055–A3081. doi:10.1137/20M1318043 .[39] A. G. Baydin, B. A. Pearlmutter, A. A. Radul, J. M. Siskind, Automatic di ff erentiation in machine learning: a survey, J. Mach. Learn. Res. 18 (153) (2018) 1–43. URL http://jmlr.org/papers/v18/17-468.html 
+
+20 [40] D. Hendrycks, K. Gimpel, Gaussian error linear units (gelus), arXiv preprint arXiv:1606.08415 (2016). doi: 10.48550/arXiv.1606.08415 .[41] I. Loshchilov, F. Hutter, Decoupled weight decay regularization, in: International Conference on Learning Rep-resentations, 2019. URL https://openreview.net/forum?id=Bkg6RiCqY7 
+
+[42] Z. Zhang, G. Cui, K. Jiang, A.-C. Shi, P. Zhang, J. Yin, L. Zhang, Exploring transition pathways in the Landau-Brazovskii model, arXiv preprint arXiv:2510.17080 (2025). doi:10.48550/arXiv.2510.17080 .[43] A. Jaatinen, T. Ala-Nissila, Extended phase diagram of the three-dimensional phase field crystal model, J. Phys.: Condens. Matter 22 (20) (2010) 205402. doi:10.1088/0953-8984/22/20/205402 .[44] G. I. Tóth, G. Tegze, T. Pusztai, G. Tóth, L. Gránásy, Polymorphism, crystal nucleation and growth in the phase-field crystal model in 2D and 3D, J. Phys.: Condens. Matter 22 (36) (2010) 364101. doi:10.1088/ 0953-8984/22/36/364101 .[45] M. W. Matsen, M. Schick, Stable and unstable phases of a diblock copolymer melt, Phys. Rev. Lett. 72 (1994) 2660–2663. doi:10.1103/PhysRevLett.72.2660 .[46] K. R. Elder, M. Grant, Modeling elastic and plastic deformations in nonequilibrium processing using phase field crystals, Phys. Rev. E 70 (2004) 051605. doi:10.1103/PhysRevE.70.051605 .[47] P.-G. de Gennes, J. Prost, The Physics of Liquid Crystals, 2nd Edition, Vol. 83 of The International Series of Monographs on Physics, Oxford University Press, Oxford, 1993. doi:10.1093/oso/9780198520245.001. 0001 .21

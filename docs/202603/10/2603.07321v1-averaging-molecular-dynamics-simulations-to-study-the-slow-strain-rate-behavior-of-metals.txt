@@ -1,0 +1,940 @@
+Title: Averaging Molecular Dynamics simulations to study the slow-strain rate behavior of metals
+
+URL Source: https://arxiv.org/pdf/2603.07321v1
+
+Published Time: Tue, 10 Mar 2026 00:58:38 GMT
+
+Number of Pages: 28
+
+Markdown Content:
+# Averaging Molecular Dynamics simulations to study the slow-strain rate behaviour of metals 
+
+Sarthok Kumar Baruah a, Sabyasachi Chatterjee a, ∗, Amit Acharya c, Gerald J. Wang b  
+
+> aDepartment of Applied Mechanics, Indian Institute of Technology Delhi, Hauz Khas, New Delhi 110016, India
+> bDepartment of Civil and Environmental Engineering, Carnegie Mellon University, Pittsburgh, PA 15213
+> cDepartment of Civil and Environmental Engineering &Center for Nonlinear Analysis, Carnegie Mellon University, Pittsburgh, PA 15213
+
+Abstract 
+
+The application of molecular dynamics (MD) simulations to quasi-static loading is severely limited by the large separation between atomic vibration timescales and experimentally relevant deformation rates. In this work, we employ the Practical Time Averaging (PTA) framework to overcome this limitation and enable atomistic simula-tions of crystalline solids under quasi-static loading conditions. PTA exploits the intrinsic separation of timescales by defining slow variables as time-averaged observables of the fast atomistic dynamics and their evolution in the slow loading timescale, thereby avoiding explicit integration of the fast dynamics. Using this approach, we simulate uniaxial deformation, in both tension and compression, of (4 to 20) nanome-ter sized cubic specimens of face-centered cubic Aluminum nanocrystals and applied strain rates approaching quasi-static conditions (10 −4 s−1 − 10 −3 s−1). We define slow variables as the averaged kinetic energy, potential en-ergy and normal stress in the loading direction, and show their evolution in the slow time scale. The stress-strain curves show yield close to the theoretical yield stress for homogeneous nucleation, followed by successive load drops and rise, caused due to dislocation nucleation, motion and exit from free surfaces. The "smaller is harder" eff ect is evident from the stresss-strain response as well as from the variation of yield stress with the sample size. The serrations in the response are more pronounced for smaller samples. The e ff ects of applied strain rate and initial temperature are studied. An interesting aspect of our study is that it is also able to show the evolution of intricate dislocation microstructures in the slow time scale, by tracking the (fast) time-averaged atomic positions. The PTA framework enables simulations at strain rates several orders of magnitude lower than those accessible to conventional MD, demonstrating significant speedup in computer time, while retaining full atomistic resolution. 
+
+Keywords: Molecular Dynamics, Time Averaging, Multiscale Modelling 
+
+1. Introduction 
+
+Molecular dynamics (MD) simulations have become a powerful tool in understanding material behavior. How-ever, a key di ffi culty in using MD for engineering applications is due to the extremely large separation between the timescales of atomic vibrations (on the order of femtoseconds) and the timescales of applied loading (on the order of seconds). A long-standing limitation in the use of molecular dynamics (MD) simulation is that it can only be applied directly to processes that take place on very short timescales. Many important processes in chemistry, physics and materials science take place on time scales that cannot be reached by molecular dynamics, which is limited to nanoseconds (or a few microseconds for very small systems). This restricts MD to extremely high strain rates of 10 8 s−1 to 10 10 s−1.Application of MD is therefore not feasible in many problems of practical interest such as materials under slow loading rates (such as quasi-static tension test), evolution of defects in materials such as voids and bubbles, twinning, phase-transformation, protein folding and many others. Radiation damage in structural materials used in nuclear reactors involves the evolution of an isolated collision cascade over picosecond (ps) time scales followed by long-term evolution of such defects which include both annihilation and aggregation. In order to e ff ectively pre-dict radiation-damage evolution, longer time-scale behavior of such defects must be simulated. Another potential application is investigating thin-film deposition and crystal growth where deposition events take place in the order of picoseconds but the time to next deposition is in the order of seconds. Most MD simulations employ deposition rates which are 10 8 − 10 11 orders of magnitude higher than experimental values. However, thermally activated   
+
+> ∗Corresponding Author
+> Email address: sabyasachi@am.iitd.ac.in (Sabyasachi Chatterjee)
+> arXiv:2603.07321v1 [cond-mat.mtrl-sci] 7 Mar 2026
+
+atomic processes with rates as low as one per second can have significant e ff ects on thin-film microstructures. The high atom deposition rate required for conventional MD simulations cannot realistically model such processes and thus, alternative methods such as PTA must be used. In the specific case of metal plasticity, dislocation motion is characterized by stick-and-slip motion where dislocations are stuck for long periods of time (with respect to MD time-scale) followed by sudden slip. Several MD studies have been made on the e ff ect of size and strain rate on the mechanical behavior of materials like Kabir et al. (2024); Chang et al. (2017); Yu et al. (2013); Wan et al. (2021); Komanduri et al. (2001); Vogl et al. (2021); Uchic et al. (2004); Van Vliet et al. (2003). In almost all the above studies, simulating material behavior at much slower strain rates still remains a significant challenge. Thus, traditional MD methods become computationally infeasible at such slow rates because of the unrealistically large number of time steps required to reach the characteristically large observed deformations. Numerous techniques have been developed to address the challenge of accessing long timescales in MD sim-ulations, which we briefly review here. A popular class of methods – including hyperdynamics Voter (1997), metadynamics Laio and Parrinello (2002), and Gaussian accelerated MD Miao et al. (2015) – broadly involves modifying the energy landscape to accelerate exploration of phase space. Another broad class of methods – includ-ing replica exchange MD Sugita and Okamoto (1999) and temperature-accelerated dynamics So /rensen and Voter (2000); Zamora et al. (2016) – achieves this accelerated exploration by performing simulations at temperatures higher than the temperature of interest. A large number of approaches fall under the umbrella of pathway-focused methods. Such methods focus on sampling along specific reaction coordinates, with less or no e ff ort invested in sampling in directions orthogonal to the chosen ones (see, e.g., reviews in Bolhuis and Swenson (2021); Mohr et al. (2024)). Coarse-graining spatial degrees of freedom is yet another common approach to access long timescales, covering an enormous number of methods (see, e.g., reviews in Shi et al. (2023); Noid et al. (2024)). The method discussed herein shares the most conceptual similarity with existing techniques that explicitly (or implicitly) lever-age the separation of timescales between fast and slow dynamics, most notably Mori-Zwanzig-based methods (Izvekov and Voth (2006); Hijón et al. (2010); Mielke et al. (2025)), methods based on adiabatic elimination of fast dynamics (Berezhkovskii and Szabo (2011)), or mathematical homogenization for Hamiltonian systems, see, e.g., (Bornemann and Schütte (1997); Bornemann (1998); Klar et al. (2021)). Each existing method presents certain drawbacks, which the method discussed herein avoids, either alto-gether or at least in ways that di ff er from the existing method. The energy-landscape-modification and elevated-temperature methods all fundamentally alter transition rates between states (and typically require some knowledge of and /or assumptions about the underlying kinetics in order to correct for these altered transition rates). Pathway-focused methods typically require prior knowledge of and /or assumptions about productive reaction coordinates along which to sample. Current methods driven by separation of timescales mentioned in the previous paragraph typically require a) expensive computation of and /or assumptions about a memory kernel that links the fast and slow dynamics or b) an assumption of the fast dynamics in question settling on an equilibrium point in phase space for fixed slow variables (adiabatic elimination or the Tikhonov scheme (see, e.g., Artstein (2002); Chatter-jee et al. (2018)), which is not satisfied by MD (especially NVE) systems or c) the satisfaction of delicate resonace conditions ((Bornemann, 1998, discussion of Takens chaos),Neishtadt (2019)). Spatial coarse-graining has a long history of successes and challenges; since these methods act on spatial degrees of freedom, most of these methods could likely be integrated with the approach developed herein in a relatively straightforward manner. The separation of timescales of atomic vibrations in MD and applied slow loading leads to singularly perturbed forms of the evolution equations. In this context, the coarse-graining scheme named Practical Time Averaging (PTA), originating in Slemrod and Acharya (2012); Acharya and Sawant (2006) and given definitive form in Chat-terjee et al. (2018), was developed to understand the behavior of nonlinear systems on a time scale much slower than that of the intrinsic dynamics. The technique deals with the averaging of singularly perturbed di ff erential equations, which involve a small parameter representing the ratio between the fast and slow fundamental time periods involved and the goal of PTA is to develop a tool to model the limiting behavior as the parameter tends to zero. For small values of the parameter, the direct simulation of the underlying nonlinear dynamics becomes infeasible due to the restriction on the time-step. Hence, instead of evolving the fast dynamics, slow variables were introduced as averages of the state function of the fast dynamics. The scheme also provides the evolution of 
+
+slow variables, which gives a measurement of the underlying intrinsic fast dynamics. In Chatterjee et al. (2018) a further improvement of the scheme is developed, describing a procedure to obtain the initial conditions of the fast trajectory of the state at a time in the future on the slow time scale, not accessible using a direct calculation with the fast dynamics. They also demonstrated the application of the scheme to problems that involve both conserva-tive as well as dissipative microscopic dynamics such as slowly evolving fast oscillations, exponential decay, and even sharp jump (i.e., fast behavior) in the evolution of the slow variable. Prior applications of PTA to model engineering problems include the work Tan et al. (2014), who applied it to two-dimensional lattice made of Nickel–Manganese undergoing detwinning and a three-dimensional atomic chain 2made of face-centered cubic (FCC) Nickel under uniaxial tension. The macroscopic features such as space-time averaged strain /stress) are obtained from coarse dynamics, qualitatively consistent with generic observed behavior for the systems involved. Significant time savings compared to conventional MD was observed. In another work, Chatterjee et al. (2020) used PTA to time-average fast Dislocation Dynamics (DD) and use the resulting slow-variables to replace constitutive phenomenological assumptions in Mesoscale Field Dislocation Mechanics (MFDM) continuum model of plasticity Acharya and Roy (2006); Roy and Acharya (2005, 2006); Arora and Acharya (2020b,a). The mechanical response of macroscopic samples at slow loading rates up to moderately large strains was computed with significant savings in computing time compared to conventional DD. The objective of the present work is to demonstrate the application of PTA to more complex and realistic engineering problems. The system we consider is a molecular dynamical system of FCC Aluminum crystal of few nanometers upto tens of nanometers in size, undergoing uniaxial tension and compression at quasi-static loading rates. We define slow variables of interest and evolve them on the slow time-scale of applied loading. We also show other details such as evolution of the atomic microstructure and dislocation configurations at quasi-static loading rates. Experimental studies of such details of evolution of microstructure at slow loading rates is challenging, which makes validation of these aspects in detail di ffi cult. Our work may also be considered as posing some challenges for experiments in this sense. This paper is organized as follows. In Section 2, we discuss the PTA numerical scheme and algorithm. In Section 3, we discuss the problem setup. In Section 4, we show the results of our work followed by conclusion in Section 5. 
+
+2. Methodology 
+
+In this section, we will discuss the PTA scheme and algorithm. A detailed discussion can be found in Chatterjee et al. (2018). Here, we provide a summary which includes the definition of the slow variable and its evolution equation. This is followed by the algorithm of its implementation. 
+
+2.1. Singularly perturbed di ff erential equations 
+
+A particular class of ODE which involves a split into fast and slow dynamics, coupled to each other, is of the form dx dt = 1
+
+ϵ F(x, l)
+
+dl dt = L(x, l),
+
+(1) with x ∈ Rn and l ∈ Rm. Here, x corresponds to the fast variable and its evolution is governed by the fast dynamics. Denoting σ = t 
+
+> ϵ
+
+as time scale of the fast dynamics, the fast evolution equation becomes 
+
+dx dσ = F(x, l). (2) On the other hand, l corresponds to the load, which evolves in the slow time scale and can be considered to be fixed in the fast dynamics in Eq. (2). Such class of ODEs are called singularly perturbed di ff erential equations. In the context of MD, we can think of x as the position and velocities of atoms with characteristic time period of 
+
+T f which is in the order of the time period of atomic vibrations (femtoseconds). l is the slow applied loading rate, with time period T f (typically a few to 1000 seconds). The small real parameter ϵ > 0, represents the ratio between fast and slow time periods, i.e. ϵ = T f 
+
+> Ts
+
+. In the case of MD under slow strain rates, it is of the order of 10 −15 or even smaller, which shows the vast separation in time scales between fast and slow dynamics. This small parameter multiplies the highest order derivative in the governing equation, thus forming a singular perturbation of the rest of the terms in the equation. Often, the limit behavior as ϵ → 0 is well-recovered simply by obtaining the solution to the problem by setting ϵ = 0. However, in many cases of practical relevance, as in MD, this is no longer true and obtaining the slow limit behavior requires more delicate analysis and the use of such understanding in robust and successful computation of the slow behavior of such systems. As already mentioned, the primary challenge in the direct computation of a singularly perturbed evolution is that when ϵ becomes very small, the time-step needs to reduce significantly as well, making the computations impractical. In such cases, instead of obtaining a full solution, a practical strategy is to define slow variables which give a measurement of the underlying dynamics. In the next section, we discuss the Practical Time Averaging (PTA) framework and algorithm, which precisely follows this idea. 32.2. Practical Time Averaging (PTA) - framework and algorithm 
+
+In Chatterjee et al. (2018), a class of slow variables called H-observables (where H stands for history) were defined as: vm(t) = 1
+
+∆
+
+Z tt−∆
+
+Z
+
+> Rn
+
+m(x) μ(s)( dx ) ds , (3) where m(x) is a state function of the fast dynamics, μ(s) is the invariant measure (also called Young measure) which gives the probability density function of the fast trajectory and ∆ is an interval in the slow time scale. Thus, 
+
+H-observables are averages over an interval in slow time of the moments of state functions with respect to the probability density function (Young measure) of the fast trajectory. Hence, such variables not only depend on the value of the measure at time t but on the “history” of the measure in the interval [ t − ∆, t]. Di ff erentiation of Eq. (3) in time using Newton-Leibnitz rule gives the time-derivative of the slow variable in the form: 
+
+dvm
+
+dt (t) = 1
+
+∆
+
+Z
+
+> Rn
+
+m(x) μ(t)( dx ) −
+
+Z
+
+> Rn
+
+m(x) μ(t − ∆)( dx )
+
+!
+
+. (4) Given the initial conditions of the fast and slow variables i.e. x(t0) and l(t0), where t0 = −∆ is the initial time, we think of the calculations marching forward in slow time-scale in discrete steps (also called jumps ) of size h in the slow time scale, with total time as T0 = nh . Thus the variable t below in description of our algorithm takes values of 0 , h, 2h, ..., nh . The interval ∆ in the slow time-scale is a fraction of h and its value is given in Table. 1. The goal is to determine the successive values of the slow variable v( t) in the slow time, which gives a measure of the underlying fast dynamics. 
+
+• Step 1: Calculate the rate of change of slow variable 
+
+We denote R 
+
+> Rn
+
+m(x) μ(t)( dx ) as Rmt and R 
+
+> Rn
+
+m(x) μ(t − ∆)( dx ) as Rmt−∆. In practice, we do not compute the Young Measure and then take the moment of the state function with respect to it, but instead obtain it as running time averages of the state function till it converges. However, the latter definition using the running time average is computationally e ffi cient and is therefore utilized in our work. We denote it as Rmt , which is computed as 
+
+Rmt = 1
+
+NtNtX
+
+> r=1
+
+m(x(σr), lt), (5) where the successive values of x(σr) are calculated by running the fast dynamics given by Eq. (2) while holding the load lt at slow time t fixed. The initial conditions to run the fast dynamics is discussed in Step 4. Here, Nt is the number of fine time steps required for Rmt to converge up to a specified tolerance. A discussion on the convergence criteria is provided in Appendix A. In this work, we have three state functions (as defined later in Eq. (21)), and the tolerance for checking the convergence of the running time averages for each of them is provided in Table 1. Substituting Eq. (5) to the RHS of Eq. (4), the time derivative of the slow variable is computed as: 
+
+dvm
+
+dt (t) = 1
+
+∆
+
+Rmt − Rmt−∆
+
+ (6) 
+
+• Step 2: Find the value of slow variables 
+
+The predicted value of slow variable using PTA at ( t + h) is given using the extrapolation rule: vm(t + h) = vm(t) + dvm(t)
+
+dt h (7) where dvm(t) 
+
+> dt
+
+is obtained from Eq. (6). 
+
+• Step 3: Accept the Measure 
+
+The value of the slow variable at ( t + h) is defined as vmd (t + h) : = 1
+
+N′
+
+X
+
+> r
+
+m(x(σr)) , where N′ = ∆
+
+ϵ ∆σ , (8) and successive values x(σr) are obtained by running the fast dynamics in Eq. (2), using a suitable initial condition as described in Step 4. Note that the number of steps N′ used to calculate the slow variable v( t +h)4above is di ff erent from the number of steps Nt to determine the Rmt using Eq. (5) (with N′ >> Nt). This shows that both v( t + h) and Rmt are running time averages but are computed over di ff erent number of fast time steps. Moreover, N′ is fixed but Nt depends on how fast the running time average converges at slow time t. In practice, it is not feasible to run the fast dynamics over the period ∆ when ϵ becomes very small, since N′ becomes exceedingly large. Hence, we approximate it using Simpson’s rule as vmd (t + h) ≈ 16
+
+
+
+Rmt+h−∆ + 4Rmt+h− ∆
+
+> 2
+
++ Rmt+h
+
+
+
+(9) where Rmt+h−∆, Rmt+h− ∆
+
+> 2
+
+, and Rmt+h are the converged values of the running time averages (as defined in Eq. (5)) at the slow times given by their respective subscripts. The initial conditions to run the fast dynamics in order to obtain these averages are provided in Eq. (13) in Step 4. The relative error between the values of the slow variable v( t + h) computed using Eq. (7) and Eq. (9) is denoted as ev 
+
+> t+h
+
+and given by 
+
+ev 
+
+> t+h
+
+= vm(t + h) − vmd (t + h)vmd (t + h) . (10) Since the fast dynamics at play is not known to satisfy the ergodicity assumption for each fixed value of applied load, the invariant measures of the limit (as ϵ → 0) dynamics at any slow time depends on the initial condition used to generate the fast trajectory - this is also borne out by our practical experience. The relative error ev 
+
+> t+h
+
+does not address that component of the error. Addressing and quantifying that component of the error is challenging because it requires knowing the solution of the fast dynamics over impossibly large (fast) times. We say there is a match in the value of the slow variable at t + h if ev 
+
+> t+h
+
+< tol v, where tol v is a specified tolerance for slow variable v. Since we have 3 di ff erent slow variables in our work (as defined in the discussion following Eq. (21)), we have three tolerances corresponding to each of them, which are listed in Table (1).In that case, we accept the value of the slow variable predicted by PTA at t + h as defined in Eq. (7) and move on to the next slow time. If not, we check whether there is a jump in the measure at t + h. Since we do not compute the measure but instead obtain the moments of state functions with respect to it, a jump in such moments identifies a jump in the measure indirectly. Hence, we check if the following inequality holds: 
+
+e1
+
+e2
+
+− 1 ≥ tol j , where e1 = Rmt+h − Rmt
+
+Rmt
+
+, e2 = Rmt − Rmt−h
+
+Rmt−h
+
+. (11) The above inequality is satisfied when Rmt+h is significantly di ff erent from Rmt and Rmt−h, which occurs when there is a jump in the measure at time t + h.In Eq. (11), we use the assumption that the measure does not undergo a jump at time t. However, if a jump in the measure is already detected at time t, we detect if there is a jump in the measure at time t + h by checking if e1 ≥ tol j, where e1 is given in Eq. (11). If a jump in the measure is detected, v md (t + h) defined in Eq. (8) is accepted as the value of the slow variable at t + h and the prediction of the slow variable given by the extrapolation rule in Eq. (7) is discarded. 
+
+• Step 4: Obtain the fine initial conditions 
+
+Step 1 and Step 3 requires obtaining the values of Rm at di ff erent slow times. To obtain Rmt , we need to run MD with an initial guess of the fast variable, xguess t , which is chosen as a fine state at a fast time corresponding to tprev for which Rmtprev was considered to have converged. We denote such a state as xconv tprev .As mentioned in Eq. (5), it takes Ntprev fine time steps for Rmtprev to converge. Hence, xconv tprev is equivalent to 
+
+x(σNtprev ). Based on the above argument, the initial guess at slow times t − ∆ and t, used to obtained Rmt−∆ and Rmt
+
+respectively in Eq. (6) in Step 1 are obtained as: 
+
+xguess t−∆ = xconv t−h
+
+xguess t = xconv t− ∆
+
+> 2
+
+(12) 5Similarly, the initial guess used to obtained Rmt+h−∆, Rmt+h− ∆
+
+> 2
+
+and Rmt+h in Eq. (9) in Step 3, are obtained as: 
+
+xguess t+h−∆ = xconv t
+
+xguess t+h− ∆
+
+> 2
+
+= xconv t+h−∆
+
+xguess t+h = xconv t+h− ∆
+
+> 2
+
+(13) If the running time average obtained by running the fast dynamics with initial condition xguess t does not converge even after running a reasonably large number of fast time steps, then we cannot obtain Rmt using that xguess t . In such cases, we have to try di ff erent values of xguess t and repeat Steps 3 and 4. While the protocol defined above appears to produce plausible results for the applications we are inter-ested in, as shown later in Section 3, defining these guesses for generating the approximate measures at well-separated slow times is a fundamental problem. The challenge here is that the initial condition for gen-erating the measure at any slow time has to to be within the basin of attraction of the invariant measure(s) corresponding to the limit flow at that slow time. Estimating such a location in phase space with some plau-sibility from well-separated, in slow-time, spurts of fast computation, as employed by our scheme requires some special consideration. One line of reasoning was provided by the closest-point-projection approach as described in (Chatterjee et al., 2018, Step 3 and Step 5 of Section 9). There, the initial condition was ob-tained by taking the closest point projection of a point in the support of the invariant measure at a slow time with respect to the measure at a previous slow time. Then linearly extrapolating these points gave the initial condition for the fast trajectory at the next slow time (under the condition that the measure evolves slowly and does not undergo a jump in this interval of slow time). Applying that protocol here did not result in success, most likely due to the lack of a adapted metric w.r.t which the required projection can be executed in phase space. Based on the naive choices made, the guesses obtained for initial conditions seemed to have excessive kinetic energy, resulting in non-convergence of the Rm values over the typical time intervals that were employed to perform the averages. At a fundamental level, the plausibility of our obtained results (up to validation) does not rule out the fact that the measure that we work with, say at slow time t, is not an approximation of any of the invariant measures of the limit dynamics we are trying to probe. A full answer to this (very) di ffi cult question of predicting the slow dynamics of a fast evolution with guarantees and furthermore, with computational e ffi ciency, awaits further study. A natural idea in this regard would be to evolve the slow variables (v rα , vvα ) defined in Sec. 2.3 below (i.e., the slow variables corresponding to the atomic positions and velocities of an MD asembly) and consider these at a discrete slow time, t, as the initial condition for the fine dynamics at time t to generate the various Rmt .In the meanwhile, we proceed with our strategy laid out above which produces plausible outcomes. 
+
+2.3. Molecular Dynamics 
+
+In this work, the fast dynamics is the evolution of a molecular dynamical system consisting of a block of FCC Aluminum atoms, as discussed later in Section 2.4.1. We have performed MD simulations with the software Large-scale Atomic /Molecular Massively Parallel Simulator (LAMMPS) to study the tensile and compressive behaviors of metals under slow strain rates using embedded-atom method (EAM). Specifically, we used the Mishin et al. (1999) aluminum potential. It is converted in LAMMPS format by C. A. Becker (2008). The total potential energy of the system is represented as 
+
+U = 12
+
+X
+
+> α
+
+X
+
+> ββ,α
+
+V(rαβ ) +
+
+X
+
+> α
+
+B(ρα) (14) Here, V is the pair potential which is a function of the distance rαβ between atoms α and β and B is the embedding energy which is a function of the atomic electron density ρ. The latter is given by 
+
+ρα =
+
+X
+
+> ββ,α
+
+ρ(rαβ )In MD the atoms are treated as classical Newtonian particles. Thus, the total force on particle α is expressed as 
+
+Fα = ma aα = Fext ,α + Fint ,α (15) 6Here, ma is the mass of each atom (note the di ff erence between this and the state function defined previously as 
+
+m(x) in Eq. (3)) and aα is the acceleration of atom α. Fext ,α represents the external force acting on the atom due to external fields and atoms outside the system, while Fint ,α represents the internal force arising from interactions with other atoms within the system. The internal force on atom α can be expressed as 
+
+Fint ,α =
+
+X
+
+> ββ,α
+
+Fαβ = − ∂∂rα U (16) In the above the expression of potential energy ( U) is substituted from Eq. (14). To evolve the fast dynamics of the sample LAMMPS uses the Velocity-Verlet (VV) algorithm LAMMPS Developers (2024a,b). Given, at fast time σ the positions and velocities of the particles are rα(σ) and vα(σ), respectively. As discussed in Section 2.4, they form the state of the system. The steps of the algorithm are as follows: 
+
+• Step 1: Calculate the velocity at fast time σ + ∆σ
+
+> 2
+
+We calculate a half-step update to the velocities as 
+
+vα
+
+
+
+σ + ∆σ
+
+2
+
+
+
+= vα(σ) + Fα(rα(σ)) 
+
+m
+
+∆σ
+
+2 (17) 
+
+• Step 2: Calculate the position at fast time σ + ∆ σ
+
+We calculate a full-step update to the positions using the half-step update to the velocities as 
+
+rα(σ + ∆ σ) = rα(σ) + vα
+
+
+
+σ + ∆σ
+
+2
+
+
+
+∆σ (18) 
+
+• Step 3: Calculate the velocity at fast time σ + ∆ σ
+
+Finally, we calculate one additional half-step update to the velocities as 
+
+vα(σ + ∆ σ) = vα
+
+
+
+σ + ∆σ
+
+2
+
+
+
++ Fα(rα(σ + ∆ σ)) 
+
+m
+
+∆σ
+
+2 (19) 
+
+2.4. Application of PTA to Molecular Dynamics 
+
+In this section, we discuss the application of PTA to a specific problem in which the fast dynamics is given by Molecular Dynamics, as discussed the previous section. This requires the identification of the load and fast variable, the state functions and the slow variable, which we discuss next. 
+
+2.4.1. Problem Setup 
+
+A simulation box of constant volume is defined within which a sample of Aluminum with FCC lattice structure, with lattice parameter a is created. The dimensions of the box are Bx, By and Bz (whose values are specified in Table 1) while that of the sample are Lx, Ly and Lz, respectively, as shown in Fig. 1. In this work, we have used cubic samples, hence Lx = Ly = Lz = Ls, where Ls is the size of the cubic sample, which ranges from 4 nm to 30 nm , as specified in Table 1. Since the dimensions of the simulation box are much larger than those of the sample, they need not be changed during the deformation of the sample. Hence, the system is evolved using NVE ensemble (where V is the simulation box volume) with EAM potential as defined in Eq. (14). The global coordinate axes x, y, and z are aligned along the lattice directions [100], [010], and [001] respectively of the sample. The MD box is subjected to fixed boundary condition in all directions. As shown in Fig. 2, we define the left boundary atoms of the sample as the set of atoms which belong to the left boundary region ∂Bl = {(x, y, z) ∈
+
+R3 : 0 ≤ x ≤ a, 0 ≤ y ≤ Ly, 0 ≤ z ≤ Lz}. Similarly, the right boundary atoms of the sample are defined as the set of atoms which belong to the right boundary region ∂Br = {(x, y, z) ∈ R3 : ( Lx − a) ≤ x ≤ Lx, 0 ≤ y ≤ Ly, 0 ≤ z ≤ Lz}.The state of the system comprises the set of atomic positions and velocities and is denoted as 
+
+s = {rα, vα} = r1, r2, ..., rn, v1, v2, ... vn
+
+= x1, y1, z1, ..., xn, yn, zn, v1
+
+> x
+
+, v1 
+
+> y
+
+, v1 
+
+> z
+
+, ... vnx, vny , vnz
+
+ , (20) where the system consists of n atoms and rα and vα are the position and velocity of atom α. Thus, the state s is a vector of size 6 n, where n is the number of atoms in the system. The state s evolves on the fast time scale σ, hence it is denoted as s(σ). This serves as the fast variable in our work, similar to x(σ) in Section 2.1 and 2.2. The load 
+
+l(t) corresponds to the applied displacement on the system under quasi-static loading rate. A detailed discussion on the boundary conditions is provided next. 7𝐵 𝑦 
+
+𝐿 𝑥 
+
+𝐿 𝑦 
+
+𝐿 𝑧 
+
+𝐵 𝑥 
+
+𝐵 𝑧 Figure 1: MD Box and Sample. 𝜕𝐵 l 𝜕𝐵 𝑟 
+
+𝒖 α = 𝟎  𝒖 α = 𝜀 𝑡 𝑡 , 0 , 0
+
+# 𝜀   
+
+> 𝐿 𝑠
+> Type equation here. 𝐿 𝑠
+> 𝑥
+> 𝑦
+> 𝑧
+
+Figure 2: Boundary conditions (BCs) applied on the sample corresponding to uniaxial tension /compression in the x direction. To obtain the converged running time average R mt at slow time t, MD is run with the left boundary atoms ∂Bl fixed at zero displacement while the right boundary atoms ∂Br are fixed at u x(t) = ε(t) Ls = ˙ε t L s while uy = uz = 0, where ˙ε is the applied strain rate and t is the slow time. 2.4.2. Boundary conditions 
+
+In this section, we discuss the boundary conditions applied to the sample at di ff erent stages of the simulation. Fig. 2 shows the boundary conditions applied to the sample. The left and right boundary atoms, ∂Bl and ∂Br,and the corresponding constraints on the atomic positions, velocities, and forces are indicated. First, we generate the initial state s(−∆). The initial positions of the atoms are the lattice positions; velocities are initialized from a Maxwell-Boltzmann distribution corresponding to the temperatures T0. During this step, the left boundary atoms 8are fixed at their reference lattice positions by setting vα(σ) = 0, Fα(σ) = 0. Note that this is the standard procedure to fix atoms in LAMMPS, unlike in mechanics, where we cannot simultaneously specify both velocity and force. However, setting vα(σ) = 0, Fα(σ) = 0 in Eq. (17)-(19) ensures that the position rα(σ) for atom 
+
+α which belongs to the left boundary ∂Bl remains unchanged during the Velocity-Verlet update in MD. (some comment that this actually implements the mechanics correctly should be added - Jerry /Sabyasachi) while the right boundary atoms are allowed to move freely in the x direction until the resultant reaction force on the right boundary atoms in the x direction, Rx(σ), vanishes. The sample thus undergoes thermal relaxation to achieve an initial stress-free state. After thermal relaxation, the simulation proceeds by a combination of two steps. Mechanical loading is applied to the sample corresponding to the applied strain rate and the slow time. After the load is applied, the right boundary atoms are fixed at that displacement, and the running time average of the state functions is calculated. The steps we followed are summarized below: 1. We first displace the right boundary atoms to ux(t − ∆) = ˙ϵ(t − ∆)Ls and then fix them at that position (by setting vα(σ) = 0, Fα(σ) = 0, similar to the procedure used to fix the left boundary atoms as discussed above). At time t − ∆, we run MD simulations until Rmt−∆ converges, following Eq. (5). 2. We then displace the right boundary atoms by ux(t − ∆ 
+
+> 2
+
+) − ux(t − ∆) = ˙ϵ ∆ 
+
+> 2
+
+Ls and fix them at that position. At time t − ∆ 
+
+> 2
+
+, we run MD simulations until Rmt− ∆
+
+> 2
+
+converges, following Eq. (5). 3. We then displace the right boundary atoms by ux(t) − ux(t − ∆ 
+
+> 2
+
+) = ˙ε ∆ 
+
+> 2
+
+Ls and fix them at that position. At time t, we run MD simulations until Rmt converges, following Eq. (5). 4. We calculate the rate of change of the slow variable using Eq. (6), and obtain the extrapolated value v m(t +h)using the extrapolation rule in Eq. (7). Finally, we displace the right boundary atoms by ux(t+h−∆)−ux(t) =
+
+˙ε(h − ∆)Ls.5. We similarly fix the right boundary atoms at that position corresponding to t + h − ∆, t + h − ∆ 
+
+> 2
+
+, and t + h.Using the initial guess for the state as defined in Eq. (13), we run MD until convergence to calculate Rmt+h−∆,
+
+Rmt+h− ∆
+
+> 2
+
+, and Rmt+h, respectively, following Eq. (5). 6. We then compare the value of the slow variable v md (t +h) calculated using Eq. (9) with the extrapolated value of the slow variable at slow time t + h. We accept the measure if the two values are close to each other, up to a specified tolerance, using Eq. (11). 7. If the values of the slow variables are di ff erent, we check if there is a jump in the measure using Eq. 11. If there is a jump in the measure, we discard v obtained using the extrapolation rule in Eq. (7) and set the value of the slow variable as the value v md obtained using Eq. (9). 8. We then proceed to the next slow time t + h, where h is the jump-size in slow time, and repeat the above steps. 
+
+2.4.3. State functions and slow variables 
+
+The state functions (denoted as m in the discussion following Eq. (3)) that we choose in our work are the instantaneous kinetic energy K(σ), potential energy U(σ) and normal stress (obtained as resultant reaction force divided by the cross-sectional area) in the x direction, Tx(σ), which are defined as 
+
+K(σ) = 12
+
+> n
+
+X
+
+> α=1
+
+ma vα(σ) · vα(σ)
+
+U(σ) = 12
+
+> n
+
+X
+
+> α=1
+
+X
+
+> ββ,α
+
+V(rαβ (σ)) +
+
+X
+
+> α
+
+B(ρα(σ)) 
+
+Tx(σ) = R(σ) · ˆex
+
+A0
+
+=
+
+− Pα∈∂Br Fint ,α (σ) · ˆex
+
+L2
+
+> s
+
+.
+
+(21) The forms of the potential energy of the system U(σ) and the internal force Fint ,α (σ) on atom α have been dis-cussed previously in Eq. (14) and Eq. (16) respectively. The right boundary region ∂Br is defined in Section 2.4.1. Note that the state functions depend on the state s(σ) as defined above in Eq. (20) through the set of atomic positions rα and atomic velocities vα.
+
+The slow variables (denoted as vm in Eq. (3) ) corresponding to the state functions defined in Eq. (21) in this work are vK (t), vU (t) and vTx (t). For simplicity, hereafter we denote them with overhead bars as K, U and T x and refer to them as averaged kinetic energy, averaged potential energy and averaged normal stress respectively. 
+
+9In addition to the slow variables defined above, we also track the average atomic positions of each atom in the system to visualize the evolution of the microstructure at di ff erent slow times t. The averaged position of atom α
+
+is calculated as ˜rα(t) = 1
+
+Nt
+
+X
+
+> i
+
+rα(σi), (22) where Nt is defined in the discussion following Eq. (5). Note that ˜rα(t) is not evolved as a slow variable (and neither is it the same as v rα ) but is only meant for the purpose of visualization of a measure of a type of averaged atomic positions and dislocation microstructure in slow time. 
+
+3. Results 
+
+Table 1: Simulation parameters. 
+
+Symbol Description Value 
+
+a Lattice parameter of aluminum 4.05 Å 
+
+∆σ MD timestep 1 femtosecond 
+
+Bx × By × Bz Dimension of box 202 .5 nm × 90 nm × 90 nm Ls Size of cubic sample 4 to 30 nm 
+
+∆ Time interval in Eq. (3) h/5
+
+Nmax Maximum MD runs to check for convergence 50 × 10 3
+
+tol m Tolerance for convergence check in Eq. (A.2) 5%( U, K, Rx)
+
+tol j Tolerance for jump check in Eq. (11) 1%( U), 8%( K), 5%( Rx)
+
+tol v Tolerance for acceptance of measure in Eq. (24) 5%( U), 1%( K), 1%( Rx)
+
+3.1. Uniaxial tension test 
+
+In this section, we discuss the results for uniaxial tension simulations performed on samples of sizes 4, 8, 20, 25 and 30 nm . The boundary conditions are described in Figure 2 and we have used the applied strain rate of 10 −3 s−1.
+
+• Evolution of averaged kinetic energy, averaged potential energy, and averaged normal stress: The evolution of the slow variables - averaged potential energy U, averaged kinetic energy K and averaged nor-mal stress T x along with the relative errors between these quantities and the corresponding values obtained from the measure, Ud, Kd, and T dx , for the 8 nm sample are shown in Fig. 3, 4, and 5, respectively. We observed that the relative error for all the slow variables are within 5% at all strains. The increase in potential and kinetic energy due to application of mechanical load is visible. This is ex-pected as energy is supplied to the system which leads to bond stretching (increase of potential energy) and increased lattice vibrations (increase of kinetic energy). The stress strain curve has an elastic part up to around 5% strain at which point dislocation nucleation and motion occurs. The resulting lattice waves lead to a sudden increase in kinetic energy. It also causes slip and plastic deformation and hence the stress-strain curve drops suddenly. Thus, dislocation nucleation events have a distinct signature in our simulations on slow time scales when the invariant measures jump, which is further reflected as jumps in the slow vari-ables. Once dislocations exit the free-surface, the stress rises again due to dislocation starvation, followed by subsequent drop. These serrations are a characteristic feature of uniaxial tension and compression of samples of sizes ranging from a few nanometers to tens of nanometers (the sample sizes in this work range from 4 nm to 30 nm ). The yield stress of around 5 GPa is reasonable since we are starting from a defect-free sample and homo-geneous nucleation of dislocations is expected. The theoretical shear stress for the same is G/10 = 2.5 GPa 
+
+(where G = 25 GPa is the shear modulus of Aluminum) Frenkel (1926). The shear stress multiplied with the Schmid Factor √6 (for {111 } < 110 > slip systems in FCC crystal under uniaxial tension) gives around 6 GPa , which is close to our model prediction. However, the primary contribution and key novelty of our approach is that the stress-strain curve shown till a strain of 20 % is obtained with applied strain rate of 10 −3/s, which is almost 10 orders of magnitude smaller than the conventional rates applied in MD simulations. This is important for studying the mechanical response of samples at quasi-static loading rates using MD. To the best of our knowledge, MD simulations using such small rates and up to high strains have not been conducted yet. 10 Another significant improvement is that the size e ff ect that we observe does not involve calibration of any fitting parameter and instead is an emergent behaviour that is caused by the underlying microstructure evolution on the scale of applied loading at quasistatic loaidng rates. 0 5 10 15 20 
+
+0x (%)     
+
+> -1.42 -1.41 -1.4 -1.39 -1.38 -1.37
+> U (G # L3
+> s )
+> (a) 0510 15 20
+
+0x (%)  
+
+> 00.2 0.4 0.6 0.8 1
+> e U (%) (b)
+
+Figure 3: Evolution of averaged potential energy (U) and its relative error (eU ) with strain (ϵx) for 8 nm sample in uniaxial tension. L s in the y-axis denotes the size of the sample. 0 5 10 15 20 
+
+0x (%)     
+
+> 00.01 0.02 0.03 0.04 0.05
+> K (G # L3
+> s )
+> (a) 0510 15 20
+
+0x (%)  
+
+> 02468
+> e K (%) (b)
+
+Figure 4: Evolution of averaged kinetic energy (K) and its relative error (eK ) with strain (ϵx) for 8 nm sample in uniaxial tension. 
+
+• Eff ect of sample size on the stress–strain curve: To ensure statistical reliability, five simulations re-sults with di ff erent initial atomic velocity distributions are performed for both 8 nm and 20 nm blocks. For each block size, the mean of these simulation results is used to analyze the size e ff ect. The corresponding stress–strain curves are shown in Figure 6. Under the same loading conditions, the 8 nm block exhibits a higher stress response than the 20 nm block, indicating a pronounced size e ff ect. Size e ff ect in micron to submicron sized samples has been widely reported in micropillar compression tests and torsion tests of nanowires Uchic et al. (2004) It is caused by the limited availability of dislocation sources in smaller samples, which also require higher stress to nucleate. Secondly, the strain gradients in smaller samples are higher, which leads to the generation of Geometrically Necessary Dislocations (GNDs) to maintain lattice compatibility. GNDs are a source of hardening in metals. The size e ff ect observed in our simulations agrees qualitatively with the experimental results of Uchic et al. (2004), discussed later in Section 3.5. 
+
+• Eff ect of size on standard deviation of mean stress: We carry out five simulations with di ff erent initial atomic velocity distributions for both 8 nm and 20 nm blocks. At a certain strain value, the mean and standard deviation of stress across those simulations are then calculated for both sizes. In Figure 7, we show the variation of the standard deviation of stress for di ff erent sizes. It can be observed that the smaller 8 nm block shows a higher standard deviation compared to the larger 20 nm block. To quantify this, we 11 0 5 10 15 20 
+
+0x (%)     
+
+> 00.05 0.1 0.15 0.2 0.25
+> T x (G)(a) 0510 15 20
+
+0x (%)  
+
+> 012345
+> e T x (%) (b)
+
+Figure 5: Evolution of averaged normal stress (T x) and its relative error (eT x ) with strain (ϵx) for 8 nm sample in uniaxial tension. 0 5 10 15 
+
+0x (%)      
+
+> 00.05 0.1 0.15 0.2 0.25
+> T x (G)
+> 8nm
+> 20 nm
+> (a) 0510 15
+
+0x (%)    
+
+> -0.06 -0.04 -0.02 00.02 0.04
+> log T  x (G)
+> 8nm
+> 20 nm (b)
+
+Figure 6: Evolution of averaged normal stress (T x) with strain (ϵx) for di ff erent sample sizes under uniaxial tension. 
+
+calculate the mean of the standard deviation. The values are 0 .3549 GPa and 0 .2188 GPa for the 8 nm and 20 nm sizes, respectively. After yielding, the shaded regions corresponding to the 8 nm and 20 nm sizes appear to overlap. The higher standard deviation for smaller sample is reasonable. In smaller samples, fewer dislocations are nucleated and once nucleated, they exit the surface quickly, followed by a period of dislocation starvation, leading to pronounced serrations. However, in larger samples, higher number of dislocations are present at any given time (post-yielding), hence dislocation nucleation and exit events do not have such pronounced e ff ect on the stress-strain curve. 
+
+• Eff ect of size on the tensile properties of the sample: We performed uniaxial tension tests on samples of various sizes Ls = {4, 8, 20 , 25 , 30 } nm to understand the e ff ect of sample size on the mechanical properties of the material. We then fit a linear curve to the stress–strain data in the 0 to 1 % strain range and the slope of this fitted line is taken as the Young’s modulus ( E). The yield strength ( σys ) is taken as the value of the averaged normal stress ( T x) at which the first dislocation nucleation in slow time is observed. This is done by tracking the mean atomic positions of every atom calculated using Eq. (22). Figure 8a shows the elastic modulus plotted as a function of size. It is observed that the Young’s modulus decreases significantly as the size increases. Similarly, Figure 8b shows the variation of yield strength with size, indicating a decreasing trend with increasing sample size. The increase in Young’s modulus with decreasing sample size is because of the increase in the surface to volume ratio. Surface atoms have higher sti ff ness compared to bulk atoms, which increases the Young’s modulus. The decrease in yield strength with increasing sample size is because larger samples have more surface area, and hence higher number of potential sites for dislocation nucleation (which are usually parts of 12 0 5 10 15 
+
+0x (%) 
+
+00.05 0.1 0.15 0.2 0.25 
+
+> T x (G)
+
+8 nm : 7(T x)8 nm : 7(T x) ' <(T x)20 nm : 7(T x)20 nm : 7(T x) ' <(T x)Figure 7: Evolution of mean and standard deviation of T x across di ff erent runs corresponding to di ff erent initial velocity distributions and for di ff erent sample sizes with strain (ϵx). The mean averaged stress μ(T x) is marked using the solid curve while the shaded envelope around it shows the range of μ(T x) ± σ(T x), where σ(T x) is the standard deviation of the averaged stress. 
+
+the sample with higher local stress concentration such as edges and corners), compared to smaller samples. Although done for very di ff erent sample sizes, the trends observed in our simulation results align with the experimental observations of Uchic et al. (2004), discussed later in Section 3.5. 5 10 15 20 25 30 
+
+## Ls (nm )        
+
+> 60 70 80 90 100 110 120
+> E (GP a )
+> (a) Variation of Young’s modulus (E) with sample size (Ls).0.2 0.25 0.3 0.35 0.4 0.45 0.5
+
+L!1=2 
+
+> s
+
+(nm !1=2)    
+
+> 2345678
+> <ys  (GP a )(b) Variation of Yield strength ( σys ) with sample size (L−1/2
+> s).
+
+Figure 8: Dependence of mechanical properties on sample size. 
+
+• Eff ect of initial state of system on the stress-strain curve: We carry out five simulations with di ff erent initial atomic velocity distributions at the same initial temperature of T0 = 300 K for the 8 nm and 20 nm 
+
+blocks, each. In Fig. 9, we have shown the variation of stress response for di ff erent initial states of the system. It is observed that although the initial temperature of the system remains the same, di ff erent ini-tial velocity distributions of atoms lead to variation in stress response. This is the primary reason for the stochasticity of the response observed in our simulations. As observed and discussed previously, a smaller sample size leads to harder responses and higher serrations in the stress-strain curve. 
+
+• Eff ect of applied strain rate on stress-strain curve: We perform uniaxial tension simulations on the 20 nm block under applied strain rates of 10 −4 s−1 and 10 −3 s−1. Figure 10 shows the variation of stress with the applied strain rate. It is observed that although the elastic slopes are nearly identical, the plastic deformation behavior, governed by dislocation nucleation and evolution, depends on the applied strain rate. In particular, the stress levels after yielding remain consistently above those at a lower strain rate. At higher strain rates, the material has less time for dislocations to nucleate and move, so higher stresses are required to activate plastic deformation mechanisms. Conversely, at lower strain rates, dislocations have 13 0 5 10 15 
+
+# 0x (%) 
+
+00.05 0.1 0.15 0.2 0.25 
+
+> T x (G)
+
+8 (1) 8 (2) 8 (3) 8 (4) 8 (5) 20 (1) 20 (2) 20 (3) 20 (4) 20 (5) 
+
+nm Figure 9: Averaged normal stress (T x) with strain (ϵx) with di ff erent initial atomic velocity and same temperature for di ff erent sample sizes under uniaxial tension. 
+
+more time to multiply and glide, leading to lower flow stresses. Plastic deformation involves overcoming energy barriers for dislocation nucleation and motion. Faster deformation (higher strain rate) means less time for thermal fluctuations to assist these processes, requiring larger applied stresses. 0 2 4 6 8 10 12 
+
+## 0x (%) 
+
+00.05 0.1 0.15 0.2 
+
+> T x (G)
+
+10 !3 s!1
+
+10 !4 s!1
+
+Figure 10: Evolution of averaged normal stress (T x) with strain (ϵx) for 20 nm sample under uniaxial tension with di ff erent applied strain rates of 10 −4 s−1 and 10 −3 s−1.
+
+• Eff ect of initial sample temperature on stress-strain curves: 
+
+We initialize the atomic velocities corresponding to di ff erent initial temperatures. For each initial tem-perature, we run 3 simulations from di ff erent initial velocity distribution corresponding to the same initial temperauture. The evolution of the mean kinetic energy and mean potential energy from the 3 simulations for each initial temperature are shown in Fig. 11a and Fig. 11b respectively. It is evident that there is a rise in both kinetic and potential energy with increasing initial temperature, at almost all strain values. The rise in kinetic energy is due to the increased initial kinetic energy supplied to the system at higher temperature. The rise in potential energy is because atoms vibrate at larger distance from their mean position due to in-creased kinetic energy. Fig. 12 shows the evolution of the stress (averaged over 3 simulations for each initial temperature) with strain. The initial yielding occurs at lower stress with increasing temperature as expected. Till about 7 .5% strain, the stress-strain curves show a drop with increasing temperature. However, at higher strains, the serrations due to stochasticity of dislocation motion and exit, particularly for smaller samples, cause stress at the same strain to lower at some strains with lowering of the initial temperature. Hence the serrations dominate over the e ff ect of increased atomic vibrations at higher strains. 
+
+• Evolution of the microstructure: Tracking the evolution of averaged atomic positions at di ff erent slow times allows us to visualize the evolution of the dislocation microstructure in slow time. The dislocation 14 0 5 10 15 
+
+0x (%)              
+
+> 00.01 0.02 0.03
+> K (G # L3
+> s )
+> T0= 0 KT0= 300 KT0= 400 KT0= 500 K(a) Averaged kinetic energy (K)0510 15
+
+0x (%)            
+
+> -1.42 -1.41 -1.4 -1.39 -1.38
+> U (G # L3
+> s )
+> T0= 0 KT0= 300 KT0= 400 KT0= 500 K(b) Averaged potential energy (U)
+
+Figure 11: Evolution of averaged kinetic (K) and potential (U) energy (each curve represents the mean over 3 di ff erent simulations for the same initial temperature) with strain for di ff erent initial temperatures for 8 nm sample in uniaxial tension. 0 5 10 15 
+
+0x (%)         
+
+> 00.05 0.1 0.15 0.2 0.25
+> T x (G) T0= 0 KT0= 300 KT0= 400 KT0= 500 K
+
+Figure 12: Evolution of averaged normal stress (T x) (each curve represents the mean over 3 di ff erent simulations for the same initial temperature) with strain for di ff erent initial temperatures for 8 nm sample in uniaxial tension. 
+
+microstructure at di ff erent strains for a 20 nm sample are generated using Dislocation Analysis DXA in OVITO software Stukowski (2010), as shown in Fig. 13. We observe that dislocations nucleate for the first time at 6 .5 % strain and the dislocation network evolves with applied strain. The networks consists of predominantly Shockley partials and Stair-rod dislocations. Dislocations exit the free surface and this leads to creation of slip steps, which can be seen particularly in Fig. 13c and Fig. 13d. Fig. 14 show the mean atomic positions at 7 % strain. A defective zone of the crystal is zoomed in to show plastic deformation. Fig. 15 shows the atoms in colors which are categorized into FCC, HCP and other crystal structures (using DXA analysis in OVITO). Only FCC atoms are in their perfect lattice positions while the HCP and other atoms are out of their regular lattice positions, caused by plastic deformation due to dislocation motion. 
+
+3.2. Uniaxial compression test 
+
+Since compression tests are more common for micron sized samples, we have performed uniaxial compression tests on samples of sizes of 8 and 20 nm blocks to demonstrate the applicability of our method. We have used the applied strain rate of ( −10 −3) s−1.
+
+• Evolution of averaged kinetic energy, averaged potential energy and averaged normal stress: The evo-lution of the slow variables - averaged potential energy U, the averaged kinetic energy K and the averaged normal stress T xx and the relative errors between them and the corresponding values of the measure Ud,
+
+Kd and T dxx for 8 nm sample are shown in Fig. 16, 17 and 18 respectively. We observed that the relative error for the slow variables, averaged potential energy, averaged kinetic energy and averaged normal stress are within 1%, 8% and 5%, respectively at all strains. A discussion on the physical reasoning behind these observations is provided in Section 3.1. 15 (a) 6 .5 % strain. (b) 13 % strain.    
+
+> (c) 13 .5 % strain. (d) 14 .5 % strain.
+
+Figure 13: Evolution of dislocation microstructure in slow time, under uniaxial tension at di ff erent strains for 
+
+20 nm sample. Di ff erent types of dislocations are indicated using the colors shown in the legend. The slip steps created by exiting dislocations can be observed clearly at higher strains. 
+
+• Eff ect of sample size on the stress-strain curve: To ensure statistical reliability, five and four simulations with di ff erent initial atomic velocity distributions are performed for the 8 nm and 20 nm blocks, respec-tively. For each sample size, the mean of the stress-strain curves are shown in Figure 19. Under the same applied loading rate, the 8 nm sample exhibits a higher stress response than the 20 nm sample, indicating a pronounced size e ff ect. The discussion on the cause of size e ff ect is provided in Section 3.1. However, we observe that the elastic slope in compression is not dependent on the sample size, unlike in the tension case presented earlier. The yield stress of around 4 GPa is also lower than than 5 GPa which is observed in uniaxial tension. The stress-strain response is also softer in compression compared to tension as upon comparison of Fig. 6 and Fig. 19. In general, a specimen is more stable in tension than compression because buckling (in slender specimens) and barrelling instabilities are avoided in the latter case. Although the sam-ple sizes di ff er, the trends observed in our simulations are in qualitative agreement with the experimental observations of Uchic et al. (2004), as discussed later in Section 3.5. 
+
+• Eff ect of size on standard deviation of mean stress: We carry out four and three simulations with di ff erent initial atomic velocity distributions for the 8 nm and 20 nm blocks, respectively. At a certain strain value, the mean and standard deviation of stress across those simulations are then calculated for both sizes. In Figure 20, we show the variation of the standard deviation of stress for di ff erent sizes. It can be observed that the smaller 8 nm sample shows a higher standard deviation compared to the larger 20 nm block. To quantify this, we calculate the mean of the standard deviation. The values are 0 .4285 GPa and 0 .1087 GPa 
+
+for the 8 nm and 20 nm sizes, respectively. A justification for this size e ff ect is provided in Section 3.1. 16 Figure 14: Mean atomic positions at 7 % strain for 20 nm sample in uniaxial tension. A defective zone of the sample is zoomed in to show slip and plastic deformation. 
+
+Figure 15: Mean atomic position at 7 % strain for 20 nm sample in uniaxial tension. Atoms are colored as FCC, HCP or others. Only FCC atoms in green are at their regular lattice positions. Atoms which are not in their regular lattice positions such as the HCP atoms in red and other atoms in white result from slip caused by dislocation motion. A defective zone of the crystal is zoomed in to show the atoms which are out of their lattice positions. 
+
+• Eff ect of the initial state of the system on the stress-strain curve: We carry out four simulations with di ff erent initial atomic velocity distributions at same initial temperature of T0 = 300 K for the 8 nm and 20 nm blocks, each. In Fig. 19 we have shown the variation of stress response for di ff erent initial state of the system. It is observed that although the initial temperature of the system remains the same, di ff erent initial velocity distributions of atoms lead to variation in stress response, similar to our observation in uniaxial tension case. 
+
+• Evolution of the microstructure: The dislocation microstructure at di ff erent strains, generated using Ovito as mentioned earlier, are shown in Fig. 22. We observe that dislocations nucleate for the first time at 3% strain and the dislocation network evolves with applied strain. The networks consists of predominantly Shockley partials along with some Hirth, Stair-rod and full (Perfect) dislocations. Fig. 22 show the mean atomic positions at 5% strain. A defective zone of the crystal is zoomed in to show plastic deformation. Fig. 23 shows the mean positions of atoms for a 20 nm sample under uniaxial 17 0 5 10 15 20 
+
+0x (%)     
+
+> -1.42 -1.41 -1.4 -1.39 -1.38 -1.37
+> U (G # L3
+> s )(a) 0510 15 20
+
+0x (%)  
+
+> 00.2 0.4 0.6 0.8 1
+> e U (%) (b)
+
+Figure 16: Evolution of averaged potential energy (U) and relative error (ϵU ) with strain (ϵx) for 8 nm sample under uniaxial compression. L s in the y-axis denotes the size of the sample. 0 5 10 15 20 
+
+0x (%)     
+
+> 0.005 0.01 0.015 0.02 0.025 0.03 0.035
+> K (G # L3
+> s )
+> (a) 0510 15 20
+
+0x (%)  
+
+> 012345
+> e K (%) (b)
+
+Figure 17: Evolution of averaged kinetic energy (K) and relative error (ϵK ) with strain (ϵx) for 8 nm sample under uniaxial compression. 0 5 10 15 20 
+
+0x (%)     
+
+> 00.05 0.1 0.15 0.2
+> T x (G)
+> (a) 0510 15 20
+
+0x (%)  
+
+> 012345
+> e T x (%) (b)
+
+Figure 18: Evolution of averaged normal stress (T x) and relative error (ϵT x ) with strain (ϵx) for 8 nm sample under uniaxial compression. 
+
+compression at di ff erent values of strain. We observe that at su ffi ciently large strains ( ≈ 11% in this case), the sample changes its state and undergoes liquefaction, which is not observed in the case of uniaxial tension. Fig. 24 shows the atoms in colors which are categorized into FCC, HCP and other crystal structures (using 18 0 5 10 15 
+
+0x (%) 
+
+00.05 0.1 0.15 0.2 
+
+> T x (G)
+
+8 nm 
+
+20 nm (a) 0 5 10 15 
+
+0x (%) 
+
+-0.06 -0.04 -0.02 00.02 
+
+> log T  x (G)
+
+8 nm 
+
+20 nm (b) 
+
+Figure 19: Evolution of averaged normal stress (T x) with strain (ϵx) for di ff erent sample sizes under uniaxial compression. 0 5 10 15 
+
+0x (%) 
+
+00.05 0.1 0.15 0.2 
+
+> T x (G)
+
+8 nm : 7(T x)8 nm : 7(T x) ' <(T x)20 nm : 7(T x)20 nm : 7(T x) ' <(T x)
+
+Figure 20: Evolution of mean and standard deviation of T x across di ff erent runs corresponding to di ff erent initial velocity distributions and for di ff erent sample sizes with strain (ϵx). The mean averaged stress μ(T x) is marked using the solid curve while the shaded envelope around it shows the range of μ(T x) ± σ(T x), where σ(T x) is the standard deviation of the averaged stress. 0 5 10 15 
+
+# 0x (%) 
+
+00.05 0.1 0.15 0.2 
+
+> T x (G)
+
+8 (1) 8 (2) 8 (3) 8 (4) 20 (1) 20 (2) 20 (3) 20 (4) 
+
+nm 
+
+Figure 21: Averaged normal stress (T x) with strain (ϵx) for di ff erent sample sizes with di ff erent initial atomic velocity and same temperature. Curves labeled 1–4 in brackets represent independent simulations for the same sample size but with di ff erent initial atomic velocity distributions. Blue curves correspond to the 8 nm sample, while red curves correspond to the 20 nm sample. 
+
+19 DXA analysis in OVITO). Only FCC atoms are in their perfect lattice positions while the HCP and other atoms are out of their regular lattice positions, similar to our observation for the tension case presented earlier. 
+
+(a) 3 % strain. (b) 4 % strain. 
+
+(c) 5 .5 % strain. (d) 9 % strain. 
+
+Figure 22: Evolution of dislocation microstructure in slow time, at di ff erent strains for 20 nm sample under uniaxial compression. Di ff erent types of dislocations are indicated using the colors shown in the legend. 3.3. Speedup in compute time 
+
+The speedup S in computer time between the pure MD and PTA calculations is calculated as follows. Let 
+
+TCPU f and TCPU PT A be the compute time to reach strain ϵ f and ϵPT A using pure MD and PTA, respectively. The speedup S is defined as: 
+
+S =
+
+ TCPU f 
+
+> ϵf
+
+ TCPU PT A 
+
+> ϵPT A
+
+ . (23) We have run MD using PTA and pure MD on an 8 nm sample. The compute time for pure MD ( TCPU f ) to reach a strain of 6 × 10 −11 % strain at an applied strain rate of 10 −3 s−1 is 43290 seconds. In comparison, it took 20 (a) Mean atomic positions at 5 % strain for 20 nm sample under uniaxial compression. A defective zone of the sample is zoomed in to show slip and plastic deformation.     
+
+> (b) Mean atomic positions at 11 %
+> strain for 20 nm sample under uniaxial compression. We can observe that the sample has liquefied at this strain.
+
+Figure 23: Mean atomic positions at 5 % and 11 % strain for 20 nm sample under uniaxial compression. 
+
+Figure 24: Mean atomic position at 5 % strain for 20 nm sample under uniaxial compression. Atoms are colored as FCC, HCP or others. Only FCC atoms in green are at their regular lattice positions. Atoms which are not in their lattice positions such as the HCP atoms in red and other atoms in white result from slip caused by dislocation motion. A defective zone of the crystal is zoomed in to show the atoms which are out of their lattice positions. 
+
+a compute time ( TCPU PT A ) of 3268 seconds for PTA calculations to reach slow time 0 .5% strain at the same applied strain rate. The speed up S in compute time between the the two methods, as defined in Eq. (23) comes out to be: 
+
+S =
+
+ 46290 6×10 −11 
+
+ 3268 0.5
+
+ = 11 .95 × 10 8.
+
+This shows that PTA is significantly faster than pure MD for the problem. Note that this is a very conservative estimate of the speedup since MD is run only till very small strain, while starting from a defect-free state. In this regime, the lattice structure is close to that of a perfect crystal and only mild lattice stretching is observed. At higher strains, the dynamics is much more computationally expensive due to generation and evolution of defects. This means the compute time for pure MD is expected to increase even more compared to PTA at higher strains. 21 This makes reaching large strains using pure MD alone practically impossible. However, the increase in compute time for PTA will not be significant since it involves only running short bursts of MD. 
+
+3.4. Verification with fine dynamics 
+
+In this section, we demonstrate a verification of the evolution of the slow variable v m with PTA using Eq. (7) (which we denote as v PT A m in this section) by comparing it to the value of the slow variable v m, f ine d using Eq. (8) obtained by running the fine dynamics for the entire slow time interval of the simulation (which we denote as vm, f ine d ). Note that v m, f ine d is di ff erent from v md used in PTA to accept the measure in Step 3 of Section 2.2. The calculation of v m, f ine d does not involve approximations such as the usage of Simpson’s rule in Eq. (9) and, more importantly, the fine initial guesses as described in Step 4 of Section 2.2. Hence, the evolution of v m, f ine d is the exact evolution of the slow variable in the slow time interval that is considered for this verification, corresponding to an MD trajectory. Since the applied strain rate is in the quasi-static regime, we can only reach a very small strain range using the fine dynamics. It is due to the di ffi culty associated with running MD over large strains that a direct verification with fine dynamics over large strains with PTA results is currently not possible. We consider an 8 nm sample and apply uniaxial tensile loading for this verification. We divide the discussion into two parts. In Section 3.4.1, we load the sample from a defect-free initial state, while in Section 3.4.2, we load the sample from a defective initial state. The defect-free initial state corresponds to the pre-yield regime, whereas the defective state corresponds to the post-yield regime. We then calculate the relative error between the two using the following: 
+
+Error , v( t) = vPT A m (t) − vm, f ine d (t)vm, f ine d (t) . (24) The error as defined above includes the component of the error arising due to the fine initial conditions used to calculate v PT A m using PTA (as discussed in Step 4 of Section 2.2), since the fine initial condition used in the calculation of v m, f ine d is exact as it is obtained by running the fine dynamics in the entire slow time interval. 
+
+3.4.1. Defect-free initial-state 
+
+The evolution of the relative errors of the slow variables—namely, the averaged potential energy UPT A , the averaged kinetic energy KPT A , and the averaged normal stress T PT A x —with respect to their corresponding fine-scale values U f ine , K f ine , and T f ine x , calculated using Eq. (24), for the 8 nm sample are summarized in Table 2. For the stress plot shown in Figure 5, we start from a state at 3 .1 % strain, in the pre-yield regime, and load it under uniaxial tension. We observed that the relative error for the slow variables, averaged potential energy, averaged kinetic energy, and averaged normal stress, are within 5 .87 × 10 −3 %, 0 .78 %, and 0 .27 %, respectively, at all points. This extremely small error indicates that the slow evolution with PTA using the guess for the fine initial conditions is in close agreement with that obtained by running the fine dynamics alone, for the strain range that we considered. 
+
+MD steps (×10 7) Error , U (×10 −3) (%) Error , K (%) Error , T x (%) 0 0 0 00.5 5.74 0.77 0.14 1.0 3.35 0.44 0.27 1.5 2.94 0.39 0.04 2.0 5.87 0.78 0.21 Table 2: Evolution of relative errors: Error , U, Error , K and Error , T x (in %) with MD steps for 8 nm sample in uniaxial tension, starting with a defect-free initial-state at 3.1 % strain. 3.4.2. Defective initial-state 
+
+In this section, we evolve the same slow variables as discussed in Section 3.4.1, but we start the simulations with a defective state of the sample. For the stress plot shown in Figure 5, we start from a state at 8 .1 % strain, in the post-yield regime, and load it under uniaxial tension. Here also we observed that the relative error for the slow variables, averaged potential energy, averaged kinetic energy, and averaged normal stress, are within 13 .6×10 −3 %, 0.32 % and 0 .74 %, respectively, at all points, indicating that the slow evolution with PTA using the guess for the fine initial conditions is in close agreement with that obtained by running the fine dynamics alone, for the strain range that we considered. We have summarized them in Table 3 22 MD steps (×10 7) Error , U(×10 −3) (%) Error , K (%) Error , T x (%) 0 0 0 00.5 2.5 0.19 0.74 1.0 2.8 0.21 0.30 1.5 12 .5 0.32 0.19 2.0 13 .6 0.23 0.27 Table 3: Evolution of relative errors: Error , U, Error , K and Error , T x (in %) with MD steps for 8 nm sample in uniaxial tension, starting with a defective initial-state at 8.1 % strain. 3.5. Comparison with experimental results 
+
+In this section, we discuss the experimental results of Uchic et al. (2004) for comparison with our model predictions. They performed uniaxial compression tests on Ni 3 Al –T a micropillars, which were fabricated directly on a bulk crystal using focused-ion beam (FIB) techniques. The samples were prepared in the size range of 0.5 to 20 μm in diameter and tested using a conventional nanoindentation device equipped with a flat-punch indentation tip. They observed that the stress-strain curve become harder as the sample size decreases. We observe similar 
+
+smaller is harder size e ff ect in our simulation results, for both tension (in Fig. 6) and compression (in Fig. 19) cases. They also observed that increasing the diameter of the micropillars led to a decrease in flow stress. We observe similar inverse-relation between yield strength and sample size under uniaxial tension in Fig. 8b. The initial elastic slope of the stress–strain curve is not dependent on the sample size, which is consistent with our results for the uniaxial compression case in Fig. 19. One point to note is that the sample sizes considered in the experiments and in our simulations are around 2-3 orders of magnitude di ff erent. In the experimental work of Uchic et al. (2004), micron and submicron sized samples were tested while the samples used in our simulations are in the order of a few nanometers upto 20 nm . Thus, the dislocation nucleation mechanisms and the plastic deformation that follows in the two cases are di ff erent, which leads to much higher yield stress and harder response in our model predictions. Inspite of these di ff erences, we still observed similar trends related to size e ff ect in our results. In order to compare the predictions with experiments conducted on larger samples which are relevant for engineering purposes, one possible approach is to fit the stress-strain data of samples (of size 0.1 micron or above, so that it can capture the operating dislocation mechanisms at those length scales) using our approach to a surrogate material model. This model can then serve as the constitutive model for upscaled Finite Element simulations, with sample sizes (possibly) orders of magnitude larger than that used in MD. However, there are challenges in coupling time-averaged data from microscopic models to macroscale plasticity models, owing to the vast separation in time-scales that govern the microscale and macroscale models. One such approach using time-averaged Discrete Dislocation Dynamics response serving as inputs to a mesoscale plasticity model (and the challenges therewith) is provided in our previous work Chatterjee et al. (2020); of relevance here is also the recent work Mielke et al. (2025). Although challenging, such coupled multiscale models have the potential of being truly predictive and microstructure sensitive. 
+
+4. Conclusion 
+
+Molecular dynamics (MD) simulations are performed to study the mechanical response of nanometer-sized single-crystal aluminum samples under uniaxial tension and compression at slow, realistic strain rates. Although our results cannot be directly validated with experiments, the predictions are in qualitative agreement. A summary of the predictions are listed below: 1. Serrations are observed in the stress-strain plots of the 8 nm block under both uniaxial tension and compres-sion. This behavior is due to the low surface-to-volume ratio of the 8 nm block. In addition, an increase in internal potential energy is observed with increase in applied strain. This is because work is done on the sample during deformation. During instances where a drop in stress occurs, a sharp increase in kinetic en-ergy is observed. This happens because dislocation nucleation and motion creates lattice waves. Moreover, dislocation nucleation correspond to very fast events which result in jumps even in an averaged quatity like the support of an invariant measures, which consequently result in jumps in the slow variables. 2. A significant size e ff ect is observed in the tensile properties of the material. Both the yield strength and elastic modulus decrease as the sample size increases from 4 nm and 30 nm . In this range, the yield strength dropped from 7 .05 GPa for 4 nm sample to 2 .62 GPa for 30 nm sample, while the elastic modulus decreased from 101 .31 GPa for 4 nm sample to 68 .39 GPa for 30 nm sample. As the sample size increases, the material 23 behavior transitions toward that of bulk aluminum, and the elastic modulus approaches values predicted by continuum models. The observed “smaller is stronger” behavior aligns with the experimental and modeling results in the literature for submicron sized samples. 3. The overall stress response beyond yielding is lower for the larger (20 nm ) sample compared to the smaller (8 nm ) sample. This occurs because, in smaller samples with a higher surface-to-volume ratio, dislocations can escape to the surface more easily, resulting in a higher stress response Moreover, the dislocation sources in smaller samples are limited and they activate at higher stresses, leading to harder response compared to larger samples. Prediction of mechanical behaviour and size e ff ects of nanometer-sized samples at small strain-rates (at the scales employed in this work) is extremely challenging using existent approaches. Our method provides a viable alternative for conducting such studies. Our approach is also a starting point for understanding behaviour of materials at a larger scale, where the mechanisms we observed may no longer be relevant. But our work in this paper is a test of methodol-ogy for the (smaller) scales that we have been able to explore. The algorithm used in our approach will remain unchanged even for larger samples. However, since the number of atoms will be much higher for such samples compared to the sizes we have considered, it will take significantly more computational re-sources (higher number of cores, e ffi cient hardware architechture, increased wall-clock time) and optimized LAMMPS settings in order to do so. 4. The statistical variation in stress is smaller for the 20 nm block compared to the 8 nm block. The standard deviation of the stress–strain curve was 0 .3549 GPa and 0 .2188 GPa for the 8 nm and 20 nm samples un-der tension, and 0 .4285 GPa and 0 .1087 GPa under compression, respectively. This indicates that larger samples exhibit a smoother stress response compared to smaller samples. 5. Plastic deformation due to dislocation nucleation and evolution depends on the applied strain rate as ex-pected. The stress–strain curve corresponding to the higher strain rate remained consistently above that of the lower strain rate along the stress axis. This is because at higher strain rates, to reach the same strain the material has less time for dislocations to move, thereby leading to higher flow stress. 6. The simulations reveal the sensitivity of the system to its initial state of the system. Although the initial temperature of the sample is kept same, changing the initial atomic velocity distribution leads to variations in the stress–strain response, demonstrating the stochasticity in the response. 7. Our approach is able to predict the evolution of the microstructure of the sample in slow time by tracking the averaged position of every atom in the assembly. This allows us to identify the defective regions in the crystal with more plastic deformation. 8. We also observe the evolution of the dislocation microstructure at di ff erent strains in slow time and are also able to categorize them into di ff erent types, like Shockley partials, Stair-rod and full dislocations. In order to validate the results with experiments, a possible approach is to fit the stress-strain data from micron-sized samples using our approach into a surrogate material model which will act as constitutive equation for upscaled FEM simulations on larger samples, as mentioned previously. However, such coupled, multiscale ap-proaches are challenging due to the significant separation in time-scales of the fast, microscopic dynamics and that of the mesoscale model under quasi-static strain rates. This will be a topic for future work. Another future application of our method is in advanced structural materials like High Entropy Alloys, BCC refractory metal alloys and Mg Alloys, among others, for which traditional Crystal Plasticity Finite Element Method (CPFEM) has resulted in very limited success. The mechanics of dislocation and slip for such materials is complicated, which makes formulation of constitutive flow rules at slow strain rates very challenging. The mechanical response predicted using our approach does not involve phenomenological assumptions and is a direct outcome of the underlying microstructural evolution from time-averaged MD. Hence, it does not su ff er from such limitations and may potentially prove to be useful for studying the plastic deformation of such materials. It may be used to predict response of new materials as a function of temperature, orientation and strain-rate from first principles and also for understanding complicated dislocation interactions in such materials at slow time scales. However, it is essential that the statistical /representative volume element (RVE) size used in MD to generate the surrogate material model must be of su ffi cient size (approximately 100 nm or larger) in order to capture the dislocation microstructure evolution that occurs in the bulk of the material. 
+
+CRediT authorship contribution statement S.Baruah: Formal analysis, Investigation, Methodology, Validation, Visualization, Writing – original draft, Writing – review and editing; S.Chatterjee: Conceptualization, Investigation, Methodology, Project administra-tion, Resources, Supervision, Validation, Visualization, Writing – review and editing; A.Acharya: Conceptual-ization, Investigation, Methodology, Validation, Writing – review and editing; G.Wang: Investigation, Validation, Visualization, Software, Writing – review and editing. (AA and GW, please check and add anything if necessary.) 24 Declaration of Competing Interest 
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. 
+
+Data Availability 
+
+Data will be made available on request. 
+
+Acknowledgements S.Baruah acknowledges the Institute Fellowship received from Indian Institute of Technology Delhi and the High Performance Computing facility at Indian Institute of Technology Delhi. S. Chatterjee acknowledges the New Faculty Seed Grant and Equipment Matching Grant received from Indian Institute of Technology Delhi, the financial support received from the Anusandhan National Research Foundation (ANRF, erstwhile SERB) via grant no. SRG /2022 /001328 and the financial support received from the Department of Applied Mechanics at Indian Institute of Technology Delhi. 
+
+Appendix A. Convergence criteria for the running time average of state function 
+
+We define ˆ Rms as the running time average of state function m at slow time s, given as: ˆRms (i) = 1
+
+i
+
+> i
+
+X
+
+> i=1
+
+mi.
+
+The successive values of mi are obtained by running the fast dynamics with the initial conditions obtained from step 4. We denote Rms as the converged value of ˆ Rms , defined as: 
+
+Rms = 1
+
+NsNsX
+
+> i=1
+
+mi, (A.1) where Ns denotes the number of fine steps required for ˆRms to converge upto a specified value of tolerance. The maximum value of Ns is Nmax (Ns < Nmax ). We define the tolerance as 
+
+em(i) = ˆRms (i) − ˆRms (i − k)ˆRms (i) . (A.2) Here, ( i) and ( i − k) are step numbers in fast time. If em(i) < tol m we declare Rms = ˆRms (i) and ˆRms has converged at 
+
+Ns = i. The values of tol m used for our simulation purposes are defined in Table. 1. In our problem, we have the state functions as U(σi) and Rx(σi). In the following figures, we have shown the plots of the state functions and their running time averages. 0 200 400 600 800 1000 
+
+## i
+
+> -0.16825 -0.16824 -0.16823 -0.16822 -0.16821 -0.1682 -0.16819
+> U (G # L3
+> s )
+
+(a) 0 200 400 600 800 1000 
+
+## i 
+
+> -0.168227 -0.168226 -0.168225 -0.168224 -0.168223 -0.168222 -0.168221
+> ^RUs (G # L3
+> s )
+
+(b) 
+
+Figure A.25: Potential energy (U) and its running time average ( ˆ RUs ).
+
+25 0 1 2 3 4 5
+
+## i #10 4     
+
+> -0.6 -0.4 -0.2 00.2 0.4
+> Rx (G)(a) 012345
+
+## i #10 4 
+
+> -0.05 00.05 0.1 0.15
+> ^RRx
+> s (G)(b)
+
+Figure A.26: Reaction force (Rx) and its running time average ( ˆ RRx 
+
+> s
+
+).
+
+References 
+
+Acharya, A. and Roy, A. (2006). Size e ff ects and idealized dislocation microstructure at small scales: Predictions of a phenomenological model of mesoscopic field dislocation mechanics: Part i. Journal of the Mechanics and Physics of Solids , 54(8):1687–1710. Acharya, A. and Sawant, A. (2006). On a computational approach for the approximate dynamics of averaged variables in nonlinear ode systems: toward the derivation of constitutive laws of the rate type. Journal of the Mechanics and Physics of Solids , 54(10):2183–2213. Arora, R. and Acharya, A. (2020a). Dislocation pattern formation in finite deformation crystal plasticity. Interna-tional Journal of Solids and Structures , 184:114–135. Arora, R. and Acharya, A. (2020b). A unification of finite deformation j2 von-mises plasticity and quantitative dislocation mechanics. Journal of the Mechanics and Physics of Solids , 143:104050. Artstein, Z. (2002). On singularly perturbed ordinary di ff erential equations with measure-valued limits. Proceed-ings of Equadi ff 10 , pages 15–26. Berezhkovskii, A. and Szabo, A. (2011). Time scale separation leads to position-dependent di ff usion along a slow coordinate. The Journal of Chemical Physics , 135(7). Bolhuis, P. G. and Swenson, D. W. H. (2021). Transition path sampling as Markov Chain Monte Carlo of tra-jectories: Recent algorithms, software, applications, and future outlook. Advanced Theory and Simulations ,4(4). Bornemann, F. (1998). Homogenization in time of singularly perturbed mechanical systems , volume Lecture Notes in Mathematics. Springer-Verlag Berlin Heidelberg. Bornemann, F. A. and Schütte, C. (1997). Homogenization of Hamiltonian systems with a strong constraining potential. Physica D: Nonlinear Phenomena , 102(1-2):57–77. Chang, L., Zhou, C.-Y., Wen, L.-L., Li, J., and He, X.-H. (2017). Molecular dynamics study of strain rate e ff ects on tensile behavior of single crystal titanium nanowire. Computational Materials Science , 128:348–358. Chatterjee, S., Acharya, A., and Artstein, Z. (2018). Computing singularly perturbed di ff erential equations. Jour-nal of Computational Physics , 354:417–446. Chatterjee, S., Po, G., Zhang, X., Acharya, A., and Ghoniem, N. (2020). Plasticity without phenomenology: a first step. Journal of the Mechanics and Physics of Solids , 143:104059. Frenkel, J. (1926). Zur theorie der elastizitätsgrenze und der festigkeit kristallinischer körper. Zeitschrift für Physik , 37(7):572–609. 26 Hijón, C., Español, P., Vanden-Eijnden, E., and Delgado-Buscalioni, R. (2010). Mori–zwanzig formalism as a practical computational tool. Faraday Discuss. , 144:301–322. Izvekov, S. and Voth, G. A. (2006). Modeling real dynamics in the coarse-grained representation of condensed phase systems. The Journal of Chemical Physics , 125(15). Kabir, H., Aghdam, M. M., Samandari, S. S., and Moeini, M. (2024). A molecular dynamics study on the size e ff ects of Fe 3O4 nanoparticles on the mechanical characteristics of polypyrrole /Fe 3O4 nanocomposite. 
+
+Molecular Simulation , 50(7-9):493–505. Klar, M., Matthies, K., Reina, C., and Zimmer, J. (2021). Second-order fast–slow dynamics of non-ergodic hamil-tonian systems: Thermodynamic interpretation and simulation. Physica D: Nonlinear Phenomena , 428:133036. Komanduri, R., Chandrasekaran, N., and Ra ff , L. (2001). Molecular dynamics (md) simulation of uniaxial tension of some single-crystal cubic metals at nanolevel. International Journal of Mechanical Sciences , 43(10):2237– 2260. Laio, A. and Parrinello, M. (2002). Escaping free-energy minima. Proceedings of the National Academy of Sciences , 99(20):12562–12566. LAMMPS Developers (2024a). LAMMPS Documentation: fix nve . Sandia National Laboratories. Velocity-Verlet time integration. LAMMPS Developers (2024b). LAMMPS Documentation: run_style verlet . Sandia National Laboratories. Ve-locity form of the Störmer–Verlet integrator. Miao, Y., Feher, V. A., and McCammon, J. A. (2015). Gaussian accelerated molecular dynamics: Uncon-strained enhanced sampling and free energy calculation. Journal of Chemical Theory and Computation ,11(8):3584–3595. Mielke, A., Peletier, M. A., and Zimmer, J. (2025). Deriving a generic system from a hamiltonian system: Mielke, peletier and zimmer. Archive for Rational Mechanics and Analysis , 249(5):62. Mishin, Y., Farkas, D., Mehl, M. J., and Papaconstantopoulos, D. A. (1999). Interatomic potentials for monoatomic metals from experimental data and ab initio calculations. Phys. Rev. B , 59:3393–3407. Mohr, B., van Heesch, T., Pérez de Alba Ortíz, A., and Vreede, J. (2024). Enhanced sampling strategies for molecular simulation of <scp >dna </ scp >. WIREs Computational Molecular Science , 14(2). Neishtadt, A. (2019). On mechanisms of destruction of adiabatic invariance in slow–fast hamiltonian systems. 
+
+Nonlinearity , 32(11):R53–R76. Noid, W., Szukalo, R. J., Kidder, K. M., and Lesniewski, M. C. (2024). Rigorous progress in coarse-graining. 
+
+Annual Review of Physical Chemistry , 75(1):21–45. Roy, A. and Acharya, A. (2005). Finite element approximation of field dislocation mechanics. Journal of the Mechanics and Physics of Solids , 53(1):143–170. Roy, A. and Acharya, A. (2006). Size e ff ects and idealized dislocation microstructure at small scales: Predictions of a phenomenological model of mesoscopic field dislocation mechanics: Part ii. Journal of the Mechanics and Physics of Solids , 54(8):1711–1743. Shi, R., Qian, H., and Lu, Z. (2023). Coarse-grained molecular dynamics simulation of polymers: Structures and dynamics. WIREs Computational Molecular Science , 13(6). Slemrod, M. and Acharya, A. (2012). Time-averaged coarse variables for multi-scale dynamics. Quarterly of applied mathematics , 70(4):793–803. So /rensen, M. R. and Voter, A. F. (2000). Temperature-accelerated dynamics for simulation of infrequent events. 
+
+The Journal of Chemical Physics , 112(21):9599–9606. Stukowski, A. (2010). Visualization and analysis of atomistic simulation data with OVITO-the Open Visualization Tool. Modelling and Simulation in Materials Science and Engineering , 18(1):015012. Sugita, Y. and Okamoto, Y. (1999). Replica-exchange molecular dynamics method for protein folding. Chemical Physics Letters , 314(1–2):141–151. 27 Tan, L., Acharya, A., and Dayal, K. (2014). Modeling of slow time-scale behavior of fast molecular dynamic systems. Journal of the Mechanics and Physics of Solids , 64:24–43. Uchic, M. D., Dimiduk, D. M., Florando, J. N., and Nix, W. D. (2004). Sample dimensions influence strength and crystal plasticity. Science , 305(5686):986–989. Van Vliet, K. J., Li, J., Zhu, T., Yip, S., and Suresh, S. (2003). Quantifying the early stages of plasticity through nanoscale experiments and simulations. Physical Review B , 67(10):104105. Vogl, L. M., Schweizer, P., Richter, G., and Spiecker, E. (2021). E ff ect of size and shape on the elastic modulus of metal nanowires. MRS Advances , 6(27):665–673. Voter, A. F. (1997). Hyperdynamics: Accelerated molecular dynamics of infrequent events. Physical Review Letters , 78(20):3908–3911. Wan, W., Tang, C., Qiu, A., and Xiang, Y. (2021). The size e ff ects of point defect on the mechanical properties of monocrystalline silicon: A molecular dynamics study. Materials , 14(11):3011. Yu, H., Sun, C., Zhang, W., Lei, S., and Huang, Q. (2013). Study on size-dependent young’s modulus of a silicon nanobeam by molecular dynamics simulation. Journal of Nanomaterials , 2013(1):319302. Zamora, R. J., Uberuaga, B. P., Perez, D., and Voter, A. F. (2016). The modern temperature-accelerated dynamics approach. Annual Review of Chemical and Biomolecular Engineering , 7(1):87–110. 28
