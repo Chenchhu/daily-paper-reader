@@ -1,0 +1,1033 @@
+Title: Physics-Consistent Neural Networks for Learning Deformation and Director Fields in Microstructured Media with Loss-Based Validation Criteria
+
+URL Source: https://arxiv.org/pdf/2603.06939v1
+
+Published Time: Tue, 10 Mar 2026 00:19:28 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# Physics-Consistent Neural Networks for Learning Deformation and Director Fields in Microstructured Media with Loss-Based Validation Criteria. 
+
+## Milad Shirani 1, Pete H. Gueldner 1, Murat Khidoyatov 2, Jeremy L. Warren 1, and Federica Ninno 11Department of Biomedical Engineering, Yale University, New Haven, CT, USA 
+
+> 2
+
+## Department of Mechanical Engineering, Yale University, New Haven, CT, USA March 10, 2026 
+
+Abstract 
+
+In this work, we study the mechanical behavior of solids with microstructure using the framework of Cosserat elasticity with a single unit director. This formulation captures the coupling between deformation and orien-tational fields that arises in many structured materials. To compute equilibrium configurations of such media, we develop two complementary computational approaches: a finite element formulation based on variational principles and a neural network-based solver that directly minimizes the total potential energy. The neural ar-chitecture is constructed to respect the fundamental kinematic structure of the theory. In particular, it enforces frame invariance of the energy, satisfies the unit-length constraint on the director field, and represents deforma-tion and director fields through separate networks to preserve their kinematic independence in the variational setting. Beyond satisfying balance laws, however, physically admissible solutions must also correspond to sta-ble energy minimizers. To assess this requirement, we derive the quasiconvexity condition, rank-one convexity condition, and the Legendre-Hadamard inequalities for the Cosserat model and formulate them in a manner suitable for evaluating neural network predictions. These necessary stability conditions provide a physics-based validation framework: network outputs that violate these necessary conditions cannot correspond to stable en-ergy minimizers and can therefore be rejected. In this way, we integrate classical variational stability theory with modern machine-learning solvers, establishing a computational workflow in which equilibrium solutions are not only learned but also assessed for energetic consistency. 
+
+Keywords : Physics-Informed Neural Network, Cosserat Elasticity, Quasiconvexity condition, Rank-one convexity condition, Legendre-Hadamard Inequalities. 
+
+# 1 Introduction 
+
+Materials and biological systems with internal directional structure require continuum theories that couple defor-mation with local orientation fields. Several theories have been introduced to capture the effects of microstructure and these orientational properties into the modeling of the system. For example, higher gradient elasticity is used to model the effects of bending of the embedded fibers in tissues or fibrous materials [46, 54, 55, 14, 38, 47, 22, 21, 15]. Furthermore, Cosserat elasticity has been used to capture the effects of both bending and twisting of fibers in modeling fibrous materials [46, 50]. Cosserat elasticity with a single director is used to model mechanical behaviors of plates and shells [26, 53, 18, 25, 24], liquid crystals [57, 17, 18, 20, 19, 16], lipid bilayers and cell membranes [52, 27, 28, 3, 49, 4, 40, 41], and cell monolayers [61, 30, 10]. A practical example of the usage of the theories of Cosserat elasticity with a single director is modeling the mechanical behaviors of nematic elastomers. In nematic elastomers, a polymer network’s elastic response depends not only on deformation gradients but also on the orientation of internal anisotropic structures within the material, leading to distinctive mechanical behavior such as soft elasticity and anisotropic actuation that cannot be captured by classical elasticity alone [60, 59]. Similar continuum descriptions arise in liquid crystal systems and are relevant for structural materials where orientational order strongly influences mechanical response [57]. Beyond soft matter physics, Cosserat continuum models with internal fields are widely used in biomechanics and biological physics. For example, collective cell migration and polarization are modeled as continuum active media in which mechanical 1
+
+> arXiv:2603.06939v1 [cs.LG] 6 Mar 2026
+
+forces and internal polarity fields interact to govern tissue morphogenesis, wound healing, and cancer invasion [7]. By using theories of Cosserat continuum mechanics and liquid crystals, one can model the mechanical behaviors of lipid bilayers [52]. By using these theories, one can show that the mechanical behaviors of lipid bilayers can be described by the mean and Gaussian curvatures of the body, leading to Helfrich energy [52]. In these models, elastic bending and lateral stretching play key roles in membrane deformation, protein interactions, and cellular processes like endocytosis and vesicle formation [32]. These examples illustrate how coupled deformation and internal structural fields can capture complex mechanical behavior across scales. From a variational mechanics perspective, the existence and stability of solutions to elastic boundary-value problems hinge on properties of the energy density. In nonlinear elasticity, one can prove that choosing a convex functional form of elastic energy leads to unique solutions, and as a result, one cannot capture behaviors such as buckling [51]. Therefore, one has to find other conditions to prevent unrealistic cases coming from choosing convex elastic energy. It is shown that at the stable equilibrium, when the total potential energy of the system is minimized, the solution has to satisfy quasiconvexity, rank-one convexity, and Legendre-Hadamard inequalities. These conditions are necessary and must be satisfied by the solution to the balance laws and boundary conditions for them to be energy minimizers. In the seminal work of Ball [6], it is shown that the polyconvexity condition implies quasiconvexity conditions, rank-one convexity, and in consequence, Legendre-Hadamard inequalities. These conditions were established in classical analyses of nonlinear variational problems and elasticity theory, providing essential criteria for lower semicontinuity of energy functionals and absence of fine-scale instabilities [6, 13]. In continuum descriptions of structures such as plates and shells, similar energy minimization principles underlie generalized plate theories derived via variational asymptotics, such as those developed for active and composite thin sheets [48, 2]. These theoretical tools are central to assessing whether candidate solutions are not only stationary but stable under admissible perturbations, regardless of the specific physical system under study. Recent work has extended these necessary stability conditions to continuum theories with additional internal fields. In particular, a Legendre-Hadamard condition appropriate to generalized continuum formulations that include structural fields, showing how positivity of the second variation imposes pointwise constraints on constitutive energy densities for stable minimizers [45], and further work has explored rank-one convexity and quasiconvexity in related theories with additional field variables [44]. These developments provide robust theoretical checks that go beyond satisfying balance laws alone, ensuring that solutions are consistent with both mechanical equilibrium and energy minimization. A variety of numerical approaches are used to approximate solutions to continuum mechanics problems with coupled fields. Traditional discretization methods such as finite element analysis remain the standard for many engineering and biophysical applications, including membrane deformation and thin structure mechanics. Emerging machine learning-based methods also embed physical laws directly into network training to approximate solutions to governing equations, and frameworks such as physics-informed neural networks have been applied in elasticity and related fields to solve for displacement and derived stress fields consistent with physical constraints [39]. Physics-Informed Neural Networks (PINNs) for problems of classical continuum mechanics, such as nonlinear elasticity, were originally proposed to obtain the state of the system, by either solving balance laws [39] or by minimizing the total potential energy of the system [43]. Related neural network approaches have also been used to predict tissue-level mechanical behavior and biological remodeling in vascular disease, including aneurysms, typically in a data-driven or hybrid modeling setting [63, 35, 62, 23, 34, 11, 12, 42, 36]. Recent work suggests methods such as neural networks, Gaussian processes, ensembles, Support Vector Machines, regression, and PINNs can excel at fitting high-dimensional stress/strain mappings [31]. Supervised learning with feed-forward networks can directly learn stress-strain relationships, even outperforming the Holzapfel-Gasser-Ogden model with human aorta data [37]. Similarly, the FHCNN-Bio model embeds fiber/invariant structure for improved interpretability, training stability, and strong generalization on experimental and synthetic tissue datasets [56]. Symbolic regression approaches directly search for explicit, interpretable equations, using evolutionary/deep super-resolution (SR) to reduce model–form bias [1]. PINNs learn constitutive behavior from limited or indirect measurements by enforcing PDEs/energy principles during training, showing promise for hyperelastic identification with sparse data [8]. Even with such methods, however, satisfying balance equations is not sufficient: numerical approximations must be validated against necessary conditions for energy minimality to avoid spurious or unstable solutions. Despite these advances, a formal analysis of these approaches to check if the solutions satisfy energy–minimizing conditions has not been presented, mostly in non–classical continuum mechanics. However, some references [9, 33] have introduced networks for nonlinear classical elasticity that generate a polyconvex elastic energy. Note that, as shown by Ball [6, 51], if the elastic energy is polyconvex, then the solutions of the system automatically satisfy quasiconvexity and in turn rank–one convexity condition and the Legendre–Hadamard inequality. In this manuscript, we formulate the governing balance laws and derive necessary variational stability criteria 2for a Cosserat continuum with a unit director, extending classical energy minimization principles to this class of coupled field problems. We then show how these criteria can be evaluated and used as validation checks for numerical solutions obtained from both finite element simulations and neural network–based solvers, ensuring consistency with energy minimality in addition to mechanical equilibrium. By integrating theory with computational approaches, our work provides a unified framework for assessing the mechanical and energetic consistency of solutions across a wide range of directed media, with applicability to systems ranging from soft biological tissues and active gels to thin structural elements and liquid crystalline materials. 
+
+# 2 Cosserat mechanics of microstructured media 
+
+In this section, we present the mechanical modeling of materials by including the effects of their microstructures on their mechanical behaviors. We use the theory of Cosserat elasticity with a unit director to model these media. 
+
+## 2.1 Kinematics and frame invariance condition 
+
+In this section, we present the kinematics of a body described by the theories of Cosserat elasticity with a single unit director. According to this theory, the kinematics of the body is described by two kinematical fields, namely deformation field from a reference configuration κ0 to the current configuration κ and a unit director field in the current configuration. As a result, the kinematics of the motion are 
+
+x = χ (X) and d = d (X) (1) in which X is a material point in the reference configuration and x is the position of the same material point after motion in the current configuration. In this work, we require d to be a unit vector, i.e., 
+
+d · d = 1 (2) and this should be considered as a constraint in the formulation of the problem. We assume that there exists an elastic energy shown by W defined per unit volume of the reference configuration 
+
+W = W (F , d, ∇d) (3) in which F is the gradient of the deformation, defined as 
+
+F = ∂χ
+
+∂X A
+
+⊗ EA = ∇χ (4) in which EA are the orthonormal basis vectors in the reference configuration and ∇• is the referential gradient of the quantity •. We require deformation χ be invertible and as a result, we find 
+
+J = det F > 0. (5) Elastic energy has to be frame invariant, meaning that for any ε−family of rotation tensors Q (ε), the following relation has to hold 
+
+W (F , d, ∇d) = W (Q (ε) F , Q (ε) d, Q (ε) ∇d) . (6) Given that the left–hand side of (6) is not a function of ε, but the right–hand side is, we conclude that 
+
+ddε (W (Q (ε) F , Q (ε) d, Q (ε) ∇d)) = 0 (7) and as a result  ∂W ∂ (Q (ε) F ) F T + ∂W ∂ (Q (ε) d) ⊗ d + ∂W ∂ (Q (ε) ∇d) (∇d)T
+
+
+
+· dQ (ε)
+
+dε = 0 (8) Among all possible choices of rotation tensors, choose Q (ε) such that Q (0) = I and 
+
+ dQ(ε)
+
+> dε
+
+ 
+
+> |ε=0
+
+= Ω, where Ω
+
+is an arbitrary second order skew–symmetric tensor ( Ω ∈ Skew). By evaluating the above relation at ε = 0 , we get 
+
+ ∂W ∂F F T + ∂W ∂d ⊗ d + ∂W ∂∇d (∇d)T
+
+
+
+· Ω = 0 (9) and because Ω is an arbitrary skew–symmetric tensor, we conclude 
+
+∂W ∂F F T + ∂W ∂d ⊗ d + ∂W ∂∇d (∇d)T ∈ Sym (10) Any energy used for the system has to satisfy (10), otherwise, it is not a frame–invariant elastic energy. 32.2 Balance laws and boundary conditions 
+
+At equilibrium, the total potential energy of the system is minimized. As a result, one could conclude that the first variation of the total potential energy of the system has to vanish. Therefore, to find balance laws and boundary conditions, we will use the principle of virtual power and the calculus of variations. According to the principle of virtual power, for any kinematically admissible virtual deformation and virtual director, the variation of the elastic energy of the system is equal to the virtual power of all applied effects. Note that, one has to consider the constraints in the formulation of the problem. In this work, the only constraint that we have is (2). Therefore, we need to find the variation of the director field such that this constraint is satisfied. Consider one ε−family of the variations of deformation and director fields as 
+
+ˆχ (X, ε ) = χ (X) + εδ χ + o (ε) (11) 
+
+ˆd (X, ε ) = d (X) + εδ d + o (ε) (12) in which χ and d are the kinematical field at the equilibrium, δχ and δd are the variation of the deformation and the director field, respectively. Variation of the director field has to satisfy the constraint. Therefore, taking the variation of (2) results in 
+
+d · δd = 0 (13) from which we conclude that δd = g × d in which g is a non–unique arbitrary vector. By using this, and showing the variation of the deformation by u, we can write 
+
+ˆχ (X, ε ) = χ (X) + εu + o (ε) (14) 
+
+ˆd (X, ε ) = d (X) + εg × d + o (ε) (15) and in consequence, we find δF and ∇δd as 
+
+δF = ∇u and ∇δd = ( g,A × d + g × d,A ) ⊗ EA (16) Taking the variation of the elastic energy (3) gives 
+
+δW = P · δF + N · δd + M · ∇ δd (17) in which P is the generalized first Piola stress tensor, N is the internal couple, and M is couple stress, defined as 
+
+P = ∂W ∂F , N = ∂W ∂d , M = ∂W ∂∇d (18) Taking the volume integral of δW gives 
+
+Z
+
+> κ0
+
+δW dV =
+
+Z
+
+> κ0
+
+(P · δF + N · δd + M · ∇ δd) dV (19) 
+
+=
+
+Z
+
+> κ0
+
+ Div  P T u − Div (P ) · u + d × (N − Div (M )) · g + Div  M T δd dV (20) where dV is the element of volume in the reference configuration and by applying the divergence theorem for integrals, we find 
+
+Z
+
+> κ0
+
+δW dV =
+
+Z
+
+> ∂κ 0
+
+(P ν · u + d × M ν · g) dA −
+
+Z
+
+> κ0
+
+(Div (P ) · u + d × (Div (M ) − N ) · g) dV 
+
+in which dA is the referential areal element, ν is the outward unit normal to the boundary of the body in the reference configuration, ∂κ 0 is the boundary of the body in the reference configuration. According to the principle of virtual power, at equilibrium, we have Z
+
+> κ0
+
+δW dV = P (21) in which P is the virtual power of external effects, i.e., 
+
+P =
+
+Z
+
+> κ0
+
+(f · u + l · g × d) dV +
+
+Z
+
+> ∂κ p0
+
+p · u dA +
+
+Z
+
+> ∂κ d0
+
+m · g × d dA (22) 4in which f , l, p, and m are external body force, body couple, traction, and couple traction, respectively, and ∂κ p0
+
+and ∂κ d0 are portion of the boundary of the body over which p and m are applied. Note that over the parts of the boundary where deformation and director fields are, which prescribe the variations of the deformation and director fields vanish. By applying the principle of virtual power, one can find the following balance laws and boundary conditions Div P + f = 0 ∈ κ0 and P ν = p on ∂κ p0 (23) 
+
+d × (Div (M ) − N + l) = 0 ∈ κ0 and d × M ν = d × m on ∂κ d0 (24) Given that in this work we are proposing neural network methods to model the effects of materials’ microstructure on the mechanical behavior of the body of the body based on variational methods, in the following sections, we will present conditions that must be satisfied by the outputs of the network for any form of elastic energy used as part of the loss function in the network. We obtain quasiconvexity condition, rank–one convexity condition, and Legendre–Hadamard inequalities that must be satisfied by the solutions of these balance laws and boundary conditions for them to correspond to stable energy minimizers. 
+
+## 2.3 Energy minimizers 
+
+In this section, we derive energy–minimizing conditions that the solutions of (23) and (24) have to satisfy. Therefore, these conditions are necessary for these solutions, and if the solutions do not satisfy these necessary conditions, they cannot correspond to stable minimizers. These conditions are important because they provide a ground truth to check the validity of a solution obtained by numerical methods or analytical approaches for conservative systems at equilibrium. As a result, we are using the total potential energy of the system as a loss function in neural networks to make sure that the solutions of the networks adhere to and satisfy the laws of physics and thermodynamics. We conclude that these energy–minimizing conditions also must be satisfied by the output of the networks for any given loss function. Therefore, if the solutions obtained by the neural networks do not satisfy these conditions, we conclude that the network’s solutions are not valid. At the stable equilibrium, the total potential energy of a system is minimized. Consider the total potential energy of a conservative system as 
+
+E (χ, d) = 
+
+Z
+
+> κ0
+
+W (F , d, ∇d) dV − L (25) in which L is the potential energy of applied external effect. In this work, we consider the case of dead loads and in consequence 
+
+L =
+
+Z
+
+> κ0
+
+(f · χ + l · d) dV +
+
+Z
+
+> ∂κ p0
+
+p · χ dA +
+
+Z
+
+> ∂κ d0
+
+m · d dA (26) For any deformation and director fields satisfying boundary conditions and that are not the kinematical fields at equilibrium, the total potential energy of the system should be greater than the value of the total potential energy for the kinematical fields at the equilibrium. That is to say 
+
+E
+
+
+
+˜χ, ˜d
+
+
+
+− E (χe, de) ≥ 0 (27) in which χe and de are the kinematical fields at the stable equilibrium obtained from solving (23) and (24) whereas and ˜χ and ˜d are the deviated kinematical fields away from equilibrium. Note that both ˜d and de have to satisfy the constraint in (2). In the following sections, we find quasiconvexity condition, rank–one convexity condition, and Legendre–Hadamard inequalities by minimizing the total potential energy of the system. These conditions must be satisfied by the solutions of (23) and (24) at the stable equilibrium. Therefore, these conditions are necessary conditions that must be satisfied by solutions of the balance laws for them to be valid at the equilibrium. 
+
+2.3.1 Quasiconvexity condition 
+
+Consider the following deformations 
+
+˜χ (X, μ ) = χe (X) + μΦ (Z) and ˜d (X, μ ) = R (Z, μ ) de with R (Z, μ ) ∈ Orth + (28) in which Φ (Z) and ˜R (Z, μ ) − I are smooth enough compactly supported functions in D ⊂ κ and 
+
+Z = X − X0
+
+μ (29) 5where X0 is a material point in the interior of κ0 and μ is a scalar. Note that choosing ˜d (X, μ ) = ˜R (Z, μ ) de
+
+satisfies the constraint (2) therefore, it is a valid director field. There are several representations for a rotation tensor, among which we use Cayley’s representation of rotation tensors. According to this representation, for any skew–symmetric tensor W the quantity (I − W )−1 (I + W ) is a rotation tensor. Therefore, by using this representation, we pick 
+
+R (Z, μ ) = 
+
+
+
+I − μ
+
+2 W (Z)
+
+−1 
+
+I + μ
+
+2 W (Z)
+
+
+
+(30) in which W (Z) is a smooth compactly supported tensor–valued function in D ⊂ κ0. By using (28) and (30), we find 
+
+˜F = Fe + ∇Z Φ (31) 
+
+∇ ˜d = 1
+
+μ∂R
+
+∂Z A
+
+de ⊗ EA + R∇de (32) in which 
+
+∇Z • = ∂•
+
+∂Z A
+
+⊗ EA (33) is the gradient of the vector quantity •. Note that 
+
+1
+
+μ∂R
+
+∂Z A
+
+= 12
+
+
+
+I − μ
+
+2 W
+
+−1  ∂W
+
+∂Z A
+
+
+
+(R + I) (34) where we used the identity 
+
+∂∂Z A
+
+
+
+I − μ
+
+2 W
+
+−1
+
+=
+
+
+
+I − μ
+
+2 W
+
+−1  μ
+
+2
+
+∂W
+
+∂Z A
+
+ 
+
+I − μ
+
+2 W
+
+−1
+
+(35) and by substituting (35) into (34) and results in (32), we find ∇ ˜d as 
+
+∇ ˜d = 12
+
+
+
+I − μ
+
+2 W
+
+−1  ∂W
+
+∂Z A
+
+
+
+(R + I) de ⊗ EA + R∇de (36) By substituting (28), (31), and (36) into (27) and using the fact that Φ = 0 on the boundary ∂κ p0 and R = I
+
+on ∂κ d0 , we find 
+
+E
+
+
+
+˜χ, ˜d
+
+
+
+− E (χe, de) = 
+
+Z
+
+> D
+
+W
+
+
+
+Fe + ∇Z Φ, Rd e, R∇de + 12
+
+
+
+I − μ
+
+2 W
+
+−1  ∂W
+
+∂Z A
+
+
+
+(R + I) de ⊗ EA
+
+
+
+μ3dV Z
+
+−
+
+Z
+
+> D
+
+W (Fe, de, ∇de) μ3dV Z −
+
+Z
+
+> D
+
+(f · μΦ (Z) + l · (R − I) de) μ3dV Z ≥ 0 (37) in which dV Z is the volume element of the domain D. By dividing this relation by μ3, passing to the limit μ → 0,and because lim μ→0 R = I, and lim μ→0 X = X0, we find 
+
+Z
+
+> D
+
+
+
+W
+
+
+
+F0e + ∇Z Φ, d0e, ∇d0e + ∂W
+
+∂Z A
+
+d0e ⊗ EA
+
+
+
+− W (F0e, d0e, ∇d0e)
+
+
+
+dV Z ≥ 0 (38) in which the quantities with the subscription 0e are those at the equilibrium and they are evaluated at X = X0.
+
+Relation (38) is called quasiconvexity condition which is a necessary condition for de and χe to be those at the stable equilibrium. This relation has to hold for any compactly supported functions Φ and W and for any domain 
+
+D ⊂ κ0 and at every material point X0.Because W is a skew symmetric tensor, we use its axial vector w = ax (W ) and rewrite the above relation as 
+
+Z
+
+> D
+
+
+
+W
+
+
+
+F0e + ∇Z Φ, d0e, ∇d0e + ∂w
+
+∂Z A
+
+× d0e ⊗ EA
+
+
+
+− W (F0e, d0e, ∇d0e)
+
+
+
+dV Z ≥ 0. (39) It can be seen that the quasiconvexity condition is an integral inequality that has to hold for any domain D, for any compactly supported functions Φ and W at each material point. Therefore, one can conclude that it would not be possible to use it to check the validity of the solutions. In the next section, we obtain rank–one convexity condition, which is a point–wise condition that must be satisfied by χe and de.62.3.2 Rank–one convexity condition 
+
+In this section, we obtain rank–one convexity condition for Cosserat media with a single unit director field. The origin of Z is located at X = X0, therefore, by a coordinate transformation and attaching an orthonormal right– handed basis {L1, L2, L3} on point X0, we can define a new coordinate system (ξ1, ξ 2, ξ 3) such that ξ1 = Z · L1,
+
+ξ2 = Z · L2, and ξ3 = Z · L3; therefore, we can write Z as 
+
+Z = ξ1L1 + ξ2L2 + ξ3L3 (40) Note that given that {LA} and {EA} are orthonormal basis vectors, there exists a rotation tensor S such that 
+
+EA = SLA. Moreover, consider a domain R ⊂ D such that 
+
+R = (ξ1, ξ 2, ξ 3) | | ξ3| < B (ξ1, ξ 2) = h2 −  ξ21 + ξ22
+
+ and B (ξ1, ξ 2) ≥ 0 (41) where h is small enough. Consider disjoint domains R0, R+ and R− such that R = R− ∪ R 0 ∪ R +
+
+R+ = {(ξ1, ξ 2, ξ 3) | θ B (ξ1, ξ 2) < ξ 3 ≤ B (ξ1, ξ 2)} (42) 
+
+R0 = {(ξ1, ξ 2, ξ 3) | − θ B (ξ1, ξ 2) ≤ ξ3 ≤ θ B (ξ1, ξ 2)} (43) 
+
+R− = {(ξ1, ξ 2, ξ 3) | − B (ξ1, ξ 2) ≤ ξ3 < −θ B (ξ1, ξ 2)} (44) with 0 < θ ≤ 1. Consider the following function 
+
+f (Z) = 
+
+
+
+−θ [ξ3 − B (ξ1, ξ 2)] , Z ∈ R +
+
+(1 − θ) ξ3 , Z ∈ R 0
+
+−θ [ξ3 + B (ξ1, ξ 2)] , Z ∈ R −
+
+0 , Z /∈ R 
+
+(45) Note that f (Z) is a compactly supported function and is zero outside of the domain D. Moreover, it can be seen that f (Z) is continuous everywhere. However, by simple calculation we can find the gradient of f and passing to the limit h → 0, we find that lim h→0 ∇Z f suffers a finite jump as 
+
+lim  
+
+> h→0
+
+∇Z f =
+
+
+
+−θL3 , Z ∈ R +
+
+(1 − θ) L3 , Z ∈ R 0
+
+−θL3 , Z ∈ R −
+
+0 , Z /∈ R 
+
+(46) in which we used the fact that passing to the limit h → 0 results in ξ1, ξ 2 → 0. Define functions Φ (Z) and 
+
+w (Z) = ax (W (Z)) in (28) and (30) as 
+
+Φ (Z) = af (Z) and w (Z) = bf (Z) (47) in which a and b are fixed vectors in the current configuration. Define 
+
+F = 1
+
+V (R)
+
+Z
+
+> R
+
+
+
+W
+
+
+
+F0e + ∇Z Φ, d0e, ∇d0e + ∂w
+
+∂Z A
+
+× d0e ⊗ EA
+
+
+
+− W (F0e, d0e, ∇d0e)
+
+
+
+dV Z (48) in which V (R) is the whole volume of the domain R and according to (39), we conclude that F ≥ 0. Now we find rank–one convexity condition by calculating the following limit 
+
+lim  
+
+> h→0
+
+F ≥ 0 (49) Note that V (R+) = V (R−) = (1 − θ) V (R) /2 and V (R0) = θV (R) as a result, we can write F as 
+
+F = (1 − θ)2V (R+)
+
+Z
+
+> R+
+
+
+
+W
+
+
+
+F0e + ∇Z Φ, d0e, ∇d0e + ∂w
+
+∂ξ A
+
+× d0e ⊗ EA
+
+
+
+− W (F0e, d0e, ∇d0e)
+
+
+
+dV Z
+
++ θV (R0)
+
+Z
+
+> R0
+
+
+
+W
+
+
+
+F0e + ∇Z Φ, d0e, ∇d0e + ∂w
+
+∂Z A
+
+× d0e ⊗ EA
+
+
+
+− W (F0e, d0e, ∇d0e)
+
+
+
+dV Z
+
++ (1 − θ)2V (R−)
+
+Z
+
+> R−
+
+
+
+W
+
+
+
+F0e + ∇Z Φ, d0e, ∇d0e + ∂w
+
+∂Z A
+
+× d0e ⊗ EA
+
+
+
+− W (F0e, d0e, ∇d0e)
+
+
+
+dV Z .
+
+7Passing to the limit h → 0 and invoking the mean value theorem of integrals, we find 
+
+lim  
+
+> h→0
+
+F = (1 − θ) W
+
+
+
+F0e − θa ⊗ ST L3, d0e, ∇d0e − θb × d0e ⊗ ST L3
+
+
+
++ θW 
+
+
+
+F0e + (1 − θ) a ⊗ ST L3, d0e, ∇d0e + (1 − θ) b × d0e ⊗ ST L3
+
+
+
+− W (F0e, d0e, ∇d0e) ≥ 0
+
+where we used the relation E3 = ST L3. By expanding the following equation in terms of θ, we find 
+
+W
+
+
+
+F0e − θa ⊗ ST L3, d0e, ∇d0e − θb × d0e ⊗ ST L3
+
+
+
+= W (F0e, d0e, ∇d0e)
+
+− θP0e · a ⊗ ST L3 − θM0e · b × d0e ⊗ ST L3 + o  θ2 (50) in which P0e = P (F0e, d0e, ∇d0e) and M0e = M (F0e, d0e, ∇d0e). By substituting above in lim h→0 F, we find and dividing the result by θ and passing to the limit θ → 0, we find 
+
+W
+
+
+
+F0e + a ⊗ ST L3, d0e, ∇d0e + b × d0e ⊗ ST L3
+
+
+
+−W (F0e, d0e, ∇d0e) ≥ P0e · a ⊗ ST L3 + M0e · b × d0e ⊗ ST L3 (51) Furthermore, given that L3 and S are arbitrary, we conclude that ST L3 is also an arbitrary vector. Therefore, we can use any other arbitrary vector T and rewrite the above relation as 
+
+W (F0e + a ⊗ T , d0e, ∇d0e + b × d0e ⊗ T ) − W (F0e, d0e, ∇d0e) ≥ P0e · a ⊗ T + M0e · b × d0e ⊗ T (52) Relation (52) is called a rank–one convexity condition that must be satisfied at each material point for any arbitrary vectors a, b in the current configuration and T in the reference configuration by χe and de. Next, we find Legendre–Hadamard inequality. 
+
+2.3.3 Legendre–Hadamard inequalities 
+
+Consider the following vectors used in (52) 
+
+a = ϵs and b = ϵq (53) where ϵ ≪ 1 is a fix scalar, and expand the following energy function W (F0e + ϵs ⊗ T , d0e, ∇d0e + ϵq × d0e ⊗ T )
+
+in terms of ϵ as 
+
+W (F0e + ϵs ⊗ T , d0e, ∇d0e + ϵq × d0e ⊗ T ) − W (F0e, d0e, ∇d0e) = +ϵ (P0e · s ⊗ T + M0e · q × d0e ⊗ T )+ ϵ2
+
+2 (M [s ⊗ T ] · s ⊗ T + 2 N [s ⊗ T ] · q × d0e ⊗ T + L [q × d0e ⊗ T ] · q × d0e ⊗ T )+o  ϵ2 . (54) in which 
+
+M =
+
+ ∂2W∂F 2
+
+
+
+> |d=d0e,χ=χ0e
+
+(55) 
+
+N =
+
+ ∂2W∂F ∂∇d
+
+
+
+> |d=d0e,χ=χ0e
+
+=
+
+ ∂2W∂∇d∂F
+
+
+
+> |d=d0e,χ=χ0e
+
+(56) 
+
+L = ∂2W∂ (∇d)2
+
+!
+
+> |d=d0e,χ=χ0e
+
+(57) By substituting (54) into rank–one convexity condition (52), and dividing the result by ϵ2 and passing to the limit 
+
+ϵ → 0 we find 
+
+M [s ⊗ T ] · s ⊗ T + 2 N [s ⊗ T ] · q × d0e ⊗ T + L [q × d0e ⊗ T ] · q × d0e ⊗ T ≥ 0 (58) 8Relation (58) is called the Legendre–Hadamard inequality that must be satisfied for any arbitrary vectors s,
+
+q and T by the solutions of (23) and (24). The strong form of the Legendre–Hadamard inequality is called the ellipticity condition. Violation of the ellipticity condition, also known as loss of ellipticity, is associated with material instabilities. 
+
+# 3 Numerical simulations 
+
+In this section, we present numerical solutions by using Finite Element Analysis (FEA) and two multilayer percep-tron networks. 
+
+## 3.1 Constitutive relation 
+
+In this section, we will use the following elastic energy as a representative for a generic elastic energy to capture the mechanical behavior of directed media. This energy is inspired by those energies used for nematic elastomers introduced in [64, 58]. The simulations consider pulling a two–dimensional object embedded in two–dimensional space (to be able to compare the solutions we get from both the neural network and FEA), as a result, we use the following form of energy 
+
+W = μ
+
+2 (tr (L0F T L−1F ) − 2 − 2 ln J) + αγ 2
+
+2 ∇d · ∇ d (59) where μ and α are the shear modulus and Frank elastic modulus, respectively, γ is the size effect, J = det F , and 
+
+L and L0 are defined as 
+
+L = I + ( r − 1) d ⊗ d and L0 = I + ( r − 1) D ⊗ D (60) in which D is the initial orientation of the director field in the reference configuration, r = ℓ∥ 
+
+> ℓ⊥
+
+is the shape anisotropy of the network in which ℓ⊥ and ℓ∥ are material parameters that correspond to the effective step lengths perpendicular and parallel to the director, respectively [64, 58]. In all simulations reported in the rest of this work, the normalized material parameters are taken as 
+
+μ = 1 , r = 2 , γ2α
+
+2 = 5 × 10 −4, (61) Before we perform numerical analysis, we show that this elastic energy satisfies (10) and (58) a priori . Therefore, the loss function is frame invariant and the solutions that the network produces satisfy these necessary conditions, specifically, Legendre–Hadamard inequalities. By using (18), we find 
+
+P = μ  L−1F L 0 − F −T  (62) 
+
+N = μ
+
+ 1
+
+r − 1
+
+  F L 0F T  d (63) 
+
+M = αγ 2∇d (64) then by substituting these stresses and moments into (10), we can see that 
+
+P F T + N ⊗ d + M (∇d)T = μ  L−1F L 0F T + F L 0F T L−1 − F L 0F T − I + αγ 2∇d (∇d)T ∈ Sym (65) Furthermore, one can show that 
+
+M [s ⊗ T ] · s ⊗ T = μ
+
+ s · L−1s (T · L0T ) + 2 J−1  s · F −T T 2
+
+(66) in which by picking s and T to be unit vectors we find 
+
+ s · L−1s (T · L0T ) = 14r (r + 1 − (r − 1) cos 2 λ) ( r + 1 + ( r − 1) cos 2 λ0) (67) where cos λ = s · d and cos λ0 = T · D. In this example, we have with r = ℓ∥ 
+
+> ℓ⊥
+
+= 2 and as a result, we find 
+
+ s · L−1s (T · L0T ) = 18 (3 − cos 2 λ) (3 + cos 2 λ0) > 0 (68) 9from which, we can see that the following strong ellipticity condition, which is the strong form of the Legendre– Hadamard inequality is satisfied 
+
+M [s ⊗ T ] · s ⊗ T > 0. (69) Therefore, the adopted constitutive model satisfies the strong ellipticity condition, ensuring material stability within the admissible range of deformation states considered. Similarly, it can be seen that 
+
+L [q × de0 ⊗ T ] · q × de0 ⊗ T > 0 (70) and in consequence, the solutions obtained by the network satisfy the Legendre–Hadamard inequalities a priori 
+
+and hence, for the chosen constitutive model and parameter set, the ellipticity condition holds within the regime considered for each material point. It can be seen from (69) and (70) that the ellipticity conditions are satisfied and as a result the material model is strongly elliptic for the selected parameters. 
+
+## 3.2 Finite Element Analysis 
+
+Finite element simulations are used to compute equilibrium configurations of a directed elastic medium and provide a reference solution for comparison with the neural network–based solver. The simulations are carried out using the open–source finite element framework FEniCSx [5], which provides an automated environment for the variational formulation and solution of nonlinear partial differential equations. The numerical implementation follows the variational formulation introduced in section (2.2) and computes stationary points of the elastic energy defined in (59). The reference domain is taken as the rectangular region 
+
+κ0 = [0 , L ] × [0 , W ], L = 1 .0, W = 0 .2, (71) where all dimensions are normalized by H0 = 1 cm. The reference domain is discretized using a structured quadrilateral mesh with Nx = 25 elements in the longitudinal direction and Ny = 5 elements in the transverse direction. The unknown fields are the displacement u and a single director field d. In two dimensions, the director is represented by an angular field 
+
+φ : κ0 → R, d = (cos φ, sin φ), (72) which enforces the unit length constraint |d| = 1 identically. The unknown fields are approximated using continuous Lagrange finite elements, 
+
+uh ∈ [P2]2, φh ∈ P 2. (73) Numerical integration of all surface and boundary line integrals is performed using quadrature degree 4. For notational convenience, we denote the four sides of the rectangle by 
+
+ΓL = {X = 0 }, ΓR = {X = L}, ΓB = {Y = 0 }, ΓT = {Y = W }. (74) Displacement–controlled loading is applied through Dirichlet boundary conditions, 
+
+u = (0 , 0) on ΓL, (75) 
+
+u = (∆ u(t), 0) on ΓR, (76) 
+
+φ = φ0 on ΓL. (77) where load parameter t denotes a pseudo–time (increment counter) used to apply the displacement in N equal increments, and ∆u(t) is 
+
+∆u(t) = ∆ umax 
+
+tN , ∆umax = 0 .1 L, N = 300 . (78) The director field is initialized uniformly in the reference configuration as 
+
+φ(X) = φ0 ∀X ∈ κ0, (79) which is consistent with the prescribed boundary condition on ΓL.At each load increment, equilibrium is obtained through a staggered minimization of the total energy. First, the displacement field is solved for fixed director field by enforcing 
+
+δΠ( u, φ ; δu) = 0 , (80) 10 using a Newton iteration. Next, the director field is updated for fixed displacement by solving 
+
+δΠ( u, φ ; δφ ) = 0 . (81) This alternating procedure is repeated at each increment of the prescribed displacement. All nonlinear problems are solved using Newton’s method with consistent linearization obtained via automatic differentiation. Convergence is assessed using an incremental criterion with relative tolerance 10 −6. Linearized systems are solved using Krylov subspace methods with standard algebraic preconditioning. 
+
+3.2.1 Mesh Independence Study 
+
+A mesh independence study was conducted for the case where φ0 = π/ 3 to ensure that the numerical solution was independent of mesh resolution. The number of discretizations in the y dimension ( ny ) ranged from 5 to 20. The number of corresponding discretizations in the x dimension was equal to 5 × ny . The director orientation response is effectively mesh–converged over the tested range, as the min, mean, and max director orientation angles are unchanged with refinement. Therefore, conclusions based on these results are mesh–independent across these meshes. 
+
+Figure 1: Mesh–independence study showing the minimum, mean, and maximum values of director orientation angle at the final simulation time as a function of mesh resolution ( ny ). 
+
+## 3.3 Neural Network–Based Solver 
+
+In this section, we present a neural network–based approach to obtain the solution of materials with microstructures under deformation. The kinematical fields in this problem are the deformation map χ and the director field d. In principle, one could construct a single network that maps material points to both χ and d while minimizing the total potential energy. However, because the deformation and director fields are kinematically independent and should be varied independently in the minimization process, we instead employ two separate neural networks. The overall architecture is shown in Fig. (2). In this figure, both networks take a material point in the reference configuration denoted by X = ( X, Y ) ∈ Ω ⊂
+
+R2 as an input. The DeformationNet generates the displacement field ( u(X)), from which the deformation map 
+
+χ = X + u is obtained. The DirectorNet generates a scalar director angle ( φ(X)), from which the director d is constructed using (72). By this construction, the constraint (2) is automatically satisfied. 11 Figure 2: Neural Network Architecture with DeformationNet and DirectorNet 
+
+Deformation Network. The raw displacement output ˜uθ (X) ∈ R2 is parameterized by a fully–connected neural network with three hidden layers of width 64 and tanh activation functions 
+
+hu 
+
+> 1
+
+= tanh( W u 
+
+> 1
+
+X + bu 
+
+> 1
+
+) , (82) 
+
+hu 
+
+> 2
+
+= tanh( W u 
+
+> 2
+
+hu 
+
+> 1
+
++ bu 
+
+> 2
+
+) , (83) 
+
+hu 
+
+> 3
+
+= tanh( W u 
+
+> 3
+
+hu 
+
+> 2
+
++ bu 
+
+> 3
+
+) , (84) 
+
+˜χθ (X) = W u 
+
+> 4
+
+hu 
+
+> 3
+
++ bu 
+
+> 4
+
+. (85) The trainable parameter set is θ = {W uℓ , buℓ }4
+
+> ℓ=1
+
+.
+
+Director Network. The DirectorNet produces a scalar angle field ˜φη (X) ∈ R
+
+hθ 
+
+> 1
+
+= tanh  W θ 
+
+> 1
+
+X + bθ
+
+> 1
+
+ , (86) 
+
+hθ 
+
+> 2
+
+= tanh  W θ 
+
+> 2
+
+hθ 
+
+> 1
+
++ bθ
+
+> 2
+
+ , (87) 
+
+hθ 
+
+> 3
+
+= tanh  W θ 
+
+> 3
+
+hθ 
+
+> 2
+
++ bθ
+
+> 3
+
+ , (88) 
+
+˜φη (X) = W θ 
+
+> 4
+
+hθ 
+
+> 3
+
++ bθ
+
+> 4
+
+, (89) with trainable parameters η = {W θℓ , bθℓ }4
+
+> ℓ=1
+
+. The director field d(X) is then constructed as 
+
+d(X) =   cos φ(X), sin φ(X), (90) which corresponds to (72) and satisfies the unit length constraint (2). To enforce boundary conditions without adding penalty terms to the loss function, we employ ansatz functions. The physical displacement field is defined as 
+
+u(X) = ( XL ∆L, 0) + X(L − X) ˜ uθ (X), (91) which satisfies the prescribed displacement boundary conditions at X = 0 and X = L. The director angle is constructed as 
+
+φ(X) = φ0 + X ˜φη (X), (92) so that the initial orientation φ0 is enforced at X = 0 .The loss function corresponds to the total potential energy defined in (25), in which the elastic contribution is given in (59). Because the boundary conditions are enforced through the ansatz [29], they do not appear explicitly as penalty terms in the loss function. 12 3.4 Verification of NN with FEA 
+
+To assess the accuracy of the neural network–based solver, we compare its final equilibrium solutions with those obtained from FEA for three different initial director orientations: φ0 = π/ 3, π/ 4, and π/ 6. In all cases, figures (3 - 5) display the final deformed configuration, including normalized displacement magnitude ( |u|2 = u2 
+
+> x
+
++ u2 
+
+> y
+
+), normalized displacement components ( ux and uy ), and the director orientation φ at equilibrium. The parameter 
+
+φ0 refers to the uniform initial director orientation prescribed in the reference configuration prior to loading which remains fixed on the Dirichlet boundary condition ( X = 0 , Y ∈ (0 , W )). 
+
+3.4.1 Case 1: φ0 = π/ 3
+
+For the case where the director is initially oriented at φ0 = π/ 3 (shown in figure (3)), relative to the x-axis, the imposed right boundary displacement produces a predominant ux stretch, with secondary transverse effects arising from large deformation and the coupling between deformation and director fields. At equilibrium, the FEA solution shows a smooth x–displacement gradient across the specimen, with ux dominating the response and uy remaining smaller but non–negligible. The neural network reproduces the overall deformation and director fields. The normalized displacement magni-tude and spatial gradient in ux are similar to the FEA solution, with the largest discrepancies appearing in regions where the X−gradient is steepest. This is expected, since ux carries the primary mechanical response and therefore accumulates the largest absolute errors. The transverse displacement field uy exhibit closer agreement. Importantly, although the neural network begins training with randomly initialized values, the final predicted 
+
+φ field closely matches the FEA equilibrium configuration. The director reorients smoothly under stretch, and the network captures both the magnitude and spatial variation of this reorientation. The difference plots confirm that deviations are small and spatially smooth, with no spurious oscillations or localized instabilities. 
+
+3.4.2 Case 2: φ0 = π/ 4
+
+When the director is initially oriented at φ0 = π/ 4 (shown in figure (4)), it lies midway between the X and Y axes. This configuration results in a more symmetric coupling between deformation and director evolution. In the final equilibrium state, both FEA and neural network solutions show a smooth ux with modest curvature in Y direction. In this case, agreement between the two methods is particularly strong. The ux and uy fields are nearly indistinguishable at the plotted resolution, and the difference fields remain uniformly small throughout the domain. The final director orientation predicted by the neural network aligns closely with the FEA solution, indicating that the network correctly captures the energetically preferred reorientation under loading. Because the initial orientation is neither strongly aligned nor strongly oblique to the stretch direction, this case provides a balanced test of the coupled kinematics. 
+
+3.4.3 Case 3: φ0 = π/ 6
+
+For φ0 = π/ 6 is shown in figure (5), the director is initially closer to the loading direction. This leads to a deformation response that is slightly more anisotropic, with stronger coupling in the X direction and subtle variations in uy .In the final state, the FEA solution exhibits smooth gradients in both displacement components and a consistent director rotation toward the stretch direction. The neural network again reproduces the displacement magnitude and component fields with strong agreement. Minor differences are visible near the boundaries and in regions where gradients are largest, but these differences remain small and smoothly distributed. The predicted director field converges to the same equilibrium pattern observed in the FEA simulation, demonstrating that the DirectorNet 
+
+successfully captures the coupling between deformation and orientational energy even when starting from a random initialization. 
+
+3.4.4 Overall Assessment 
+
+Across all three initial director orientations, the neural network accurately reproduces the final equilibrium displace-ment and director fields obtained from FEA. The largest discrepancies consistently occur in the primary loading direction ( X), where gradients are strongest, while uy and φ show very close agreement. Crucially, the network is not trained on FEA data but instead minimizes the total potential energy directly. The agreement seen in the final states, therefore, indicates that the combined DeformationNet –DirectorNet architecture, together with the variational loss formulation, is sufficient to recover stable, energy–consistent equilibrium solutions of the coupled Cosserat model. 13 4 Conclusion 
+
+In this work, we developed energy–minimizing conditions for materials with microstructure by using theories of oriented media, also known as Cosserat elasticity, with a single unit director. We designed and implemented two multilayer perceptron networks to model the mechanical behavior of microstructured media by minimizing the total potential energy of these materials. This architecture guarantees that the outputs of the networks are kinematically independent and due to the specific form of enforcing the boundary conditions, these outputs are kinematically admissible too. We showed that the loss function satisfies the frame invariant conditions. In addition, we showed that the chosen constitutive model satisfies the strong form of the Legendre–Hadamard inequality, and as a result, the outputs are materially stable. Furthermore, we validated the results of the network against the finite element method and the good agreement between the results verifies the output of the network. 
+
+# 5 Codebase and Data Availability 
+
+No data is used in this work. The codebase will be available by the corresponding author after publication. 
+
+# 6 Contribution 
+
+MS: Writing and editing the original draft, formal analysis, theoretical development, neural network design and implementation, FEA design and implementation, network validation against FEA, and supervision. PHG: Writing and editing the original draft, neural network design, network validation against FEA, and visualization. MK: Network validation against FEA, and visualization. JLW: Writing and editing the original draft, mesh sensitivity analysis. FN: Writing and editing the original draft, and visualization. 
+
+# 7 Acknowledgments 
+
+The authors would like to thank Prof. Jay D. Humphrey at Yale University for his invaluable advice and guidance in the preparation of this work 14 References 
+
+[1] Rasul Abdusalamov and Mikhail Itskov. “Rediscovering Hyperelasticity by Deep Symbolic Regression”. In: 
+
+International Journal for Numerical Methods in Engineering 127 (2 Jan. 2026). issn : 0029-5981. doi : 10. 1002/nme.70258 .[2] Virginia Agostiniani and Antonio DeSimone. “Rigorous derivation of active plate models for thin sheets of nematic elastomers”. In: Mathematics and Mechanics of Solids 25.10 (2020), pp. 1804–1830. [3] A. Agrawal and D. J. Steigmann. “Asymmetric lipid bilayers from the perspective of three-dimensional liquid crystal theory”. In: Continuum Mechanics and Thermodynamics 33 (2021), pp. 591–602. [4] A. Agrawal and D. J. Steigmann. “Boundary-value problems in the theory of lipid membranes”. In: Continuum Mechanics and Thermodynamics 21 (2009), pp. 57–82. [5] Martin S Alnaes et al. “The FEniCS Project Version 1.5”. In: Archive of Numerical Software 3 (100 2015). 
+
+issn : 2197-8263. [6] John M Ball. “Convexity conditions and existence theorems in nonlinear elasticity”. In: Archive for rational mechanics and Analysis 63.4 (1976), pp. 337–403. [7] Shiladitya Banerjee and M Cristina Marchetti. “Continuum models of collective cell migration”. In: Cell migrations: Causes and functions (2019), pp. 45–66. [8] Jorge Luis Barrera et al. “Liquid Crystal Orientation and Shape Optimization for the Active Response of Liquid Crystal Elastomers”. In: Polymers 16 (10 May 2024), p. 1425. issn : 2073-4360. doi : 10 . 3390 / polym16101425 .[9] Peiyi Chen and Johann Guilleminot. “Polyconvex neural networks for hyperelastic constitutive models: A rectification approach”. In: Mechanics Research Communications 125 (2022), p. 103993. [10] M. Chiang et al. “Intercellular friction and motility drive orientational order in cell monolayers”. In: Proceedings of the National Academy of Sciences 121.40 (2024), e2319310121. [11] Timothy K Chung, Nathan L Liang, and David A Vorp. “Artificial intelligence framework to predict wall stress in abdominal aortic aneurysm”. In: Applications in engineering science 10 (2022), p. 100104. [12] Timothy K Chung et al. “Augmented reality visualization of biomechanical wall stresses on abdominal aortic aneurysms using artificial intelligence”. In: Science talks 13 (2025), p. 100432. [13] Bernard Dacorogna. Direct methods in the calculus of variations . Springer, 2008. [14] F. dell’Isola et al. “Pantographic metamaterials: an example of mathematically driven design and of its tech-nological challenges”. In: Continuum Mechanics and Thermodynamics 31 (2019), pp. 851–884. [15] M. Epstein and M. J. Javadi. “Kinematically exact formulation of large deformations of gradient elastic beams”. In: International Journal of Engineering Science 186 (2023), p. 103827. [16] J. L. Ericksen. “Equilibrium theory of liquid crystals”. In: Advances in liquid crystals . Vol. 2. Elsevier, 1976, pp. 233–298. [17] J. L. Ericksen and D. Kinderlehrer. Theory and applications of liquid crystals . Vol. 5. Springer Science & Business Media, 2012. [18] A. C. Eringen. “A unified continuum theory of liquid crystals”. In: ARI-An International Journal for Physical and Engineering Sciences 50.2 (1997), pp. 73–84. [19] A. C. Eringen. “An assessment of director and micropolar theories of liquid crystals”. In: International journal of engineering science 31.4 (1993), pp. 605–616. [20] A. C. Eringen. “Micropolar theory of liquid crystals”. In: Liquid crystals and ordered fluids (1978), pp. 443– 474. [21] R. Fedele. “Third-gradient continua: nonstandard equilibrium equations and selection of work conjugate vari-ables”. In: Mathematics and Mechanics of Solids 27.10 (2022), pp. 2046–2072. [22] R. Fedele, L. Placidi, and F. Fabbrocino. “A review of inverse problems for generalized elastic media: formu-lations, experiments, synthesis”. In: Continuum Mechanics and Thermodynamics (2024), pp. 1–41. [23] Somdatta Goswami et al. “Neural operator learning of heterogeneous mechanobiological insults contributing to aortic aneurysms”. In: Journal of the Royal Society Interface 19.193 (2022), p. 20220410. 15 [24] A. E. Green and P. M. Naghdi. “Directed fluid sheets”. In: Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences 347.1651 (1976), pp. 447–473. [25] A. E. Green and P. M. Naghdi. “On Thermomechanical Formulation of Theories of Continuous Media”. In: 
+
+Nonlinear Effects in Fluids and Solids . Springer, 1996, pp. 161–187. [26] Albert Edward Green, N Laws, and Paul Mansour Naghdi. “Rods, plates and shells”. In: Mathematical Pro-ceedings of the Cambridge Philosophical Society . Vol. 64. 3. Cambridge University Press. 1968, pp. 895–913. [27] B. Hendrickson, M. Shirani, and D. J. Steigmann. “Equilibrium theory for a lipid bilayer with a conforming cytoskeletal membrane”. In: Mathematics and Mechanics of Complex Systems 8.1 (2020), pp. 69–99. [28] B. Hendrickson, M. Shirani, and D. J. Steigmann. “On the equations of equilibrium for asymmetric tilted lipid bilayers”. In: Mathematics and Mechanics of Complex Systems 9.2 (2021), pp. 153–166. [29] Leon Herrmann. Deep Learning in Computational Mechanics: An Introductory Course . Springer Nature, 2025. [30] L. A. Hoffmann et al. “Chiral stresses in nematic cell monolayers”. In: Soft matter 16.3 (2020), pp. 764–774. [31] Arif Hussain, Amir Hosein Sakhaei, and Mahmood Shafiee. “Machine learning-based constitutive modelling for material non-linearity: A review”. In: Mechanics of Advanced Materials and Structures (Dec. 2024), pp. 1– 19. issn : 1537-6494. doi : 10.1080/15376494.2024.2439557 .[32] Jichul Kim. “A Review of Continuum Mechanics for Mechanical Deformation of Lipid Membranes”. In: Mem-branes 13.5 (2023), p. 493. [33] Dominik K Klein et al. “Polyconvex anisotropic hyperelasticity with neural networks”. In: Journal of the Mechanics and Physics of Solids 159 (2022), p. 104703. [34] Nikolaos Kontopodis et al. “Prediction of abdominal aortic aneurysm growth by artificial intelligence taking into account clinical, biologic, morphologic, and biomechanical variables”. In: Vascular 31.3 (2023), pp. 409– 416. [35] David S Li et al. “Importance of localized dilatation and distensibility in identifying determinants of thoracic aortic aneurysm with neural operators”. In: PLOS Computational Biology 21.10 (2025), e1013550. [36] Moritz Lindquist Liljeqvist et al. “Geometric and biomechanical modeling aided by machine learning improves the prediction of growth and rupture of small abdominal aortic aneurysms”. In: Scientific reports 11.1 (2021), p. 18040. [37] Minliang Liu, Liang Liang, and Wei Sun. “A generic physics-informed neural network-based constitutive model for soft biological tissues”. In: Computer Methods in Applied Mechanics and Engineering 372 (Dec. 2020), p. 113402. issn : 00457825. doi : 10.1016/j.cma.2020.113402 .[38] L. Placidi, U. Andreaus, and I. Giorgio. “Identification of two-dimensional pantographic structure via a linear D4 orthotropic second gradient elastic model”. In: Journal of Engineering Mathematics 103.1 (2017), pp. 1–21. [39] Maziar Raissi, Paris Perdikaris, and George E Karniadakis. “Physics-informed neural networks: A deep learn-ing framework for solving forward and inverse problems involving nonlinear partial differential equations”. In: 
+
+Journal of Computational physics 378 (2019), pp. 686–707. [40] P. Rangamani and D. J. Steigmann. “Variable tilt on lipid membranes”. In: Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences 470.2172 (2014), p. 20140463. [41] P. Rangamani et al. “Small scale membrane mechanics”. In: Biomechanics and modeling in mechanobiology 
+
+13 (2014), pp. 697–711. [42] Balaji Rengarajan, Sourav S Patnaik, and Ender A Finol. “A predictive analysis of wall stress in abdominal aortic aneurysms using a neural network model”. In: Journal of Biomechanical Engineering 143.12 (2021), p. 121004. [43] Esteban Samaniego et al. “An energy approach to the solution of partial differential equations in computa-tional mechanics via machine learning: Concepts, implementation and applications”. In: Computer Methods in Applied Mechanics and Engineering 362 (2020), p. 112790. [44] Milad Shirani and David J Steigmann. “Quasiconvexity and rank-one convexity in Cosserat elasticity theory”. In: Theoretical Analyses, Computations, and Experiments of Multiscale Materials: A Tribute To Francesco Dell’Isola . Springer, 2022, pp. 273–283. [45] Milad Shirani, David J Steigmann, and Patrizio Neff. “The Legendre–Hadamard condition in Cosserat elas-ticity theory”. In: The Quarterly Journal of Mechanics and Applied Mathematics 73.4 (2020), pp. 293–303. 16 [46] Milad Shirani et al. “A mixed Cosserat and higher gradient formulation for fibrous tissues and biomaterials”. In: International Journal of Solids and Structures (2025), p. 113671. [47] M. Spagnuolo et al. “Are higher-gradient models also capable of predicting mechanical behavior in the case of wide-knit pantographic structures?” In: Mathematics and Mechanics of Solids 26.1 (2021), pp. 18–29. [48] D Steigmann, Mircea Bîrsan, and Milad Shirani. Lecture notes on the theory of plates and shells . Springer, 2023. [49] D. J. Steigmann and A. Agrawal. “Electromechanics of polarized lipid bilayers”. In: Mathematics and Me-chanics of Complex Systems 4.1 (2016), pp. 31–54. [50] David J Steigmann. “Effects of fiber bending and twisting resistance on the mechanics of fiber-reinforced elastomers”. In: Nonlinear mechanics of soft fibrous materials . Springer, 2015, pp. 269–305. [51] David J Steigmann. Finite elasticity theory . Oxford University Press, 2017. [52] David J Steigmann. The role of mechanics in the study of lipid bilayers . Vol. 577. Springer, 2017. [53] DJ1706449 Steigmann. “On the relationship between the Cosserat and Kirchhoff-Love theories of elastic shells”. In: Mathematics and Mechanics of Solids 4.3 (1999), pp. 275–288. [54] M. Stilz et al. “A second-gradient elasticity model and isogeometric analysis for the pantographic ortho-block”. In: International Journal of Solids and Structures 280 (2023), p. 112358. [55] M. Stilz et al. “Chirality effects in panto-cylindrical structures”. In: Mathematics and Mechanics of Solids 29.4 (2024), pp. 818–830. [56] Dongliang Tan et al. “Fhcnnbio: a fiber-reinforced hyperelastic constitutive neural network model for biological tissues with prior physical information”. In: Complex & Intelligent Systems 11 (10 Oct. 2025), p. 433. issn :2199-4536. doi : 10.1007/s40747-025-02071-9 .[57] Epifanio G Virga. Variational theories for liquid crystals . Chapman and Hall/CRC, 2018. [58] Chen Wei et al. “Exceptional stress-director coupling at the crack tip of a liquid crystal elastomer”. In: Journal of the Mechanics and Physics of Solids 183 (2024), p. 105522. [59] Xiangjun Xing and Leo Radzihovsky. “Nonlinear elasticity, fluctuations and heterogeneity of nematic elas-tomers”. In: Annals of Physics 323.1 (2008), pp. 105–203. doi : 10.1016/j.aop.2007.10.009 .[60] Xiangjun Xing et al. “Fluctuating nematic elastomer membranes”. In: Physical Review E 68.2 (2003), p. 021108. [61] V. Yashunsky et al. “Chiral edge current in nematic cell monolayers”. In: Physical Review X 12.4 (2022), p. 041017. [62] Minglang Yin et al. “Simulating progressive intramural damage leading to aortic dissection using DeepONet: an operator–regression neural network”. In: Journal of the Royal Society Interface 19.187 (2022), p. 20210670. [63] Enrui Zhang et al. “G2 Φnet: Relating genotype and biomechanical phenotype of tissues with deep learning”. In: PLOS Computational Biology 18.10 (2022), e1010660. [64] Yu Zhou, Chen Wei, and Lihua Jin. “A modified semi-soft model of liquid crystal elastomers: Application to elastic and viscoelastic responses”. In: Journal of the Mechanics and Physics of Solids 196 (2025), p. 106027. 17 (a) 
+
+> (b)
+> (c)
+> (d)
+> (e)
+
+Figure 3: Comparison between solutions obtained from FEA and NN for the case with φ0 = π/ 3. From the right to the left, results from FEA, results from NN, and the difference between the solutions. (a) Magnitude of deformation with director fields, (b) Magnitude of deformation, (c) Magnitude of deformation in x−direction (d) Magnitude of deformation in y−direction, and (e) Orientation of the director field. 18 (a) 
+
+> (b)
+> (c)
+> (d)
+> (e)
+
+Figure 4: Comparison between solutions obtained from FEA and NN for the case with φ0 = π/ 4. From the right to the left, results from FEA, results from NN, and the difference between the solutions. (a) Magnitude of deformation with director fields, (b) Magnitude of deformation, (c) Magnitude of deformation in x−direction (d) Magnitude of deformation in y−direction, and (e) Orientation of the director field. 19 (a) 
+
+> (b)
+> (c)
+> (d)
+> (e)
+
+Figure 5: Comparison between solutions obtained from FEA and NN for the case with φ0 = π/ 6. From the right to the left, results from FEA, results from NN, and the difference between the solutions. (a) Magnitude of deformation with director fields, (b) Magnitude of deformation, (c) Magnitude of deformation in x−direction (d) Magnitude of deformation in y−direction, and (e) Orientation of the director field. 20

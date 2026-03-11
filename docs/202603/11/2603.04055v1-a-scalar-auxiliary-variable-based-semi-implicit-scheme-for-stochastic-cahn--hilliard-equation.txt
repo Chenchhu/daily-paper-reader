@@ -1,0 +1,6713 @@
+Title: A scalar auxiliary variable-based semi-implicit scheme for stochastic Cahn--Hilliard equation
+
+URL Source: https://arxiv.org/pdf/2603.04055v1
+
+Published Time: Thu, 05 Mar 2026 02:11:32 GMT
+
+Number of Pages: 54
+
+Markdown Content:
+# A scalar auxiliary variable-based semi-implicit scheme for stochastic Cahn–Hilliard equation 
+
+## Jianbo Cui 1, Jie Shen 2†, Derui Sheng 1, Yahong Xiang 1†
+
+1Department of Applied Mathematics, The Hong Kong Polytechnic University, Hung Hom, Kowloon, Hong Kong. 
+
+2School of Mathematical Sciences, Eastern Institute of Technology, Ningbo, 315200, Zhejiang, People’s Republic of China. Contributing authors: jianbo.cui@polyu.edu.hk; jshen@eitech.edu.cn; sdr@lsec.cc.ac.cn; xiangyahong2025@outlook.com; 
+
+†These authors contributed equally to this work. 
+
+Abstract 
+
+In this paper, we present a novel semi-implicit numerical scheme for the stochas-tic Cahn–Hilliard equation driven by multiplicative noise. By reformulating the original equation into an equivalent stochastic scalar auxiliary variable (SSAV) system, our method enables an efficient and stable treatment of polynomial non-linearities in a semi-implicit fashion. In order to accurately capture the impact of stochastic perturbations, we carefully incorporate Itô correction terms into the SSAV approximation. Leveraging the smoothing properties of the underlying semigroup and the H−1-dissipative structure of the nonlinear term, we establish the optimal strong convergence order of one-half for the proposed scheme in the trace-class noise case. Moreover, we show that the modified SAV energy asymp-totically preserves the energy evolution law. Finally, numerical experiments are provided to validate the theoretical results and to explore the influence of noise near the sharp-interface limit. 
+
+Keywords: Stochastic scalar auxiliary variable, stochastic Cahn–Hilliard equation, strong convergence, energy evolution law 
+
+1
+
+> arXiv:2603.04055v1 [math.NA] 4 Mar 2026
+
+# 1 Introduction 
+
+The Cahn–Hilliard equation was initially introduced to describe phase separation dynamics in binary metallic alloys [1]. By incorporating stochastic perturbations representing thermal fluctuations and random solute vibrations [2], the stochas-tic Cahn–Hilliard equation provides a more realistic description of microstructure evolution. This stochastic formulation has been applied broadly, including to nucle-ation dynamics [3], spinodal decomposition [4, 5], coarsening phenomena [6], cell proliferation and adhesion [7], bubble motion [8], and related processes. In this paper, we consider the following stochastic Cahn–Hilliard equation 
+
+dφ (t) = ∆ μ(t) dt + g(φ(t)) dW (t), in O × (0 , T ],μ(t) := δE (φ(t)) 
+
+δφ = −∆φ(t) + F ′(φ(t)) , in O × (0 , T ], (1.1) subject to homogeneous Dirichlet boundary conditions φ = μ = 0 on ∂O × (0 , T ] and the non-random initial condition φ(0) = φ0. The spatial domain O ⊂ Rd, d ∈ { 1, 2, 3},is a bounded domain with smooth boundary or a bounded convex domain with polyg-onal boundary. The Dirichlet problem is physically relevant because it governs the propagation of a solidification front into an ambient medium at rest relative to the front [9]; see also [10, 11]. The unknown φ denotes the order parameter for phase transitions, and the chemical potential μ is defined as the functional derivative of the Ginzburg–Landau free energy functional 
+
+E(φ(t)) = 
+
+∫
+
+> O
+
+[ 12 |∇ φ(t, x )|2 + f (φ(t, x )) 
+
+]
+
+dx (1.2) where f is a quartic polynomial, typically chosen as the double-well potential f (φ) =  
+
+> 14
+
+(φ2 − 1) 2. In the sequel, F ′ and g denote the Nemitskii operators associated with f ′
+
+and a bounded function σ : R → R, respectively, and W is a spatially homogeneous Wiener process of trace class (see Assumptions 1 and 2). For the results on well-posedness and regularity of (1.1), we refer to [9, 12, 13] and references therein. In these studies, the energy evolution law serves as a fundamental tool (see, e.g., [14]), and has also been used to investigate the long-time dynamics, such as the existence of invariant measures [15], ergodicity [16], and the existence and strict positivity of the solution densities [10, 17, 18], for the underlying system. In recent years, the stochastic Cahn–Hilliard equation has become a focal point of numerical research, as the absence of closed-form analytical solutions necessitates the development of robust computational methods. A central challenge in numer-ical discretizations for stochastic evolution equations lies in the treatment of time discretization [19]. In particular, the stochastic stability and convergence behave fun-damentally differently from the deterministic case. For the stochastic Cahn–Hilliard equation with polynomial nonlinearities, a common approach to address stability is to use fully implicit time-stepping schemes; see, for example, [9, 20–22] for additive noise and [10, 23–25] for multiplicative noise. Recently, using a truncation strategy, [26] developed a fully discrete scheme for a class of fourth-order stochastic partial 2differential equations driven by spatially smooth multiplicative noise, based on a par-tially implicit time-stepping combined with a mixed finite element method. However, these schemes require solving a large nonlinear stochastic system at each step, which is computationally expensive in high dimensions or on fine meshes. Moreover, a unified error-analysis framework that combines numerical discretization and iteration errors is still lacking, leaving the overall simulation error unclear. Another popular numerical approach to solve the stochastic Cahn–Hilliard equation is via explicit or semi-implicit schemes, which aims to improve efficiency while maintaining stability, often through structure-preserving or tamed strategies. For example, tamed-exponential Euler methods have been proposed for (1.1) in the additive-noise setting [27], but they may fail to capture the energy evolution law. Splitting-based structure-preserving schemes offer another option and are effective for the stochastic Allen–Cahn equation [28, 29]; however, they are ill-suited to the stochastic Cahn–Hilliard equation because the corresponding subsystems may not be explicitly solvable. A further alternative is the stochastic scalar auxiliary variable (SSAV) approach, inspired by scalar auxiliary variable (SAV) methods for deter-ministic gradient flows [30, 31]. SSAV techniques have been successfully adapted to stochastic models, including stochastic nonlinear Klein–Gordon [32] and Allen–Cahn equations [33, 34]. For the stochastic Cahn–Hilliard equation with dynamic boundary conditions, [35] proposed an SAV-based finite element scheme and proved convergence in distribution to suitable weak solutions, but without establishing strong convergence. It is known that the strong convergence order of numerical scheme is a key measure of pathwise accuracy and is crucial for the complexity analysis of Monte Carlo and multilevel Monte Carlo methods [36]. Nonetheless, to the best of our knowledge, no explicit or semi-implicit scheme has been shown to achieve strong convergence while preserving the energy evolution law for the stochastic Cahn–Hilliard equation with non-globally Lipschitz nonlinearities. This gap motivates the present work. The numerical analysis of the SAV-based scheme for (1.1) faces several challenges. First, unlike the deterministic case, the energy evolution is governed by the complex interplay between random noise and the nonlinear potential, which complicates the construction of the SSAV framework. Capturing the energy evolution demands careful control over the approximations of both the solution and its gradient. Second, the low temporal regularity of the Wiener process prevents the direct application of standard SAV formulations to stochastic systems, necessitating appropriate adaptations. Third, in contrast to the stochastic Allen–Cahn equation, the strong convergence analysis for (1.1) is further complicated by the presence of an unbounded linear operator acting on the nonlinearity, which introduces additional technical difficulties in establishing error estimates. To address these challenges, we introduce an SSAV r(t) := √Ep(φ(t)) , where Ep
+
+is the potential functional (see (3.1)), and reformulate (1.1) into the following SSAV system 
+
+dφ (t) = −A2φ(t)dt + r(t)
+
+√Ep(φ(t)) AF ′(φ(t)) dt + g(φ(t)) dW (t), (1.3) where A is the Laplacian equipped with homogeneous Dirichlet boundary condi-tions. By freezing the drift coefficient r(t)
+
+√Ep(ϕ(t)) F ′(φ(t)) of (1.3) over each subinterval 3[tn, t n+1 ] by a modified nonlinearity ˜f n (to be specified later), we propose the following exponential Euler SSAV scheme 
+
+Xn+1 = e−A2τ Xn + ( I − e−A2τ )A−1 ˜f n + e−A2τ g(Xn)δW n. (1.4) Here, {tn = nτ }Nn=0 denotes the temporal grid with the step size τ = T /N , N ∈ N+,and δW n = W (tn+1 ) − W (tn) is the Wiener increment. The modified nonlinearity ˜f n has to be carefully designed, as it involves the numer-ical approximation of the SSAV r(t) whose evolution is intrinsically different from that of SAV in the deterministic setting (see, e.g., [31]). This can be observed in the following asymptotic expansion 
+
+r(t) = r(s) + 12√Ep(φ(s)) ⟨F ′(φ(s)) , φ (t) − φ(s)⟩ (1.5) 
+
+− 18( Ep(φ(s))) 3/2 ⟨F ′(φ(s)) , φ (t) − φ(s) ⟩2
+
++ 14√Ep(φ(s)) ⟨F ′′ (φ(s))( φ(t) − φ(s)) , φ (t) − φ(s) ⟩ + o(|t − s|)
+
+due to the Itô–Taylor expansion [37, Section 5.5] and low regularity structure of W .Since (1.5) contains two additional Itô correction terms, the direct usage of Itô–Taylor method for (1.5) destroys the linear structure of the SSAV system, making the result-ing scheme cannot be solved explicitly. Inspired by [35], we design the discrete SSAV as follows 
+
+rn+1 = rn + 12√Ep(Xn)
+
+〈F ′(Xn), X n+1 − Xn 〉 (1.6) 
+
+− 18( Ep(Xn)) 3/2 ⟨F ′(Xn), g (Xn)δW n ⟩ 〈F ′(Xn), X n+1 − Xn 〉
+
++ 14√Ep(Xn)
+
+〈F ′′ (Xn)( Xn+1 − Xn), g (Xn)δW n〉 ,
+
+which maintains the scheme’s linear structure while ensuring consistency with the Itô formula. Accordingly, the nonlinearity ˜f n is then determined via (see (3.8)) 
+
+2rn+1 (rn+1 − rn) = ⟨ ˜f n, X n+1 − Xn⟩. (1.7) Although replacing Xn+1 − Xn by g(Xn)δW n in (1.6) also gives an explicit update for the discrete SSAV, it fails to fulfill the SAV structure (1.7) (see Remark 2). We would also like to mention that since the proposed SAV formulation is fundamentally energy-based, it may not be suitable for the stochastic evolution equation driven by space–time white noise (see, e.g., [18, 20]). To overcome the difficulties arising from the superlinear nonlinearity, two key components are essential: obtaining regularity estimates of the numerical solution 4Xn, and a careful quantification of the difference between the square root of the discrete potential energy √Ep(Xn) and the discrete SSAV rn. These elements are crucial for establishing the sharp strong convergence rate of the proposed scheme (1.4). On the one hand, the special algebraic structure (1.7) enables us to control the polynomial growing drift term ˜f n, which in turn allows us to prove that the scheme (1.4) is unconditionally stable in H1(O) (see Lemma 4). As a consequence, we can show the averaged energy evolution law of the exponential Euler SSAV scheme (1.4) (see Theorem 3), which captures the effects of noise at a discrete level and asymptotically preserves the averaged energy evolution law of (1.1). Then, using the semigroup approach, we lift the regularity of the numerical solution to the Hβ (O)
+
+space for some β > d 
+
+> 2
+
+, yielding the L∞(O)-stability of the numerical solution. On the other hand, by utilizing the temporal Hölder continuity estimates of the numerical solution in both the L2(O) and H1(O) norms, we prove that (see Lemma 11) 
+
+E
+
+[
+
+|rn −
+
+√
+
+Ep(Xn)|p
+
+]
+
+≤ C(p)τ p 
+
+> 2
+
+, p ≥ 1.
+
+As a comparison, [38, Lemma 6.4] presented a convergence order of 1/8 for this SAV quantity under dynamic boundary conditions. Furthermore, by exploiting the one-sided Lipschitz continuity of −F ′ in L2(O) and the local Lipschitz continuity of F ′ in 
+
+H1(O), we establish the following sharp strong convergence rate (see Theorem 2) 
+
+E [∥φ(tn) − Xn∥2] ≤ Cτ, 
+
+based on a coupling of variational and semigroup approaches. The strong convergence order 1/2 is optimal in the sense that it coincides with the temporal Hölder continuity exponent of the exact solution to (1.1). In summary, the main contributions of this work are as follows: 1. We develop a novel semi-implicit time discretization framework for the stochastic Cahn–Hilliard equation with multiplicative noise by integrating the exponential Euler method with the SAV approach. The resulting scheme is iteration-free and unconditionally stable. 2. We establish the optimal strong convergence rate of the proposed scheme through a coupling of variational and semigroup approaches. This hybrid analytical frame-work not only overcomes the technical challenges posed by non-globally Lipschitz nonlinearity and multiplicative noise, but also can be extended to related models, such as the stochastic Allen–Cahn equation. 3. We prove that the proposed scheme asymptotically preserves the averaged energy evolution law of the underlying continuous system, thereby revealing a deeper con-sistency between the discrete and continuous dynamics. Numerical experiments validate this theoretical finding and further demonstrate the divergence of the averaged energy evolution law for the standard SAV scheme. The remainder of this paper is organized as follows. In Section 2, we present the preliminaries and main results. Section 3 introduces the construction of the exponen-tial Euler SSAV scheme (1.4) and demonstrates its explicit solvability. In Section 4, 5we establish regularity estimates for the numerical solution, which form the basis for the proofs of the main results given in Sections 5 and 6. Finally, Section 7 presents several numerical experiments that confirm both the accuracy and efficiency of the proposed scheme, as well as its ability to capture the sharp-interface dynamics. For the sake of completeness, the appendix provides proofs of several auxiliary results used in the paper. 
+
+# 2 Preliminaries and main results 
+
+In this section, we present the preliminaries and state the main result of this paper. In Subsection 2.1, we specify the main assumptions on the coefficients F ′ and g, as well as on the driving Wiener process W , under which the stochastic Cahn–Hilliard equation (1.1) admits a unique mild solution. In Subsection 2.2, we present the optimal strong convergence order and the energy evolution law of the proposed scheme (1.4). We begin by introducing some useful notations. For p ∈ [1 , ∞), denote by Lp(O)
+
+the space of pth integrable functions defined on O, equipped with the norm ∥v∥Lp := (∫ 
+
+> O
+
+|v(x)|p dx )1/p for p ∈ [1 , ∞). For p = ∞, L∞ consists of measurable functions v
+
+such that ∥v∥L∞ := ess sup x∈O |v(x)| < ∞. When p = 2 , we write H := L2(O) and 
+
+∥ · ∥ := ∥ · ∥ L2 for brevity. The symbol ⟨· , ·⟩ represents the inner product in H. Let 
+
+L(H) be the space of bounded linear operators from the Hilbert space H to itself. Given two Hilbert spaces U and V , we define L2(U, V ) as the space of Hilbert–Schmidt operators from U to V , equipped with the norm ∥Ψ∥L2(U,V ) := (∑ ∞ 
+
+> k=1
+
+∥Ψfk∥2
+
+> V
+
+)1/2
+
+for Ψ ∈ L 2(U, V ), where {fk}k∈N+ is a complete orthonormal basis of U . Throughout the paper, C denotes a generic positive constant that may vary from one occurrence to another and is independent of the discretization parameter. This constant may depend on the terminal time T , the initial value φ0, the covariance operator of W ,and the coefficients F ′ and g, but such dependence is not made explicit for simplicity. 
+
+## 2.1 Preliminaries 
+
+In this subsection, we introduce the main assumptions, mild formulation, and averaged energy evolution law for the stochastic Cahn–Hilliard equation (1.1). Since the spatial domain O ⊂ Rd, d ∈ { 1, 2, 3}, is a bounded domain with smooth boundary ∂O or a bounded convex domain with polygonal boundary, by [39, Section 2.3], the Dirichlet Laplacian A : D(A) ⊂ H → H is densely defined, self-adjoint and positive definite with compact inverse. Hereafter, D(·) denotes the domain of an operator. Then there exists a non-decreasing sequence {λj }j≥1 ⊂ (0 , ∞) and a complete orthonormal basis {ej }j≥1 ⊂ D(A) of H such that −Ae j = λj ej and 
+
+lim j→∞ λj = ∞. For α ∈ R, define the fractional power (−A)α of the operator −A
+
+by (−A)αv = ∑∞ 
+
+> j=1
+
+λαj ⟨v, e j ⟩ ej with the domain D(( −A)α) := {v = ∑∞
+
+> j=1
+
+⟨v, e j ⟩ej :
+
+∑∞ 
+
+> j=1
+
+λ2αj ⟨v, e j ⟩2 < ∞} . It is well known that −A2 generates an C0-semigroup 
+
+{S(t) = e−tA 2
+
+, t ≥ 0} of contractions on H (see, e.g., [10]), i.e., ∥S(t)∥L(H) ≤ 1 for all t ≥ 0. Furthermore, {S(t), t > 0} has the following smoothing effect (see, e.g., [39, 6Lemma B.9]) 
+
+∥(−A)γ S(t)∥L(H) ≤ C(γ)t− γ 
+
+> 2
+
+, γ ≥ 0, (2.1) 
+
+∥∥(−A)−ν (I − S(t)) ∥∥L(H) ≤ C(ν)t ν 
+
+> 2
+
+, ν ∈ [0 , 2] . (2.2) For s > 0, let Hs(O) denote the standard Sobolev space with the norm ∥ · ∥ Hs ,and for s > 12 , ˙Hs(O) := {v ∈ Hs(O) : v = 0 on ∂O} . According to [40, Theorems 16.12 & 16.13], for s ∈ (0 , 12 ) the Sobolev norm ∥ · ∥ Hs is equivalent to ∥(−A) s 
+
+> 2
+
+· ∥ on 
+
+Hs(O), and for s ∈ ( 12 , 32 ) ∪ ( 32 , 2) the Sobolev norm ∥ · ∥ Hs is equivalent to ∥(−A) s 
+
+> 2
+
+· ∥ 
+
+on ˙Hs(O). We will also frequently use the equivalence between ∥ · ∥ H1 and ∥∇ · ∥ on 
+
+˙H1(O), namely, there exists a constant C > 0 such that C−1∥∇ u∥ ≤ ∥ u∥H1 ≤ C∥∇ u∥
+
+for all u ∈ ˙H1(O), due to the Poincaré inequality. We note that the numerical analysis of the proposed scheme also extends to (1.1) with homogeneous Neumann boundary conditions by a slight modification. In this setting, one can first extract the constant mode to account for the kernel of the Neumann Laplacian, and then carry out the analysis on the mean-zero subspace (see, e.g., [20, 22]). Next, we specify the main assumptions on the drift and diffusion coefficients, as well as on the driving Wiener process. 
+
+Assumption 1 Let f (ξ) = c1ξ4 + c2ξ3 + c3ξ2 with c1 > 0 and c2, c 3 ∈ R. Assume that 
+
+F ′ : L6(O) → H is the Nemytskii operator associated with f ′ : R → R, i.e., F ′(v)( x) = 
+
+f ′(v(x)) , x ∈ O for v ∈ L6(O).
+
+In the sequel, let φ0 ∈ ˙H1(O) be non-random, under which 
+
+E(φ0) = 12 ∥∇ φ0∥2 +
+
+∫
+
+> O
+
+f (φ0(x)) dx ≤ 12 ∥∇ φ0∥2 + C (∥φ0∥4 
+
+> L4
+
++ 1 ) , (2.3) in view of Assumption 1 and the Sobolev embedding H1(O) ↪→ L4(O). Under Assumption 1, there exists a positive constant Lf such that −f ′′ ≤ Lf , which implies 
+
+−⟨ F ′(u) − F ′(v), u − v⟩ ≤ Lf ∥u − v∥2, u, v ∈ L6(O). (2.4) It follows from the quadratic growth of f ′′ that 
+
+∥F ′(u) − F ′(v)∥ ≤ C(1 + ∥u∥2 
+
+> L∞
+
++ ∥v∥2
+
+> L∞
+
+) ∥u − v∥, u, v ∈ L∞(O). (2.5) Moreover, the potential energy functional ∫ 
+
+> O
+
+f (v(x)) dx , is coercive in L4(O); that is, there are positive constants c and Θ such that 
+
+∫
+
+> O
+
+f (v(x)) dx + Θ ≥ c
+
+∫
+
+> O
+
+(|v(x)|4 + 1) dx, v ∈ L4(O). (2.6) Let W = {W (t)}t≥0 in (1.1) be a Q-Wiener process defined on a complete filtered probability space (Ω , F, {F t}t≥0, P), which admits the Karhunen–Loève expansion 7W (t) = ∑∞ 
+
+> k=1
+
+Q1/2ekβk(t) for t ≥ 0. Here {βk}k∈N+ is a sequence of independent real-valued standard Brownian motions. Assume that Q ∈ L (H) satisfies Qe k = qkek
+
+for k ≥ 1, where qk ≥ 0. Denote by Q1/2H the image of Q1/2 on H endowed with the inner product (v, w )0 := ⟨Q− 12 v, Q − 12 w⟩ for v, w ∈ Q1/2H, where Q− 12 is the pseudo inverse of Q 12 . Then {Q1/2ek}∞ 
+
+> k=1
+
+forms a complete orthonormal basis of Q1/2H. We make the following assumption on the diffusion term of (1.1). 
+
+Assumption 2 The mapping g : H → L 02 := L2(Q1/2H, H ) is defined by (g(v)w)( x) := 
+
+σ(v(x)) w(x) for v ∈ H and w ∈ Q1/2H, where σ : R → R is a bounded and con-tinuously differentiable function with bounded derivative. Moreover, ∑∞ 
+
+> k=1
+
+∥Q 12 ek∥2 
+
+> L∞
+
++
+
+∑∞ 
+
+> k=1
+
+∥∇ (Q 12 ek)∥2 ≤ C for some C > 0.
+
+The boundedness of σ′ implies that the mapping g : H → L02 is Lipschitz continuous, i.e., 
+
+∥g(v) − g(w)∥L02 ≤ C∥v − w∥, v, w ∈ H. (2.7) In addition, under Assumption 2, g : ˙H1(O) → L 2(Q1/2H, ˙H1(O)) exhibits linear growth. Indeed, by the boundedness of σ and σ′, as well as the chain rule, for any 
+
+v ∈ ˙H1(O),
+
+∥g(v)∥2    
+
+> L2(Q12H, ˙H1(O))
+
+=
+
+> ∞
+
+∑
+
+> k=1
+
+∥(−A) 12 (g(v)Q 12 ek)∥2 ≤ C
+
+> ∞
+
+∑
+
+> k=1
+
+∥∇ (g(v)Q 12 ek)∥2 (2.8) 
+
+≤ C
+
+> ∞
+
+∑
+
+> k=1
+
+∥σ(v)∥2 
+
+> L∞
+
+∥∇ (Q 12 ek)∥2 + C
+
+> ∞
+
+∑
+
+> k=1
+
+∥σ′(v)∥2 
+
+> L∞
+
+∥∇ v∥2∥Q 12 ek∥2
+
+> L∞
+
+≤ C(1 + ∥∇ v∥2).
+
+This property will play a crucial role in establishing the unconditional stability of the numerical solution in H1(O) (see the proof of Lemma 4 for details). Under Assumptions 1 and 2, the stochastic Cahn–Hilliard equation (1.1) admits a unique mild solution φ = {φ(t), t ∈ [0 , T ]} given by (see, e.g., [12, 17]) 
+
+φ(t) = S(t)φ0 +
+
+∫ t
+
+> 0
+
+S(t − s)AF ′(φ(s)) ds +
+
+∫ t
+
+> 0
+
+S(t − s)g(φ(s)) dW (s).
+
+Proposition 1 Let Assumptions 1 and 2 hold, and let φ0 ∈ ˙Hβ (O) for some β ∈ [1 , 2) .Then for any p ≥ 1, there exists a constant C := C(p, β ) > 0 such that 
+
+E
+
+[
+
+sup  
+
+> t∈[0 ,T ]
+
+∥φ(t)∥pHβ
+
+]
+
+≤ C. (2.9) 
+
+We include the proof of Proposition 1 in Appendix B for the completeness. Based on a standard finite-dimensional approximation argument (see e.g., [15, section 2.3]) 8and applying Itô’s formula, one can see that the stochastic Cahn–Hilliard equation (1.1) satisfies the following energy evolution law 
+
+dE (φ(t)) = − ∥∇ μ(t)∥2 dt + ⟨μ(t), g (φ(t)) dW (t)⟩ (2.10) 
+
++ 12
+
+> ∞
+
+∑
+
+> k=1
+
+〈
+
+(−A + F ′′ (φ(t))) g(φ(t)) Q 12 ek, g (φ(t)) Q 12 ek
+
+〉
+
+dt, 
+
+where μ(t) is the chemical potential given by (1.1). In this paper, we omit such standard finite-dimensional approximation procedures for convenience. 
+
+## 2.2 Main results 
+
+Our first main result, Theorem 2, shows that the numerical solution associated with the proposed scheme (1.4) is strongly convergent to the mild solution φ to (1.1). We remark that the strong convergence order 1/2 in Theorem 2 is optimal in the sense that it coincides with the temporal Hölder continuity exponent of φ.
+
+Theorem 2 Let Assumptions 1 and 2 hold, and let φ0 ∈ ˙H2(O). Then for any p ≥ 1, there exists a constant C > 0 such that for any n ∈ { 0, 1, · · · , N },
+
+E
+
+[
+
+∥φ(tn) − Xn∥2]
+
+≤ Cτ. 
+
+According to (2.10), the averaged energy evolution law of (1.1) reads 
+
+E[E(φ(t))] + Θ = E(φ0) + Θ −
+
+∫ t
+
+> 0
+
+E[∥∇ μ(s)∥2]ds 
+
++ 12
+
+∫ t
+
+> 0
+
+E
+
+[ ∞∑
+
+> k=1
+
+〈
+
+(−A + F ′′ (φ(s))) g(φ(s)) Q 12 ek, g (φ(s)) Q 12 ek
+
+〉 ]
+
+ds 
+
+for any t ∈ [0 , T ]. In our numerical study, the original energy E(φ(tn)) + Θ = 
+
+> 12
+
+∥∇ φ(t)∥2 + r(tn)2 is approximated by the following modified SAV energy 
+
+E n 
+
+> mod
+
+:= Emod (Xn, r n) with Emod (X, r ) := 12 ∥∇ X∥2 + |r|2. (2.11) Our second main result is Theorem 3 on the averaged evolution law of the modified SSAV energy. 
+
+Theorem 3 Let Assumptions 1 and 2 hold, and let φ0 ∈ ˙H2(O). Then for each m ∈{1, 2, · · · , N },
+
+E [Em
+
+> mod
+
+] = E0 
+
+> mod
+
+− 12
+
+> m−1
+
+∑
+
+> n=0
+
+E
+
+[
+
+∥(I − S2(τ )) 12 (−A)− 12 ˜μn∥2]
+
+9+ 12 τ                        
+
+> m−1∑
+> n=0
+> E
+> [∞∑
+> k=1
+> 〈
+> (−A+F′′ (Xn)) g(Xn)Q12ek, g (Xn)Q12ek
+> 〉 ]
+> +Rτm,(2.12)
+> where the modified chemical potential
+> ˜μn:= −AX n+ ˜fn−A(g(Xn)δW n),(2.13)
+> and the remainder term Rτmsatisfies lim
+> τ→0Rτm= 0 .
+
+Formally, the modified chemical potential ˜μn serves as a numerical approximation of the chemical potential μ(tn) = −Aφ (tn)+ F ′(φ(tn)) , which can be proved rigorously when the driving Wiener process possesses suitable spatial regularity. Consequently, as the time step tends to zero, the averaged discrete energy evolution law (2.12) for the modified SAV energy recovers the averaged energy evolution law of (1.1). Hence, the proposed scheme (1.4) asymptotically preserves the averaged energy evolution law of the stochastic Cahn–Hilliard equation (1.1). 
+
+# 3 Exponential Euler SSAV scheme 
+
+In this section, we present the construction of the exponential Euler SSAV scheme (1.4) and show that it is explicitly solvable. Following [30–32], the nonlinear term is treated explicitly through introducing an SSAV r : [0 , T ] × Ω → R, defined as 
+
+r(t, ω ) := √Ep(φ(t, ω )) , where Ep is the potential energy functional 
+
+Ep(v) := 
+
+∫
+
+> O
+
+f (v(x)) dx + Θ , v ∈ L4(O). (3.1) Here, the constant Θ > 0 is the same as in (2.6) so that 
+
+Ep(v) ≥ c
+
+∫
+
+> O
+
+(|v(x)|4 + 1 ) dx ≥ c, ∀v ∈ L4(O). (3.2) We remark that the non-negativity of Ep ensures that the SSAV r is well-defined, whereas the coercivity in (3.2) is imposed for technical reasons and will be used in the stability and convergence analysis of the proposed scheme. For general nonlinearities not satisfying (3.2), one may instead employ the convex splitting technique (see, e.g., [41]) to solve (1.1). In view of (3.1) and the Itô formula, the original equation (1.1) can be recast into the following SSAV reformulation 
+
+dφ (t) = −A2φ(t)dt + r(t)
+
+√Ep(φ(t)) AF ′(φ(t)) dt + g(φ(t)) dW (t), (3.3a) 
+
+dr (t) = 12√Ep(φ(t)) ⟨F ′(φ(t)) , dφ (t)⟩ (3.3b) 
+
+− 18Ep(φ(t)) 3/2
+
+> ∞
+
+∑
+
+> k=1
+
+〈
+
+F ′(φ(t)) , g (φ(t)) Q 12 ek
+
+〉2
+
+dt 
+
+10 + 14√Ep(φ(t)) 
+
+> ∞
+
+∑
+
+> k=1
+
+〈
+
+F ′′ (φ(t)) g(φ(t)) Q 12 ek, g (φ(t)) Q 12 ek
+
+〉
+
+dt 
+
+for t ∈ (0 , T ] subject to the initial values φ(0) = φ0 and r(0) = √Ep(φ0).To discretize (3.3) in time, we partition [0 , T ] into N (N ∈ N+) uniform subin-tervals with time step size τ = T /N , and denote the time grid by {tn := nτ }Nn=0 .Over each subinterval (tn, t n+1 ], we freeze the coefficient r(t)
+
+√Ep(ϕ(t)) F ′(φ(t)) in (3.3a) through a suitable approximation, denoted by ˜f n (to be specified later), and thereby obtain the following approximation of φ(t):
+
+d ˜φ(t) = −A2 ˜φ(t)dt + A ˜f ndt + g( ˜φ(t)) dW (t), t ∈ (tn, t n+1 ]. (3.4) Then applying the exponential Euler method to (3.4), we obtain the numerical scheme (1.4) for any n ∈ { 0, 1, · · · , N − 1}, with X0 = φ0. It remains to define a consistent approximation ˜f n for the quantity r(t)
+
+√Ep(ϕ(t)) F ′(φ(t)) with t ∈ [tn, t n+1 ].
+
+Remark 1 For the deterministic Cahn–Hilliard equation (i.e., g ≡ 0), a suitable choice of ˜f n is 
+
+˜f n 
+
+> d
+
+= rn+1 
+
+> d
+
+√Ep(Xn) F ′(Xn), (3.5) where rn+1  
+
+> d
+
+is the numerical solution of r(tn+1 ) generated iteratively by 
+
+rn+1  
+
+> d
+
+= rn 
+
+> d
+
++ 12√Ep(Xn) ⟨F ′(Xn), X n+1 − Xn⟩ (3.6) for any n ∈ { 0, 1, · · · , N − 1}, with the initial value r0 
+
+> d
+
+= √Ep(φ0) (see, e.g., [31]). However, this construction does not directly extend to the stochastic case. To illustrate this issue, we apply the Taylor expansion to √Ep(φ(tn+1 )) , discarding terms of order three and higher, which formally gives (see also (1.5)) 
+
+r(tn+1 ) ≈ r(tn) + 12√Ep(φ(tn)) 
+
+〈F ′(φ(tn)) , φ (tn+1 ) − φ(tn)〉 + Rn, (3.7) where Rn is the quadratic term given by 
+
+Rn := − 18Ep(φ(tn)) 3/2
+
+〈F ′(φ(tn)) , φ (tn+1 ) − φ(tn) 〉2
+
++ 14√Ep(φ(tn)) 
+
+〈F ′′ (φ(tn))( φ(tn+1 ) − φ(tn)) , φ (tn+1 ) − φ(tn) 〉 .
+
+A comparison of (3.7) and (3.6) shows that the difference r(tN ) − rN 
+
+> d
+
+contains a telescoping sum ∑N −1 
+
+> n=0
+
+Rn. Roughly speaking, in the stochastic case, the solution increment φ(tn+1 ) −
+
+φ(tn) is of order O(τ 1/2). Hence, the telescoping sum ∑N −1 
+
+> n=0
+
+Rn does not vanish as τ → 0,which prevents the convergence of rN 
+
+> d
+
+to r(T ) as τ → 0. In other words, directly adopting the standard SAV update (3.6) together with (1.4) with the choice ˜f n = ˜f n 
+
+> d
+
+leads to a numerical scheme that either converges to a different stochastic system or diverges, rather than converging to the target model (3.3). In fact, the accumulation of the quadratic term 
+
+Rn over time gives rise to the Itô correction term in (3.3b), and thus the quadratic terms in 
+
+11 (3.7) should be retained in the numerical discretization of r(t), to ensure consistency with the Itô formula and to accurately capture the energy evolution law (2.10) of (1.1) (see Figure 1 for the influence of the modified SSAV). 
+
+Since the quadratic terms in (3.7) involve the second power of φ(tn+1 ) − φ(tn), a straightforward Euler-type discretization of (3.7) destroys the linear structure of the proposed scheme and fail to produce an explicit or semi-implicit numerical discretiza-tion. Following the strategy in [35], we replace one factor φ(tn+1 ) − φ(tn) in the Itô correction terms by g(Xn) δW n, and update the numerical SSAV {rn}Nn=0 via (1.6) for any n ∈ { 0, 1, · · · , N − 1}, with the initial value r0 = √Ep(φ0). Instead of using (3.5), in the stochastic case, we adopt 
+
+˜f n = rn+1 
+
+√Ep(Xn) F ′(Xn) + χn, (3.8) where the modified term 
+
+χn := − rn+1 
+
+4Ep(Xn)3/2 F ′(Xn)⟨F ′(Xn), g (Xn)δW n⟩ (3.9) 
+
++ rn+1 
+
+2√Ep(Xn) F ′′ (Xn)( g(Xn)δW n)
+
+is added to compensate the Itô correction term on the right hand side of (1.6) (see (3.10) for more details). The temporal semi-discretization (1.4), together with (1.6) and (3.8), constitutes the proposed scheme, which is referred to as the exponential Euler SSAV scheme. In this work, we focus on the time discretization (1.4) for (1.1); the extension to a fully discrete scheme by incorporating suitable spatial discretizations will be addressed in future work. 
+
+Remark 2 The update of rn in (1.6) together with the definition of ˜f n in (3.8) ensures that 
+
+2rn+1 (rn+1 − rn) = ⟨ ˜f n, X n+1 − Xn⟩, n = 0 , 1, · · · , N − 1. (3.10) Although applying the Euler method to (3.3b) or replacing the solution increment Xn+1 −
+
+Xn by g(Xn) δW n in the Itô correction terms of (1.6) also yields an explicit update for 
+
+{rn}Nn=0 , neither of these two approaches satisfies (3.10). As in the standard SAV scheme for deterministic gradient flows (see [31]), the relation (3.10) is crucial for establishing the unconditional stability and the averaged energy evolution law of the exponential Euler SSAV scheme (1.4) (see the proofs of Lemma 5 and Theorem 3 for more details). 
+
+To end this section, we point out that the exponential Euler SSAV scheme (1.4) can be explicitly solved as follows. First, for each n = 0 , 1, · · · , N − 1, we denote 
+
+bn := F ′(Xn)
+
+√Ep(Xn) − F ′(Xn)⟨F ′(Xn), g (Xn)δW n⟩
+
+4Ep(Xn)3/2 + F ′′ (Xn)g(Xn)δW n
+
+2√Ep(Xn) .
+
+12 Then, (1.6) and (3.8) can be rewritten as rn+1 = rn + 12 ⟨bn, X n+1 − Xn⟩ and ˜f n =
+
+rn+1 bn = rnbn + 12 bn⟨bn, X n+1 − Xn⟩. Substituting this expression of ˜f n into (1.4), we obtain 
+
+Xn+1 − 12 (I − S(τ )) A−1bn⟨bn, X n+1 ⟩ = wn, (3.11) where wn = S(τ )Xn + ( I − S(τ )) A−1bnrn − 12 (I − S(τ )) A−1bn⟨bn, X n⟩ +
+
+S(τ )g(Xn)δW n. Taking the inner product on both sides of (3.11) with bn, it follows that ⟨Xn+1 , b n⟩ + γn⟨bn, X n+1 ⟩ = ⟨wn, b n⟩, where 
+
+γn = − 12
+
+〈(I − S(τ )) A−1bn, b n〉 = 12 ∥(I − S(τ )) 1/2(−A)−1/2bn∥2 ≥ 0.
+
+This yields ⟨Xn+1 , b n⟩ = (1 + γn)−1⟨bn, w n⟩. Hence, the updated value Xn+1 can be computed from (3.11) in a fully explicit manner. 
+
+# 4 Regularity estimates 
+
+In this section, we establish several regularity estimates for the exponential Euler SSAV scheme (1.4). These estimations are essential for the proofs of the main results Theorems 2 and 3. 
+
+## 4.1 Spatial regularity estimate 
+
+We begin by deriving the H1(O)-spatial regularity estimate of the numerical solution in the following lemma, which implies that the exponential Euler SSAV scheme (1.4) is unconditionally stable. 
+
+Lemma 4 Let Assumptions 1 and 2 hold, and let φ0 ∈ ˙H1(O). Then for any p ≥ 1, there exists a positive constant C := C(p) such that 
+
+E
+
+[
+
+∥∇ Xn∥2p]
+
++ E
+
+[
+
+|rn|2p]
+
+≤ C(p), ∀ n ∈ { 0, 1, · · · , N }. (4.1) 
+
+Proof Let n ∈ { 0, 1, · · · , N − 1}. Applying the integration by parts formula and utilizing the commutativity of S(τ ) and A, it follows from (1.4) that 
+
+12
+
+[
+
+∥∇ Xn+1 ∥2 − ∥∇ Xn∥2]
+
+(4.2) 
+
+= 12
+
+〈
+
+(S2(τ ) − I)Xn, (−A)Xn〉
+
++ 12
+
+〈 (I − S(τ )) 2 A−1 ˜f n, − ˜f n〉
+
++ 12 ⟨S2(τ )g(Xn)δW n, (−A)g(Xn)δW n⟩ + ⟨S(τ )( I − S(τ )) Xn, − ˜f n⟩
+
++ ⟨S2(τ )Xn, (−A)g(Xn)δW n⟩ + ⟨S(τ )( I − S(τ )) A−1 ˜f n, (−A)g(Xn)δW n⟩.
+
+From (3.10) and utilizing (1.4), we arrive at 
+
+2rn+1 (rn+1 − rn) = ⟨(I − S(τ )) Xn, − ˜f n⟩ + ⟨(S(τ ) − I)A−1 ˜f n, − ˜f n⟩ (4.3) 
+
+13 + ⟨− S(τ )A−1 ˜f n, (−A)g(Xn)δW n⟩.
+
+Combining (4.2) and (4.3) together, and using the elementary identity 2a(a − b) = a2 − b2 +(a − b)2 for a, b ∈ R, we have 
+
+12
+
+[∥∥∥∇Xn+1 ∥∥∥2
+
+− ∥∥∇Xn∥∥2
+
+]
+
++ |rn+1 |2 − | rn|2 + |rn+1 − rn|2 (4.4) 
+
++ 12 ∥(I − S2(τ )) 12 (−A) 12 ˜μn∥2
+
+= 12
+
+〈
+
+(S2(τ ) − I)( Xn − A−1 ˜f n + g(Xn)δW n), (−A)( Xn − A−1 ˜f n + g(Xn)δW n)
+
+〉
+
++
+
+〈
+
+Xn − A−1 ˜f n, (−A)g(Xn)δW n〉
+
++ 12
+
+〈g(Xn)δW n, (−A)g(Xn)δW n〉
+
++ 12 ∥(I − S2(τ )) 12 (−A) 12 ˜μn∥2
+
+=
+
+〈
+
+−AX n + ˜f n, g (Xn)δW n〉
+
++ 12 ∥(−A) 12
+
+(g(Xn)δW n) ∥2,
+
+where the definition of ˜μn was applied in the last step. It follows from the formulation (3.8) of ˜f n, as well as Young’s inequality, that 
+
+⟨ ˜f n, g (Xn)δW n⟩
+
+= rn
+
+√Ep(Xn)
+
+〈F ′(Xn), g (Xn)δW n〉 + rn+1 − rn
+
+√Ep(Xn)
+
+〈F ′(Xn), g (Xn)δW n〉
+
++ rn+1 − rn
+
+2√Ep(Xn)
+
+〈F ′′ (Xn)g(Xn)δW n, g (Xn)δW n〉
+
+− rn+1 − rn
+
+4Ep(Xn)3/2
+
+〈F ′(Xn), g (Xn)δW n〉2
+
++ rn
+
+2√Ep(Xn)
+
+〈F ′′ (Xn)g(Xn)δW n, g (Xn)δW n〉
+
+− rn
+
+4Ep(Xn)3/2
+
+〈F ′(Xn), g (Xn)δW n〉2
+
+≤ rn
+
+√Ep(Xn)
+
+〈F ′(Xn), g (Xn)δW n〉 + 34 |rn+1 − rn|2 + 1
+
+Ep(Xn)
+
+〈F ′(Xn), g (Xn)δW n〉2
+
++ Cτ |rn|2 + C(1 + τ −1) 1
+
+Ep(Xn)
+
+〈F ′′ (Xn)g(Xn)δW n, g (Xn)δW n〉2
+
++ C(1 + τ −1) 1
+
+Ep(Xn)3
+
+〈F ′(Xn), g (Xn)δW n〉4 .
+
+Combining this with (4.4), and then summing the resulting inequality from n = 0 to m, it holds that 
+
+∥∇ Xm+1 ∥2 + |rm+1 |2 + 14
+
+> m
+
+∑
+
+> n=0
+
+|rn+1 − rn|2 + 12
+
+> m
+
+∑
+
+> n=0
+
+∥(I − S2(τ )) 12 (−A)− 12 ˜μn∥2 (4.5) 
+
+≤ ∥∇ φ0∥2 + |r0|2 + Cτ 
+
+> m
+
+∑
+
+> n=0
+
+|rn|2 +
+
+> m
+
+∑
+
+> n=0
+
+1
+
+Ep(Xn)
+
+〈F ′(Xn), g (Xn)δW n〉2
+
++ C(1 + τ −1)
+
+> m
+
+∑
+
+> n=0
+
+1
+
+Ep(Xn)
+
+〈F ′′ (Xn)g(Xn)δW n, g (Xn)δW n〉2
+
+14 + C(1 + τ −1)
+
+> m
+
+∑
+
+> n=0
+
+1
+
+Ep(Xn)3
+
+〈F ′(Xn), g (Xn)δW n〉4 + 12
+
+> m
+
+∑
+
+> n=0
+
+∥(−A) 12 (g(Xn)δW n)∥2
+
++
+
+> m
+
+∑
+
+> n=0
+
+〈
+
+− AX n + rn
+
+√Ep(Xn) F ′(Xn), g (Xn)δW n〉
+
+.
+
+Taking the pth power on both sides of (4.5), we obtain by Hölder’s inequality that 
+
+∥∇ Xm+1 ∥2p + |rm+1 |2p +
+
+( 14
+
+> m
+
+∑
+
+> n=0
+
+|rn+1 − rn|2
+
+)p
+
+(4.6) 
+
++
+
+( 12
+
+> m
+
+∑
+
+> n=0
+
+∥(I − S2(τ )) 12 (−A)− 12 ˜μn∥2
+
+)p
+
+≤ C∥∇ φ0∥2p + C|r0|2p
+
++ Cτ 
+
+> m
+
+∑
+
+> n=0
+
+|rn|2p + C
+
+( m∑
+
+> n=0
+
+1
+
+Ep(Xn)
+
+∣∣〈F ′(Xn), g (Xn)δW n〉∣ ∣2 )p
+
++ C(1 + τ −1)p
+
+( m∑
+
+> n=0
+
+1
+
+Ep(Xn)
+
+〈F ′′ (Xn)g(Xn)δW n, g (Xn)δW n〉2 )p
+
++ C(1 + τ −1)p
+
+( m∑
+
+> n=0
+
+1
+
+Ep(Xn)3
+
+〈F ′(Xn), g (Xn)δW n〉4 )p
+
++ C
+
+( m∑
+
+> n=0
+
+12 ∥(−A) 12 (g(Xn)δW n)∥2
+
+)p
+
++ C
+
+∣∣∣∣
+
+> m
+
+∑
+
+> n=0
+
+〈
+
+− AX n + rn
+
+√Ep(Xn) F ′(Xn), g (Xn)δW n〉∣∣∣∣
+
+> p
+
+=: C∥∇ φ0∥2p + C|r0|2p + Cτ 
+
+> m
+
+∑
+
+> n=0
+
+|rn|2p + Rm 
+
+> 1
+
++ Rm 
+
+> 2
+
++ Rm 
+
+> 3
+
++ Rm 
+
+> 4
+
++ Rm 
+
+> 5
+
+.
+
+We next estimate the expectations of the terms Rm 
+
+> 1
+
+, · · · , R m 
+
+> 5
+
+, separately. 
+
+Estimate of Rm 
+
+> 1
+
+. According to Assumption 2 and the Sobolev embedding L∞(O) ↪→
+
+Lq (O) with 1 ≤ q ≤ ∞ , it holds that for any 1 ≤ q ≤ ∞ ,
+
+> ∞
+
+∑
+
+> k=1
+
+∥g(Xn)Q 12 ek∥2 
+
+> Lq
+
+≤ C∥g(Xn)∥2
+
+> L∞
+> ∞
+
+∑
+
+> k=1
+
+∥Q 12 ek∥2 
+
+> L∞
+
+≤ C. (4.7) By Young’s inequality, (3.2), and Assumption 1, we derive that for any q > 0,
+
+∥∥F ′(Xn)∥∥4qL4/3 ≤ C(1 + ∥Xn∥4 
+
+> L4
+
+)3q ≤ CE p(Xn)3q . (4.8) In particular, applying (4.8) gives 
+
+E
+
+[ ∥ ∥F ′(Xn)∥∥2pL4/3
+
+Ep(Xn)p
+
+]
+
+≤ CE
+
+[∥∥F ′(Xn)∥∥ 23 pL4/3
+
+]
+
+(4.9) 
+
+≤ CE
+
+[
+
+1 + ∥Xn∥2pL4
+
+]
+
+≤ C + CE
+
+[
+
+∥∇ Xn∥2p]
+
+,
+
+where the last inequality follows from the Sobolev embedding H1(O) ↪→ L4(O) and the Dirichlet boundary conditions for the numerical solution. By Hölder’s inequality, the mar-tingale property of stochastic integrals, the Burkholder–Davis–Gundy (BDG) inequality [39, 
+
+15 Chap. 2], (4.9), and (4.7), we obtain 
+
+E[Rm 
+
+> 1
+
+] ≤ C(m + 1) p−1 m∑
+
+> n=0
+
+E
+
+[∣ ∣∣∣∫ tn+1 
+
+> tn
+
+〈 1
+
+√Ep(Xn) F ′(Xn), g (Xn)dW (s)
+
+〉∣ ∣∣∣
+
+> 2p
+
+]
+
+≤ C(m + 1) p−1 m∑
+
+> n=0
+
+τ pE
+
+[ 1
+
+Ep(Xn)p
+
+( ∞∑
+
+> k=1
+
+⟨F ′(Xn), g (Xn)Q 12 ek⟩2
+
+)p]
+
+≤ C
+
+> m
+
+∑
+
+> n=0
+
+τ E
+
+[ ∥ ∥F ′(Xn)∥∥2pL4/3
+
+Ep(Xn)p
+
+( ∞∑
+
+> k=1
+
+∥g(Xn)Q 12 ek∥2
+
+> L4
+
+)p]
+
+≤ C + C
+
+> m
+
+∑
+
+> n=0
+
+τ E
+
+[
+
+∥∇ Xn∥2p]
+
+.
+
+Estimate of Rm 
+
+> 2
+
+. By Young’s inequality, (3.2) and with the help of Assumption 1, one gives 
+
+∥| F ′′ (Xn)|1/2∥4pL4 = ∥F ′′ (Xn)∥2p ≤ C(1 + ∥Xn∥4 
+
+> L4
+
+)p ≤ CE p(Xn)p. (4.10) Applying Hölder’s inequality, the BDG inequality together with (4.7) and (4.10), we infer that 
+
+E[Rm 
+
+> 2
+
+] ≤ Cτ −2p+1 m∑
+
+> n=0
+
+E
+
+[∥ ∥∥∥∫ tn+1 
+
+> tn
+
+1
+
+Ep(Xn)1/4 |F ′′ (Xn)| 12 g(Xn)dW (s)
+
+∥∥∥∥
+
+> 4p
+
+]
+
+≤ Cτ 
+
+> m
+
+∑
+
+> n=0
+
+E
+
+[ 1
+
+Ep(Xn)p
+
+( ∞∑
+
+> k=1
+
+∥∥∥|F ′′ (Xn)| 12 g(Xn)Q 12 ek
+
+∥∥∥2 )2p]
+
+≤ Cτ 
+
+> m
+
+∑
+
+> n=0
+
+E
+
+[ ∥| F ′′ (Xn)| 12 ∥4pL4
+
+Ep(Xn)p
+
+( ∞∑
+
+> k=1
+
+∥g(Xn)Q 12 ek∥2
+
+> L4
+
+)2p]
+
+≤ C. 
+
+Estimate of Rm 
+
+> 3
+
+. Invoking the BDG inequality, (4.7), and (4.8) results in 
+
+E
+
+[ 1
+
+Ep(Xn)3p
+
+〈F ′(Xn), g (Xn)δW n〉4p]
+
+(4.11) 
+
+≤ CE
+
+[ 1
+
+Ep(Xn)3p
+
+(
+
+τ
+
+> ∞
+
+∑
+
+> k=1
+
+〈
+
+F ′(Xn), g (Xn)Q 12 ek
+
+〉2 )2p]
+
+≤ Cτ 2pE
+
+[ ∥ ∥F ′(Xn)∥∥4pL4/3
+
+Ep(Xn)3p
+
+( ∞∑
+
+> k=1
+
+∥g(Xn)Q 12 ek∥2
+
+> L4
+
+)2p]
+
+≤ Cτ 2p.
+
+Hölder’s inequality and (4.11) yield 
+
+E[Rm 
+
+> 3
+
+] ≤ C(1 + τ −1)p(m + 1) p−1 m∑
+
+> n=0
+
+E
+
+[ 1
+
+Ep(Xn)3p
+
+〈F ′(Xn), g (Xn)δW n〉4p]
+
+≤ C. 
+
+Estimate of Rm 
+
+> 4
+
+. By (2.8), Hölder’s inequality, and the BDG inequality, 
+
+E[Rm 
+
+> 4
+
+] ≤ C(m + 1) p−1 m∑
+
+> n=0
+
+E
+
+[∥∥∥(−A) 12
+
+∫ tn+1 
+
+> tn
+
+g(Xn)dW (s)
+
+∥∥∥2p]
+
+(4.12) 
+
+≤ C(m + 1) p−1 m∑
+
+> n=0
+
+E
+
+[( ∫ tn+1 
+
+> tn
+
+∥g(Xn)∥2   
+
+> L2(Q12H, ˙H1(O))
+
+ds 
+
+)p]
+
+16 ≤ C + Cτ 
+
+> m
+
+∑
+
+> n=0
+
+E
+
+[∥∥∇Xn∥∥2p]
+
+.
+
+Estimate of Rm 
+
+> 5
+
+. In view of Hölder’s inequality and the BDG inequality, 
+
+E[Rm 
+
+> 5
+
+] ≤ CE
+
+[∣ ∣∣∣
+
+> m
+
+∑
+
+> n=0
+
+〈
+
+− AX n + rn
+
+√Ep(Xn) F ′(Xn), g (Xn)δW n
+
+〉∣ ∣∣∣
+
+> p
+
+]
+
+(4.13) 
+
+≤ CE
+
+[( m∑
+
+> n=0
+
+τ
+
+> ∞
+
+∑
+
+> k=1
+
+⟨− AX n, g (Xn)Q 12 ek⟩2
+
+) p
+
+> 2
+
+]
+
++ CE
+
+[( m∑
+
+> n=0
+
+τ
+
+> ∞
+
+∑
+
+> k=1
+
+〈 rn
+
+√Ep(Xn) F ′(Xn), g (Xn)Q 12 ek
+
+〉2) p
+
+> 2
+
+]
+
+=: Rm 
+
+> 51
+
++ Rm
+
+> 52
+
+.
+
+By Hölder’s inequality, Young’s inequality, the integration by parts formula, and (2.8), we derive that 
+
+Rm 
+
+> 51
+
+≤ C(m + 1) p  
+
+> 2−1m
+
+∑
+
+> n=0
+
+τ p 
+
+> 2
+
+E
+
+[( ∞∑
+
+> k=1
+
+⟨∇ Xn, ∇(g(Xn)Q 12 ek)⟩2
+
+) p
+
+> 2
+
+]
+
+(4.14) 
+
+≤ Cτ 
+
+> m
+
+∑
+
+> n=0
+
+E
+
+[
+
+∥∇ Xn∥2p]
+
++ Cτ 
+
+> m
+
+∑
+
+> n=0
+
+E
+
+[( ∞∑
+
+> k=1
+
+∥∇ (g(Xn)Q 12 ek)∥2
+
+)p]
+
+≤ C + Cτ 
+
+> m
+
+∑
+
+> n=0
+
+E
+
+[
+
+∥∇ Xn∥2p]
+
+.
+
+In a similar manner, by using the BDG inequality, Hölder’s inequality, Young’s inequality, (4.7) together with (4.9), we conclude that 
+
+Rm 
+
+> 52
+
+≤ C(m + 1) p  
+
+> 2−1m
+
+∑
+
+> n=0
+
+τ p 
+
+> 2
+
+E
+
+[( ∞∑
+
+> k=1
+
+〈 rn
+
+√Ep(Xn) F ′(Xn), g (Xn)Q 12 ek
+
+〉2) p
+
+> 2
+
+]
+
+(4.15) 
+
+≤ Cτ 
+
+> m
+
+∑
+
+> n=0
+
+E
+
+[∣∣rn∣∣2p]
+
++ Cτ 
+
+> m
+
+∑
+
+> n=0
+
+E
+
+[( ∥ ∥F ′(Xn)∥∥2
+
+> L4/3
+
+Ep(Xn)
+
+)p( ∞∑
+
+> k=1
+
+∥g(Xn)Q 12 ek∥2
+
+> L4
+
+)p]
+
+≤ C + Cτ 
+
+> m
+
+∑
+
+> n=0
+
+E
+
+[∣∣rn∣∣2p]
+
+.
+
+Inserting (4.14) and (4.15) into (4.13) leads to 
+
+E[Rm 
+
+> 5
+
+] ≤ C + Cτ 
+
+> m
+
+∑
+
+> n=0
+
+E
+
+[∣∣rn∣∣2p]
+
++ Cτ 
+
+> m
+
+∑
+
+> n=0
+
+E
+
+[
+
+∥∇ Xn∥2p]
+
+.
+
+Combining the above estimates for Rm 
+
+> 1
+
+through Rm 
+
+> 5
+
+, we deduce by taking expectations on both sides of (4.6) that for any m ∈ { 0, 1, · · · , N − 1},
+
+E
+
+[∥∥∥∇Xm+1 ∥∥∥2p]
+
++ E
+
+[
+
+|rm+1 |2p]
+
+≤ C + CE
+
+[∥∥∥∇φ0∥∥∥2p]
+
++ CE
+
+[
+
+|r0|2p]
+
++ Cτ 
+
+> m
+
+∑
+
+> n=0
+
+E
+
+[
+
+|rn|2p]
+
++ Cτ 
+
+> m
+
+∑
+
+> n=0
+
+E
+
+[
+
+∥∇ Xn∥2p]
+
+.
+
+Hence, on account of (3.2), we can conclude (4.1) by applying the discrete Gronwall’s inequality. □
+
+17 We would like to point out that the proof of Lemma 4 crucially relies on the boundedness of σ and its derivative σ′; see in particular the estimate of Rm 
+
+> 4
+
+in (4.12). Extending the analysis to more general diffusion models, including those with unbounded diffusion coefficients or gradient-type noise, would require substantially different techniques and is therefore left for future work. Based on Lemma 4, we obtain the following regularity estimate for the numerical solution under a stronger topology; see Appendix A.1 for the proof. 
+
+Corollary 5 Let Assumptions 1 and 2 hold, and let φ0 ∈ ˙H1(O). Then for any p ≥ 1, there exists a positive constant C := C(p) such that 
+
+E
+
+[
+
+sup  
+
+> 0≤n≤N−1
+
+∥∇ Xn+1 ∥2p
+
+]
+
++ E
+
+[
+
+sup  
+
+> 0≤n≤N−1
+
+|rn+1 |2p
+
+]
+
++ E
+
+[( N −1∑
+
+> n=0
+
+|rn+1 − rn|2
+
+)p]
+
++ E
+
+[( N −1∑
+
+> n=0
+
+∥(I − S2(τ )) 12 (−A)− 12 ˜μn∥2
+
+)p]
+
+≤ C, (4.16) 
+
+where ˜μn is the modified chemical potential defined in (2.13) .
+
+The sharp error analysis of the exponential Euler SSAV scheme (1.4) involves the 
+
+Hβ (O) (β > 1) spatial regularity estimates for both the exact and numerical solutions. To facilitate the higher regularity estimate of the numerical solution, we introduce its continuous time version X = {X(t)}t∈[0 ,T ] defined by 
+
+dX (t) = −A2X(t)dt + A ˜f κN (t)/τ dt + S(t − κN (t)) g(X(κN (t))) dW (t) (4.17) for any t ∈ (0 , T ], with the initial value X(0) = φ0. Hereafter, for t ∈ [0 , T ], we define 
+
+κN (t) := ⌊t/τ ⌋τ , where ⌊·⌋ denotes the floor function. Notice that X(tn) = Xn for all 
+
+n ∈ { 0, 1, · · · , N }.To present the regularity analysis of numerical and exact solutions in a unified manner, we consider a stochastic process {Z(t)}t∈[0 ,T ] defined via 
+
+dZ (t) = −A2Z(t)dt + A ˜F (t)dt + ˜G(t)dW (t), t ∈ [0 , T ], (4.18) subject to the initial condition Z(0) = φ0, where ˜F : [0 , T ] × Ω → H and ˜G :[0 , T ]×Ω → L 02 are {F t}t∈[0 ,T ]-adapted stochastic processes. We focus on the following two cases. (a) If ˜F (s) = F ′(φ(s)) and ˜G(s) = g(φ(s)) , then Z = φ is the mild solution of the original problem (1.1). (b) If ˜F (s) = ˜f κN (s)/τ and ˜G(s) = S(s − κN (s)) g(XκN (s)/τ ), then Z = X is the continuous version of the numerical solution {Xn}Nn=0 .The following lemma identifies sufficient conditions to guarantee the Hβ (O)-spatial regularity of the mild solution Z to (4.18). 18 Lemma 6 Let ˜F ∈ Lp(0 , T ; Lp(Ω; H)) and ˜G ∈ Lp(0 , T ; Lp(Ω; L2(Q 12 H, H ))) for any p ≥ 1.If φ0 ∈ D(( −A) β 
+
+> 2
+
+) for some β ∈ (0 , 2) , then for any p ≥ 1, there exists a constant C := 
+
+C(p, β ) > 0 such that 
+
+E
+
+[
+
+sup  
+
+> t∈[0 ,T ]
+
+∥(−A) β 
+
+> 2
+
+Z(t)∥p
+
+]
+
+≤ C
+
+(
+
+∥(−A) β 
+
+> 2
+
+φ0∥p + E
+
+∫ T
+
+> 0
+
+[
+
+∥ ˜F (s)∥p + ∥ ˜G(s)∥p
+
+> L02
+
+]
+
+ds 
+
+)
+
+.
+
+Since the proof of Lemma 6 is standard, we include it in Appendix A.2 for com-pleteness. We are now in a position to derive a higher spatial regularity estimate for the numerical solution. 
+
+Lemma 7 Let Assumptions 1 and 2 hold, and φ0 ∈ ˙Hβ (O) for some β ∈ [1 , 2) . Then for any p ≥ 1, there exists a constant C := C(p, β ) > 0 such that 
+
+E
+
+[
+
+sup  
+
+> t∈[0 ,T ]
+
+∥(−A) β 
+
+> 2
+
+X(t)∥2p
+
+]
+
+≤ C. (4.19) 
+
+Proof The proof is based on applying Lemma 6 with 
+
+˜F (s) = ˜f κN (s)/τ and ˜G(s) = S(s − κN (s))g(X(κN (s))) . (4.20) By the contractivity of the semigroup S(·) and (4.7), 
+
+E
+
+∫ T
+
+> 0
+
+∥ ˜G(s)∥p
+
+> L02
+
+ds = 
+
+> N−1
+
+∑
+
+> n=0
+
+∫ tn+1 
+
+> tn
+
+E
+
+[
+
+∥S(s − tn)g(Xn)∥p
+
+> L02
+
+]
+
+ds (4.21) 
+
+≤ 
+
+> N−1
+
+∑
+
+> n=0
+
+∫ tn+1 
+
+> tn
+
+∥S(s − tn)∥p
+
+> L(H)
+
+E
+
+[
+
+∥g(Xn)∥p
+
+> L02
+
+]
+
+ds ≤ C. 
+
+Using Hölder’s inequality, Corollary 5, Assumption 1, the Sobolev embedding H1(O) ↪→
+
+L6(O), the fact that Xn ∈ ˙H1(O) yields that for any p ≥ 1,
+
+E[∥F ′(Xn)∥4p] ≤ C + CE[∥∇ Xn∥12 p] ≤ C(p). (4.22) Recall that by (3.2), the functional Ep is bounded from below by a positive constant. In view of (3.8), Corollary 5, and Young’s inequality, it holds that 
+
+E[∥ ˜f n∥p] ≤ CE[|rn+1 |2p] + E[∥F ′(Xn)∥2p] + CE[∥χn∥p] ≤ C + CE[∥χn∥p] (4.23) for any n = 0 , 1, · · · , N . We claim that for any p ≥ 1,
+
+E [∥χn∥p] ≤ C(p)τ p 
+
+> 2
+
+, (4.24) whose proof is put in the Appendix A.3 for completeness. Substituting (4.24) into (4.23) ensures that for any p ≥ 1,
+
+E[∥ ˜f n∥p] ≤ C(p). (4.25) This, along with (4.21), validates the conditions of Lemma 6 for the functions ˜F and ˜G
+
+defined in (4.20). Finally, we can obtain (4.19) by applying Lemma 6. □
+
+19 Remark 3 Based on Lemma 7, if in addition φ0 ∈ ˙H2(O), one can further derive an H2(O)-spatial regularity estimate for both the mild solution φ(t) and the continuous version X(t)
+
+of the numerical solution. For instance, for the numerical solution, by noticing that Z := (−A) 12 X solves 
+
+dZ (t) = −A2Z(t)dt + A(−A) 12 ˜f κN (t)/τ dt + S(t − κN (t))( −A) 12 g(X(κN (t))) dW (t),
+
+one can apply Lemma 6 with the choices ˜F (s) = ( −A)1/2 ˜f κN (s)/τ and ˜G(s) = ( −A)1/2S(s −
+
+κN (s)) g(X(κN (s))) to obtain (−A) 12 X ∈ Lp(Ω; L∞(0 , T ; D(( −A) 12 )) .
+
+The Sobolev embedding Hβ (O) ↪→ L∞(O) for β > d 
+
+> 2
+
+, the norm equivalence between ∥ · ∥ Hβ and ∥(−A) β 
+
+> 2
+
+· ∥ in the space ˙Hβ (O), together with Lemma 7 with 
+
+β ∈ ( d 
+
+> 2
+
+, 2) ∩ [1 , 2) , give that for any p ≥ 1,
+
+E
+
+[
+
+sup 
+
+> 0≤n≤N
+
+∥Xn∥pL∞
+
+]
+
+≤ CE
+
+[
+
+sup  
+
+> t∈[0 ,T ]
+
+∥(−A) β 
+
+> 2
+
+X(t)∥2p
+
+]
+
+≤ C(p, β ). (4.26) 
+
+## 4.2 Temporal regularity estimate 
+
+In this subsection, we present temporal regularity results for the numerical solution of the exponential Euler SSAV scheme (1.4), including the temporal Hölder continuity in 
+
+L2(O) and an a priori bound for the accumulated discrete increment sum in H1(O).
+
+Lemma 8 Let Assumptions 1 and 2 hold, and let φ0 ∈ ˙Hβ (O) for some β ∈ ( d 
+
+> 2
+
+, 2) ∩ [1 , 2) .Then for any p ≥ 1, there exists a constant C := C(p, β ) > 0 such that 
+
+∥Xn+1 − Xn∥L2p(Ω; H) ≤ Cτ β 
+
+> 4
+
+, n ∈ { 0, 1, · · · , N − 1}.
+
+Proof The proof is standard, relying on (2.1), (2.2), and the Hβ (O)-spatial regularity esti-mate of Xn (see Remark 3 for β = 2 and Lemma 7 for β < 2). We therefore omit the details and refer the reader to, for example, [39, Theorem 2.31] for a similar argument. □
+
+We notice that even if the initial value φ0 /∈ ˙H2(O), one can still observe 12 -Hölder continuity in time for the numerical solution away from the initial time t0 = 0 .
+
+Lemma 9 Let Assumptions 1 and 2 hold, and let φ0 ∈ ˙Hβ (O) for some β ∈ ( d 
+
+> 2
+
+, 2) ∩ [1 , 2) .Then for any p ≥ 1, there exists a constant C := C(p, β ) > 0 such that for any n ∈{1, 2, · · · , N − 1},
+
+∥Xn+1 − Xn∥L2p(Ω; H) ≤ Cτ 12 (1 + t β   
+
+> 4−12
+> n
+
+). (4.27) 
+
+Proof For any n = 1 , 2, · · · , N − 1, we can decompose 
+
+Xn+1 − Xn = ( S(τ ) − I)Xn +
+
+∫ tn+1 
+
+> tn
+
+S(tn+1 − s)A ˜f nds 
+
+20 +
+
+∫ tn+1 
+
+> tn
+
+S(τ )g(Xn)dW (s) =: Rn 
+
+> 1
+
++ Rn 
+
+> 2
+
++ Rn 
+
+> 3
+
+.
+
+Utilizing (2.2), the Minkowski inequality, and (4.25), it holds that 
+
+E[∥Rn 
+
+> 2
+
+∥2p] ≤ CE
+
+[∣∣∣∫ tn+1 
+
+> tn
+
+(tn+1 − s)− 12 ∥ ˜f n∥ds 
+
+∣∣∣2p]
+
+≤ Cτ pE[∥ ˜f n∥2p] ≤ Cτ p. (4.28) By the BDG inequality, the contractivity of S(·), and (4.7), we derive 
+
+E[∥Rn 
+
+> 3
+
+∥2p] ≤ CE
+
+[∣∣∣∫ tn+1 
+
+> tn
+
+∥S(τ )g(Xn)∥2
+
+> L02
+
+ds 
+
+∣∣∣p]
+
+≤ Cτ p. (4.29) To estimate Rn 
+
+> 1
+
+for 1 ≤ n ≤ N , recall that 
+
+Xn = S(tn)φ0 +
+
+> n−1
+
+∑
+
+> i=0
+
+∫ ti+1 
+
+> ti
+
+S(tn − s)A ˜f ids +
+
+> n−1
+
+∑
+
+> i=0
+
+∫ ti+1 
+
+> ti
+
+S(tn − ti)g(Xi)dW (s).
+
+Since φ0 ∈ ˙Hβ (O), in view of (2.1) and (2.2), for any α ∈ [0 , 1] ,
+
+∥(S(τ ) − I)S(tn)φ0∥ = ∥(S(τ ) − I)( −A)−1−α(−A)− β 
+
+> 2+1+ α
+
+S(tn)( −A) β 
+
+> 2
+
+φ0∥≤ C(β, α )t β     
+
+> 4−12α−12
+> n
+
+τ 12 (1+ α). (4.30) Since φ0 ∈ ˙H1(O), the BDG inequality, (2.1), (2.2), (2.8), and Corollary 5 imply that for any α ∈ [0 , 12 ),
+
+E
+
+[∥∥∥
+
+> n−1
+
+∑
+
+> i=0
+
+∫ ti+1 
+
+> ti
+
+(S(τ ) − I)S(tn − ti)g(Xi)dW (s)
+
+∥∥∥2p]
+
+(4.31) 
+
+≤ CE
+
+[∣∣∣
+
+> n−1
+
+∑
+
+> i=0
+
+∫ ti+1 
+
+> ti
+
+∥(S(τ ) − I)( −A)−1−α(−A) 12 +αS(tn − ti)( −A) 12 g(Xi)∥2
+
+> L02
+
+ds 
+
+∣∣∣p]
+
+≤ CE
+
+[∣∣∣
+
+> n−1
+
+∑
+
+> i=0
+
+∫ ti+1 
+
+> ti
+
+τ 1+ α(tn − ti)− 12 −α(1 + ∥∇ Xi∥2)ds 
+
+∣∣∣p]
+
+≤ Cτ p(1+ α).
+
+Due to (2.1) and (2.2), for any α ∈ [0 , 12 ),
+
+∥∥∥∥
+
+> n−1
+
+∑
+
+> i=0
+
+∫ ti+1 
+
+> ti
+
+(S(τ ) − I)S(tn − s)A ˜f ids 
+
+∥∥∥∥
+
+≤
+
+> n−1
+
+∑
+
+> i=0
+
+∫ ti+1 
+
+> ti
+
+∥(−A)−1−α(S(τ ) − I)∥L(H)∥(−A) 32 +αS(tn − s)∥L(H) ∥(−A) 12 ˜f i∥ds 
+
+≤ Cτ 12 (1+ α) n−1∑
+
+> i=0
+
+∫ ti+1 
+
+> ti
+
+(tn − s)− 34 − 12 α∥(−A) 12 ˜f i∥ds. 
+
+To proceed, we claim that for any q ≥ 1,
+
+E
+
+[
+
+∥(−A) 12 ˜f n∥q ]
+
+≤ C(q). (4.32) The proof of (4.32) can be found in Appendix A.4. Invoking (4.32) and the Minkowski inequality, it follows that for any p ≥ 1 and α ∈ [0 , 12 ),
+
+E
+
+[∥∥∥
+
+> n−1
+
+∑
+
+> i=0
+
+∫ ti+1 
+
+> ti
+
+(S(τ ) − I)S(tn − s)A ˜f ids 
+
+∥∥∥2p]
+
+≤ C(p, α )τ p(1+ α).
+
+21 This, together with (4.30) and (4.31), yields that for any p ≥ 1 and α ∈ [0 , 12 ),
+
+∥Rn 
+
+> 1
+
+∥L2p(Ω; H) = ∥(S(τ ) − I)Xn∥L2p(Ω; H) ≤ C(β, α )(1 + t β     
+
+> 4−12α−12
+> n
+
+)τ 12 (1+ α). (4.33) for all n ∈ { 1, 2, · · · , N }. Consequently, the required Hölder continuity estimate (4.27) comes from (4.33) with α = 0 , (4.28), and (4.29). The proof is completed. □
+
+The following lemma provides a moment estimate for the discrete quadratic variation of the numerical solution in the energy space ˙H1(O).
+
+Lemma 10 Let Assumptions 1 and 2 hold, and let φ0 ∈ ˙H1(O). Then for any p ≥ 1, there exists a constant C := C(p) > 0 such that 
+
+E
+
+[( N −1∑
+
+> n=0
+
+∥(−A) 12 (Xn+1 − Xn)∥2
+
+)p]
+
+≤ C. 
+
+Proof From (1.4), we have 
+
+Xn+1 − Xn = ( S(τ ) − I)( −A)−1 ˜μn + g(Xn)δW n, (4.34) where ˜μn is defined in (2.13). By Hölder’s inequality and Young’s inequality, 
+
+( N −1∑
+
+> n=0
+
+∥(−A) 12 (Xn+1 − Xn)∥2
+
+)p
+
+(4.35) 
+
+≤ C
+
+∣∣∣ 
+
+> N−1
+
+∑
+
+> n=0
+
+〈
+
+(I − S(τ ))˜ μn, −(Xn+1 − Xn)
+
+〉 ∣ ∣∣p
+
++ C
+
+∣∣∣ 
+
+> N−1
+
+∑
+
+> n=0
+
+⟨g(Xn)δW n, (−A)( Xn+1 − Xn)⟩
+
+∣∣∣p
+
+≤ 14
+
+( N −1∑
+
+> n=0
+
+∥(I − S(τ )) 12 (−A) 12 (Xn+1 − Xn)∥2
+
+)p
+
++ C
+
+( N −1∑
+
+> n=0
+
+∥(I − S(τ )) 12 (−A)− 12 ˜μn∥2
+
+)p
+
++ 14
+
+( N −1∑
+
+> n=0
+
+∥(−A) 12 (Xn+1 − Xn)∥2
+
+)p
+
++ C
+
+( N −1∑
+
+> n=0
+
+∥(−A) 12 (g(Xn)δW n)∥2
+
+)p
+
+.
+
+Using the fact that ∥(I − S(τ )) 12 ∥L(H) ≤ 1, it follows that 
+
+∥(I − S(τ )) 12 (−A) 12 (Xn+1 − Xn)∥2 ≤ ∥ (−A) 12 (Xn+1 − Xn)∥2. (4.36) Applying (4.12) and Corollary 5, we have 
+
+E
+
+[( N −1∑
+
+> n=0
+
+∥(−A) 12 (g(Xn)δW n)∥2
+
+)p]
+
+≤ C. (4.37) Taking expectations on both sides of (4.35), and then on account of (4.36) and (4.37), as well as using Corollary 5, we complete the proof. □
+
+# 5 Proof of Theorem 2 
+
+This section is devoted to proving Theorem 2 on the strong convergence rate of the exponential Euler SSAV scheme (1.4). To this end, inspired by e.g., [20, 24], we introduce an auxiliary process Φ = {Φ( t)}t∈[0 ,T ], defined by 
+
+dΦ( t) = −A2Φ( t)dt + AF ′(XκN (t)/τ )dt + g(XκN (t)/τ )dW (t), t ∈ (0 , T ], (5.1) 22 with the initial value Φ(0) = φ0. By the triangle inequality, we have 
+
+∥φ(tn) − Xn∥L2(Ω; H) ≤ ∥ φ(tn) − Φ( tn)∥L2(Ω; H) + ∥Φ( tn) − Xn∥L2(Ω; H) . (5.2) In the following, we provide estimates for the errors between the auxiliary process Φ
+
+and the numerical solution X, as well as between Φ and the exact solution φ. The corresponding analyses are given in subsections 5.1 and 5.2, respectively. 
+
+## 5.1 Error estimate between Φ and X
+
+By applying the Hölder’s inequality, it follows from (4.17) and (5.1) that for any p ≥ 1
+
+and n ∈ { 0, 1, · · · , N − 1},
+
+∥Φ( tn+1 ) − X(tn+1 )∥p ≤ C
+
+∥∥∥∥
+
+> n
+
+∑
+
+> j=0
+
+∫ tj+1 
+
+> tj
+
+S(tn+1 − s)A[F ′(Xj ) − ˜f j ]ds 
+
+∥∥∥∥
+
+> p
+
++ C
+
+∥∥∥∥
+
+> n
+
+∑
+
+> j=0
+
+∫ tj+1 
+
+> tj
+
+S(tn+1 − s) ( I − S(s − tj )) g(Xj )dW (s)
+
+∥∥∥∥
+
+> p
+
+=: Bn 
+
+> 1
+
++ Bn 
+
+> 2
+
+. (5.3) Applying the BDG inequality, (2.1), (2.2), (2.8), and Corollary 5, we deduce that 
+
+E [Bn 
+
+> 2
+
+] ≤ CE
+
+[∥∥∥
+
+> n
+
+∑
+
+> j=0
+
+∫ tj+1 
+
+> tj
+
+(−A) 12 S(tn+1 − s)( −A)− 12 (I − S(s − tj )) g(Xj )dW (s)
+
+∥∥∥p]
+
+≤ CE
+
+[( n∑
+
+> j=0
+
+∫ tj+1 
+
+> tj
+
+(tn+1 − s)− 12 ∥(−A)−1 (S(s − tj ) − I) ( −A) 12 g(Xj )∥2
+
+> L02
+
+ds 
+
+) p 
+
+> 2
+
+]
+
+≤ CE
+
+[( n∑
+
+> j=0
+
+∫ tj+1 
+
+> tj
+
+(tn+1 − s)− 12 |s − tj |∥ (−A) 12 g(Xj )∥2
+
+> L02
+
+ds 
+
+) p 
+
+> 2
+
+]
+
+≤ Cτ p 
+
+> 2
+
+E
+
+[( n∑
+
+> j=0
+
+∫ tj+1 
+
+> tj
+
+(tn+1 − s)− 12 (1 + ∥∇ Xj ∥2)ds 
+
+) p 
+
+> 2
+
+]
+
+≤ Cτ p 
+
+> 2
+
+. (5.4) According to (3.8), we further split the term Bn 
+
+> 1
+
+as follows 
+
+Bn 
+
+> 1
+
+≤ C
+
+∥∥∥∥
+
+> n
+
+∑
+
+> j=0
+
+∫ tj+1 
+
+> tj
+
+S(tn+1 − s)A
+
+( rj+1 − rj
+
+√Ep(Xj ) F ′(Xj )
+
+)
+
+ds 
+
+∥∥∥∥
+
+> p
+
+(5.5) 
+
++ C
+
+∥∥∥∥
+
+> n
+
+∑
+
+> j=0
+
+∫ tj+1 
+
+> tj
+
+S(tn+1 − s)A
+
+( rj − √Ep(Xj )
+
+√Ep(Xj ) F ′(Xj ) + χj
+
+)
+
+ds 
+
+∥∥∥∥
+
+> p
+
+=: Bn 
+
+> 11
+
++ Bn
+
+> 12
+
+.
+
+23 For the first term Bn
+
+> 11
+
+, using (2.1), the Minkowski inequality, and Young’s inequality, we have 
+
+E [Bn
+
+> 11
+
+] ≤ CE
+
+[( n∑
+
+> j=0
+
+∫ tj+1 
+
+> tj
+
+∥∥∥S(tn+1 − s)( −A) 12
+
+rj+1 − rj
+
+√Ep(Xj ) (−A) 12 F ′(Xj )
+
+∥∥∥ds 
+
+)p]
+
+≤ CE
+
+[( n∑
+
+> j=0
+
+∫ tj+1 
+
+> tj
+
+(tn+1 − s)− 14 |rj+1 − rj |∥ (−A) 12 F ′(Xj )∥ds 
+
+)p]
+
+≤ Cτ p 
+
+> 2
+
+E
+
+[( n∑
+
+> j=0
+
+|rj+1 − rj |2
+
+)p]
+
++ Cτ − p 
+
+> 2
+
+E
+
+[( n∑
+
+> j=0
+
+( ∫ tj+1 
+
+> tj
+
+(tn+1 − s)− 14 ∥(−A) 12 F ′(Xj )∥ds 
+
+)2)p]
+
+.
+
+Furthermore, by Corollary 5, the Minkowski inequality, and (A.5), we obtain 
+
+E [Bn
+
+> 11
+
+] ≤ Cτ p 
+
+> 2
+
+. (5.6) The estimate of the term Bn 
+
+> 12
+
+requires the following result, which implies that the discrete SSAV rm approximates √Ep(Xm) for all m ∈ { 0, 1, · · · , N }, with a convergence rate of order 1/2.
+
+Lemma 11 Let Assumptions 1 and 2 hold, and let φ0 ∈ ˙H2(O). Then for any p ≥ 1, there exists a constant C := C(p) > 0 such that for any m ∈ { 0, 1, · · · , N },
+
+E
+
+[∣∣rm −
+
+√
+
+Ep(Xm)∣∣p
+
+]
+
+≤ Cτ p 
+
+> 2
+
+.
+
+Proof To start with, we take the first- and second-order Taylor expansions of the real valued function b1(ξ) := Ep(ξX n+1 + (1 − ξ)Xn) for ξ ∈ [0 , 1] , which yields 
+
+Ep(Xn+1 ) − Ep(Xn) = b1(1) − b1(0) = 
+
+∫ 10
+
+〈
+
+F ′(ψnξ ), X n+1 − Xn〉
+
+dξ, Ep(Xn+1 ) − Ep(Xn) = 
+
+〈
+
+F ′(Xn), X n+1 − Xn〉
+
++
+
+∫ 10
+
+(1 − ξ)
+
+〈
+
+F ′′ (ψnξ )( Xn+1 − Xn), X n+1 − Xn〉
+
+dξ, 
+
+where ψnξ := ξX n+1 + (1 − ξ)Xn. Similarly, by taking the Taylor expansion of b2(θ) := 
+
+√θE p(Xn+1 ) + (1 − θ)Ep(Xn) for θ ∈ [0 , 1] , we further have 
+
+√
+
+Ep(Xn+1 ) −
+
+√
+
+Ep(Xn) = b2(1) − b2(0) = 12√Ep(Xn)
+
+(
+
+Ep(Xn+1 ) − Ep(Xn)
+
+)
+
+− 18Ep(Xn)3/2
+
+(
+
+Ep(Xn+1 ) − Ep(Xn)
+
+)2
+
++ 316 
+
+∫ 10
+
+(1 − θ)2( ˜Enθ )−5/2 (
+
+Ep(Xn+1 ) − Ep(Xn)
+
+)3
+
+dθ, 
+
+24 = 12√Ep(Xn)
+
+( 〈 
+
+F ′(Xn), X n+1 − Xn〉
+
++ 12
+
+〈
+
+F ′′ (Xn)( Xn+1 − Xn), X n+1 − Xn〉 ) 
+
+− 18Ep(Xn)3/2
+
+〈
+
+F ′(Xn), X n+1 − Xn〉2
+
++ Pn 
+
+> 1
+
++ Pn 
+
+> 2
+
++ Pn 
+
+> 3
+
++ Pn 
+
+> 4
+
+,
+
+where ˜Enθ := θE p(Xn) + (1 − θ)Ep(Xn+1 ) and the remainder terms are 
+
+Pn 
+
+> 1
+
+:= 12√Ep(Xn)
+
+∫ 10
+
+(1 − ξ)
+
+〈
+
+(F ′′ (ψnξ ) − F ′′ (Xn))( Xn+1 − Xn), X n+1 − Xn〉
+
+dξ, 
+
+Pn 
+
+> 2
+
+:= − 14Ep(Xn)3/2 ⟨F ′(Xn), X n+1 − Xn⟩×
+
+∫ 10
+
+(1 − ξ)
+
+〈
+
+F ′′ (ψnξ )( Xn+1 − Xn), X n+1 − Xn〉
+
+dξ, 
+
+Pn 
+
+> 3
+
+:= − 18Ep(Xn)3/2
+
+( ∫ 10
+
+(1 − ξ)
+
+〈
+
+F ′′ (ψnξ )( Xn+1 − Xn), X n+1 − Xn〉
+
+dξ 
+
+)2
+
+,
+
+Pn 
+
+> 4
+
+:= 316 
+
+∫ 10
+
+(1 − θ)2( ˜Enθ )−5/2
+
+(∫ 10
+
+〈
+
+F ′(ψnξ ), X n+1 − Xn〉
+
+dξ 
+
+)3
+
+dθ. 
+
+From (4.34) and (1.6), we can reformulate 
+
+√
+
+Ep(Xn+1 ) −
+
+√
+
+Ep(Xn) = ( rn+1 − rn) + Pn 
+
+> 1
+
++ Pn 
+
+> 2
+
++ Pn 
+
+> 3
+
++ Pn 
+
+> 4
+
++ Pn 
+
+> 5
+
++ Pn 
+
+> 6
+
+,
+
+where 
+
+Pn 
+
+> 5
+
+:= 14√Ep(Xn)
+
+〈
+
+F ′′ (Xn)( Xn+1 − Xn), (S(τ ) − I)( −A)−1 ˜μn〉
+
+,
+
+Pn 
+
+> 6
+
+: − 18Ep(Xn)3/2
+
+〈
+
+F ′(Xn), X n+1 − Xn〉 〈 
+
+F ′(Xn), (S(τ ) − I)( −A)−1 ˜μn〉
+
+.
+
+Summing from n = 0 to m, since r0 = √Ep(φ0), we obtain from Hölder’s inequality that for any p ≥ 1,
+
+E
+
+[∣∣∣rm+1 −
+
+√
+
+Ep(Xm+1 )
+
+∣∣∣p]
+
+≤ C ∑
+
+> l=1 ,5,6
+
+E
+
+[∣∣∣
+
+> m
+
+∑
+
+> n=0
+
+Pnl
+
+∣∣∣p]
+
++ C(m + 1) p−1 4∑
+
+> l=2
+> m
+
+∑
+
+> n=0
+
+E [|P nl |p] .
+
+(5.7) 
+
+Estimate of ∑mn=0 Pn 
+
+> 1
+
+. Invoking the mean value theorem, we can rewrite 
+
+Pn 
+
+> 1
+
+= 12√Ep(Xn)
+
+∫ 10
+
+(1 − ξ)
+
+∫ 10
+
+∫
+
+> O
+
+F ′′′ (θψ nξ + (1 − θ)Xn)( ψnξ − Xn)( Xn+1 − Xn)2dxdθdξ. 
+
+The Gagliardo–Nirenberg inequality (see, e.g., [42, Chapter 5]) reads that for d ∈ { 1, 2, 3}
+
+and any p ∈ (2 , 6] ,
+
+∥Xn+1 − Xn∥Lp ≤ C(p, d )∥Xn+1 − Xn∥1−d( 12 − 1 
+
+> p)
+
+∥∇ (Xn+1 − Xn)∥d( 12 − 1 
+
+> p)
+
+. (5.8) Hence, by (3.2), Assumption 1, Hölder’s inequality, and (5.8) with p = 3 ,
+
+|P n 
+
+> 1
+
+| ≤ C(1 + ∥Xn∥L∞ + ∥Xn+1 ∥L∞ )∥Xn+1 − Xn∥3
+
+> L3
+
+≤ C(1 + ∥Xn∥L∞ + ∥Xn+1 ∥L∞ )∥Xn+1 − Xn∥3(1 − d 
+
+> 6)
+
+∥∇ (Xn+1 − Xn)∥ d 
+
+> 2
+
+.
+
+Moreover, by Young’s inequality and Poincare’s inequality, for d ∈ { 1, 2, 3},
+
+|P n 
+
+> 1
+
+| ≤ C(1 + ∥Xn∥L∞ + ∥Xn+1 ∥L∞ )∥Xn+1 − Xn∥ 32 ∥∇ (Xn+1 − Xn)∥ 32
+
+25 ≤ Cτ − 32 (1 + ∥Xn∥4 
+
+> L∞
+
++ ∥Xn+1 ∥4 
+
+> L∞
+
+)∥Xn+1 − Xn∥6 + Cτ 12 ∥∇ (Xn+1 − Xn)∥2
+
+It follows from Hölder’s inequality, (4.26), as well as Lemmas 8 and 10 that 
+
+E
+
+[∣∣∣
+
+> m
+
+∑
+
+> n=0
+
+Pn
+
+> 1
+
+∣∣∣p]
+
+≤ CE
+
+[( 
+
+τ 12
+
+> m
+
+∑
+
+> n=0
+
+∥(−A) 12 (Xn+1 − Xn)∥2
+
+)p]
+
++ CE
+
+[( 
+
+τ − 32
+
+> m
+
+∑
+
+> n=0
+
+(
+
+1 + ∥Xn∥4 
+
+> L∞
+
++ ∥Xn+1 ∥4
+
+> L∞
+
+)
+
+∥Xn+1 − Xn∥6
+
+)p]
+
+≤ Cτ p 
+
+> 2
+
+.
+
+Estimate of ∑mn=0 Pn 
+
+> 5
+
+. Young’s inequality, (2.2), and Corollary 5 lead to 
+
+E
+
+[∣∣∣
+
+> m
+
+∑
+
+> n=0
+
+Pn
+
+> 5
+
+∣∣∣p]
+
+≤ CE
+
+[∣∣∣
+
+> m
+
+∑
+
+> n=0
+
+τ − 12 ∥(I − S(τ )) 12 (−A)− 12 [F ′′ (Xn)( Xn+1 − Xn)] ∥2 (5.9) 
+
++ Cτ 12
+
+> m
+
+∑
+
+> n=0
+
+∥(I − S(τ )) 12 (−A)− 12 ˜μn∥2∣∣∣p]
+
+≤ CE
+
+[∣∣∣
+
+> m
+
+∑
+
+> n=0
+
+τ − 12 ∥(I − S(τ )) 12 (−A)−1(−A) 12 [F ′′ (Xn)( Xn+1 − Xn)] |2∣∣∣p]
+
++ Cτ p
+
+> 2
+
+≤ CE
+
+[∣∣∣
+
+> m
+
+∑
+
+> n=0
+
+τ 12 ∥(−A) 12 [F ′′ (Xn)( Xn+1 − Xn)] ∥2∣∣∣p]
+
++ Cτ p 
+
+> 2
+
+.
+
+Using the integration by parts formula, the chain rule, Hölder’s inequality, Assumption 1, the Sobolev embedding ˙H1(O) ↪→ L6(O), we have that for any β ∈ ( 32 , 2) ,
+
+∥(−A) 12 [F ′′ (Xn)( Xn+1 − Xn)] ∥2 =
+
+∥∥∥∇[F ′′ (Xn)( Xn+1 − Xn)] 
+
+∥∥∥2
+
+≤ C
+
+∥∥∥F ′′′ (Xn)∇Xn(Xn+1 − Xn)
+
+∥∥∥2
+
++ C
+
+∥∥∥F ′′ (Xn)∇(Xn+1 − Xn)
+
+∥∥∥2
+
+≤ C∥Xn+1 − Xn∥2
+
+> L6
+
+∥∥(1 + Xn)∇Xn∥∥2 
+
+> L3
+
++ C ∥∥F ′′ (Xn)∥∥2 
+
+> L∞
+
+∥∇ (Xn+1 − Xn)∥2
+
+≤ C∥∇ (Xn+1 − Xn)∥2 (
+
+(1 + ∥Xn∥2 
+
+> L∞
+
+)∥∇ Xn∥2 
+
+> L3
+
++ C(1 + ∥Xn∥4 
+
+> L∞
+
+)
+
+)
+
+≤ C∥∇ (Xn+1 − Xn)∥2(1 + ∥Xn∥4 
+
+> Hβ
+
+),
+
+where we have used the Sobolev embeddings Hβ−1(O) ↪→ L3(O) and Hβ (O) ↪→ L∞(O) in the last step. Then the combination of Lemma 7 and Lemma 10 gives 
+
+E
+
+[∣∣∣
+
+> m
+
+∑
+
+> n=0
+
+∥(−A) 12 [F ′′ (Xn)( Xn+1 − Xn)] ∥2∣∣∣p]
+
+≤ C
+
+(
+
+1 + E
+
+[
+
+sup 
+
+> 0≤n≤m
+
+∥Xn∥8pHβ
+
+]) 12 (
+
+E
+
+[( m∑
+
+> n=0
+
+∥∇ (Xn+1 − Xn)∥2
+
+)2p]) 12
+
+≤ C. 
+
+Inserting the above estimate into (5.9) yields E[| ∑mn=0 Pn 
+
+> 5
+
+|p] ≤ Cτ p 
+
+> 2
+
+.
+
+Estimate of ∑mn=0 Pn 
+
+> 6
+
+. By Cauchy–Schwarz inequality and (3.2), 
+
+∣∣∣
+
+> m
+
+∑
+
+> n=0
+
+Pn
+
+> 6
+
+∣∣∣2
+
+≤ C
+
+( m∑
+
+> n=0
+
+∥∥F ′(Xn)∥∥2 ∥Xn+1 − Xn∥2∥(I − S(τ )) 12 (−A)− 12 F ′(Xn)∥2
+
+)
+
+×
+
+( m∑
+
+> n=0
+
+∥(I − S(τ )) 12 (−A)− 12 ˜μn∥2
+
+)
+
+.
+
+26 Furthermore, utilizing (2.2), Corollary 5, and Hölder’s inequality, 
+
+E
+
+[∣∣∣
+
+> m
+
+∑
+
+> n=0
+
+Pn
+
+> 6
+
+∣∣∣p]
+
+≤ Cτ p
+
+> 2
+
+(
+
+E
+
+[( m∑
+
+> n=0
+
+∥F ′(Xn)∥2∥Xn+1 − Xn∥2∥(−A) 12 F ′(Xn)∥2
+
+)p]) 12
+
+≤ Cτ p 
+
+> 2
+
+(m + 1) p−12
+
+( m∑
+
+> n=0
+
+E
+
+[
+
+∥F ′(Xn)∥2p∥Xn+1 − Xn∥2p∥(−A) 12 F ′(Xn)∥2p]) 12
+
+.
+
+Together with Lemma 8, (4.22), and (A.5), this proves E[| ∑mn=0 Pn 
+
+> 6
+
+|p] ≤ Cτ p 
+
+> 2
+
+.
+
+Estimates of Pn 
+
+> 2
+
+and Pn 
+
+> 3
+
+. In virtue of Assumption 1 and (4.26), it holds that for any 
+
+q ≥ 1 and ξ ∈ [0 , 1] ,
+
+E [∥F ′′ (ψnξ )∥qL∞
+
+] ≤ CE
+
+[
+
+(1 + ∥Xn∥2 
+
+> L∞
+
++ ∥Xn+1 ∥2 
+
+> L∞
+
+)q ]
+
+≤ C(q). (5.10) Applying Hölder’s inequality, (3.2), Lemma 8, (4.22), and (5.10), we infer that 
+
+E [∣ ∣Pn
+
+> 2
+
+∣∣p] ≤ C
+
+∫ 10
+
+E
+
+[∥∥F ′(Xn)∥∥p ∥∥F ′′ (ψnξ )∥∥pL∞ ∥Xn+1 − Xn∥3p]
+
+dξ ≤ Cτ 32 p.
+
+Analogously, we also have 
+
+E [∣ ∣Pn
+
+> 3
+
+∣∣p] ≤ C
+
+∫ 10
+
+E
+
+[
+
+∥F ′′ (ψnξ )∥2pL∞ ∥Xn+1 − Xn∥4p]
+
+dξ ≤ Cτ 2p.
+
+Estimate of Pn 
+
+> 4
+
+. By (3.2), Hölder’s inequality, (4.26), and Lemma 8, 
+
+E [∣ ∣Pn
+
+> 4
+
+∣∣p] ≤ C
+
+∫ 10
+
+E
+
+[∣∣∣〈
+
+F ′(ψnξ ), X n+1 − Xn〉∣ ∣∣3p]
+
+dξ 
+
+≤ CE
+
+[( 
+
+1 + ∥Xn∥9pL∞ + ∥Xn+1 ∥9pL∞
+
+)
+
+∥Xn+1 − Xn∥3p]
+
+≤ Cτ 32 p.
+
+Finally, substituting the above estimates on Pn 
+
+> 1
+
+through Pn 
+
+> 6
+
+into (5.7), we complete the proof. □
+
+With Lemma 11 at hand, we now present the error estimate between the auxiliary process Φ( tn) and the numerical solution Xn.
+
+Proposition 12 Let Assumptions 1 and 2 hold, and let φ0 ∈ ˙H2(O). Then for any p ≥ 1,there exists a constant C > 0 such that for n ∈ { 0, 1, · · · , N − 1},
+
+E
+
+[∥ ∥∥Φ( tn+1 ) − Xn+1 ∥∥∥p]
+
+≤ Cτ p 
+
+> 2
+
+.
+
+Proof Recalling that by (5.3) and (5.5), 
+
+∥∥∥Φ( tn+1 ) − Xn+1 ∥∥∥p
+
+≤ B n 
+
+> 11
+
++ Bn 
+
+> 12
+
++ Bn 
+
+> 2
+
+, (5.11) where the expectations of Bn 
+
+> 11
+
+and Bn 
+
+> 2
+
+have been estimated in (5.6) and (5.4), respectively. To estimate Bn
+
+> 12
+
+, we utilize (3.2), (4.24), (4.22), and Lemma 11 to obtain that for any p ≥ 1,
+
+∥∥∥∥
+
+rj − √Ep(Xj )
+
+√Ep(Xj ) F ′(Xj ) + χj
+
+∥∥∥∥Lp(Ω; H)
+
+≤ C∥rj −
+
+√
+
+Ep(Xj )∥L2p(Ω) ∥F ′(Xj )∥L2p(Ω; H) + ∥χj ∥Lp(Ω; H) ≤ C(p)τ 12 .
+
+Then using the Minkowski inequality and (2.1), one has 
+
+E [Bn
+
+> 12
+
+] ≤ Cτ p 
+
+> 2
+
+.
+
+This, along with (5.11), (5.6), and (5.4), finishes the proof. □
+
+27 5.2 Error estimate between ϕ and Φ
+
+In this subsection, we estimate the error ˜ε(t) := φ(t) − Φ( t) between the mild solution 
+
+φ and the auxiliary process Φ. According to (5.1) and (1.1), we have 
+
+d˜ε(t) = −A2 ˜ε(t)dt + A (F ′(φ(t)) − F ′(X(κN (t)))) dt (5.12) 
+
++ ( g(φ(t)) − g(X(κN (t)))) dW (t)
+
+for any t ∈ (0 , T ], with the initial value ˜ε(0) = 0 . To handle the non-globally Lipschitz nonlinearity F ′, we decompose 
+
+F ′(φ(t)) − F ′(X(κN (t)) = [ F ′(φ(t)) − F ′(Φ( t))] + [ F ′(Φ( t)) − F ′(X(κN (t)))] ,
+
+where the first term on the right-hand side can be handled by the one-sided Lipschitz continuity of −F ′. As for the second term, taking advantage of the local Lipschitz continuity property (2.5) of F ′, it follows 
+
+∥F ′(Φ( t)) − F ′(X(κN (t))) ∥ ≤ C(1 + ∥Φ( t)∥2 
+
+> L∞
+
++ ∥X(κN (t)) ∥2 
+
+> L∞
+
+)∥Φ( t) − X(κN (t)) ∥≤ C(1 + ∥Φ( t)∥2 
+
+> L∞
+
++ ∥X(κN (t)) ∥2 
+
+> L∞
+
+)( ∥Φ( t) − Φ( κN (t)) ∥ + ∥Φ( κN (t)) − X(κN (t)) ∥).
+
+(5.13) To proceed, we will use the spatial regularity and temporal Hölder regularity estimates for the auxiliary process Φ, provided in Lemmas 13 and 14, respectively. 
+
+Lemma 13 Let Assumptions 1 and 2 hold and let φ0 ∈ ˙Hβ (O) for some β ∈ ( d 
+
+> 2
+
+, 2) ∩ [1 , 2) .Then for any p ≥ 1, there exists a constant C := C(p) > 0 such that 
+
+E
+
+[
+
+sup  
+
+> t∈[0 ,T ]
+
+∥Φ( t)∥pL∞
+
+]
+
+≤ C. (5.14) 
+
+Proof In view of (5.1), similar to the proof of Lemma 7, an application of Lemma 6 with 
+
+˜F (s) = and ˜G(s) = g(X(κN (s))) can produce that for any β ∈ [1 , 2) ,
+
+E
+
+[
+
+sup  
+
+> t∈[0 ,T ]
+
+∥(−A)β Φ( t)∥p
+
+]
+
+≤ C. (5.15) Finally, the result (5.14) comes from the Sobolev embedding Hβ (O) ↪→ L∞(O) for any 
+
+β > d/ 2. □
+
+Lemma 14 Let Assumptions 1 and 2 hold and let φ0 ∈ ˙H2(O). Then for any p ≥ 1, there exists a constant C := C(p) > 0 such that for any 0 ≤ s < t ≤ T ,
+
+E [∥Φ( t) − Φ( s)∥p] ≤ C(t − s) p 
+
+> 2
+
+.
+
+Since the proof of Lemma 14 follows essentially the same arguments as in Lemma 8, it is omitted for brevity. Now based on (5.12) and the one-sided Lipschitz continuity of −F ′, we can establish a strong error bound for ˜ε(t) in H−1(O).28 Lemma 15 Let Assumptions 1 and 2 hold, and let φ0 ∈ ˙H2(O). Then for any p ≥ 2, there exists a constant C := C(p) > 0 such that for any t ∈ [0 , T ],
+
+E
+
+[
+
+∥(−A)− 12 ˜ε(t)∥p]
+
++ E
+
+[∫ t
+
+> 0
+
+∥(−A)− 12 ˜ε(s)∥p−2∥(−A) 12 ˜ε(s)∥2ds 
+
+]
+
+≤ Cτ p 
+
+> 2
+
+.
+
+Proof Recalling (5.12) and then applying Itô formula to ∥(−A)− 12 ˜ε(t)∥p, we obtain 
+
+d∥(−A)− 12 ˜ε(t)∥p = −p∥(−A)− 12 ˜ε(t)∥p−2∥(−A) 12 ˜ε(t)∥2dt (5.16) 
+
++ p∥(−A)− 12 ˜ε(t)∥p−2 〈
+
+AF ′(φ(t)) − AF ′(X(κN (t))) , (−A)−1 ˜ε(t)
+
+〉
+
+dt 
+
++ p∥(−A)− 12 ˜ε(t)∥p−2 〈
+
+(g(φ(t)) − g(X(κN (t)))) dW (t), (−A)−1 ˜ε(t)
+
+〉
+
++ 12 p∥(−A)− 12 ˜ε(t)∥p−2∥(−A)− 12 (g(φ(t)) − g(X(κN (t)))) ∥2
+
+> L02
+
+dt 
+
++ 12 p(p − 2) ∥(−A)− 12 ˜ε(t)∥p−4
+
+×
+
+> ∞
+
+∑
+
+> k=1
+
+〈
+
+(−A)− 12 ˜ε(t), (−A)− 12 (g(φ(t)) − g(X(κN (t)))) Q 12 ek
+
+〉2
+
+dt. 
+
+=: J1dt + J2dt + J3 + J4dt + J5dt. 
+
+Using the one sided Lipschitz continuity (2.4) of −F ′, the Cauchy–Schwarz inequality, and the first inequality of (5.13), we arrive at 
+
+− 〈F ′(φ(t)) − F ′(Φ( t)) + F ′(Φ( t)) − F ′(X(κN (t))) , ˜ε(t)〉 (5.17) 
+
+≤ Lf ∥˜ε(t)∥2 + ∥˜ε(t)∥ ∥ F ′(Φ( t)) − F ′(X(κN (t))) ∥≤ L′ 
+
+> f
+
+⟨(−A) 12 ˜ε(t), (−A)− 12 ˜ε(t)⟩ + C|I(t)|2,
+
+where L′ 
+
+> f
+
+:= Lf + 12 and 
+
+I(t) := (1 + ∥Φ( t)∥2 
+
+> L∞
+
++ ∥X(κN (t)) ∥2 
+
+> L∞
+
+)∥Φ( t) − X(κN (t)) ∥, t ∈ [0 , T ]. (5.18) By virtue of (5.17) and using Young’s inequality, for any υ > 0 one has 
+
+J2≤ p∥(−A)− 12 ˜ε(t)∥p−2(L′ 
+
+> f
+
+⟨(−A) 12 ˜ε(t), (−A)− 12 ˜ε(t)⟩ + C|I(t)|2) (5.19) 
+
+≤ pL ′
+
+> f
+
+( υ2
+
+2 ∥(−A)− 12 ˜ε(t)∥p−2∥(−A) 12 ˜ε(t)∥2 + 12υ2 ∥(−A)− 12 ˜ε(t)∥p
+
+)
+
++ C∥(−A)− 12 ˜ε(t)∥p + C|I(t)|p.
+
+To estimate the terms J4 and J5 on the right hand side of (5.16), we denote 
+
+Kp(t) := ∥(−A)− 12 ˜ε(t)∥p−2∥(−A)− 12 (g(φ(t)) − g(X(κN (t)))) ∥2
+
+> L02
+
+(5.20) for t ∈ [0 , T ], so that 
+
+J4 = 12 pKp(t) and J5 ≤ 12 p(p − 2) Kp(t). (5.21) Plugging the estimates (5.19) and (5.21) into (5.16) gives 
+
+d∥(−A)− 12 ˜ε(t)∥p + p∥(−A)− 12 ˜ε(t)∥p−2∥(−A) 12 ˜ε(t)∥2dt (5.22) 
+
+29 ≤ pL ′
+
+> f
+
+( υ2
+
+2 ∥(−A)− 12 ˜ε(t)∥p−2∥(−A) 12 ˜ε(t)∥2dt + 12υ2 ∥(−A)− 12 ˜ε(t)∥pdt 
+
+)
+
++ C∥(−A)− 12 ˜ε(t)∥pdt + C|I(t)|pdt + 12 p(p − 1) Kp(t)dt 
+
++ p∥(−A)− 12 ˜ε(t)∥p−2 〈
+
+(g(φ(t)) − g(X(κN (t)))) dW (t), (−A)−1 ˜ε(t)
+
+〉
+
+.
+
+In this proof, we set υ > 0 with L′ 
+
+> f
+
+υ2 = 1 . Integrating (5.22) over time and then taking expectations on both sides, we derive that for any t ∈ [0 , T ],
+
+E
+
+[
+
+∥(−A)− 12 ˜ε(t)∥p]
+
++ p
+
+2 E
+
+∫ t
+
+> 0
+
+∥(−A)− 12 ˜ε(s)∥p−2∥(−A) 12 ˜ε(s)∥2ds (5.23) 
+
+≤ CE
+
+∫ t
+
+> 0
+
+∥(−A)− 12 ˜ε(s)∥pds + C
+
+∫ t
+
+> 0
+
+E[|I(s)|p]ds + 12 p(p − 1) 
+
+∫ t
+
+> 0
+
+E[Kp(s)] ds, 
+
+since the expectation of the stochastic integral vanishes. To proceed, we next estimate I(·)
+
+and Kp(·) individually. For the term I(·) defined in (5.18), by Hölder’s inequality, it holds that for any p ≥ 1 and 
+
+s ∈ [0 , T ],
+
+E[|I(s)|p] ≤ C
+
+(
+
+E
+
+[
+
+1 + ∥Φ( s)∥4pL∞ + ∥X(κN (s)) ∥4pL∞
+
+]) 12 (
+
+E
+
+[
+
+∥Φ( s) − X(κN (s)) ∥2p]) 12
+
+.
+
+Lemma 14 and Proposition 12 ensure that for any q ≥ 1 and s ∈ [0 , T ],
+
+E [∥Φ( s) − X(κN (s)) ∥q ] ≤ CE [∥Φ( s) − Φ( κN (s)) ∥q ] (5.24) 
+
++ CE [∥Φ( κN (s)) − X(κN (s)) ∥q ] ≤ C(q)τ q 
+
+> 2
+
+.
+
+Further taking (4.26) and Lemma 13 into account, we conclude that for any p ≥ 1,
+
+E[|I(s)|p] ≤ C(p)τ p 
+
+> 2
+
+, s ∈ [0 , T ]. (5.25) To estimate Kp(·) defined in (5.20), we notice that for p = 2 , by (2.7) and Young’s inequality, for any υ1 > 0,
+
+K2(s) = ∥(−A)− 12 (g(φ(s)) − g(X(κN (s)))) ∥2
+
+> L02
+
+≤ C ∥g(φ(s)) − g(X(κN (s))) ∥2
+
+> L02
+
+≤ C∥Φ( s) − X(κN (s)) ∥2 ≤ C ∥˜ε(s)∥2 + C∥Φ( s) − X(κN (s)) ∥2
+
+≤ 12 υ21 ∥(−A) 12 ˜ε(s)∥2 + C(υ1)∥(−A)− 12 ˜ε(s)∥2 + C∥Φ( s) − X(κN (s)) ∥2. (5.26) Now selecting υ1 = 1 /√p − 1 in (5.26), and then utilizing Young’s inequality, we have that for any p ≥ 2,
+
+Kp(s) = ∥(−A)− 12 ˜ε(t)∥p−2K2(s) ≤ C(υ1)∥(−A)− 12 ˜ε(s)∥p
+
++ 12( p − 1) ∥(−A)− 12 ˜ε(s)∥p−2∥(−A) 12 ˜ε(s)∥2 + ∥Φ( s) − X(κN (s)) ∥p.
+
+Taking expectations and then integrating over time on both sides of the above inequality, we infer from (5.24) that 
+
+∫ t
+
+> 0
+
+E[Kp(s)] ds ≤ C
+
+∫ t
+
+> 0
+
+E
+
+[
+
+∥(−A)− 12 ˜ε(s)∥p]
+
+ds (5.27) 
+
++ 12( p − 1) 
+
+∫ t
+
+> 0
+
+E
+
+[
+
+∥(−A)− 12 ˜ε(s)∥p−2∥(−A) 12 ˜ε(s)∥2]
+
+ds + Cτ p 
+
+> 2
+
+.
+
+Plugging the estimates (5.25) and (5.27) into (5.23), we can apply Gronwall’s inequality to finish the proof. □
+
+30 We are in a position to measure the error between φ(t) and Φ( t) in L2(Ω; H).
+
+Proposition 16 Let Assumptions 1 and 2 hold, and let φ0 ∈ ˙H2(O). Then there exists a constant C > 0 such that for any t ∈ [0 , T ],
+
+E
+
+[
+
+∥φ(t) − Φ( t)∥2]
+
+≤ Cτ. (5.28) 
+
+Proof We shall split the proof into two steps. In the first step, we show that there exists a constant C > 0 such that 
+
+E
+
+[∣∣∣∫ t
+
+> 0
+
+∥(−A) 12 ˜ε(s)∥2ds 
+
+∣∣∣2]
+
+≤ Cτ 2, t ∈ [0 , T ]. (5.29) Then based on the estimate on the L4(Ω; L2(0 , T ; H1(O))) -norm of ˜ε = φ − Φ in (5.29), we further prove the required estimate (5.28) on the L∞(0 , T ; L2(Ω; H)) -norm of ˜ε.
+
+Step 1. The integral form of (5.22) with p = 2 reads 
+
+∥(−A)− 12 ˜ε(t)∥2 +
+
+∫ t
+
+> 0
+
+∥(−A) 12 ˜ε(s)∥2ds 
+
+≤ C
+
+∫ t
+
+> 0
+
+∥(−A)− 12 ˜ε(s)∥2ds + C
+
+∫ t
+
+> 0
+
+|I(s)|2ds +
+
+∫ t
+
+> 0
+
+K2(s)ds 
+
++ 2 
+
+∫ t
+
+> 0
+
+〈
+
+(g(φ(s)) − g(X(κN (s)))) dW (s), (−A)−1 ˜ε(s)
+
+〉
+
+.
+
+Squaring both sides on the above inequality, we deduce from Hölder’s inequality that for any 
+
+t ∈ [0 , T ],
+
+∣∣∣∣∫ t
+
+> 0
+
+∥(−A) 12 ˜ε(s)∥2ds 
+
+∣∣∣∣
+
+> 2
+
+≤ C
+
+∫ t
+
+> 0
+
+∥(−A)− 12 ˜ε(s)∥4ds + C
+
+∫ t
+
+> 0
+
+|I(t)|4ds (5.30) 
+
++ 4 
+
+∣∣∣∣∫ t
+
+> 0
+
+K2(s)ds 
+
+∣∣∣∣
+
+> 2
+
++ C
+
+∣∣∣∣∫ t
+
+> 0
+
+〈
+
+(g(φ(s)) − g(X(κN (s)))) dW (s), (−A)−1 ˜ε(s)
+
+〉∣∣∣∣
+
+> 2
+
+.
+
+From the BDG inequality, (5.27), and Lemma 15 with p = 4 , it follows that 
+
+E
+
+[∣ ∣∣∣∫ t
+
+> 0
+
+〈
+
+(g(φ(s)) − g(X(κN (s)))) dW (s), (−A)−1 ˜ε(s)
+
+〉 ∣∣∣∣
+
+> 2
+
+]
+
+(5.31) 
+
+≤ CE
+
+[∫ t
+
+> 0
+
+∥(−A)− 12 (g(φ(s)) − g(X(κN (s)))) ∥2
+
+> L02
+
+∥(−A)− 12 ˜ε(s)∥2ds 
+
+]
+
+= CE
+
+[∫ t
+
+> 0
+
+K4(s)ds 
+
+]
+
+≤ Cτ 2.
+
+In view of (5.26) with υ1 = 1 /2, the Cauchy–Schwarz inequality, and (5.24), we obtain that 
+
+E
+
+[∣∣∣∣∫ t
+
+> 0
+
+K2(s)ds 
+
+∣∣∣∣
+
+> 2
+
+]
+
+≤ 2E
+
+[∣∣∣∣∫ t
+
+> 0
+
+18 ∥(−A) 12 ˜ε(t)∥2 + C∥(−A)− 12 ˜ε(t)∥2ds 
+
+∣∣∣∣
+
+> 2
+
+]
+
+(5.32) 
+
++ CE
+
+[∣∣∣∣∫ t
+
+> 0
+
+∥Φ( s) − X(κN (s)) ∥2ds 
+
+∣∣∣∣
+
+> 2
+
+]
+
+≤ 116 E
+
+[∣∣∣∣∫ t
+
+> 0
+
+∥(−A) 12 ˜ε(t)∥2ds 
+
+∣∣∣∣
+
+> 2
+
+]
+
+31 + CE
+
+[∫ t
+
+> 0
+
+∥(−A)− 12 ˜ε(t)∥4ds 
+
+]
+
++ Cτ 2.
+
+Taking expectations on both sides of (5.30), and then using (5.25) with p = 4 , (5.31) and (5.32), it follows that for any t ∈ [0 , T ],
+
+34 E
+
+[∣∣∣∣∫ t
+
+> 0
+
+∥(−A) 12 ˜ε(s)∥2ds 
+
+∣∣∣∣
+
+> 2
+
+]
+
+≤ CE
+
+∫ t
+
+> 0
+
+∥(−A)− 12 ˜ε(s)∥4ds + Cτ 2,
+
+which, along with Lemma 15, results in (5.29). 
+
+Step 2. It follows from (5.12) and the Cauchy–Schwarz inequality that 
+
+∥˜ε(t)∥2 
+
+> L2(Ω; H)
+
+≤ 3
+
+∥∥∥∥∫ t
+
+> 0
+
+S(t − s)A (F ′(φ(s)) − F ′(Φ( s)) ) ds 
+
+∥∥∥∥
+
+> 2
+> L2(Ω; H)
+
+(5.33) 
+
++ 3 
+
+∥∥∥∥∫ t
+
+> 0
+
+S(t − s)A (F ′(Φ( s)) − F ′(X(κN (s))) ) ds 
+
+∥∥∥∥
+
+> 2
+> L2(Ω; H)
+
++ 3 
+
+∥∥∥∥∫ t
+
+> 0
+
+S(t − s) ( g(φ(s)) − g(X(κN (s))) dW (s)
+
+∥∥∥∥
+
+> 2
+> L2(Ω; H)
+
+=: Q1,t + Q2,t + Q3,t .
+
+By Assumption 1, for any β1 ∈ ( 32 , 2) , there exists a constant C > 0 such that for any 
+
+v, w ∈ ˙H1(O),
+
+∥(−A) 12 (F ′(v) − F ′(w)) ∥2 = ∥∇ (F ′(v) − F ′(w)) ∥2
+
+=
+
+∫
+
+> O
+
+|f ′′ (v(x)) ∇v(x) − f ′′ (w(x)) ∇w(x)|2dx 
+
+≤ 2
+
+∫
+
+> O
+
+|f ′′ (v(x)) − f ′′ (w(x)) |2|∇ v(x)|2dx + 2 
+
+∫
+
+> O
+
+|f ′′ (w(x)) |2|∇ (v − w)( x)|2dx 
+
+≤ C(1 + ∥v∥2 
+
+> L∞
+
++ ∥w∥2 
+
+> L∞
+
+)∥v − w∥2 
+
+> L6
+
+∥∇ v∥2 
+
+> L3
+
++ C(1 + ∥v(x)∥4 
+
+> L∞
+
+)∥∇ (v − w)∥2
+
+≤ C(1 + ∥v∥4 
+
+> Hβ1
+
++ ∥w∥4 
+
+> Hβ1
+
+)∥(−A) 12 (v − w)∥2,
+
+where the last step is due to the Sobolev embeddings H1(O) ↪→ L6(O), Hβ1−1(O) ↪→
+
+H1/2(O) ↪→ L3(O) and Hβ1 (O) ↪→ L∞(O) for any β1 ∈ ( 32 , 2) . Hence we can apply (2.2), Hölder’s inequality, (5.15), Proposition 1, and (5.29) to obtain 
+
+Q1,t ≤ CE
+
+[(∫ t
+
+> 0
+
+∥∥∥S(t − s)( −A) 12 (−A) 12
+
+(F ′(φ(s)) − F ′(Φ( s)) )∥∥∥ ds 
+
+)2]
+
+≤ CE
+
+[(∫ t
+
+> 0
+
+(t − s)− 14 ∥(−A) 12 (F ′(φ(s)) − F ′(Φ( s))) ∥ds 
+
+)2]
+
+≤ CE
+
+[(∫ t
+
+> 0
+
+(t − s)− 14 ∥(−A) 12 ˜ε(s)∥
+
+(
+
+1 + ∥φ(s)∥2 
+
+> Hβ1
+
++ ∥Φ( s)∥2
+
+> Hβ1
+
+)
+
+ds 
+
+)2]
+
+≤ C
+
+(
+
+E
+
+[(∫ t
+
+> 0
+
+∥(−A) 12 ˜ε(s)∥2ds 
+
+)2]) 12
+
+×
+
+(
+
+E
+
+[(∫ t
+
+> 0
+
+(t − s)− 12
+
+(
+
+1 + ∥φ(s)∥4 
+
+> Hβ1
+
++ ∥Φ( s)∥4
+
+> Hβ1
+
+)
+
+ds 
+
+)2]) 12
+
+32 ≤ Cτ. 
+
+The first inequality of (5.13) and the Minkowski inequality give 
+
+Q2,t ≤ CE
+
+[( ∫ t
+
+> 0
+
+(t − s)− 12
+
+∥∥F ′(Φ( s) − F ′(X(κN (s))) ∥∥ ds 
+
+)2]
+
+(5.34) 
+
+≤ CE
+
+[( ∫ t
+
+> 0
+
+(t − s)− 12 I(s)ds 
+
+)2]
+
+≤ C
+
+(∫ t
+
+> 0
+
+(t − s)− 12 ∥I(s)∥L2(Ω) ds 
+
+)2
+
+,
+
+where I(·) is defined in (5.18). Furthermore, plugging (5.25) with p = 2 into (5.34) yields 
+
+Q2,t ≤ Cτ for any t ∈ [0 , T ]. Applying the BDG inequality, the contractivity of S(·), (2.7), (5.24), and (5.29), we arrive at 
+
+Q3,t ≤ 2E
+
+[∫ t
+
+> 0
+
+∥S(t − s) ( g(φ(s)) − g(X(κN (s))) ∥2
+
+> L02
+
+ds 
+
+]
+
+≤ C
+
+∫ t
+
+> 0
+
+E
+
+[
+
+∥˜ε(s)∥2]
+
++ E
+
+[
+
+∥Φ( s) − X(κN (s)) ∥2]
+
+ds 
+
+≤ C
+
+∫ t
+
+> 0
+
+E
+
+[
+
+∥(−A) 12 ˜ε(s)∥2]
+
+ds + C
+
+∫ t
+
+> 0
+
+E
+
+[
+
+∥(−A)− 12 ˜ε(s)∥2]
+
+ds + Cτ ≤ Cτ. 
+
+Finally, plugging the estimates of Qi,t , i = 1 , 2, 3, into (5.33) yields the desired result. □
+
+Finally, We are now ready to complete the proof of Theorem 2. 
+
+Proof of Theorem 2 . Combining Propositions 12 and 16, we can conclude the proof from (5.2). □
+
+# 6 Proof of Theorem 3 
+
+This section is devoted to proving Theorem 3 on the averaged evolution law of the modified SAV energy (2.11). 
+
+Proof of Theorem 3. Recall that by (4.4), for any n ∈ { 0, 1, · · · , N − 1},
+
+En+1 mod − En 
+
+> mod
+
+= 12
+
+[∥∇ Xn+1 ∥2 − ∥∇ Xn∥2] + |rn+1 |2 − | rn|2 (6.1) 
+
+= − 12 ∥(I − S2(τ )) 12 (−A)− 12 ˜μn∥2 + 12 ∥(−A) 12 (g(Xn)δW n) ∥2
+
+− | rn+1 − rn|2 + ⟨− AX n + ˜f n, g (Xn)δW n⟩.
+
+On account of (3.8) and (3.9), it holds that 
+
+⟨− AX n + ˜f n, g (Xn)δW n⟩ =
+
+〈
+
+− AX n + rn
+
+√Ep(Xn) F ′(Xn), g (Xn)δW n〉
+
+(6.2) 
+
++ 12 ⟨F ′′ (Xn)g(Xn)δW n, g (Xn)δW n⟩
+
++ rn+1 − rn
+
+√Ep(Xn) ⟨F ′(Xn), g (Xn)δW n⟩ − rn+1 
+
+4Ep(Xn)3/2 ⟨F ′(Xn), g (Xn)δW n⟩2
+
++ 12
+
+( rn+1 
+
+√Ep(Xn) − 1
+
+)
+
+⟨F ′′ (Xn)g(Xn)δW n, g (Xn)δW n⟩ .
+
+33 Substituting (6.2) into (6.1) yields 
+
+En+1 mod − En 
+
+> mod
+
+= − 12 ∥(I − S2(τ )) 12 (−A)− 12 ˜μn∥2 (6.3) 
+
++
+
+〈
+
+− AX n + rn
+
+√Ep(Xn) F ′(Xn), g (Xn)δW n〉
+
++ 12 ⟨(−A + F ′′ (Xn)) g(Xn)δW n, g (Xn)δW n⟩ + J n,
+
+where the remainder term 
+
+J n = −| rn+1 − rn|2 + rn+1 − rn
+
+√Ep(Xn) ⟨F ′(Xn), g (Xn)δW n⟩ (6.4) 
+
+− rn+1 
+
+4Ep(Xn)3/2 ⟨F ′(Xn), g (Xn)δW n⟩2 ,
+
++ 12
+
+( rn+1 
+
+√Ep(Xn) − 1
+
+)
+
+⟨F ′′ (Xn)g(Xn)δW n, g (Xn)δW n⟩ .
+
+Summing over n = 0 through n = m − 1 on both sides of (6.3) and then taking expectations on both sides of the resulting equation, we obtain the required equation (3) with Rτm = ∑m−1 
+
+> n=0
+
+E[J n].It remains to prove that lim τ →∞ Rτm = 0 , which needs to be estimate carefully. At first glance, each of the first three terms on the right-hand side of (6.4) appears to have only strong convergence order 1, which does not vanish as τ → 0 after summing over n. Hence, a more refined decomposition of the remainder term J n is necessary. In fact, the first three terms on the right-hand side of (6.4) contain mutually canceling contributions. To illustrate this, we notice that −| rn+1 − rn|2 = Jn 
+
+> 1
+
++ Jn 
+
+> 2
+
++ Jn 
+
+> 3
+
+, where 
+
+Jn 
+
+> 1
+
+:= − 14Ep(Xn) |⟨ F ′(Xn), g (Xn)δW n⟩| 2 ,Jn 
+
+> 2
+
+:= 14Ep(Xn)
+
+(
+
+|⟨ F ′(Xn), g (Xn)δW n⟩| 2 − ∣∣〈F ′(Xn), X n+1 − Xn〉∣ ∣2)
+
+,Jn 
+
+> 3
+
+:= −| rn+1 − rn|2 + 14Ep(Xn)
+
+∣∣〈F ′(Xn), X n+1 − Xn〉∣ ∣2 . (6.5) In addition, using (1.6) leads to 
+
+rn+1 − rn
+
+√Ep(Xn) ⟨F ′(Xn), g (Xn) δW n⟩ = 12Ep(Xn) ⟨F ′(Xn), g (Xn) δW n⟩2
+
++ 12Ep(Xn) ⟨F ′(Xn), g (Xn) δW n⟩ 〈F ′(Xn), X n+1 − Xn − g(Xn)δW n〉
+
+− 18Ep(Xn)2 ⟨F ′(Xn), g (Xn) δW n⟩2 〈F ′(Xn), X n+1 − Xn〉
+
+34 + 14Ep(Xn) ⟨F ′(Xn), g (Xn) δW n⟩ 〈F ′′ (Xn)( Xn+1 − Xn), g (Xn)δW n〉
+
+=: Jn 
+
+> 4
+
++ Jn 
+
+> 5
+
++ Jn 
+
+> 6
+
++ Jn 
+
+> 7
+
+,
+
+and 
+
+− rn+1 
+
+4Ep(Xn)3/2 ⟨F ′(Xn), g (Xn)δW n⟩2 = − 14Ep(Xn) ⟨F ′(Xn), g (Xn)δW n⟩2
+
+− 14
+
+( rn+1 
+
+√Ep(Xn) − 1
+
+) 1
+
+Ep(Xn) ⟨F ′(Xn), g (Xn)δW n⟩2 =: Jn 
+
+> 8
+
++ Jn 
+
+> 9
+
+.
+
+Since Jn 
+
+> 1
+
++ Jn 
+
+> 4
+
++ Jn 
+
+> 8
+
+= 0 , one has 
+
+J n = ∑
+
+> i∈I
+
+Jni (6.6) where I := {2, 3, 5, 6, 7, 9, 10 }, and 
+
+Jn 
+
+> 10
+
+:= 12
+
+( rn+1 
+
+√Ep(Xn) − 1
+
+)
+
+⟨F ′′ (Xn)g(Xn)δW n, g (Xn)δW n⟩
+
+is the last term on the right hand side of (6.4). Using Hölder’s inequality, (4.22), (A.7), and Lemma 8, we deduce that 
+
+E[|Jn 
+
+> 2
+
+|] ≤ C (∥Xn+1 − Xn∥L4(Ω; H) + ∥g(Xn)δW n∥L4(Ω; H)
+
+) (6.7) 
+
+× ∥ Xn+1 − Xn − g(Xn)δW n∥L2(Ω; H)
+
+≤ Cτ 12 ∥Xn+1 − Xn − g(Xn)δW n∥L2(Ω; H)
+
+for any n ∈ { 0, 1, · · · , N − 1}. Similarly, we also have 
+
+E[|Jn 
+
+> 5
+
+|] ≤ Cτ 12 ∥Xn+1 − Xn − g(Xn)δW n∥L2(Ω; H). (6.8) Referring to (1.4), one infers that 
+
+Xn+1 − Xn − g(Xn)δW n = ( S(τ ) − I)Xn + ( I − S(τ )) A−1 ˜f n
+
++ ( S(τ ) − I)g(Xn)δW n.
+
+Recall that by (4.33), for any α ∈ (0 , 12 ),
+
+∥(S(τ ) − I)Xn∥L2(Ω; H) ≤ C(α)(1 + t− 12 αn )τ 12 (1+ α), n = 1 , 2, · · · , N − 1 (6.9) 35 As for n = 0 , it follows from (2.2) and φ0 ∈ ˙H2(O) that ∥(S(τ )−I)X0∥L2(Ω; H) ≤ Cτ 12 .
+
+Due to (2.2) and (4.32), 
+
+∥(I − S(τ )) A−1 ˜f n∥L2(Ω; H) = ∥(I − S(τ ))( −A)− 32 (−A) 12 ˜f n∥L2(Ω; H) ≤ Cτ 34 . (6.10) The BDG inequality and (2.8), together with (2.2) and Corollary 5, imply that 
+
+∥(S(τ ) − I)g(Xn)δW n∥L2(Ω; H) = ∥(S(τ ) − I)( −A)− 12 (−A) 12 g(Xn)δW n∥L2(Ω; H)
+
+≤ Cτ 34 ∥(−A) 12 g(Xn)∥L2(Ω; L02) ≤ Cτ 34 . (6.11) Combining (6.9), (6.10), and (6.11), it follows that for any α ∈ (0 , 12 ),
+
+> m−1
+
+∑
+
+> n=0
+
+∥Xn+1 − Xn − g(Xn)δW n∥L2(Ω; H)
+
+≤ Cτ − 14 + Cτ 12 + C(α)
+
+> m−1
+
+∑
+
+> n=1
+
+(1 + t− 12 αn )τ 12 (1+ α) ≤ C(α)τ − 12 + 12 α.
+
+Hence, it follows from (6.7) and (6.8) that for any α ∈ (0 , 12 ),
+
+> m−1
+
+∑
+
+> n=0
+
+E [|Jn 
+
+> 2
+
+| + |Jn 
+
+> 5
+
+|] ≤ Cτ 12
+
+> m−1
+
+∑
+
+> n=0
+
+∥Xn+1 − Xn − g(Xn)δW n∥L2(Ω; H) ≤ C(α)τ 12 α.
+
+For the other terms, we claim that for any i ∈ { 3, 6, 7, 9, 10 } (see Appendix A.5 for its proof), 
+
+E[|Jni |] ≤ Cτ 32 , n ∈ { 0, 1, · · · , N − 1}. (6.12) Finally, we can conclude from (6.6) that α ∈ (0 , 12 ),
+
+|R τm| = |
+
+> m−1
+
+∑
+
+> n=0
+
+E[J n]| ≤ ∑
+
+> i∈I
+> m−1
+
+∑
+
+> n=0
+
+E [|Jni |] ≤ C(α)τ 12 α.
+
+The proof is completed. □
+
+# 7 Numerical experiments 
+
+In this section, we present a series of numerical experiments to illustrate the perfor-mance of the exponential Euler SSAV scheme (1.4). In the implementation, we take 
+
+O = (0 , 1) 2 to be the unit square and approximate the driving process W by its finite-rank Karhunen–Loève truncation W J , namely, 
+
+W J (t, x ) = 
+
+> J
+
+∑
+
+> j1=1
+> J
+
+∑
+
+> j2=1
+
+√qj1,j 2 ej1,j 2 (x) βj1,j 2 (t), x = ( x1, x 2) ∈ O 
+
+36 with J = 4 . Here, {βj1,j 2 (t)} are independent real-valued Brownian motions, the spatial modes are 
+
+ej1,j 2 (x) = 2 sin (j1πx 1
+
+) sin (j2πx 2
+
+),
+
+and qj1,j 2 = ( j21 + j22 )−1. Note that for the regular domain (0 , 1) d, the eigenvalues and eigenfunctions of the Dirichlet Laplacian are explicitly known. This enables efficient spatial discretization using the spectral Galerkin method. In the following, spatial discretization is performed in the finite-dimensional subspace (see, e.g., [43]) 
+
+HM := span {ej1,j 2 : 1 ≤ j1, j 2 ≤ M }.
+
+For more general, possibly irregular, spatial domains, the spectral Galerkin method becomes less practical. In such cases, alternative spatial discretization methods, such as the finite difference or finite element method, may be employed. Without otherwise specified, we set Θ = 1 in (3.1) and the spatial discretization parameter M = 128 .The expectation of a random variable Y is always approximated by the Monte Carlo ensemble mean, i.e., E[Y ] ≈ 1
+
+> P
+
+∑Pi=1 Y (ωi), where {Y (ωi)}Pi=1 are P samples of Y .
+
+## 7.1 Averaged energy evolution 
+
+In this subsection, we verify the averaged energy evolution law of the proposed scheme (1.4), by studying the following stochastic Cahn–Hilliard equation 
+
+dφ (t) = −A2φ(t) + A (φ(t)3 − φ(t)) dt + 2 .5(1 + φ(t)2)− 12 dW (t),φ0(x) = 0 .6 sin( πx 1) sin( πx 2) + 0 .4 sin(2 πx 1) sin(3 πx 2). (7.1) in (0 , 1) 2 ×(0 , T ]. For equation (7.1), Figure 1 compares the averaged energy evolution produced by the exponential Euler SSAV scheme (1.4) with that of the standard SAV scheme (i.e., (1.4) with ˜f n replaced by ˜f n 
+
+> d
+
+in (3.5)). The expectation is approximated using P = 1000 Monte Carlo samples, and the time step size is chosen as τ = 5 ×10 −4.Since the exact solution of the stochastic Cahn–Hilliard equation (1.1) is not available, the reference averaged energy is computed using the fully implicit Euler method in time (see, e.g., [22]) with the reference step size τ = 5 × 10 −5.As shown in Figure 1, the averaged modified SAV energy associated with the proposed scheme (1.4) remains in close agreement with the reference averaged energy over the entire time interval, in consistent with Theorem 3. In contrast, the averaged energy produced by the standard SAV scheme exhibits a persistent upward drift and appears to converge to a different energy level. From the perspective of the energy evolution law, Figure 1 indicates that the standard SAV method is no longer suitable for the stochastic Cahn–Hilliard equation, and therefore it is necessary to consider its stochastic modifications, such as the exponential Euler SSAV scheme (1.4); see also Remark 1. 37 0 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.1 
+
+t
+
+11.5 22.5 33.5 44.5 5
+
+> Averaged Energy
+
+Implicit Euler Scheme 
+
+Standard SAV scheme 
+
+Exponential Euler SSAV scheme Fig. 1 Comparison of averaged energies of the exponential Euler SSAV scheme and standard SAV scheme for equation (7.1). 0 0.2 0.4 0.6 0.8 1
+
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+t = 0.100 0 0.2 0.4 0.6 0.8 1
+
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+t = 0.300 0 0.2 0.4 0.6 0.8 1
+
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+t = 0.500 0 0.2 0.4 0.6 0.8 1
+
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+t = 1.000 
+
+Fig. 2 Individual snapshots of the zero–level set of the solution at several time points for equation (7.2) with γ = 1 .
+
+38 7.2 Sharp-interface dynamics 
+
+In this subsection, we consider the stochastic Cahn–Hilliard equation near the sharp interface limit 
+
+dφ (t) = A
+
+(
+
+−Aφ (t) + 1
+
+ (φ(t)3 − φ(t)) 
+
+)
+
+dt + γ 10 
+
+√1 + φ(t)2 dW (t),φ0(x) = tanh 
+
+( R − 0.25 
+
+√2 
+
+)
+
+, with R = √(x1 − 0.5) 2 + ( x2 − 0.5) 2
+
+(7.2) in (0 , 1) 2 × (0 , T ]. Introducing the interfacial width  and the noise-scaling exponent 
+
+γ in (7.2) is motivated by the asymptotic study in [44] and the numerical analysis in [45]. 
+
+7.2.1 Evolution of interface 
+
+In this part, we investigate the influence of a small interfacial parameter  > 0 and the noise intensity on the evolution of the interface in the stochastic Cahn–Hilliard equation. In the numerical test, we choose different values of the interfacial width parameter  = 2 −i/64 , i = 5 , 6, 7, 8, and run the simulation up to the final time 
+
+T = 1 . We first investigate the effect of the noise intensity on the geometric evolution in the sharp-interface limit. Figure 2 (resp. Figure 4) plots an individual realization of the zero-level set of the numerical solution for equation (7.2) at different times 
+
+t = 0 .1, 0.3, 0.5, 1 with γ = 1 (resp. γ = 0 ). For γ = 1 , the intensity of the space–time noise decreases as  decreases, and the resulting evolution of the zero-level set (Figure 2) is almost indistinguishable from that of the deterministic Cahn–Hilliard equation (Figure 3) under the same ini-tial configuration. In addition, the interface remains nearly stationary, and the small random perturbations only cause mild fluctuations without altering the overall mor-phology. This numerical observation is consistent with the theoretical prediction that the stochastic Cahn–Hilliard equation dynamics (7.2) converges to the deterministic problem as  → 0 (see [44]). For γ = 0 , the noise amplitude remains of order O(1) , and the zero-level set in Figure 4 exhibits visible random oscillations around its determin-istic profile. The persistent randomness observed in the zero-level set suggests that the limiting interface dynamics retain stochastic characteristics, consistent with the conjectured stochastic sharp-interface limit (see [44]). Furthermore, we present in Figure 5 the averaged zero-level set of the numerical solution for equation (7.2) with γ = 0 over P = 100 sample realizations. Although the averaged interface does not fully coincide with the deterministic profile, one can still observe the expected shrinking behavior as the parameter  tends to zero. This qualitative difference between the cases γ = 1 and γ = 0 highlights the distinct asymptotic regimes induced by different noise scalings in the stochastic Cahn–Hilliard equation near the sharp interface limit. 39 0 0.2 0.4 0.6 0.8 1                   
+
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> t = 0.100 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> t = 0.300 00.2 0.4 0.6 0.8 1
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> t = 0.500 00.2 0.4 0.6 0.8 1
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> t = 1.000
+
+Fig. 3 Snapshots of the zero–level set of the solution at several time points for deterministic Cahn– Hilliard equation. 
+
+7.2.2 Discretization error and convergence order 
+
+Continuing with equation (7.2) for γ = 0 , we next test the convergence order of the exponential Euler SSAV scheme (1.4). Moreover, we also numerically investigate the dependence of the mean square error on the interfacial parameter . The simulations are performed up to the final time T = 0 .1, and the Monte–Carlo average is taken over P = 100 samples. We first fix the spatial discretization parameter at M = 128 and use the numerical solution computed with the finest time step size τref = T / 3200 as the ref-erence solution. A sequence of coarser time step sizes τ = 2 × 10 −3, 1 × 10 −3, 5 ×
+
+10 −4, 2.5 × 10 −4, 1.25 × 10 −4 is tested under different interfacial parameters  =0.16 , 0.08 , 0.04 , 0.02 , 0.01 , 0.005 . For each pair (τ,  ), the mean-square error at the final time T is computed relative to the reference solution. The results, reported in Table 1, suggest that the temporal discretization error depends polynomially on 1/ , with no indication of exponential growth. Moreover, Table 1 shows that, for each fixed  in the tested range, the temporal strong error exhibits an empirical rate close to O(τ 1/2),which confirms the theoretical result stated in Theorem 2. Next, we fix the time step at τ = T / 800 and take the numerical solution cor-responding to the finest spatial resolution Mref = 256 as the reference solution. We consider spatial resolutions M = 16 , 32 , 64 , 128 for various interfacial parameters 40 0 0.2 0.4 0.6 0.8 1               
+
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> t = 0.100 00.2 0.4 0.6 0.8 1
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> t = 0.300 00.2 0.4 0.6 0.8 1
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> t = 0.500 00.2 0.4 0.6 0.8 1
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> t = 1.000
+
+Fig. 4 Individual snapshots of the zero–level set of the solution at several time points for equation (7.2) with γ = 0 .
+
+ = 0 .16 , 0.08 , 0.04 , 0.02 , 0.01 . For each pair (M,  ), the mean-square error at the final time T is presented in Table 2. This experiment similarly indicates that the spatial discretization error depends polynomially on 1/ .
+
+# 8 Concluding remarks 
+
+In this work, we proposed and analyzed a semi-implicit numerical scheme for the stochastic Cahn–Hilliard equation driven by multiplicative noise, combining the SSAV approach with the exponential Euler method. The resulting exponential Euler SSAV scheme is shown to achieve the optimal strong convergence rate of order 12 in the case of trace-class noise. Furthermore, we proved that the scheme asymptotically preserves the averaged energy evolution law of the underlying continuous system. We also con-ducted a series of numerical experiments to investigate the effects of the interfacial parameter and noise intensity on interface evolution, as well as the dependence of discretization error on the interfacial parameter. A theoretical investigation of these numerical phenomena will be carried out in future work. Meanwhile, we also plan to extend the proposed framework to more general noise structures and more complex phase-field models, as well as to develop higher-order structure-preserving numerical schemes. 41 0 0.2 0.4 0.6 0.8 1               
+
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> t = 0.100 00.2 0.4 0.6 0.8 1
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> t = 0.300 00.2 0.4 0.6 0.8 1
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> t = 0.500 00.2 0.4 0.6 0.8 1
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> t = 1.000
+
+Fig. 5 Averaged snapshots of the zero–level set of the solution at several time points for equation (7.2) with γ = 0 .
+
+# A Proof of auxiliary results 
+
+## A.1 Proof of Corollary 5 
+
+Starting from (4.6), we first take the supremum over m ∈ { 0, 1, · · · , N − 1} before evaluating the expectations, which gives 
+
+E
+
+[
+
+sup 
+
+0≤m≤N −1
+
+∥∥∇Xm+1 ∥∥2p
+
+]
+
++ E
+
+[
+
+sup 
+
+0≤m≤N −1
+
+|rm+1 |2p
+
+]
+
++ E
+
+[( N −1∑
+
+n=0 
+
+|rn+1 − rn|2
+
+)p]
+
++ E
+
+[( N −1∑
+
+n=0 
+
+∥(I − S2(τ )) 12 (−A)− 12 ˜μn∥2
+
+)p]
+
+≤ C + CE
+
+[∥∥∇φ0∥∥2p]
+
++ CE [|r0|2p] + Cτ 
+
+N −1∑
+
+n=0 
+
+E [|rn|2p] +
+
+5∑
+
+i=1 
+
+E
+
+[
+
+sup 
+
+0≤m≤N −1
+
+Rmi
+
+]
+
+.
+
+(A.1) Since the sequences {Rm
+
+1 }N −1
+
+m=0 , · · · , {Rm
+
+4 }N −1
+
+m=0 are non-decreasing in m, they reach their maximums at m = N − 1, which enables us to utilize the estimates derived 42 Table 1 Temporal mean-square errors and orders for different time step sizes τ
+
+and interfacial parameters ϵ.
+
+τ ϵ = 0 .16 ϵ = 0 .08 ϵ = 0 .04 
+
+Error Order Error Order Error Order 2e-3 1.1860 – 1.4749 – 1.9236 –1e-3 0.9356 0.3427 1.1546 0.3520 1.4467 0.4118 5e-4 0.7063 0.4053 0.9119 0.3400 1.1079 0.3847 2.5e-4 0.4996 0.4989 0.6812 0.4210 0.8287 0.4183 1.25e-4 0.3151 0.6657 0.4686 0.5397 0.5908 0.4871 
+
+τ ϵ = 0 .02 ϵ = 0 .01 ϵ = 0 .005 
+
+Error Order Error Order Error Order 2e-3 2.1091 – 2.3045 – 2.7373 –1e-3 1.5721 0.4249 1.7443 0.4022 2.0518 0.4158 5e-4 1.1574 0.4420 1.2580 0.4716 1.4500 0.5012 2.5e-4 0.8187 0.4990 0.9135 0.4619 1.0188 0.5099 1.25e-4 0.5830 0.4895 0.6641 0.4600 0.7213 0.4970 
+
+Table 2 Spatial strong L2-errors for different spatial parameter M and interface parameters ϵ.
+
+M
+
+Error ϵ 0.16 0.08 0.04 0.02 0.01 
+
+16 0.1685 0.3423 0.5660 0.7264 0.7496 32 0.1072 0.1520 0.2319 0.3543 0.5167 64 0.0583 0.0959 0.1327 0.1546 0.2441 128 0.0245 0.0361 0.0557 0.0728 0.1100 
+
+previously for RN −11 , · · · , R N −14 and obtain 
+
+E
+
+[
+
+sup  
+
+> 0≤m≤N−1
+
+Rmi
+
+]
+
+= E [RN −1
+
+> i
+
+] ≤ C, i = 1 , 2, 3, 4.
+
+By Doob’s martingale inequality, (4.14), (4.15) together with (4.1), we have 
+
+E
+
+[
+
+sup  
+
+> 0≤m≤N−1
+
+Rm
+
+> 5
+
+]
+
+= CE
+
+[
+
+sup  
+
+> 0≤m≤N−1
+
+∣∣∣∣
+
+> m
+
+∑
+
+> n=0
+
+∫ tn+1 
+
+> tn
+
+〈
+
+− AX n + rn
+
+√Ep(Xn) F ′(Xn), g (Xn)dW (s)
+
+〉∣ ∣∣∣
+
+> p
+
+]
+
+≤ CE
+
+[∣∣∣∣ 
+
+> N−1
+
+∑
+
+> n=0
+
+∫ tn+1 
+
+> tn
+> ∞
+
+∑
+
+> k=1
+
+〈
+
+− AX n + rn
+
+√Ep(Xn) F ′(Xn), g (Xn)Q 12 ek
+
+〉2
+
+ds 
+
+∣∣∣∣
+
+> p
+> 2
+
+]
+
+≤ C(RN −151 + RN −152 ) ≤ C + Cτ  
+
+> N−1
+
+∑
+
+> n=0
+
+E
+
+[
+
+|rn|2p]
+
++ Cτ  
+
+> N−1
+
+∑
+
+> n=0
+
+E [∥∇ Xn∥2p] ≤ C. 
+
+43 Finally, taking (4.1), φ0 ∈ ˙H1(O), and (3.2) into account, we conclude the proof of (4.16) from (A.1). □
+
+## A.2 Proof of Lemma 6 
+
+In view of Hölder’s inequality, it suffices to consider p > 1 sufficiently large. For 
+
+β ∈ (0 , 2) , by the mild formulation of (4.18), the contractivity of S(·), and Hölder’s inequality, we obtain 
+
+E
+
+[
+
+sup  
+
+> t∈[0 ,T ]
+
+∥(−A) β 
+
+> 2
+
+Z(t)∥p
+
+]
+
+≤ C∥(−A) β 
+
+> 2
+
+φ0∥p + R1,β + R2,β ,
+
+with 
+
+R1,β := E
+
+[
+
+sup  
+
+> t∈[0 ,T ]
+
+∥∥∥∫ t
+
+> 0
+
+S(t − s)( −A) β  
+
+> 2+1
+
+˜F (s)ds 
+
+∥∥∥p]
+
+,R2,β := E
+
+[
+
+sup  
+
+> t∈[0 ,T ]
+
+∥∥∥∫ t
+
+> 0
+
+(−A) β 
+
+> 2
+
+S(t − s) ˜G(s)dW (s)
+
+∥∥∥p]
+
+.
+
+By the Minkowski inequality, (2.1), and Hölder’s inequality, we choose q1 = 12 (1 +  
+
+> 4
+> β+2
+
+) > 1 with ( β 
+
+> 4
+
++ 12 )q1 ∈ (0 , 1) such that for any p ≥ q1 
+
+> q1−1
+
+,
+
+R1,β ≤ CE
+
+[
+
+sup  
+
+> t∈[0 ,T ]
+
+( (∫ t
+
+> 0
+
+(t − s)(− β   
+
+> 4−12
+
+)q1 ds 
+
+) 1
+
+> q1
+
+(∫ t
+
+> 0
+
+∥ ˜F (s)∥ q1 
+
+> q1−1
+
+ds 
+
+) q1−1
+
+> q1
+
+)p]
+
+≤ C E
+
+[( ∫ T
+
+> 0
+
+∥ ˜F (s)∥ q1 
+
+> q1−1
+
+ds 
+
+) (q1−1) pq1
+
+]
+
+≤ CE
+
+∫ T
+
+> 0
+
+∥ ˜F (s)∥pds. (A.2) The factorization formula [46, Proposition 5.9 & Theorem 5.10] implies that for p > 1
+
+and ρ > 1/p ,
+
+R2,β = CE
+
+[
+
+sup  
+
+> t∈[0 ,T ]
+
+∥∥∥∥∫ t
+
+> 0
+
+(−A) β 
+
+> 2
+
+S(t − s) ˜G(s)dW (s)
+
+∥∥∥∥
+
+> p
+
+]
+
+≤ C(T, p )E
+
+∫ T
+
+> 0
+
+∥ ˜Y (u)∥pdu, 
+
+(A.3) where ˜Y (u) := ∫ u 
+
+> 0
+
+(u − s)−ϱS(u − s)( −A) β 
+
+> 2
+
+˜G(s)dW (s) for any u ∈ (0 , T ). Next, using the BDG inequality, Minkowski inequality, and (2.1), and by choosing sufficiently small ρ ∈ (0 , 1) and q2 > 1 satisfying 2( β 
+
+> 4
+
++ ρ)q2 ∈ (0 , 1) , one has that for any 
+
+p > max { 2q2 
+
+> q2−1
+
+, 1 
+
+> ρ
+
+} and u ∈ (0 , T ),
+
+E
+
+[
+
+∥ ˜Y (u)∥p]
+
+≤ CE
+
+[( ∫ u
+
+> 0
+
+(u − s)−2( β 
+
+> 4+ϱ)
+
+∥ ˜G(s)∥2
+
+> L02
+
+ds 
+
+) p
+
+> 2
+
+]
+
+44 ≤ CE
+
+[( (∫ u
+
+> 0
+
+(u − s)−2( β  
+
+> 4+ϱ)q2
+
+ds 
+
+) 1
+
+> q2
+
+(∫ u
+
+> 0
+
+∥ ˜G(s)∥2 q2
+
+> q2−1
+> L02
+
+ds 
+
+) q2−1
+
+> q2
+
+) p
+
+> 2
+
+]
+
+≤ CE
+
+∫ T
+
+> 0
+
+∥ ˜G(s)∥p
+
+> L02
+
+ds. (A.4) Gathering the inequalities (A.4) and (A.3) together gives the estimate of R2,β . Then substituting the estimates of R1,β and R2,β into (A.2) completes the proof of Lemma 6. □
+
+## A.3 Proof of (4.24) 
+
+From the definition of χn in (3.9) and utilizing Young’s inequality, we have ∥χn∥p ≤
+
+Cτ p 
+
+> 2
+
+|rn+1 |2p + Cτ − p 
+
+> 2
+
+(Jn 
+
+> 1
+
++ Jn 
+
+> 2
+
+), where 
+
+Jn 
+
+> 1
+
+:= 1
+
+Ep(Xn)3p ∥F ′(Xn)∥2p |⟨ F ′(Xn), g (Xn)δW n⟩| 2p ,Jn 
+
+> 2
+
+:= 1
+
+Ep(Xn)p ∥F ′′ (Xn)g(Xn)δW n∥2p.
+
+Therefore, applying Hölder’s inequality and using (4.11) as well as (4.22), we obtain that for any p ≥ 1,
+
+E[Jn 
+
+> 1
+
+] ≤ C(E[∥F ′(Xn)∥4p]) 12
+
+(
+
+E
+
+[ 1
+
+Ep(Xn)3p |⟨ F ′(Xn), g (Xn)δW n⟩| 4p
+
+]) 12
+
+≤ Cτ p.
+
+As for Jn 
+
+> 2
+
+, it follows from the BDG inequality, (4.10), and (4.7) that for any p ≥ 1,
+
+E [Jn 
+
+> 2
+
+] ≤ CE
+
+[ 1
+
+Ep(Xn)p
+
+(
+
+τ
+
+> ∞
+
+∑
+
+> k=1
+
+∥F ′′ (Xn)g(Xn)Q 12 ek∥2
+
+)p]
+
+≤ Cτ pE
+
+[ ∥F ′′ (Xn)∥2p
+
+Ep(Xn)p
+
+( ∞∑
+
+> k=1
+
+∥g(Xn)Q 12 ek∥2
+
+> L∞
+
+)p]
+
+≤ Cτ p.
+
+Furthermore, taking Corollary 5 into account, we conclude that for any p ≥ 1,
+
+E [∥χn∥p] ≤ Cτ p 
+
+> 2
+
+E [|rn+1 |2p] + Cτ − p 
+
+> 2
+
+(E [Jn 
+
+> 1
+
+] + E [Jn 
+
+> 2
+
+]) ≤ Cτ p 
+
+> 2
+
+.
+
+□
+
+## A.4 Proof of (4.32) 
+
+Under Assumptions 1 and 2, the Dirichlet boundary conditions for the numerical solution and the integration by parts formula ensure ∥∇ ˜f n∥ = ∥(−A) 12 ˜f n∥. Invoking 45 Assumption 1, the chain rule, the integration by parts formula, Lemma 5, and (4.26), for any q ≥ 1,
+
+E
+
+[
+
+∥(−A) 12 F ′(Xn)∥2q ]
+
+= E [∥∇ F ′(Xn)∥2q ] = E
+
+[
+
+∥F ′′ (Xn)∇Xn∥2q ]
+
+(A.5) 
+
+≤ CE
+
+[
+
+∥F ′′ (Xn)∥4qL∞
+
+]
+
++ CE [∥∇ Xn∥4q ]
+
+≤ C + CE
+
+[
+
+∥Xn∥8qL∞
+
+]
+
++ CE [∥∇ Xn∥4q ] ≤ C. 
+
+Hence, by (3.8), Corollary 5, and Hölder’s inequality, for any q ≥ 1,
+
+E[∥(−A) 12 ˜f n∥2q ] ≤ C(E[|rn+1 |4q ]) 12 (E[∥(−A) 12 F ′(Xn)∥4q ]) 12 + CE[∥(−A) 12 χn∥2q ]
+
+≤ C + CE[∥(−A) 12 χn∥2q ]. (A.6) By the definition of χn in (3.9), we have 
+
+E[∥(−A) 12 χn∥2q ] ≤ CE
+
+[∥∥∥ 14Ep(Xn)3/2 ⟨F ′(Xn), g (Xn)δW n⟩(−A) 12 F ′(Xn)
+
+∥∥∥2q ]
+
++ CE
+
+[∥∥∥ 12√Ep(Xn) (−A) 12 (F ′′ (Xn)g(Xn)δW n)
+
+∥∥∥2q ]
+
+=: I nq + II nq .
+
+Estimate of Inq . By the BDG inequality and (4.7), it holds that for any q1 ≥ 1,
+
+E[∥g(Xn)δW n∥2q1 ] ≤ CE[( τ ∥g(Xn)∥2
+
+> L02
+
+)q1 ] ≤ Cτ q1 . (A.7) Then applying Hölder inequality, (A.7), (A.5), and (4.22) gives that Inq ≤ C(q)τ q for any q ≥ 1.
+
+Estimate of II nq . The BDG inequality results in 
+
+II nq ≤ CE
+
+[∥∥∥(−A) 12
+
+∫ tn+1 
+
+> tn
+
+F ′′ (Xn)g(Xn)dW (s)
+
+∥∥∥2q ]
+
+≤ CE
+
+[( 
+
+τ
+
+> ∞
+
+∑
+
+> k=1
+
+∥(−A) 12 (F ′′ (Xn)g(Xn)Q 12 ek)∥2
+
+)q ]
+
+.
+
+Integrating by parts and by the chain rule, we obtain 
+
+E
+
+[( ∞∑
+
+> k=1
+
+∥(−A) 12 (F ′′ (Xn)g(Xn)Q 12 ek)∥2
+
+)q ]
+
+= E
+
+[( ∞∑
+
+> k=1
+
+∥∇ (F ′′ (Xn)g(Xn)Q 12 ek)∥2
+
+)q ]
+
+46 ≤ CE
+
+[( ∞∑
+
+> k=1
+
+∥F ′′′ (Xn)∇Xng(Xn)Q 12 ek∥2
+
+)q ]
+
++ CE
+
+[( ∞∑
+
+> k=1
+
+∥F ′′ (Xn)∇(g(Xn)Q 12 ek)∥2
+
+)q ]
+
+.
+
+It follows from Young’s inequality, (4.7), (4.26), and Corollary 5 that 
+
+E
+
+[( ∞∑
+
+> k=1
+
+∥F ′′′ (Xn)∇Xng(Xn)Q 12 ek∥2
+
+)q ]
+
+≤ CE
+
+[
+
+∥F ′′′ (Xn)∇Xn∥4q ]
+
++ CE
+
+[( ∞∑
+
+> k=1
+
+∥g(Xn)Q 12 ek∥2
+
+> L∞
+
+)2q ]
+
+≤ C
+
+(
+
+1 + E
+
+[
+
+∥Xn∥8qL∞
+
+]
+
++ E [∥∇ Xn∥8q ])
+
+≤ C. 
+
+Similarly, by Young’s inequality, (2.8), Lemma 5, and (4.26), we also have 
+
+E
+
+[( ∞∑
+
+> k=1
+
+∥F ′′ (Xn)∇(g(Xn)Q 12 ek)∥2
+
+)q ]
+
+≤ CE
+
+[
+
+∥F ′′ (Xn)∥4qL∞
+
+]
+
++ CE
+
+[( ∞∑
+
+> k=1
+
+∥∇ (g(Xn)Q 12 ek)∥2
+
+)2q ]
+
+≤ C
+
+(
+
+1 + E
+
+[
+
+∥Xn∥8qL∞
+
+]
+
++ E [∥∇ Xn∥4q ])
+
+≤ C. 
+
+Consequently, we can infer that II nq ≤ C(q)τ q for any q ≥ 1.Combining the estimates of Inq and II nq , it follows that for any q ≥ 1,
+
+E[∥(−A) 12 χn∥2q ] ≤ C(q)τ q . (A.8) Finally, inserting (A.8) into (A.6) results in (4.32). □
+
+## A.5 Proof of (6.12) 
+
+We begin with the estimate of Jn 
+
+> 3
+
+. By (6.5), 
+
+E[|Jn 
+
+> 3
+
+|] = E
+
+[∣∣∣ − | rn+1 − rn|2 + 14Ep(Xn)
+
+∣∣〈F ′(Xn), X n+1 − Xn〉∣ ∣2 ∣∣∣]
+
+.
+
+Using Hölder’s inequality, (4.22) and Lemma 8, we have 
+
+E[|⟨ F ′(Xn), X n+1 − Xn⟩| 2] ≤ CE[∥F ′(Xn)∥2∥Xn+1 − Xn∥2] ≤ Cτ. (A.9) 47 Applying Hölder’s inequality, Assumption 1, the Sobolev embedding L∞(O) ↪→
+
+L6(O), Lemma 8, (4.26), and (A.7), we obtain that for any q ≥ 1,
+
+E
+
+[∣∣⟨F ′(Xn), g (Xn)δW n⟩⟨ F ′(Xn), X n+1 − Xn⟩∣∣2q ]
+
+(A.10) 
+
+≤ CE [∥F ′(Xn)∥4q ∥g(Xn)δW n∥2q ∥Xn+1 − Xn∥2q ]
+
+≤ C
+
+(
+
+E
+
+[
+
+(1 + ∥Xn∥24 qL∞ )∥Xn+1 − Xn∥4q ]) 12 (E [∥g(Xn)δW n∥4q ]) 12
+
+≤ Cτ 2q .
+
+In the similar manner, it can be verified that for any q ≥ 1,
+
+E
+
+[∣∣⟨F ′′ (Xn)( Xn+1 − Xn), g (Xn)δW n⟩∣∣2q ]
+
+≤ Cτ 2q . (A.11) As a result of (1.6), (A.9), (A.10), and (A.11), it holds that for any q ≥ 1,
+
+E [|rn+1 − rn|2q ] + E
+
+[∣∣∣∣rn+1 − rn + ⟨F ′(Xn), X n+1 − Xn⟩
+
+2√Ep(Xn)
+
+∣∣∣∣ 
+
+> 2q
+
+]
+
+≤ Cτ q , (A.12) 
+
+E
+
+[∣∣∣∣rn+1 − rn − ⟨F ′(Xn), X n+1 − Xn⟩
+
+2√Ep(Xn)
+
+∣∣∣∣ 
+
+> 2q
+
+]
+
+≤ Cτ 2q . (A.13) Applying Hölder’s inequality and combining (A.12) and (A.13), we obtain 
+
+E[|Jn 
+
+> 3
+
+|] = E
+
+[∣∣∣ − | rn+1 − rn|2 + 14Ep(Xn)
+
+∣∣〈F ′(Xn), X n+1 − Xn〉∣ ∣2 ∣∣∣]
+
+≤ Cτ 32 .
+
+To estimate Jn 
+
+> 6
+
+, Jn 
+
+> 7
+
+, Jn 
+
+> 9
+
+, and Jn
+
+> 10
+
+, we notice that by (A.12) and Lemma 11, the factor rn+1 
+
+√Ep(Xn) − 1 is also of magnitude O(τ 12 ) in Lq (Ω; H) for any q ≥ 1. That is, 
+
+∥∥∥ rn+1 
+
+√Ep(Xn) − 1
+
+∥∥∥Lq (Ω) 
+
+≤ C∥rn+1 − rn∥Lq (Ω) + C∥rn −
+
+√
+
+Ep(Xn)∥Lq (Ω) ≤ C(q)τ 12
+
+for any q ≥ 1. On the other hand, due to (A.7) and Lemma 7, the increments 
+
+g(Xn)δW n and Xn+1 − Xn are both of magnitude O(τ 12 ) in Lq (Ω; H) for any q ≥ 1.Since each of the remainder terms Jn 
+
+> 6
+
+, Jn 
+
+> 7
+
+, Jn 
+
+> 9
+
+, and Jn 
+
+> 10
+
+contains three factors of magnitude O(τ 1/2) in Lq (Ω; H), it can be shown that 
+
+E[|Jn 
+
+> 6
+
+| + |Jn 
+
+> 7
+
+| + |Jn 
+
+> 9
+
+| + |Jn
+
+> 10
+
+|] ≤ Cτ 32 , n ∈ { 0, 1, · · · , N − 1}.
+
+□
+
+48 B Proof of Proposition 1 
+
+Proof The proof is carried out in three steps. In the first two steps, we establish the L2(O)-and H1(O)-spatial regularity of the mild solution, respectively. In the final step, we apply Lemma 6 to derive the Hβ (O)-spatial regularity estimate of the mild solution for β ∈ (1 , 2) .
+
+Step 1. By Assumption 1 and integrating by parts, we obtain 
+
+−⟨∇ φ(t), ∇F ′(φ(t)) ⟩ = −
+
+∫
+
+> O
+
+|∇ φ(t, x )|2f ′′ (φ(t, x )) dx ≤ Lf ∥∇ φ(t)∥2
+
+= Lf ∥(−A) 12 φ(t)∥2 ≤ 12 ∥Aφ (t)∥2 + 12 L2 
+
+> f
+
+∥φ(t)∥2.
+
+Hence, from (1.1), we can apply Itô’s formula to conclude 
+
+d∥φ(t)∥2 = 2 ⟨φ(t), −A2φ(t)⟩dt − 2⟨∇ φ(t), ∇F ′(φ(t)) ⟩dt 
+
++ 2 ⟨φ(t), g (φ(t)) dW (t)⟩ + ∥g(φ(t)) ∥2
+
+> L02
+
+dt 
+
+≤ −∥ Aφ (t)∥2dt + C∥φ(t)∥2dt + 2 ⟨φ(t), g (φ(t)) dW (t)⟩ + ∥g(φ(t)) ∥2
+
+> L02
+
+dt. 
+
+By the BDG inequality, Hölder’s inequality, and the linear growth of g (see (2.7)), we deduce that for any t ∈ [0 , T ],
+
+E
+
+[
+
+∥φ(t)∥2p]
+
++ E
+
+[( ∫ t
+
+> 0
+
+∥Aφ (s)∥2 ds 
+
+)p]
+
+≤ C∥φ0∥2p + CE
+
+[( ∫ t
+
+> 0
+
+∥φ(s)∥2ds 
+
+)p]
+
++ CE
+
+[∣∣∣∫ t
+
+> 0
+
+⟨φ(s), g (φ(s)) dW (s)⟩
+
+∣∣∣p]
+
++ CE
+
+[( ∫ t
+
+> 0
+
+∥g(φ(t)) ∥2
+
+> L02
+
+)p]
+
+≤ C∥φ0∥2p + CE
+
+∫ t
+
+> 0
+
+∥φ(s)∥2pds + C. 
+
+Using Gronwall’s inequality, we have 
+
+E
+
+[
+
+∥φ(t)∥2p]
+
++ E
+
+[( ∫ t
+
+> 0
+
+∥Aφ (s)∥2ds 
+
+)p]
+
+≤ C
+
+(
+
+∥φ0∥2p + 1 
+
+)
+
+. (B.1) 
+
+Step 2. It follows from Assumption 1 and Assumption 2 that 
+
+> ∞
+
+∑
+
+> k=1
+
+〈
+
+F ′′ (φ(s)) g(φ(s)) Q 12 ek, g (φ(s)) Q 12 ek
+
+〉
+
+≤ ∥ F ′′ (φ(s)) ∥L1
+
+> ∞
+
+∑
+
+> k=1
+
+∥g(φ(s)) Q 12 ek∥2
+
+> L∞
+
+≤ C(1 + ∥φ(s)∥2).
+
+Hence, using the energy evolution law (2.10) and Hölder’s inequality results in 
+
+E(φ(t)) + 
+
+∫ t
+
+> 0
+
+∥∇ μ(s)∥2 ds ≤ E(φ0) + 
+
+∫ t
+
+> 0
+
+⟨μ(s), g (φ(s)) dW (s)⟩ (B.2) 
+
++ C
+
+∫ t
+
+> 0
+
+∥g(φ(s)) ∥2   
+
+> L2(Q12H, ˙H1(O))
+
+ds + C
+
+∫ t
+
+> 0
+
+(∥φ(s)∥2 + 1) ds. 
+
+In view of (2.8), for any s ∈ [0 , T ],
+
+∥g(φ(s)) ∥2    
+
+> L(Q12H, ˙H1(O))
+
+≤ C(1 + ∥∇ φ(s)∥2) ≤ C(1 + ∥Aφ (s)∥2 + ∥φ(s)∥2). (B.3) Then, inserting (2.3) and (B.3) into (B.2), we deduce that for any t ∈ [0 , T ],
+
+E [E(φ(t)) p] + E
+
+[( ∫ t
+
+> 0
+
+∥∇ μ(s)∥2ds 
+
+)p]
+
+(B.4) 
+
+49 ≤ C + CE
+
+[∣∣∣∫ t
+
+> 0
+
+⟨μ(s), g (φ(s)) dW (s)⟩
+
+∣∣∣p]
+
++ CE
+
+[( ∫ t
+
+> 0
+
+∥Aφ (s)∥2 + ∥φ(s)∥2ds 
+
+)p]
+
+.
+
+Applying the BDG inequality, Hölder’s inequality, Assumption 2, and Young’s inequality, and recalling the definition μ := δE δϕ = −∆φ + F ′(φ) in (1.1), we obtain 
+
+E
+
+[∣∣∣∫ t
+
+> 0
+
+⟨μ(s), g (φ(s)) dW (s)⟩
+
+∣∣∣p]
+
+≤ CE
+
+[( ∫ t
+
+> 0
+> ∞
+
+∑
+
+> k=1
+
+∣∣∣⟨μ(s), g (φ(s)) Q 12 ek⟩
+
+∣∣∣2
+
+ds 
+
+) p 
+
+> 2
+
+]
+
+(B.5) 
+
+≤ CE
+
+[( ∫ t
+
+> 0
+
+∥μ(s)∥2
+
+> L1
+> ∞
+
+∑
+
+> k=1
+
+∥g(φ(s)) Q 12 ek∥2 
+
+> L∞
+
+ds 
+
+) p 
+
+> 2
+
+]
+
+≤ CE
+
+[ (∫ t
+
+> 0
+
+∥∆φ(s)∥2 
+
+> L1
+
+ds 
+
+) p 
+
+> 2
+
+]
+
++ CE
+
+[ (∫ t
+
+> 0
+
+∥∥F ′(φ(s)) ∥∥2 
+
+> L1
+
+ds 
+
+) p 
+
+> 2
+
+]
+
+.
+
+Combining Assumption 1, the Gagliardo–Nirenberg inequality, and Young’s inequality yields 
+
+∥F ′(φ(s)) ∥2 
+
+> L1
+
+≤ C(1 + ∥φ(s)∥6 
+
+> L3
+
+) ≤ C(1 + ∥φ(s)∥ 32 
+
+> H2
+
+∥φ(s)∥ 92 )
+
+≤ C(1 + ∥φ(s)∥2 
+
+> H2
+
++ ∥φ(s)∥18 ),
+
+which implies that for any t ∈ [0 , T ],
+
+E
+
+[( ∫ t
+
+> 0
+
+∥F ′(φ(s)) ∥2 
+
+> L1
+
+ds 
+
+) p 
+
+> 2
+
+]
+
+≤ C + CE
+
+[( ∫ t
+
+> 0
+
+∥φ(s)∥2 
+
+> H2
+
+ds 
+
+) p 
+
+> 2
+
+]
+
+(B.6) 
+
++ CE
+
+[( ∫ t
+
+> 0
+
+∥φ(s)∥18 ds 
+
+) p 
+
+> 2
+
+]
+
+.
+
+Substituting (B.6) into (B.5) and applying (B.1), we arrive at 
+
+E
+
+[∣∣∣∫ t
+
+> 0
+
+⟨μ(s), g (φ(s)) dW (s)⟩
+
+∣∣∣p]
+
+≤ C. 
+
+Plugging this into (B.4) and taking (B.1) into account, we have that for any p ≥ 1,
+
+E [E(φ(t)) p] + E
+
+[( ∫ t
+
+> 0
+
+∥∇ μ(s)∥2ds 
+
+)p]
+
+≤ C. (B.7) 
+
+Step 3. From the energy definition (1.2) and (B.7), we obtain E[∥∇ φ(t)∥2p] ≤ C(p) for all p ≥ 1. It follows from Young’s inequality and the Sobolev embedding H1(O) ↪→ L6(O)
+
+that for any t ∈ [0 , T ],
+
+E
+
+[∥∥F ′(φ(t)) ∥∥p]
+
+≤ CE
+
+[
+
+∥φ(t)∥3pL6
+
+]
+
++ C ≤ CE
+
+[
+
+∥∇ φ(t)∥3p]
+
++ C ≤ C. (B.8) Moreover, by Assumption 2, it holds that E[∥g(φ(t)) ∥p
+
+> L02
+
+] ≤ C for any t ∈ [0 , T ], which, in combination with (B.8), allows us to apply Lemma 6 with ˜F (s) = F ′(φ(s)) and ˜G(s) = 
+
+g(φ(s)) to conclude (2.9). □
+
+# Declarations 
+
+Funding This work is supported by the Hong Kong Research Grant Coun-cil GRF grants 15302823 and 15301025, NSFC/RGC Joint Research Scheme N_PolyU5141/24, NSFC grant 12522119, NSFC grant 12301526, internal funds (P0041274,P0045336) from Hong Kong Polytechnic University, and the CAS AMSS-PolyU Joint Laboratory of Applied Mathematics. 50 Data Availability Data sharing not applicable to this article as no datasets were generated or analyzed during the current study. 
+
+Conflict of interest The authors declare that they have no conflict of interest. 
+
+# References 
+
+[1] Cahn, J.W., Hilliard, J.E.: Free energy of a nonuniform system. I. interfacial free energy. J. Chem. Phys. 28 (2), 258–267 (1958) [2] Scarpa, L.: On the stochastic Cahn–Hilliard equation with a singular double-well potential. Nonlinear Anal. 171 , 102–133 (2018) [3] Blömker, D., Sander, E., Wanner, T.: Degenerate nucleation in the Cahn– Hilliard–Cook model. SIAM J. Appl. Dyn. Syst. 15 (1), 459–494 (2016) [4] Blömker, D., Maier-Paape, S., Wanner, T.: Spinodal decomposition for the Cahn– Hilliard–Cook equation. Comm. Math. Phys. 223 (3), 553–582 (2001) [5] Maier-Paape, S., Wanner, T.: Spinodal decomposition for the Cahn–Hilliard equation in higher dimensions: nonlinear dynamics. Arch. Ration. Mech. Anal. 
+
+151 (3), 187–219 (2000) [6] Dai, S., Du, Q.: Computational studies of coarsening rates for the Cahn–Hilliard equation with phase-dependent diffusion mobility. J. Comput. Phys. 310 , 85–108 (2016) [7] Khain, E., Sander, L.M.: Generalized Cahn–Hilliard equation for biological applications. Phys. Rev. E 77 , 051129 (2008) [8] Blömker, D., Schindler, A.: Stochastic Cahn–Hilliard equation in higher space dimensions: the motion of bubbles. Z. Angew. Math. Phys. 71 (2), 49–27 (2020) [9] Du, Q., Nicolaides, R.A.: Numerical analysis of a continuum model of phase transition. SIAM J. Numer. Anal. 28 (5), 1310–1322 (1991) [10] Cui, J., Hong, J.: Absolute continuity and numerical approximation of stochastic Cahn–Hilliard equation with unbounded noise diffusion. J. Differential Equations 
+
+269 (11), 10143–10180 (2020) [11] Elliott, C.M., Larsson, S.: Error estimates with smooth and nonsmooth data for a finite element method for the Cahn–Hilliard equation. Math. Comp. 58 (198), 603–6303336 (1992) [12] Cui, J., Hong, J.: Wellposedness and regularity estimates for stochastic Cahn– Hilliard equation with unbounded noise diffusion. Stoch. Partial Differ. Equ. Anal. Comput. 11 (4), 1635–1671 (2023) 51 [13] Da Prato, G., Debussche, A., Tubaro, L.: Irregular semi-convex gradient systems perturbed by noise and application to the stochastic Cahn–Hilliard equation. Ann. Inst. Henri Poincaré Probab. Stat. 40 (1), 73–88 (2004) [14] Elezovic, N., Mikelic, A.: On the stochastic Cahn–Hilliard equation. Nonlinear Anal. 16 (12), 1169–1200 (1991) [15] Da Prato, G., Debussche, A.: Stochastic Cahn–Hilliard equation. Nonlinear Anal. 
+
+26 (2), 241–263 (1996) [16] Goudenège, L., Manca, L.: Asymptotic properties of stochastic Cahn–Hilliard equation with singular nonlinearity and degenerate noise. Stochastic Process. Appl. 125 (10), 3785–3800 (2015) [17] Cardon-Weber, C.: Cahn–Hilliard stochastic equation: existence of the solution and of its density. Bernoulli 7(5), 777–816 (2001) [18] Cardon-Weber, C.: Cahn–Hilliard stochastic equation: strict positivity of the density. Stoch. Stoch. Rep. 72 (3-4), 191–227 (2002) [19] Printems, J.: On the discretization in time of parabolic stochastic partial differential equations. M2AN Math. Model. Numer. Anal. 35 (6), 1055–1078 (2001) [20] Cui, J., Hong, J., Sun, L.: Strong convergence of full discretization for stochastic Cahn–Hilliard equation driven by additive noise. SIAM J. Numer. Anal. 59 (6), 2866–2899 (2021) [21] Furihata, D., Kovács, M., Larsson, S., Lindgren, F.: Strong convergence of a fully discrete finite element approximation of the stochastic Cahn–Hilliard equation. SIAM J. Numer. Anal. 56 (2), 708–731 (2018) [22] Qi, R., Wang, X.: Error estimates of semidiscrete and fully discrete finite element methods for the Cahn–Hilliard–Cook equation. SIAM J. Numer. Anal. 58 (3), 1613–1653 (2020) [23] Feng, X., Li, Y., Zhang, Y.: A fully discrete mixed finite element method for the stochastic Cahn–Hilliard equation with gradient-type multiplicative noise. J. Sci. Comput. 83 (1), 23–24 (2020) [24] Hong, J., Jin, D., Sheng, D.: Density convergence of a fully discrete finite dif-ference method for stochastic Cahn–Hilliard equation. Math. Comp. 93 (349), 2215–2264 (2024) [25] Zhou, L., Li, Y.: An LDG method for stochastic Cahn–Hilliard type equation driven by general multiplicative noise involving second-order derivative. Com-mun. Comput. Phys. 31 (2), 516–547 (2022) 52 [26] Goldys, B., Soenjaya, A.L., Tran, T.: A mixed finite element method for a class of fourth-order stochastic evolution equations with multiplicative noise. arXiv:2505.04866 (2026) [27] Bréhier, C.-E., Cui, J., Wang, X.: Weak error estimates of fully-discrete schemes for the stochastic Cahn–Hilliard equation. Commun. Math. Sci. (2025). to appear [28] Bréhier, C.-E., Cui, J., Hong, J.: Strong convergence rates of semidiscrete splitting approximations for the stochastic Allen–Cahn equation. IMA J. Numer. Anal. 
+
+39 (4), 2096–2134 (2019) [29] Bréhier, C.-E., Goudenège, L.: Analysis of some splitting schemes for the stochas-tic Allen–Cahn equation. Discrete Contin. Dyn. Syst. Ser. B 24 (8), 4169–4190 (2019) [30] Shen, J., Xu, J.: Convergence and error analysis for the scalar auxiliary variable (SAV) schemes to gradient flows. SIAM J. Numer. Anal. 56 (5), 2895–2912 (2018) [31] Shen, J., Xu, J., Yang, J.: The scalar auxiliary variable (SAV) approach for gradient flows. J. Comput. Phys. 353 , 407–416 (2018) [32] Cui, J., Hong, J., Sun, L.: The stochastic scalar auxiliary variable approach for stochastic nonlinear Klein–Gordon equation. Stoch. Partial Differ. Equ. Anal. Comput. 13 , 1607–1639 (2025) [33] Metzger, S.: A convergent stochastic scalar auxiliary variable method. IMA J. Numer. Anal. 45 (4), 2404–2469 (2025) [34] Metzger, S.: Strong error estimates for a fully discrete SAV scheme for the stochas-tic Allen–Cahn equation with multiplicative noise. ESAIM Math. Model. Numer. Anal. 59 , 2305–2327 (2025) [35] Metzger, S.: A convergent SAV scheme for Cahn–Hilliard equations with dynamic boundary conditions. IMA J. Numer. Anal. 43 (6), 3593–3627 (2023) [36] Giles, M.B.: Multilevel Monte Carlo path simulation. Oper. Res. 56 (3), 607–617 (2008) [37] Kloeden, P.E., Platen, E.: Numerical Solution of Stochastic Differential Equations. Applications of Mathematics (New York), vol. 23. Springer, Berlin (1992) [38] Metzger, S.: A convergent augmented SAV scheme for stochastic Cahn–Hilliard equations with dynamic boundary conditions describing contact line tension. arXiv e-prints, 2407–20424 (2024) arXiv:2407.20424 [cs.NA] [39] Kruse, R.: Strong and Weak Approximation of Semilinear Stochastic Evolution Equations. Lecture Notes in Mathematics, vol. 2093, p. 177. Springer, Cham 53 (2014) [40] Yagi, A.: Abstract Parabolic Evolution Equations and Their Applications. Springer, Berlin (2009) [41] Elliott, C.M., Stuart, A.M.: The global dynamics of discrete semilinear parabolic equations. SIAM J. Numer. Anal. 30 (6), 1622–1663 (1993) https://doi.org/10. 1137/0730084 [42] Adams, R.A., Fournier, J.J.F.: Sobolev Spaces, 2nd edn. Pure and Applied Mathematics (Amsterdam), vol. 140. Elsevier/Academic Press, Amsterdam (2003) [43] Shen, J., Tang, T., Wang, L.-L.: Spectral Methods. Springer Series in Com-putational Mathematics, vol. 41, p. 470. Springer, Heidelberg (2011). https: //doi.org/10.1007/978-3-540-71041-7 . Algorithms, analysis and applications. 
+
+https://doi.org/10.1007/978-3-540-71041-7 
+
+[44] Antonopoulou, D., Baňas, L., Nürnberg, R., Prohl, A.: Numerical approximation of the stochastic Cahn–Hilliard equation near the sharp interface limit. Numer. Math. 147 (3), 505–551 (2021) [45] Cui, J., Wang, F.-Y.: Improving numerical error bounds near sharp interface limit for stochastic reaction-diffusion equations. arXiv 2412.12604, 2412–12604 (2024) https://doi.org/10.48550/arXiv.2412.12604 arXiv:2412.12604 [math.NA] [46] Da Prato, G., Zabczyk, J.: Stochastic Equations in Infinite Dimensions, 2nd edn. Encyclopedia of Mathematics and Its Applications. Cambridge University Press, Cambridge (2014) 54

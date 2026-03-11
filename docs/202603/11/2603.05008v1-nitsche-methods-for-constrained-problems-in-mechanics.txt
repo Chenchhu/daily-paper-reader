@@ -1,0 +1,1459 @@
+Title: Nitsche methods for constrained problems in mechanics
+
+URL Source: https://arxiv.org/pdf/2603.05008v1
+
+Published Time: Fri, 06 Mar 2026 01:50:49 GMT
+
+Number of Pages: 30
+
+Markdown Content:
+# Highlights 
+
+Nitsche methods for constrained problems in mechanics ⋆
+
+Tom Gustafsson, Antti Hannukainen, Vili Kohonen, Juha Videman 
+
+• We derive a novel interpretation of the Nitsche Finite Element Method to solve constrained problems in solid mechanics 
+
+• We use the new formulation to solve several contact problems and val-idate the convergence rates numerically 
+
+• The computational implementation utilizes a general minimization form and automatic differentation handles the variational derivatives 
+
+> arXiv:2603.05008v1 [math.NA] 5 Mar 2026
+
+# Nitsche methods for constrained problems in mechanics ⋆
+
+Tom Gustafsson a, Antti Hannukainen b, Vili Kohonen b, ∗, Juha Videman c
+
+> a
+
+Department of Mechanical Engineering, Aalto University, P.O. Box 11100, 00076 Aalto, Espoo, Finland 
+
+> b
+
+Department of Mathematics and Systems Analysis, Aalto University, Espoo, Finland 
+
+> c
+
+CAMGSD/Departamento de Matemática, Instituto Superior Técnico, Universidade de Lisboa, Av. Rovisco Pais 1, 1049-001, Lisbon, Portugal 
+
+Abstract 
+
+We present guidelines for deriving new Nitsche Finite Element Methods to enforce equality and inequality constraints that act on the value of the un-known mechanical quality. We first formulate the problem as a stabilized finite element method for the saddle point formulation where a Lagrange multiplier enforces the underlying constraint. The Nitsche method is then presented in a general minimization form, suitable for nonlinear finite ele-ment methods and allowing straightforward computational implementation with automatic differentation. To validate these ideas, we present Nitsche formulations for a range of problems in solid mechanics and give numerical evidence of the convergence rates of the Nitsche method. 
+
+Keywords: Nitsche method, finite element method, inequality constraints, contact problems, stabilization 
+
+2000 MSC: 65N30, 74M15, 49J40 
+
+> ⋆
+
+This work was supported by the Research Council of Finland (Flagship of Advanced Mathematics for Sensing Imaging and Modelling grant 359181) and the Portuguese gov-ernment through FCT (Fundação para a Ciência e a Tecnologia), I.P., under the project UIDB/04459/2025. 
+
+> ∗
+
+Corresponding author 
+
+Email addresses: tom.gustafsson@aalto.fi (Tom Gustafsson), 
+
+antti.hannukainen@aalto.fi (Antti Hannukainen), vili.kohonen@aalto.fi (Vili Kohonen), jvideman@math.tecnico.ulisboa.pt (Juha Videman) 
+
+Preprint submitted to International Journal of Engineering Science March 6, 2026 1. Introduction 
+
+In the 1970s, Nitsche [1] introduced a method for enforcing the Dirich-let boundary conditions in the weak formulation of the finite element method. The benefits of the Nitsche method over its alternatives, the penalty method [2] and the mixed Lagrange multiplier method [3], include consistency, symmetry and positive definiteness, stability, and conditioning; cf. [4]. Hence, the ideas of Nitsche have later found applications also in domain decomposition [5], discontinuous Galerkin methods [6], unfitted finite element and fictitious do-main methods [7], Robin boundary conditions [8], Kirchhoff plates [9], elastic contact problems [10], friction problems [11], obstacle problems [12], elasto-plastic torsion problems [13], and plate contact problems [14], to name a few. In modern literature, the Nitsche method is often presented as a consis-tency correction to the penalty method, i.e., to make sure that the exact solution satisfies the discrete weak form, by including additional terms; cf., e.g., [15, 4]. This fails to answer to the obvious follow-up question: how to generalize the method to other problems and constraints? Consequently, we take a different viewpoint based on the saddle point formulation and present guidelines to derive optimal Nitsche methods for both equality and inequality constraints. These guiding principles apply to arbitrary constrained mini-mization problems, where the constraint acts on the values of the unknown. The resulting energy minimization form is particularly well-suited for solv-ing nonlinear problems numerically. We follow the guidelines in practice by deriving and implementing novel methods for problems such as inequality boundary condition for plates, membrane-solid contact problem, and plate-plate contact problem. Our formulation is based on a reinterpretation of the Nitsche method by Stenberg [16]. More precisely, on the idea that the Nitsche method corre-sponds to a conforming stabilized Lagrange multiplier method (in the sense of residual Barbosa–Hughes stabilization [17]). For such stabilized methods, an element-wise elimination of the Lagrange multiplier will lead to the equiv-alent Nitsche method; see also [10, 18, 19, 20]. This connection was exploited in the error analysis in Gustafsson [21] and consequently it became evident that the stabilized formulation leads to a family of methods with constraints of rather general form. Let us summarize the prior theoretical findings for existing Nitsche meth-ods: (1) stability becomes automatic if correct residuals of the Lagrange 2multiplier are included in the formulation; (2) optimal convergence rates are obtained if the scaling of the residual with respect to the mesh and the material parameters correctly mimics the continuous Sobolev norm of the Lagrange multiplier. In this paper, built on these observations, we explain how to define and use general Nitsche methods, present examples of their adaptation to novel physical problems, and show numerical evidence of their convergence. Amore careful numerical analysis, i.e., proofs of stability and error estimates, is beyond the scope of this work. The remainder of the paper is organized as follows. In Section 2, we review the original Nitsche method for the Dirichlet boundary condition u = g. In Section 3, we demonstrate how the method is modified to satisfy the inequality constraint u ≥ g. In Section 4, we describe a general form of the Nitsche method and how it can be used to derive new methods. In Section 5, we present some methods that exist in the literature and are of this general form. In Section 6, we derive novel Nitsche methods from the general form and show numerical evidence of their performance. 
+
+2. Background: Dirichlet boundary conditions 
+
+For better context, we briefly recall the original method of Nitsche [1]. Consider the model problem 
+
+−∇ · κ∇u = f, in Ω,u = g, on ∂Ω, (1) where f ∈ L2(Ω) is the problem-specific load, g ∈ H1/2(∂Ω) is the Dirichlet boundary condition and κ > 0 is a given parameter. Note that Nitsche [1] considered only the case κ = 1 , i.e., normalized units. Problem (1) is solved in a finite element space Vh ⊂ H1(Ω) where h is the mesh parameter. The classical Nitsche method for the Dirichlet boundary condition u = g reads: find uh ∈ Vh such that 
+
+Z
+
+> Ω
+
+κ∇uh · ∇ vh +
+
+Z
+
+> ∂Ω
+
+1
+
+γ uhvh −
+
+Z
+
+> ∂Ω
+
+κ∂u h
+
+∂n vh −
+
+Z
+
+> ∂Ω
+
+uh κ∂v h
+
+∂n 
+
+=
+
+Z
+
+> Ω
+
+f v h +
+
+Z
+
+> ∂Ω
+
+1
+
+γ gv h −
+
+Z
+
+> ∂Ω
+
+g κ ∂v h
+
+∂n ∀vh ∈ Vh.
+
+(2) Here γ is an L2(Ω) function whose restriction to each element K is the product of a dimensionless stabilization parameter α > 0 and the local mesh 3parameter hK , divided by κ, i.e. 
+
+γ|K = αh K
+
+κ .
+
+According to Stenberg [16], the Nitsche method corresponds to using stabilized finite element method to discretize the saddle point problem: find 
+
+(u, λ ) ∈ H1(Ω) × H−1/2(∂Ω) such that 
+
+L(u, λ ) = inf 
+
+> v∈H1(Ω)
+
+sup 
+
+> μ∈H−1/2(∂Ω)
+
+L(v, μ ). (3) The Lagrangian in (3) is defined as 
+
+L(u, λ ) = J(u) − ⟨ u − g, λ ⟩, (4) where 
+
+J(u) = 12
+
+Z
+
+> Ω
+
+κ∇u · ∇ u −
+
+Z
+
+> Ω
+
+f u (5) is the energy functional of the original problem (1) [22], ⟨· , ·⟩ denotes the duality pairing between H1/2(∂Ω) and H−1/2(∂Ω) , and λ is a Lagrange mul-tiplier. We are able to derive the strong formulation of problem (3) to reveal that λ = κ ∂u ∂n .The Nitsche method (2) corresponds to the stabilized discrete saddle point problem: find (uh, λ h) ∈ Vh × Qh such that 
+
+Lh(uh, λ h) = inf 
+
+> vh∈Vh
+
+sup 
+
+> μh∈Qh
+
+Lh(vh, μ h) (6) where the stabilized Lagrangian Lh is defined as 
+
+Lh(vh, μ h) = 
+
+n
+
+L(vh, μ h) −
+
+Z
+
+> ∂Ω
+
+γ
+
+2
+
+
+
+μh − κ∂v h
+
+∂n 
+
+2o
+
+. (7) The space Qh ⊂ H−1/2(∂Ω) denotes a set of elementwise polynomials that are globally discontinuous. The variational formulation of problem (6) reads: find (uh, λ h) ∈ Vh × Qh such that 
+
+Z
+
+> Ω
+
+κ∇uh · ∇ vh −
+
+Z
+
+> ∂Ω
+
+λhvh −
+
+Z
+
+> ∂Ω
+
+uhμh
+
+−
+
+Z
+
+> ∂Ω
+
+γ
+
+
+
+λh − κ∂u h
+
+∂n 
+
+ 
+
+μh − κ∂v h
+
+∂n 
+
+
+
+=
+
+Z
+
+> Ω
+
+f v h −
+
+Z
+
+> ∂Ω
+
+gμ h
+
+(8) 4for every (vh, μ h) ∈ Vh × Qh. This method is stable for any pair of finite element spaces Vh and Qh if 0 < α < C I where CI is a constant of an inverse estimate, cf. [16]. Following the steps laid out in Stenberg [16], we can show that an elimina-tion of the Lagrange multiplier element-by-element leads to the formulation (2). Assuming that κ is an element-wise constant and choosing vh = 0 leads to 
+
+−
+
+Z
+
+> ∂Ω
+
+uhμh −
+
+Z
+
+> ∂Ω
+
+γ
+
+
+
+λh − κ∂u h
+
+∂n 
+
+
+
+μh = −
+
+Z
+
+> ∂Ω
+
+gμ h ∀μh ∈ Qh. (9) Denoting by πh the L2 projection onto Qh, this reads 
+
+−πhuh − γ
+
+
+
+λh − κπ h
+
+∂u h
+
+∂n 
+
+
+
+= −πhg (10) which gives 
+
+λh = κπ h
+
+∂u h
+
+∂n − 1
+
+γ (πhuh − πhg). (11) Let Vh correspond to the space of continuous piecewise polynomial functions of degree p ≥ 1. If Qh is chosen as discontinuous piecewise polynomials of degree p or greater, then πh reduces to the identity mapping, i.e. 
+
+λh = κ∂u h
+
+∂n − 1
+
+γ (uh − g). (12) Now we can eliminate the Lagrange multiplier from the discrete saddle point problem. After substituting λh to the stabilized Lagrangian Lh we obtain 
+
+J(uh) −
+
+Z
+
+> ∂Ω
+
+
+
+κ∂u h
+
+∂n − 1
+
+γ (uh − g)
+
+
+
+(uh − g)
+
+−
+
+Z
+
+> ∂Ω
+
+γ
+
+2
+
+
+
+κ∂u h
+
+∂n − 1
+
+γ (uh − g) − κ∂u h
+
+∂n 
+
+2
+
+which simplifies to 
+
+J(uh) −
+
+Z
+
+> ∂Ω
+
+κ∂u h
+
+∂n (uh − g) + 
+
+Z
+
+> ∂Ω
+
+1
+
+γ (uh − g)2
+
+−
+
+Z
+
+> ∂Ω
+
+12γ (uh − g)2
+
+5and finally to 
+
+Jh(uh) = J(uh) −
+
+Z
+
+> ∂Ω
+
+κ∂u h
+
+∂n (uh − g) + 12
+
+Z
+
+> ∂Ω
+
+1
+
+γ (uh − g)2. (13) The classical Nitsche method (2) corresponds to the following minimization problem [1]: find uh ∈ Vh such that 
+
+Jh(uh) = inf 
+
+> vh∈Vh
+
+Jh(vh). (14) Note that by adding and subtracting R 
+
+> ∂Ω
+> γ
+> 2
+
+(κ∂u h 
+
+> ∂n
+
+)2 to complete the square we can rewrite Jh in (13) as 
+
+J(uh) + 
+
+Z
+
+> ∂Ω
+
+γ
+
+2
+
+
+
+κ∂u h
+
+∂n − 1
+
+γ (uh − g)
+
+2
+
+−
+
+Z
+
+> ∂Ω
+
+γ
+
+2
+
+
+
+κ∂u h
+
+∂n 
+
+2
+
+.
+
+This form can be compared to the penalty method which simply minimizes the penalized functional: 
+
+J(uh) + 12ε
+
+Z
+
+> ∂Ω
+
+(uh − g)2.
+
+The penalty method approximates the Robin boundary condition 
+
+κ ∂u ∂n = 1
+
+ε (u − g), (15) which satisfies u − g → 0 when ε → 0. Unfortunately, small enough values of ε lead to ill-conditioned linear systems [4]. 
+
+3. Inequality constraints: Signorini’s problem 
+
+For inequality constraints, we first consider problem (1) with the inequal-ity constraint u ≥ g on the boundary ∂Ω. The resulting problem 
+
+−∇ · κ∇u = f, in Ω,u ≥ g, κ ∂u ∂n ≥ 0, (u − g)κ ∂u ∂n = 0 , on ∂Ω, (16) is often referred to as the scalar Signorini’s or Poisson–Signorini problem [23]. The corresponding continuous saddle point formulation of (16) is: find (u, λ ) ∈
+
+H1(Ω) × H−1/2(∂Ω) , λ ≥ 0, such that 
+
+L(u, λ ) = inf 
+
+> v∈H1(Ω)
+
+sup 
+
+> μ∈H−1/2(∂Ω) , μ ≥0
+
+L(v, μ ), (17) 6where the Lagrangian L was defined in (4). The connection between the two formulations is again given by λ = κ ∂u ∂n . After residual stabilization, the finite element formulation reads: find (uh, λ h) ∈ Vh × Qh, λh ≥ 0, such that 
+
+Lh(uh, λ h) = inf 
+
+> vh∈Vh
+
+sup 
+
+> μh∈Qh, μ h≥0
+
+Lh(vh, μ h), (18) where the stabilized Lagrangian Lh was defined in (7). The error analysis of formulation (18) was given in [23] where it is concluded, among other things, that the formulation is stable for any conforming Qh.The corresponding variational inequality can be written as: find λh ∈ Qh,
+
+λh ≥ 0, so that 
+
+Z
+
+> Ω
+
+κ∇uh · ∇ vh −
+
+Z
+
+> ∂Ω
+
+λhvh +
+
+Z
+
+> ∂Ω
+
+γ
+
+
+
+λh − κ∂u h
+
+∂n 
+
+
+
+κ∂v h
+
+∂n =
+
+Z
+
+> Ω
+
+f v h,
+
+Z
+
+> ∂Ω
+
+
+
+κ∂u h
+
+∂n − 1
+
+γ (uh − g) − λh
+
+
+
+(μh − λh) ≤ 0,
+
+for every (vh, μ h) ∈ Vh × Qh, μh ≥ 0. The second inequality implies that λh is the orthogonal L2 projection of κ∂u h 
+
+> ∂n
+
+− 1 
+
+> γ
+
+(uh − g) onto the set of nonnegative functions in Qh [22, Theorem 5.2]. Since Qh is arbitrary, we may choose 
+
+Qh = L2(∂Ω) and then the orthogonal projection is given explicitly by the maximum operator, i.e., 
+
+λh = max( κ∂u h 
+
+> ∂n
+
+− 1 
+
+> γ
+
+(uh − g), 0) =: ( κ∂u h 
+
+> ∂n
+
+− 1 
+
+> γ
+
+(uh − g)) +. (19) In order to obtain the Nitsche method, we again substitute the discrete Lagrange multiplier λh from (19) to (18) and rearrange the terms to obtain: find uh ∈ Vh which minimizes 
+
+J(uh) + 
+
+Z
+
+> ∂Ω
+
+γ
+
+2
+
+
+
+κ∂u h
+
+∂n − 1
+
+γ (uh − g)
+
+2+
+
+−
+
+Z
+
+> ∂Ω
+
+γ
+
+2
+
+
+
+κ∂u h
+
+∂n 
+
+2
+
+. (20) Note that the corresponding method for the equality constraint can be ob-tained by dropping the maximum operator (subscript +). 
+
+4. Structure of the method 
+
+We now generalize the method to arbitrary inequality constraints of the form β(uh) ≥ 0. The method (20) has the following main ingredients: 7the energy of the source problem, i.e., J; the constraint to impose, i.e., 
+
+β(uh) = uh − g ≥ 0; the corresponding definition of the continuous Lagrange multiplier, i.e., λ(uh) = κ∂u h 
+
+> ∂n
+
+; and the correct scaling of the stabilization parameter γ with respect to the mesh parameter h and any material param-eters, i.e., γ(h, κ )|K = αh K 
+
+> κ
+
+. In conclusion, the general form of the Nitsche method can be written as follows: find uh ∈ Vh that minimizes the functional 
+
+J(uh) + 
+
+Z
+
+> Γ
+
+γ(h, κ )2
+
+
+
+λ(uh) − 1
+
+γ(h, κ )β(uh)
+
+2+
+
+−
+
+Z
+
+> Γ
+
+γ(h, κ )2 λ(uh)2. (21) The final method is formulated as a minimization problem instead of a vari-ational one as it is the starting point for our implementation of the method; see Section 6 and Appendix Appendix A. In particular, the calculation of the second functional derivative of (21) is performed automatically in our computational implementation of the Nitsche method. 
+
+Remark 1. We emphasize that the general form (21) was obtained following the derivation of (20) . Equivalently, it can be deduced starting from a similar minimization form existing in the literature for other physical problems; see, e.g., [10, p. 135] for elastic contact problems and [18, p. 364] for the obstacle problem. The form (21) is also present in [20] where the authors discuss an alternative approach using augmented Langrangian methods. 
+
+Hence, for new problems written in the general form (21), with energy 
+
+J(uh) and finite element space Vh, it is necessary to define: 1. A constraint β = β(uh) ≥ 0 and the subset Γ ⊂ Ω where the constraint can become active. 2. An expression for the continuous Lagrange multiplier (i.e., the contact force) as λ = λ(uh).3. An expression for the parameter γ = γ(h, κ ).In order to find an expression for λ = λ(uh), it is necessary to derive the strong formulation of the continuous saddle point problem. This is usu-ally obtained by first deriving the variational formulation and then integrat-ing by parts to find the corresponding differential equations and boundary conditions, some of which will depend directly on λ. For contact-type con-straints between two domains, prior research suggests that the parameter γ
+
+8and, hence, the expression for λ should be defined on the less stiff side; cf., e.g., [24]. Physically, equation (21) shows that an important role of γ is to scale the units of displacement in β to the units of force in λ. More precisely, λ should be proportional to βγ with the proportionality constant independent of h and 
+
+κ. Therefore, the material parameters of the problem must be included in 
+
+γ. Mathematically speaking, a correct scaling of γ is necessary to prove the uniform stability of the discrete saddle point formulation using an inverse inequality ; cf., e.g., [12, 14, 24]. Finally, we wish to remark that the penalty method can be recovered from this formulation by removing the Lagrange multiplier terms (formally, 
+
+λ = 0 ), and that the Nitsche method for equality constraints is obtained simply by dropping the maximum operator (subscript +). The solution of the minimization problem (21) using Newton’s method is explained in Appendix A. 
+
+5. Some existing methods 
+
+5.1. Membrane obstacle problem 
+
+Let Ω be a polygonal/polyhedral domain representing a Poisson mem-brane in its undeformed state. Minimization of the energy 
+
+J(u) = 12
+
+Z
+
+> Ω
+
+κ∇u · ∇ u −
+
+Z
+
+> Ω
+
+f u (22) corresponds to solving the Poisson equation −∇· (κ∇u) = f with u ∈ H10 (Ω) .Let now the deflection of the membrane u be constrained by the rigid obstacle 
+
+g below the membrane, i.e., u ≥ g. The Lagrange multiplier corresponding to the constraint u−g ≥ 0 (in Ω) is given by λ = −∇· (κ∇u)−f =: −Lu −f ,cf. [12, 18]. The scaling is given by γ|K = αh 2 
+
+> K
+> κ
+
+. Hence, the Nitsche functional reads 
+
+J(uh) + 
+
+Z
+
+> Ω
+
+γ
+
+2
+
+
+
+−Lhuh − f − 1
+
+γ (uh − g)
+
+2+
+
+−
+
+Z
+
+> Ω
+
+γ
+
+2 (−Lhuh − f )2 , (23) where Lh denotes an element-wise evaluation of L.95.2. Two-body linearized elastic contact 
+
+Let Ω1 and Ω2 be two polygonal/polyhedral domains that are initially at contact on Γ = ∂Ω1 ∩ ∂Ω2. The energy of the two-body linear elastic source problem reads 
+
+J(( w1, w2)) = 
+
+> 2
+
+X
+
+> i=1
+
+12
+
+Z
+
+> Ωi
+
+σ(wi) : ε(wi) −
+
+Z
+
+> Ωi
+
+f · wi
+
+
+
+, (24) where 
+
+σ(w) = 2 μL ε(w) + λLtr ε(w)I, (25) 
+
+ε(w) = 12(∇w + ∇wT ), (26) and f is a given body load and (μL, λ L) are the Lamé material parameters. The physical non-penetration constraint on Γ reads u1 · n1 + u2 · n2 ≤ 0
+
+where ni is the outward normal vector on ∂Ωi, i = 1 , 2. The Lagrange multiplier corresponding to the constraint (u2 − u1) · n1 ≥ 0 is given, e.g., by λ = −σ(u1)n1 · n1. Note that the choice to use the normal traction on 
+
+∂Ω1 instead of ∂Ω2 is now arbitrary. In general, the stabilization should be on the less stiff body or the body with smaller elements; cf. [24]. The scaling is given by γ|K = αh K 
+
+> μL
+
+. The Nitsche functional [25] reads 
+
+J(( u1,h , u2,h )) + 
+
+Z
+
+> Γ
+
+γ
+
+2
+
+
+
+−σ(u1,h )n1 · n1 − 1
+
+γ (u2,h · n1 − u1,h · n1)
+
+2+
+
+−
+
+Z
+
+> Γ
+
+γ
+
+2 (−σ(u1,h )n1 · n1)2 .
+
+(27) 
+
+6. Novel methods 
+
+We now present some novel methods based on formulation (20). More precisely, we consider the following problems: 1. Two-membrane contact problem, 2. Membrane against solid contact problem, 3. Plate against plate contact problem, 4. Kirchhoff plate with inequality boundary constraint. 10 For each problem, we present the Nitsche formulation and numerically in-vestigate its convergence rate. The numerical results are computed using scikit-fem [26] which is used to solve the nonlinear variational problems us-ing Newton’s method. For completeness, we describe how to manipulate the energy minimization problems for Newton’s method in Appendix Ap-pendix A. The programming implementation utilizes automatic differentia-tion with JAX [27] so that it is not necessary to manually calculate the func-tional derivatives involved in Newton’s method. The source code is available in [28] for reproducing the numerical results. Convergence rates are estimated via uniform mesh refinement. In the absence of an analytical solution, we estimate the convergence rate by eval-uating the error between two subsequent discrete solutions corresponding to mesh parameters 2h and h. Assuming that the error satisfies ∥u − uh∥ ≤ Ch p
+
+in the energy norm for some C > 0 and a given polynomial degree p of the finite element basis, we can show that the difference between two subsequent discrete solutions should be bounded by the same asymptotic rate: 
+
+∥uh −u2h∥ ≤ ∥ u−uh∥+∥u−u2h∥ ≤ C1hp +C2(2 h)p ≤ C3hp, C1, C 2, C 3 > 0.
+
+11 6.1. Two-membrane contact problem 
+
+> Figure 1: Numerical solution for two membranes in contact using the Nitsche method.
+
+Let Ω ⊂ R2 be a polygonal domain describing the shape of two struc-turally similar membranes modeled by the Poisson equation that are initially 
+
+g (units of distance) apart. We denote the vertical displacements of the mem-branes by u1, u 2 : Ω → R and their tensions by κ1, κ 2 > 0, respectively. The membranes are initially separated by a gap g > 0. The external loading 
+
+f1, f 2 : Ω → R can cause the membranes to come in contact. Therefore, we introduce a contact constraint u1 − u2 ≤ g in Ω and a corresponding contact pressure λ : Ω → R to prevent penetration. The strong form of the problem reads as: find the displacements u =(u1, u 2) and the contact pressure λ between the membranes such that 
+
+−∇ · (κ1∇u1) + λ = f1 in Ω,
+
+−∇ · (κ2∇u2) − λ = f2 in Ω,u1 = 0 , u2 = 0 on ∂Ω,u1 − u2 ≤ g, λ ≥ 0, λ(u2 − u1 + g) = 0 in Ω.
+
+(28) 12 Remark 2. We define the problem such that the unknowns are the displace-ments of the membranes. Other authors, e.g. [29, 30], solve for the displaced coordinates of the membranes. 
+
+Explicitly, the second membrane is on top, initially g units higher than the first membrane. The constraint u1 − u2 ≤ g prevents penetration by stating that the relative displacement of the membranes does not exceed the initial gap g. The contact pressure λ appears with opposite signs in the equilibrium equations to represent the opposing forces in contact. The displacements 
+
+u1 and u2 are zero on the boundary and we shall numerically approximate them in Ω. We analytically solve and substitute the discrete λ in the Nitsche method. To derive the Nitsche method, we first identify the total potential energy of the unconstrained system, i.e. ignoring the contact force λ. Multiplying the first equilibrium equation with a test function v1 ∈ H10 (Ω) and integrating by parts yields the weak form 
+
+Z
+
+> Ω
+
+−∇ · (κ1∇u1)v1 =
+
+Z
+
+> Ω
+
+κ1∇u1 · ∇ v1 =
+
+Z
+
+> Ω
+
+f1v1,
+
+=⇒
+
+Z
+
+> Ω
+
+κ1∇u1 · ∇ v1 −
+
+Z
+
+> Ω
+
+f1v1 = 0 .
+
+It is clear that the first term is the variation (Gateaux derivative) of 12
+
+R 
+
+> Ω
+
+κ1∇u1·∇u1. The same steps hold for the second equation. Hence, summing the two equations results in the total energy for the two-membrane source problem 
+
+J(( u1, u 2)) = 12
+
+Z
+
+> Ω
+
+κ1∇u1 · ∇ u1 −
+
+Z
+
+> Ω
+
+f1u1 + 12
+
+Z
+
+> Ω
+
+κ2∇u2 · ∇ u2 −
+
+Z
+
+> Ω
+
+f2u2. (29) Next, we analyze the continuous saddle point problem and find the cor-responding Lagrange multiplier as we move towards the general Nitsche for-mulation (21). The constraint is given by β(( u1, u 2)) = u2 − u1 + g ≥ 0.Hence, for the Lagrange multiplier λ(( u1, u 2)) , consider the Lagrangian 
+
+L(( u1, u 2), λ ) = J(( u1, u 2)) −
+
+Z
+
+> Ω
+
+λ(( u1, u 2)) β(( u1, u 2)) . (30) Let κ1 < κ 2 such that the first membrane is less stiff. We can find the strong form of the Lagrange multiplier by setting the Gateaux derivative 13 with respect to v = ( v1, 0) to zero, and finally applying integration by parts: 
+
+L(u, λ ; v) = 
+
+12
+
+Z
+
+> Ω
+
+κ1∇(u1 + ϵv 1) · ∇ (u1 + ϵv 1) −
+
+Z
+
+> Ω
+
+f1(u1 + ϵv 1)+ 12
+
+Z
+
+> Ω
+
+κ2∇u2 · ∇ u2 −
+
+Z
+
+> Ω
+
+f2u2 −
+
+Z
+
+> Ω
+
+λ(u2 − (u1 + ϵv 1) + g)
+
+
+
+> ϵ=0
+
+=
+
+12
+
+Z
+
+> Ω
+
+κ1(∇u1 · ∇ u1 + 2 ϵ∇u1 · ∇ v1 + ϵ2∇v1 · ∇ v1) −
+
+Z
+
+> Ω
+
+f1u1 + ϵf 1v1
+
++ 12
+
+Z
+
+> Ω
+
+κ2∇u2 · ∇ u2 −
+
+Z
+
+> Ω
+
+f2u2 −
+
+Z
+
+> Ω
+
+λ(u2 − u1 − ϵv 1 + g)
+
+
+
+> ϵ=0
+
+=
+
+Z
+
+> Ω
+
+κ1∇u1 · ∇ v1 − f1v1 + λv 1
+
+=
+
+Z
+
+> Ω
+
+−κ1∆u1v1 − f1v1 + λv 1
+
+= 0 =⇒ λ = κ1∆u1 + f1.
+
+We now have the constraint and an expression for the Lagrange multiplier, but must still ensure that the stabilized discrete problem has the correct units. As described in Section 4, γ scales the discrete problem such that λ ∝ 
+
+> βγ
+
+. Because the discrete solution uh is differentiated twice in the definition 
+
+λ(uh) and β(uh) includes the solution uh in its original units (i.e., in meters), 
+
+γ must here include a square of the mesh parameter. Further, as we derived 
+
+λ with respect to the less stiff side per [24], the tension of the first membrane is included in λ and correspondingly γ must have its reciprocal. Hence, it must be that γ(h, κ ) = αh 2 
+
+> κ1
+
+for the units to coincide. To collect, the Nitsche terms are 
+
+λ(uh) = ∆ huh, 1 + f1, β(uh) = uh, 2 − uh, 1 + g, γ(h) = αh 2
+
+κ1
+
+,
+
+where ∆h denotes the element-wise Laplacian operator. Substituting these to (21) produces the Nitsche problem: find (uh, 1, u h, 2) ∈ Vh×Vh which minimizes 
+
+J(( uh, 1, u h, 2)) + 
+
+Z
+
+> Ω
+
+αh 2
+
+2κ1
+
+
+
+∆huh, 1 + f1 − κ1
+
+αh 2 (uh, 2 − uh, 1 + g)
+
+2+
+
+−
+
+Z
+
+> Ω
+
+αh 2
+
+2κ1
+
+(∆ huh, 1 + f1)2 .
+
+(31) 14 Remark 3. The Nitsche terms and formulation are derived similarly for other problems in Section 6. 
+
+The problem was solved numerically over Ω = (0 , 1) 2 with the parame-terization g = 0 .05 , f1 = 1 , f 2 = 0 , κ 1 = κ2 = 1 and α = 1e −2 using linear triangular elements. Note that the element-wise Laplacian for linear elements is equal to zero which simplifies the formulation. The numerical solution is displayed in Figure 1 and the approximated linear convergence rate in Figure 2. 10 2 10 1    
+
+> h
+> 10 2
+> 10 1
+> u2h uh 1
+> error
+> O(h)
+> Figure 2: Two membrane contact problem convergence rate follows the theoretical linear convergence in the H1norm for linear finite element basis.
+
+As described earlier, we can revert to the penalty method by removing the terms depending on λ(( u1, u 2)) . However, the penalty method retains the optimal convergence rate only with linear elements, and to produce the same level of accuracy as Nitsche for quadratic or higher order elements we need 15 0 2 5 8 10 12 15 18 20       
+
+> Iter
+> 10 2
+> 10 3
+> 10 4
+> Condition number
+> penalty h=8.8e-02
+> nitsche h=8.8e-02
+> penalty h=1.8e-01
+> nitsche h=1.8e-01
+> penalty h=3.5e-01
+> nitsche h=3.5e-01
+
+Figure 3: Condition numbers of the Jacobian in the Newton iterations (A.6) for the penalty and Nitsche variants of the two membrane contact problem with quadratic elements. The blue lines depict condition numbers of the penalty method and red lines of the Nitsche method, respectively. The markers distinguish problems of different sizes. Compared to the Nitsche method’s γ = αh 2, the penalty method requires γ = αh 3 to retain opti-mal convergence [31] and has thus consistently larger conditioning numbers with slower convergence. 
+
+to increase the power of h in γ [31]. This leads to higher condition numbers in the Newton iteration, see Figure 3 for an example in the quadratic case. 
+
+6.2. Membrane against elastic solid 
+
+Let Ω1 describe the membrane 
+
+Ω1 = {(x, y, 0) ∈ R3 : 0 < x, y < 1}
+
+and Ω2 describe the linear elastic cube, initially g units apart from Ω1:
+
+Ω2 = {(x, y, z + g) ∈ R3 : 0 < x, y, z < 1}.
+
+16 The energy of the source problem including membrane and linear elastic solid reads 
+
+J(( u1, u2)) = J1(u1) + J2(u2) (32) where 
+
+J1(u1) = 
+
+Z
+
+> Ω1
+
+∇u1 · ∇ u1 −
+
+Z
+
+> Ω1
+
+f u 1 (33) and 
+
+J2(u2) = 
+
+Z
+
+> Ω2
+
+σ(u2) : ε(u2). (34) The functions σ and ε have been defined in equations (25) and (26), respec-tively. Given the initial gap g > 0, we set the physical non-interpenetration constraint as u1 − u2 · n ≤ g (in Ω1) which results in β(( u1, u2)) = u2 ·
+
+n − u1 + g ≥ 0. The Lagrange multiplier for the problem is λ(( u1, u2)) = 
+
+−σ(u2)n2 · n2 and the scaling is γ(h) = αh . Thus, the Nitsche method minimizes the constrained energy 
+
+J(u1,h , u2,h ) + 
+
+Z
+
+> Ω1
+
+αh 
+
+2
+
+
+
+−σ(u2)n2 · n2 − 1
+
+αh (u2 · n − u1 + g)
+
+2+
+
+−
+
+Z
+
+> Ω1
+
+αh 
+
+2 (−σ(u2)n2 · n2)2.
+
+(35) The problem was solved numerically using a gap of g = 0 .1, μL = λL = 1 ,
+
+f = 2 and α = 1e −2 using linear hexahedral elements for the solid and linear quadrilateral elements for the membrane. The numerical solution is displayed in Figure 4 and the approximated linear convergence rate in Figure 5. The first principal stress for the solid is presented in Figure 6. 17 Figure 4: Numerical solution for the membrane against elastic solid problem using the Nitsche method. 10 2 10 1  
+
+> h
+> 10 2
+> 10 1
+> u2h uh 1
+> error
+> O(h)
+
+Figure 5: Convergence rate in the H1 norm for the membrane against elastic solid problem. 
+
+18 (a) (b)  
+
+> Figure 6:
+
+The first principal stress for the elastic solid in membrane against elastic solid problem. 
+
+6.3. Plate against plate 
+
+The plate against plate problem follows very closely the two membrance contact problem with the difference of higher order derivatives in the strain energy. The energy of the source problem is 
+
+J(( u1, u 2)) = 12
+
+Z
+
+> Ω2
+
+X
+
+> i,j =1
+
+ ∂u 1
+
+∂x ixj
+
+2
+
+−
+
+Z
+
+> Ω
+
+f1u1 + 12
+
+Z
+
+> Ω2
+
+X
+
+> i,j =1
+
+ ∂u 2
+
+∂x ixj
+
+2
+
+−
+
+Z
+
+> Ω
+
+f2u2.
+
+(36) We assume again a gap g > 0 such that u1 − u2 ≤ g in Ω for the constraint 
+
+β(u1, u 2) = u2 − u1 + g ≥ 0. Then, we have λ(( u1, u 2)) = −∆2u1 − f1 and 
+
+γ(h) = αh 4.Hence, the Nitsche problem minimizes the energy 
+
+J(( uh, 1, u h, 2)) + 
+
+Z
+
+> Ω
+
+αh 4
+
+2
+
+
+
+−∆2
+
+> h
+
+uh, 1 − f1 − 1
+
+αh 4 (uh, 2 − uh, 1 + g)
+
+2+
+
+−
+
+Z
+
+> Ω
+
+αh 4
+
+2
+
+ −∆2
+
+> h
+
+uh, 1 − f1
+
+2 ,
+
+(37) where ∆2 
+
+> h
+
+denotes the element-wise biharmonic operator. The problem was solved numerically over Ω = (0 , 1) 2, a gap of g = 0 .05 ,
+
+f1 = 100 , f2 = 0 and α = 1e −2 using triangular Morley elements [32]. Notice that the Morley element is quadratic and hence the element-wise biharmonic 19 operator evaluates to zero. The numerical solution is displayed in Figure 7 and the approximated linear convergence rate in Figure 8. 
+
+Figure 7: Numerical solution for two plates in contact using the Nitsche method. The nonconforming Morley element results in small discontinueties over element boundaries. 
+
+20 10 2 10 1 
+
+> h
+> 10 1
+> 10 0
+> u2h uh 2
+> error
+> O(h)
+
+Figure 8: Two plate contact problem convergence rate follows the theoretical linear con-vergence in the H2 norm with the Morley elements [32]. 
+
+6.4. Kirchhoff plate with inequality boundary condition 
+
+Let Ω = (0 , 1) 2. For the plate corners problem [33], the energy with normalized units reads 
+
+J(u) = 
+
+Z
+
+> Ω2
+
+X
+
+> i,j =1
+
+ ∂2u∂x i∂x j
+
+2
+
+−
+
+Z
+
+> Ω
+
+f u. (38) We consider the problem where Γ = ∂Ω and β(u) = u ≥ 0 on Γ. Then, the scaling parameter is γ(h) = αh 3 and the Lagrange multiplier is λ(u) = 
+
+K(u) := Qn + ∂M ns  
+
+> ∂s
+
+, where M = −Hu , Q = div M , n is the normal vector and s the tangent vector on Γ and K(u) is called the Kirchhoff shear force [9]. The Nitsche functional is thus 
+
+J(uh) + 
+
+Z
+
+> Γ
+
+αh 3
+
+2
+
+
+
+Kh(u) − 1
+
+αh 3 uh
+
+2+
+
+−
+
+Z
+
+> Γ
+
+αh 3
+
+2 Kh(u)2, (39) where Kh is the element-wise evaluation of K.21 The problem was solved numerically with f = −1 and α = 1 /4 using quadrilateral Bogner–Fox–Schmit elements [34]. The numerical solution is displayed in Figure 9 and the approximated quadratic convergence rate in Figure 10. 0.0 
+
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> X
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Y
+> 0.004
+> 0.003
+> 0.002
+> 0.001
+> 0.000
+> 0.001
+> 0.004
+> 0.003
+> 0.002
+> 0.001
+> 0.000
+> 0.001
+
+Figure 9: The corners of the plate are displaced upwards when downwards point load is applied at the middle of the plate, approximate solution using Nitsche’s method. 
+
+22 10 2 10 1   
+
+> h
+> 10 4
+> 10 3
+> 10 2
+> u2h uh 2
+> error
+> O(h2)Figure 10: The convergence rate of the Kirchhoff plate with inequality boundary condition follows the theoretical quadratic convergence.
+
+7. Conclusions 
+
+While the Nitsche method is commonly viewed as a consistency correction to the penalty method, we demonstrate how new methods can be obtained starting from a general minimization form. This allows for developing novel Nitsche methods for problems with both equality and inequality constraints in a simple manner. We derived and implemented several new problems using the approach. Our numerical experiments suggest that the methods converge optimally while the more careful numerical analysis remains a topic of future work. 
+
+Acknowledgements 
+
+We wish to thank Rolf Stenberg for valuable comments on the manuscript. 23 Appendix A. Newton’s method 
+
+Consider a problem-dependent Sobolev space U and its corresponding subspace V of functions with zero boundary values so that V ⊂ U and 
+
+u + v ∈ U ∀v ∈ V . We want to find a solution to the energy minimization problem 
+
+min  
+
+> u∈U
+
+J(u) (A.1) where J : U → R represents the energy of the system. Let v ∈ V denote an arbitrary perturbation to u. A solution u ∈ U to (A.1) satisfies 
+
+J′(u; v) = 0 ∀v ∈ V, (A.2) where J′ : U × V → R denotes the directional (Gateaux) derivative defined by 
+
+J′(u; v) = ∂J (u + ϵv )
+
+∂ϵ ϵ=0 
+
+.
+
+The directional derivative is linear in v, but, in general, nonlinear in u.Let f = J′. We assume that the problem 
+
+f (u; v) = 0 ∀v ∈ V
+
+is nonlinear in u and, hence, the standard Ritz–Galerkin method cannot be directly applied to obtain a linear system of equations. Consequently, we approach the problem as a root-finding problem and linearize f to use the Newton’s method. More precisely, let u0 ∈ U be an initial value such that the solution is written as u = u0 + w for some w ∈ V . The perturbation w
+
+is unknown, but can be approximated by discarding the higher order terms of the Taylor series of f :
+
+0 = f (u; v) = f (u0 + w; v) ≈ f (u0; v) + f ′(u0; v, w ),
+
+where f ′ : U × V × V → R is the directional derivative of f .A single step of the Newton’s method then reads: find w ∈ V such that 
+
+f ′(u0; v, w ) = −f (u0; v) ∀v ∈ V. (A.3) Note that if u0 ∈ U is fixed, then the problem is linear with respect to w ∈ V
+
+and the standard Ritz–Galerkin method can be applied iteratively. 24 For the numerical scheme, we use the finite element method. Let Th be a mesh of elements with maximum edge length h > 0. The finite dimensional subspaces Uh ⊂ U and Vh ⊂ V contain element-wise polynomial functions of a given degree. The discrete problem then reads: given u0,h ∈ Uh, find 
+
+wh ∈ Vh such that 
+
+f ′(u0,h ; vh, w h) = −f (u0,h ; vh) ∀vh ∈ Vh. (A.4) The directional derivative of f is computable as u0,h is given. The equation (A.4) can be posed as a linear system of equations. Let 
+
+{ϕi}ni=1 , n = dim( Vh), be a finite element basis that span Vh. Then 
+
+wh =
+
+> n
+
+X
+
+> j=1
+
+βj ϕj , (A.5) where βj ∈ R are the unknown degrees-of-freedom. Choosing vh = ϕi, we have nX
+
+> j=1
+
+βj f ′(u0,h ; ϕi, ϕ j ) = −f (u0,h ; ϕi),
+
+and collecting all i = 1 , . . . , n results in a linear system 
+
+Jβ = f (A.6) where 
+
+Jij = f ′(u0,h ; ϕi, ϕ j ), fi = −f (u0,h ; ϕi),
+
+or, if the problem is given directly in the minimization form, 
+
+Jij = J′′ (u0,h ; ϕi, ϕ j ), fi = −J′(u0,h ; ϕi).
+
+The direction (A.5) is then found from the solution β.To conclude, starting from an initial value u0,h ∈ Uh, we find an approxi-mation uh ∈ Uh such that J′(uh; vh) = 0 for all vh ∈ Vh through the iterative scheme uk+1 ,h = uk,h + αkwk,h , where 0 < α k ≤ 1 is a step size parameter. Under standard assumptions the method converges quadratically. 
+
+References 
+
+[1] J. Nitsche, Über ein Variationsprinzip zur Lösung von Dirichlet-Problemen bei Verwendung von Teilräumen, die keinen Randbedingun-gen unterworfen sind, in: Abhandlungen aus dem mathematischen Sem-inar der Universität Hamburg, Vol. 36, Springer, 1971, pp. 9–15. 25 [2] R. Courant, Variational methods for the solution of problems of equi-librium and vibrations, Bull. Amer. Math. Soc. (1943) 1–23. [3] I. Babuška, The finite element method with Lagrangian multipliers, Nu-merische Mathematik 20 (3) (1973) 179–192. [4] T. Gustafsson, R. Stenberg, Finite element methods for elastic contact: penalty and Nitsche, Rakenteiden Mekaniikka 58 (2) (2025) 46–58. [5] R. Becker, P. Hansbo, R. Stenberg, A finite element method for domain decomposition with non-matching grids, ESAIM: Mathematical Mod-elling and Numerical Analysis 37 (2) (2003) 209–225. [6] P. Hansbo, M. G. Larson, Discontinuous Galerkin methods for incom-pressible and nearly incompressible elasticity by Nitsche’s method, Com-puter methods in applied mechanics and engineering 191 (17-18) (2002) 1895–1908. [7] E. Burman, S. Claus, P. Hansbo, M. G. Larson, A. Massing, CutFEM: discretizing geometry and partial differential equations, International Journal for Numerical Methods in Engineering 104 (7) (2015) 472–501. [8] M. Juntunen, R. Stenberg, Nitsche’s method for general boundary con-ditions, Mathematics of computation 78 (267) (2009) 1353–1374. [9] T. Gustafsson, R. Stenberg, J. Videman, Nitsche’s method for Kirchhoff plates, SIAM Journal on Scientific Computing 43 (3) (2021) A1651– A1670. [10] F. Chouly, P. Hild, A Nitsche-based method for unilateral contact prob-lems: numerical analysis, SIAM Journal on Numerical Analysis 51 (2) (2013) 1295–1307. [11] F. Chouly, An adaptation of Nitsche’s method to the Tresca friction problem, Journal of Mathematical Analysis and Applications 411 (1) (2014) 329–339. [12] T. Gustafsson, R. Stenberg, J. Videman, Mixed and stabilized finite element methods for the obstacle problem, SIAM Journal on Numerical Analysis 55 (6) (2017) 2718–2744. 26 [13] F. Chouly, T. Gustafsson, P. Hild, A Nitsche method for the elastoplas-tic torsion problem, ESAIM: Mathematical Modelling and Numerical Analysis 57 (3) (2023) 1731–1746. [14] T. Gustafsson, R. Stenberg, J. Videman, Nitsche’s method for the ob-stacle problem of clamped Kirchhoff plates, in: European Conference on Numerical Mathematics and Advanced Applications, Springer, 2017, pp. 407–415. [15] J. Benzaken, J. A. Evans, R. Tamstorf, Constructing Nitsche’s method for variational problems, Archives of Computational Methods in Engi-neering 31 (4) (2024). [16] R. Stenberg, On some techniques for approximating boundary conditions in the finite element method, Journal of Computational and Applied Mathematics 63 (1-3) (1995) 139–148. [17] H. J. Barbosa, T. J. Hughes, Circumventing the Babuška-Brezzi condi-tion in mixed finite element approximations of elliptic variational in-equalities, Computer methods in applied mechanics and engineering 97 (2) (1992) 193–210. [18] E. Burman, P. Hansbo, M. G. Larson, R. Stenberg, Galerkin least squares finite element method for the obstacle problem, Computer Meth-ods in Applied Mechanics and Engineering 313 (2017) 362–374. [19] F. Chouly, P. Hild, Y. Renard, Finite element approximation of contact and friction in elasticity, Springer, 2023. [20] E. Burman, P. Hansbo, M. G. Larson, The augmented Lagrangian method as a framework for stabilised methods in computational me-chanics, Archives of Computational Methods in Engineering 30 (2023) 2579–2604. [21] T. Gustafsson, Finite element methods for contact problems, Ph.D. the-sis, Aalto University (2018). [22] H. Brezis, Functional analysis, Sobolev spaces and partial differential equations, Vol. 2, Springer, 2011. 27 [23] T. Gustafsson, R. Stenberg, J. H. Videman, Nitsche’s method for unilat-eral contact problems, Portugaliae Mathematica 75 (3) (2019) 189–204. [24] T. Gustafsson, R. Stenberg, J. Videman, Error analysis of Nitsche’s mortar method, Numerische Mathematik 142 (4) (2019) 973–994. [25] F. Chouly, P. Hild, Y. Renard, Symmetric and non-symmetric variants of nitsche’s method for contact problems in elasticity: theory and numer-ical experiments, Mathematics of Computation 84 (293) (2015) 1089– 1112. [26] T. Gustafsson, G. D. McBain, scikit-fem: A Python package for finite element assembly, Journal of Open Source Software 5 (52) (2020) 2369. [27] J. Bradbury, et al., JAX: Autograd and XLA, Astrophysics Source Code Library (2021) ascl–2111. [28] V. Kohonen, T. Gustafsson, Numerical experiments for "Nitsche Methods for General Equality and Inequality Constraints", zenodo 10.5281/zenodo.18221987 (Jan. 2026). doi:10.5281/zenodo.18221987. [29] F. Ben Belgacem, C. Bernardi, A. Blouza, M. Vohralík, On the unilateral contact between membranes. part 1: Finite element discretization and mixed reformulation, Math. Model. Nat. Phenom. 4 (1) (2009) 21–43. doi:10.1051/mmnp/20094102. URL https://doi.org/10.1051/mmnp/20094102 
+
+[30] F. Ben Belgacem, C. Bernardi, A. Blouza, M. Vohralík, On the unilateral contact between membranes. part 2: a posteriori analysis and numerical experiments, IMA Journal of Numerical Analysis 32 (3) (2012) 1147– 1172. [31] T. Gustafsson, R. Stenberg, J. Videman, On finite element formulations for the obstacle problem–mixed and stabilised methods, Computational Methods in Applied Mathematics 17 (3) (2017) 413–429. [32] L. Beirão da Veiga, J. Niiranen, R. Stenberg, A posteriori error analysis for the Morley plate element with general boundary conditions, Interna-tional journal for numerical methods in engineering 83 (1) (2010) 1–26. 28 [33] S. A. Nazarov, A. Stylianou, G. Sweers, Hinged and supported plates with corners, Zeitschrift für angewandte Mathematik und Physik 63 (5) (2012) 929–960. [34] F. K. Bogner, The generation of interelement compatible stiffness and mass matrices by the use of interpolation formulae, in: Proc. Conf. Ma-trix Methods in Struct. Mech., Airforce Inst. Of Tech., Wright Patterson AF Base, Ohio, 1965. 29

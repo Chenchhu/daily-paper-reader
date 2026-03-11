@@ -1,0 +1,1410 @@
+Title: A Regularized Ensemble Kalman Filter for Stochastic Phase Field Models of Brittle Fracture
+
+URL Source: https://arxiv.org/pdf/2603.09728v1
+
+Published Time: Wed, 11 Mar 2026 01:21:17 GMT
+
+Number of Pages: 25
+
+Markdown Content:
+# A Regularized Ensemble Kalman Filter for Stochastic Phase Field Models of Brittle Fracture 
+
+# Lucas Hermann 1 Ralf J¨ anicke 2 Knut Andreas Meyer 3 Ulrich R¨ omer 1
+
+> 1
+
+TU Braunschweig, Institute for Acoustics and Dynamics 
+
+> 2
+
+TU Braunschweig, Institute for Applied Mechanics 
+
+> 3
+
+Chalmers University of Technology, Dept. of Mechanical Engineering 09.03.2026 
+
+Abstract 
+
+The phase-field approach to brittle fracture provides a continuum framework for modeling crack ini-tiation and propagation without explicit representation of discrete crack surfaces, provided the spatial discretization is fine enough to resolve the regularization length scale. However, uncertain local material parameters due to material defects can strongly influence simulation results, such as crack paths and remaining structural strength. At the same time, the ability to continuously monitor structures using sensors allows complementing modeling predictions with, e.g., displacement measurements. In this contribution, we connect these two complementary sources of information and present a Bayesian inference procedure that allows updating the current model state with incoming sensor data. We construct a Bayesian prior for the model state (both displacements and phase-field) and employ an ensemble Kalman filter (EnKF) to perform the update. In the EnKF, the update is computed by perform-ing a Kalman shift on each ensemble member. Since the standard EnKF may produce assimilated states that violate common modeling assumptions, we present a phase field-based regularization technique as a proximal step correction toward model-consistent updates. 1D and 2D numerical examples demonstrate the performance and accuracy of the proposed method and show that the updated state matches the ground truth reasonably well. Unlike traditional Bayesian inversion techniques, which have already been applied to brittle fracture, we infer not the model parameters but the model state, i.e., the displacement field and the phase-field. Although only displacements are observed, the strong correlation between both fields also allows inference of the posterior phase-field. 
+
+# 1 Introduction 
+
+Phase field fracture modeling was originally proposed to simulate crack propagation in brittle materials [1, 2], and has later been extended to ductile fracture [3] and fatigue crack growth [4]. The gradient-regularization ensures mesh-independent results in the case of a sufficiently fine spatial discretization. However, crack propagation is highly dependent on variations in boundary conditions and local material defects, both in physical experiments and models. Given that material parameters and initial conditions are often only partially known, Uncertainty Quantification (UQ) methods are employed to establish a probabilistic forward problem [5, 6]. In this context, the forward problem entails propagating uncertainty in the input parameters to model outputs. Input parameters can be related to material properties, initial conditions, and boundary conditions. The goal is then to determine the induced probability distribution for model outputs, such as displacement and the phase field and the corresponding crack paths. In this context, multivariate Gaussian approximations for the output densities are appealing to reduce the computational cost. These Gaussian distributions are defined via a mean and variance for each point of the domain, as well as two-point correlation functions and the correlations across fields. For non-linear phase field problems, the uncertainty in the output can be substantial. To mitigate this uncertainty, real-world data can be collected, for instance, through Digital Image Correlation (DIC) [7]. In a Bayesian context, prior distributions can be conditioned on this data, see, e.g. [8], effectively assimilating the data into the model. For a specific structure of the data model, this results in a new Gaussian posterior that has a reduced variance, particularly around sensor locations. 1
+
+> arXiv:2603.09728v1 [cs.CE] 10 Mar 2026
+
+The phase field fracture model operates using a quasi-static time-stepping regime, incrementally increasing the load to trace the evolving damage. In some cases, measurement data may be available at various time steps or loads during the simulation, requiring conditioning of the time-evolving probability distribution on incoming data. This process can be managed through Kalman filtering, where the model is advanced until the time step with available data. The solution is then conditioned on the measured data, and the resulting posterior distribution serves as the initial condition for subsequent uncertainty propagation. For non-linear models, the Extended Kalman Filter (EKF) is typically employed to linearize the problem. Alternatively, the Ensemble Kalman Filter (EnKF) can be used for non-linear problems, operating in a Monte Carlo fashion, which reduces uncertainty over time as different members of the ensemble converge toward a common mean. The reader is referred to [9] and the references therein for a discussion. Applying Kalman filtering to the phase field brittle fracture model presents several challenges. Since the phase field variable attempts to model a smeared but localized crack, fine discretization and the positioning of sensors around the crack path are needed. Additionally, the phase field variable is history-dependent, requiring measures to prevent unphysical solutions during the conditioning process. The aforementioned non-linearities further complicate the filtering approach. This paper aims to provide a data-corrected solution to the phase field fracture problem, particularly when dealing with non-unique crack path solutions. These may occur if the phase field is highly sensitive to mesh parameters, initial conditions or material configurations [5]. Our goal is to infer the phase field solution based on data for the displacement, leveraging the model-based correlation between both fields. It is important to note that there exists other works on data assimilation procedures, applied to numerical fracture problems. For instance, [10] derived a Bayesian approach to update scalar parameters of the phase field model, albeit not the complete high-dimensional state as targeted in this publication. The authors in [11] employ a linear elastic fracture mechanics approach and use it in conjunction with an EKF. The method parametrizes the crack, hence e.g. the length or the angle of the crack surface take a certain value, given a load increment. These parameters are subject to uncertainty and updated throughout time with the EKF. The authors state that, so far, only cracks in form of a straight line can be parametrized and updated in the given framework. In [12], the authors make use of an hydraulic fracture model, the parameters of which are updated using, again, an EKF. Here, the corresponding crack surface, i.e. the shape of the crack path, is parametrized with few parameters which are updated with the EKF. The authors of [13] focus on fatigue fracture. The model is based on XFEM and three crack parameters, stemming from Paris’ law for fatigue crack growth, are updated with an EKF. In [14], the authors use an EnKF to update fracture length and angle parameters of a 2D fracture field featuring multiple straight cracks. The mentioned references have in common that they use a Kalman Filter and parametric fracture models. The downside of these parametric fracture models, albeit being rather computationally cheap, is a lack in flexibility concerning the crack path compared to phase field models. In many cases, the overall shape and rough path of the expected crack need to be known beforehand. Geometrically complex crack surfaces are very hard to model. For XFEM, specifically, tracking a crack in three dimensions is challenging. The phase field approach to brittle fracture, as adopted in this paper, however, doesn’t assume a certain geometry of the crack. An extension to three dimensions is rather simple. Instead of updating only few parameters, the complete state of the phase field and displacement is updated using an EnKF. This makes it possible to gather real world data from complex crack paths and, in theory, end up with a model solution much closer to reality compared to the parametric models. The differences of phase field fracture models to a parametric one (in that case XFEM) are explained in great detail in [15]. The paper is structured as follows: The next chapter introduces phase field brittle fracture modeling, with a focus on the micromorphic phase field model [16]. Following this, the stochastic forward problem is presented, resulting in the prior state suitable for data assimilation. The subsequent section addresses the stochastic data model as well as the filtering. We put a special focus on the regularization of the posterior which is necessary in order to enforce physically relevant properties. A 1D numerical example is developed alongside the theory to illustrate the procedure. In the last chapter, a 2D example is used to demonstrate the ideas in a more relevant setting. 
+
+# 1.1 Notation 
+
+Before proceeding to the phase field model and Kalman filtering techniques, we first comment on the notation used throughout this study. Scalars (scalar fields) are denoted by Roman type, while vectors (vector fields) are represented with bold-italic characters. Additionally, blackboard bold characters are reserved for function spaces and sets (e.g. R). After discretization, bold-italic characters are used again for vectors and matrices. 2A Gaussian random vector is denoted as a ∼ N (¯ a, Ca), with mean vector ¯ a and covariance matrix Ca.We use p(a) to denote the (multivariate) probability density function of a and p(a|b) to denote the density, conditional on b. We use the same symbol for a random variable/vector and the respective realization, since the meaning is clear from the context. The quantity ∥a∥2 
+
+> C
+
+= a⊤C−1a denotes a weighted Euclidean norm. We will employ indices as follows: an,k denotes the k-th iterate in the Newton-Raphson iteration at displacement increment n and an refers to the final iterate. During Kalman filtering we distinguish between the forecasted state aF and the assimilated state aA from data. In the context of the ensemble Kalman filter, aF/A 
+
+> n,i
+
+denote the forecasted/assimilated state at increment n of the i-th ensemble member. Finally, we distinguish between a function and the value it takes, e.g., ˆE refers to a function, whereas E is the value it takes given specific arguments. 
+
+# 2 Phase field brittle fracture 
+
+The phase field modeling approach summarized in this chapter has been put forth in [16, 17, 18]. Let Ω ⊂ Rd,
+
+d = 1 , 2, be an open and bounded domain, occupied by a linear elastic continuum. The boundary is separated into a Dirichlet boundary Γ u 
+
+> D
+
+and, besides the natural boundary conditions, a prescribed Neumann boundary Γu
+
+> N
+
+, such that Γ u 
+
+> D
+
+∩ Γu 
+
+> N
+
+= ∅. For the phase field itself, no boundary conditions are prescribed, hence only homogeneous Neumann conditions are involved. Within the continuum, cracks can develop, as visible in Figure 1a. Γu
+
+> D
+
+Γu
+
+> N
+
+Ω
+
+> a) A crack is represented by a sharp fracture surface, which is challenging to handle numerically.
+
+l
+
+Γu
+
+> D
+
+Γu
+
+> N
+
+Ω
+
+> b) Through phase field regularization, the fracture sur-face is effectively approximated by a smooth field.
+
+Figure 1: Phase field regularization of a fracture in a continuum, based on [16] A sharp crack results in a discontinuity within the continuum along the time-evolving crack surface Γ c.The phase field method for brittle fracture aims to regularize the discontinuity in terms of the phase field variable φ(x, t ) ∈ [0 , 1], where 0 signifies an undamaged material and 1 a fully fractured one. The length scale parameter ℓ ∈ R+ controls the width of the resulting regularized crack, as visible in Figure 1b. The phase field method for brittle fracture is based on minimising an energy functional 
+
+E(u, φ ) = 
+
+Z
+
+> Ω
+
+g(φ)Ψ +(ˆ ϵ(u)) dΩ + 
+
+Z
+
+> Ω
+
+Ψ−(ˆ ϵ(u)) dΩ −
+
+Z
+
+> Γu
+> N
+
+tN · u dΓ +
+
+Z
+
+> Ω
+
+Gc
+
+cwℓ
+
+ w(φ) + ℓ2|∇ φ|2 dΩ ,
+
+(1) in which Ψ ± (ˆ ϵ(u)) is the split elastic strain energy density, where Ψ + is the fracture driving part. Moreover, ˆϵ(u) is the symmetric part of the displacement gradient and u(x, t ) the displacement. In the numerical examples, the volumetric-deviatoric split is used and we have for Ψ ±
+
+Ψ+ = 12 K⟨tr( ϵ)⟩2 + μ(ϵdev : ϵdev ), Ψ− = 12 K⟨− tr( ϵ)⟩2, (2) The boundary term over the Neumann boundary Γ u 
+
+> N
+
+models an applied traction. Finally, we use the so-called AT2 fracture model with 
+
+g(φ) = (1 − φ)2, cw = 2 , w(φ) = φ2 (3) 3where g is the degradation function, w the local dissipation function, and cw the associated scaling to make 
+
+Gc the fracture energy. Notice that this is a quasi-static problem, hence the numerical problem will be treated as being stationary. Therefore, we omit time indices at this point of the derivation and will introduce these later when they become relevant for the EnKF. For the moment it is sufficient to introduce φ′ as the phase field of the previous time/loading step. In this paper, a modified version of the phase field problem will be used, namely the micromorphic approach according to [16]. The energy functional parametrization is then extended by the micromorphic variable, d, and a term penalizing the difference between the phase field φ and d is added, resulting in 
+
+E = ˆE(u, φ, d ) = 
+
+Z
+
+> Ω
+
+g(φ)Ψ +(ˆ ϵ(u)) dΩ + 
+
+Z
+
+> Ω
+
+Ψ−(ˆ ϵ(u)) dΩ −
+
+Z
+
+> Γu
+> N
+
+tN · u dΓ +
+
+Z
+
+> Ω
+
+Gc
+
+cwℓ
+
+ w(φ) + ℓ2|∇ d|2 dΩ + 
+
+Z
+
+> Ω
+
+α
+
+2 (φ − d)2dΩ .
+
+(4) By introducing the function spaces 
+
+U = {u ∈ (H1(Ω)) 2 | u = uD on Γ u
+
+> D
+
+}, (5a) 
+
+U0 = {u ∈ (H1(Ω)) 2 | u = 0 on Γ u
+
+> D
+
+}, (5b) 
+
+D = H1(Ω) , (5c) the Euler-Lagrange equations, related to (4), read: find ( u, d, φ ) ∈ U × D × L2(Ω) such that 
+
+Z
+
+> Ω
+
+g(φ)σ+ : ˆ ϵ(δu) dΩ + 
+
+Z
+
+> Ω
+
+σ− : ˆ ϵ(δu) dΩ −
+
+Z
+
+> Γu
+> N
+
+tN · δu dΓ = 0 ∀δu ∈ U0, (6) 
+
+Z
+
+> Ω
+
+2Gcℓcw
+
+∇d · ∇ δd dΩ −
+
+Z
+
+> Ω
+
+α(φ − d)δd dΩ = 0 ∀δd ∈ D, (7) 
+
+Z
+
+> Ω
+
+δφ 
+
+
+
+g′(φ)Ψ +(ˆ ϵ(u)) + Gc
+
+cwℓ w′(φ)) + α(φ − d)
+
+
+
+dΩ = 0 ∀δφ ∈ L2(Ω) . (8) Equation (8) implies that 
+
+g′(φ)Ψ +(ˆ ϵ(u)) + Gc
+
+cwl w′(φ) + α(φ − d) = 0 , (9) almost everywhere 1 in Ω, however, we will assume additional regularity so that (9) holds pointwise in Ω. The constraints on φ, irreversibility, ˙φ ≥ 0, and bounds, 0 ≤ φ ≤ 1, can then be enforced locally. With the chosen AT2 fracture model, Equation (9) can then be solved analytically as 
+
+φ = ˆ φ(u, d, φ ′, ℓ ) = min max 2Ψ +(ˆ ϵ(u)) + αd 
+
+2Ψ +(ˆ ϵ(u)) + α + Gc
+
+> ℓ
+
+, φ ′
+
+!
+
+, 1
+
+!
+
+, (10) where the dependence on quantities ( u, d, φ ′, ℓ ) is highlighted, since these will be modified later on as part of the Kalman filter. 
+
+# FEM for PF fracture 
+
+The phase-field fracture problem is solved with the Finite Element Method (FEM), introducing the approx-imations 
+
+u(x) ≈ uh(x) = X
+
+> i
+
+ϕui (x)aui , d(x) ≈ dh(x) = X
+
+> i
+
+ϕdi (x)adi (11) such that the energy, E ≈ ˆE(uh, d h; φ′
+
+> h
+
+, ℓ ) = ˆEh(au, ad; φ′, ℓ ). Note that because of φh = ˆ φ(uh, d h, φ ′
+
+> h
+
+; ℓ)we have rewritten ˆE(uh, φ h, d h) = ˆE(uh, d h; φ′
+
+> h
+
+, ℓ ), where we now explicitly state the dependence on φ′
+
+> h
+
+, ℓ .
+
+> 1That is except on sets of Lebesgue measure zero.
+
+4This notation will be required to introduce the Kalman filter regularization. Minimizing ˆEh leads to 
+
+Rui (au, ad; φ′, ℓ ) = 
+
+Z
+
+> Ω
+
+ˆϵ(ϕui ) : g(φh)σ+ + σ− dΩ −
+
+Z
+
+> Γu
+> N
+
+ϕui · tN dΓ = 0 , (12) 
+
+Rdi (au, ad; φ′, ℓ ) = 
+
+Z
+
+> Ω
+
+∇ϕdi ·
+
+ 2Gcℓcw
+
+∇dh
+
+
+
+dΩ −
+
+Z
+
+> Ω
+
+ϕdi α(φh − dh) dΩ = 0 . (13) Following [16], we adopt convexification via extrapolation [19], using the extrapolated micromorphic field, ˇad = adn−1 + ∆ tn
+
+(adn−1 − adn−2)∆tn−1
+
+, ˇdh = X
+
+> i
+
+ϕdi ˇadi , (14) and φ ≈ ˇφ = ˆ φh(uh, ˇdh; φn−1, ℓ ) in (12) and (13). Note that we only indicate past indices n − 1, n − 2 and not the current one n, to keep the notation lighter. We also use φ instead of ˇ φ in the following, keeping in mind that always ˇdh is used here as an argument. With these definitions, we now collect the state variables (per quadrature point), φ, unknowns, a = ( au, ad), and residuals, R = ( Ru, Rd), such that we have the complete equation system 
+
+Ru(au, ˇad; φn−1, ℓ ) = 0 , (15) 
+
+Rd(au, ad; φn−1, ℓ ) = 0 , (16) that we solve monolithically in each time step using the standard Newton-Raphson method. Note that (16) is linear in ad, as ˇ ad is used to calculate φh.
+
+Remark. Solving the FE system of equations which is defined in this section is computationally very de-manding. In [20], the CPU hours were compared for different solution schemes. As we not only aim to solve a deterministic phase field problem, but a stochastic one based on an ensemble strategy, which potentially involves hundreds of parallel model evaluations, some precautions have to be taken to keep the CPU hours per ensemble member low and hence the stochastic evaluation feasible. Firstly, a coarser mesh is applied in the regions where a crack is not expected in order to reduce the number of degrees of freedom of the resulting FE system of equations. Secondly, the monolithic solution strategy has been chosen deliberately over a staggered one, because it requires significantly less CPU hours [20]. Lastly, the Volumetric-Deviatoric energy split is chosen over the spectral decomposition, as that split is computationally more demanding than the Volumetric-Deviatoric split. 
+
+# 2.1 Deterministic solution of the phase field problem/ True underlying solution 
+
+Solving the phase field problem for a fixed set of parameters yields a deterministic solution. This solution can in the further process serve as a reference solution from which data can be observed. We want to explain the concepts developed in this paper along with a simple example. To this end, we introduce a solution to the phase field problem on a 1D domain. Figure 2 illustrates the mechanical setup: A tension rod on Ω = [ −1, 1] in [mm] is pulled in a displacement controlled manner until failure. ∆u
+
+Figure 2: 1D numerical experiment 
+
+Parameter Value 
+
+Fracture Model AT2 
+
+E 210000 [N/mm 2]
+
+ν 0.3 [-] 
+
+Gc 2.7 [N/mm] 
+
+l 2.5e − 2 [mm] 
+
+α βG c/ℓ 
+
+Table 1: Model parameters for the 1D tension rod example With N = 200 degrees of freedom for each u and d, i.e. a mesh size of h = 1 e − 2 mm, the length scale is fixed to l = 2 .5e − 2. We use piecewise linear approximations for u and d. While the left boundary is fixed, a Dirichlet boundary condition on the right boundary is used to prescribe a displacement increment of 5∆u = 1 e − 4 [mm] per pseudo time step. As the problem is 1D, the energy split does not apply here. Table 1 lists all chosen parameters for the model. An initial value of φ = 0 .7 for the phase field at a certain position, in this case x0 = 0 .57, i.e. an initial damage, serves as a nucleus for the development of a crack. In Figure 4, the deterministic solution for both phase field and displacements is visible in blue for a single time step. The whole time series can be condensed to a force displacement diagram as visible in Figure 3. The time step marked in red is the one at which the displacement and phase field is shown in the plots of the next sections. 0.0000 0.0025 0.0050 0.0075 0.0100 
+
+load increment in [mm] 
+
+0
+
+200 
+
+400 
+
+600 
+
+800 
+
+> reaction force in [N]
+
+reference 
+
+Figure 3: Reaction forces over pseudo time for the 1D numerical example. A linear elastic interval is followed by an abrupt crack and loss of remaining stiffness. The red dot marks the first load increment and reaction force at which data assimilation will take place in the later section. 
+
+# 3 Data Assimilation 
+
+If both a predictive model and measured data exist, the process of connecting both, to ideally obtain improved predictions, is called data assimilation [21]. Assimilating a normally distributed output from a linear model with measurement data that also follows a normal distribution can be achieved in closed-form via conditioning of multivariate Gaussian distribution, see [22]. In the time-dependent case, a Kalman filter can be used. Details on the most important flavours of the Kalman Filter and related techniques can be found in [23]. The Kalman filter is very similar to the usual conditioning of a multivariate Gaussian, with the difference that the updated distribution serves as a prior in a subsequent time step. The standard Kalman filter is derived for linear problems. If the problem is non-linear, linearisation leads to the extended Kalman filter (EKF). Another method to treat the non-linearity is to use derivative-free sampling methods. Examples for sampling-based data assimilation methods are the Ensemble Kalman Filter (EnKF) [24] and the Particle Filter [25]. In any case, a prior is needed and is obtained here by propagating uncertainties through the predictive model. The following introduction and discussion is based on [9, 23]. 
+
+# 3.1 Stochastic forward problem 
+
+Many aspects of numerical modeling require making assumptions, handling a lack of knowledge and quan-tifying errors, originating e.g. from discretisation. In these cases, instead of using deterministic quantities, accounting and propagating uncertainties is crucial. For the given phase field problem, there are many sources of uncertainty. A prominent example is parametric uncertainty, e.g. in the boundary, initial conditions and material parameters which can be either scalar or fields. Another source of uncertainty is in the chosen initial damage field. In this paper, we will focus on the latter and introduce a random initial damage field. Uncer-tainty in these input parameters will lead to uncertainty in the solution fields, as well. For a linear model, Gaussian distributions in the random coefficients will lead to a Gaussian solution. The EnKF, which is the data assimilation technique used in this work, propagates a particle ensemble through the model, which can be used to approximate the output statistics and obtain a prior. Hence, uncertainty propagation is carried out in a Monte Carlo (MC)-like fashion, where the phase field model is simulated repeatedly with varying realizations of the model inputs. 6In Figure 4, multiple samples of the stochastic phase field problem are shown. These arise from treating the initial value for the phase field as a random variable: The position and magnitude of the damage nucleus is different for each realisation, hence also the position and behaviour in time of the resulting crack. The position is sampled from a normal distribution x0 ∼ N (−0.25 , 0.12), whereas the initial magnitude of the phase field is sampled from a uniform distribution φmag ∼ U (0 .73 , 0.76). The shape of the initial damage is defined as a Gaussian with magnitude φmag , standard deviation σ = 0 .05 and mean x0. From the ensemble, 0.000         
+
+> 0.002
+> 0.004
+> 0.006
+> 0.008
+> displacement in [m]
+> samples
+> reference
+> 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00
+> x in [m]
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> phase field in [-]
+
+Figure 4: Solution to the 1D phase field brittle fracture problem at a single time step. The deterministic reference solution is visible in blue, whereas the prior ensemble is visible in grey. Some ensemble members indicate a complete fracture (phase field of 1, displacement is a step function) while others only have a phase field smaller than 1, hence there is some stiffness degradation but no complete fracture. The prior ensemble is the result of row 6 in Algorithm 1. a Gaussian approximation can be computed, i.e. mean and covariance are calculated from the samples. The next step towards data assimilation is to connect the prior ensemble with data in form of a data model. 
+
+# 3.2 Data model 
+
+The basis for assimilating model predictions with data is a model of the observations. A data model connects the phase field FE solution to the sensor data and the derivation in this section mainly follows [8]. First, based on [26], we model the measurement data generating process as 
+
+yn = ρHa n + δn + ηn (17) now with an explicit iteration index n, the measured data yn ∈ RN at time n∆t and the linear observation map 
+
+H : RM → RN which maps from the high-dimensional state-space of the solution to the lower dimensional measurement space. The matrix can be constructed by evaluating the FE basis functions at the sensor locations. In general, H is constructed by discretising the respective operator relating the FE solution to measurable quantities. Moreover, ηn ∼ N (0, σ 2
+
+> n
+
+I) models measurement noise and 
+
+an ∼ N (¯ an, Ca;n)is the FE solution vector containing both displacements u and the micromorphic field d. At every time/load step, data can be generated. Note that measurements will only be taken on the displacements and not on the phase field variable, hence the observation matrix is non-zero only in the part related to the displacement vector. The measurement data can be collected on arbitrary points throughout the domain which are not restricted to the nodes of the FE mesh. Finally, sensor noise is modelled with the Gaussian ηn whereas the model-data-mismatch is captured with another Gaussian δn. Note that δn, ηn are independent of an. To do 7so, a kernel function, e.g. of squared exponential or Mat´ ern type, has to be chosen and this kernel is then evaluated at the sensor points. In the numerical examples given in this manuscript, the Mat´ ern kernel 
+
+c(x, x′) = σ2 21−ν
+
+Γ( ν)
+
+√2ν∥x − x′∥
+
+l
+
+!ν
+
+Kν
+
+√2ν∥x − x′∥
+
+l
+
+!
+
+(18) will be used throughout. It is defined with the scaling parameter σ ∈ R+, Γ( ν) the Gamma function and 
+
+Kν a modified Bessel function. Moreover, l ∈ R+ is the lengthscale parameter and ν ∈ R+ controls the smoothness of the kernel. For ν → ∞ (18) becomes the squared exponential kernel. See [22] for a thorough discussion. The data model, connecting model to measurements, needs to be calibrated. The calibration is accom-plished by tuning the model error covariance. The corresponding hyperparameters w = ( ν, σ, l ) can be learned from the given data by minimizing the negative log likelihood of the data model with an optimiser such as L-BFGS. A full sampling based approach, based on Markov Chain Monte Carlo (MCMC) can also be used, if uncertainties for the parameter estimation are sought. With a calibrated data model, the Kalman filter equations, to be described below, can be derived by conditioning the FE solution fields on the data. For a single observation we obtain 
+
+p(y|w) = 1(2 π)nsens /2|G| exp 
+
+
+
+− 12 (y − ρH ¯a)⊤G−1(y − ρH ¯a)
+
+
+
+(19) with nsens the number of sensors and 
+
+G = ρ2HC aH⊤ + Cδ + Ce (20) the covariance of (17). Taking the natural logarithm yields log p(y|w) = − nsens 
+
+2 log(2 π) − 12 log |G| − 12 (y − ρH ¯a)⊤G−1(y − ρH ¯a) . (21) For multiple observations per sensor we find log p(Y |w) = 
+
+> nobs
+
+X
+
+> i=1
+
+log p(yi|w) , (22) which can be applied if at one sensor location nobs multiple independent observations exist. After optimising with regard to the given likelihood, the data model can be evaluated with the estimated hyperparameters. In order to generate artificial measurement data, one can sample from the data model with a fixed set of parameters. Another possibility is misspecifying the model by changing parameters or adding complexity through different boundary terms etc. In this paper, a fixed initial phase field is chosen that isn’t part of the prior ensemble. Also, in order to prevent an inverse crime [27], the reference solution is computed on a different triangulation Tdata with hdata < h compared to the prior ensemble. An uncorrelated, mean-free noise term e ∼ N (0 , Ce) is added to the process. The resulting data generating process is then sampled nobs 
+
+times. 
+
+# 3.3 Ensemble Kalman Filter 
+
+The EnKF is an equal-weight particle system variant of the Kalman filter [24]. This enables using non-linear models without an explicit linearization. Another sampling-based variant is the particle filter [28], where each ensemble member gets assigned a weight which is updated over time. Particle filters are known to work well for non-linear problems [29], hence they appear promising in our regard. However, the problem with the particle filters is the scaling to higher dimensions, as shown in the literature [30]: Filter breakdown is expected at only hundreds of parameters already, but a high-dimensional state-space system, as the one used here, utilises tens of thousands or more state parameters. The named problems have also been addressed in the context of statFEM in [9], where the authors chose an EnKF instead of the particle filter. Because of the limitations in regard to high-dimensional problems, we also resort to the EnKF in this paper. Within the EnKF, each ensemble member has the same weight and in the update step, as data comes in, each member is conditioned individually on data. 8The EnKF consists of two repeating steps: First, in the prediction step, the approximate solution to the PDE is evolved in time. The resulting fields can then either directly be used as initial conditions to further evolve in time or be updated. Thus, the second step is the update, or analysis, step. If at some point in time measurement data are available, the solution fields of each ensemble member are updated via a Kalman shift, which can be framed in a Bayesian updating framework. It should be noted that the EnKF converges to the true filter for an increasing particle size, only in the linear Gaussian setting [31]. However, the phase field problem is inherently non-linear, hence the accuracy of our particle approximations is less obvious. Recent works develop theory for the near-Gaussian setting, see [32, 31], and bounds for the Gaussian approximation, as discussed in [23], become available. This introduction and also the implementation of the filter, presented below, follows [9, 23]. It will be instructive to view the EnKF update from an optimization perspective. We also re-introduce the time index n at this point. Following [23], we consider the objective function 
+
+Jn,i (aA
+
+> n,i
+
+) = 12 yn − Ha A 
+
+> n,i
+> 2Γ
+
++ 12 aA 
+
+> n,i
+
+− aF
+
+> n,i
+> 2
+> Cn
+
+, (23) where the analysis vector aA
+
+> n,i
+
+, for each ensemble member i, is determined by minimization. The forecast 
+
+aF 
+
+> n,i
+
+is obtained by propagating the particles according to the phase field model from the previous time step, to be detailed in Section 3.3.1. For simplicity, only a single time step n and the corresponding data are considered here. We can observe that the model is not strongly enforced, hence the analysis can potentially violate constraints that would be imposed be the phase field model; unless Cn tends to zero and the data are without any influence. Because the non-linear model is not part of the optimization, a closed form can be derived, i.e. (27). At the same time, we observed that the standard EnKF update can fail and we attribute this precisely to the missing explicit influence of the phase field model in the update equations, in combination with the strong nonlinearities of the phase field equations. In order to resolve this issue, a constraint approach will be introduced below. The EnKF has to be initialised at first. As it is a sampling based approach, the forward problem is solved for nens samples of the input parameters. Uncertain input parameters could be the spatial configuration of an initial damage field, a random material parameter or probabilistic forcing with random perturbations in the initialisation or at each timestep. 
+
+3.3.1 Forecast 
+
+Consider the ensemble {an−1,i }i at time/loading step n − 1, originating from either the initialization of the filter or a previous prediction or update. Note that we omit the dependence on y1: n−1, w1: n−1. For each ensemble member, the prediction aF 
+
+> n,i
+
+= ( aF,u  
+
+> n,i
+
+, aF,d  
+
+> n,i
+
+) is computed from the residual equation system (16), Subsequently, the prediction’s mean and covariance can be computed as ¯aF 
+
+> n
+
+= 1
+
+nens 
+
+> nens
+
+X
+
+> i=1
+
+aF 
+
+> n,i
+
+(24) and 
+
+CF 
+
+> n
+
+= 1
+
+nens − 1
+
+> nens
+
+X
+
+> i=1
+
+ aF 
+
+> n,i
+
+− ¯aF
+
+> n
+
+   aF 
+
+> n,i
+
+− ¯aF
+
+> n
+
+⊤ , (25) respectively. To keep the notation short, from here on we drop the dependence of the forecast on previous time steps, as e.g. in ¯ aF
+
+> n|n−1
+
+. The prediction step is iteratively executed until reaching a time step at which data are available. Then, each ensemble member is updated with respect to the given measurement data. In the 1D numerical example, data are available from time step 82 on in an interval of 10 steps. Because a finite ensemble size is used, the covariance is usually inflated and a localization procedure is employed. Details on that can be found in A. 
+
+3.3.2 Analysis 
+
+The first step towards updating the prior state, i.e. conditioning it on new data yn, is updating the hyper-parameters w1: n−1 of the data model, in case that they change over time. If so, the negative log-marginal posterior of the data model is minimised given suitable priors for the individual parameters. With the up-dated hyperparameters w1: n, each ensemble member is updated by a Kalman shift. The Kalman shift is an 9analytical solution to the optimization problem (23), see [23] for details. For the state of one member and a single observation per sensor we obtain 
+
+aA 
+
+> n,i
+
+= aF 
+
+> n,i
+
++ CF 
+
+> n
+
+H⊤  ρ2HC F 
+
+> n
+
+H⊤ + Cδ + Ce
+
+−1  yn − ρHa F
+
+> n,i
+
+ . (26) For the data model as proposed in [8], i.e. with multiple available readings per sensor, there holds for the updated state of a single ensemble member 
+
+aA 
+
+> n,i
+
+= aF 
+
+> n,i
+
++ CF 
+
+> n
+
+H⊤  ρ2nobs HC F 
+
+> n
+
+H⊤ + Cδ + Ce
+
+−1
+
+
+
+> nobs
+
+X
+
+> j=1
+
+yn,j − ρn obs Ha F
+
+> n,i
+
+ . (27) The updated states now serve as an initial condition again for the next prediction step. In Figure 5, the ensemble analysis for the running example are visible. The ensemble members now cluster closely around the reference solution, although it is clearly visible that the posterior ensemble members exhibit strong unphysical noise. Also, the phase field drops below zero, which violates the constraints encoded in the system of PDEs. Subsequent Newton iterations for the next time step might not converge due to this effect. The reason for these problems is the strong gradient in the displacement field. The problem can be overcome 0.0000         
+
+> 0.0025
+> 0.0050
+> 0.0075
+> displacement in [m]
+> samples
+> reference
+> data
+> 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00
+> x in [m]
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> phase field in [-]
+
+Figure 5: The posterior ensemble in gray compared to the reference solution, from which noisy measurements are drawn, in blue. Compared to the prior, the ensemble now clusters more closely around the reference. However, numerical artefacts and unphysical phase field solutions appear, which can lead to the next time step not converging. This posterior ensemble, or analysis, is the result of row 10 in Algorithm 1. to some extent by smoothing the displacement field before the update, as visible in Figure 6 a). The resulting posterior ensemble exhibits much less noise, yet negative phase fields still occur and the displacements are still unphysical. This unphysical behaviour of the posterior can be overcome by regularization within a staggered solution of the individual equations for phase field and displacement. This will be discussed in the next section. In Algorithm 1, the forecast time stepping as well as the EnKF analysis are summarized. T denotes the set of pseudo-time steps at which the phase field problem is solved with different loadings. TD denotes the set of time steps at which data is available and the EnKF update is performed. 
+
+3.3.3 Regularization 
+
+Figure 5 depicts the updated ensemble for the running example. It is clearly visible that the Kalman update can generate both spurious oscillations in the displacements as well as phase field variables with negative values. Several paths can be pursued to remove these effects. One could transform the phase field variable to 10 Algorithm 1 Phase Field Ensemble Kalman Filter 
+
+Require: aF0 =
+
+n
+
+(aF,u  
+
+> 0,i
+
+, aF,d  
+
+> 0,i
+
+)
+
+onens 
+
+> i=1
+
+, t = t0 = 0 ▷ Initial ensemble at t = 0  
+
+> 1:
+
+for t ∈ T do ▷ Calculate next pseudo-time forecast...  
+
+> 2:
+
+t = t + ∆ t 
+
+> 3:
+
+n = n + 1  
+
+> 4:
+
+for i = 1 to nens do ▷ ...for each ensemble member  
+
+> 5:
+
+update ˇ ad, φn−1 based on aF 
+
+> n−1,i
+> 6:
+
+solve monolithically: 
+
+Ru(au, ˇad; φn−1, ℓ ) = 0, 
+
+Rd(au, ad; φn−1, ℓ ) = 0  
+
+> 7:
+
+set aF 
+
+> n,i
+
+equal to ( au, ad) 
+
+> 8:
+
+aF 
+
+> n
+
+=
+
+n
+
+(aF,u n,i , aF,d n,i )
+
+onens  
+
+> i=1
+> 9:
+
+if t ∈ TD then  
+
+> 10:
+
+for i = 1 to nens do  
+
+> 11:
+
+perform EnKF analysis Eq. (27) aF 
+
+> n,i
+
+→ aA 
+
+> n,i
+> 12:
+
+aA 
+
+> n
+
+=
+
+n
+
+(aA,u n,i , aA,d n,i )
+
+onens  
+
+> i=1
+> 13:
+
+for i = 1 to nens do  
+
+> 14:
+
+perform iterative regularization (following section) aA 
+
+> n,i
+
+→ aR 
+
+> n,i
+> 15:
+
+aR 
+
+> n
+
+=
+
+n
+
+(aR,u n,i , aR,d n,i )
+
+onens  
+
+> i=1
+> 16:
+
+aF 
+
+> n
+
+= aR
+
+> n
+
+enforce the bounds [0 , 1] and smooth the displacements, however, we found that in particular the smoothing is difficult to realize in higher dimensions. Another option is to enforce the phase field model as a strong constraint in a 3D-Var or 4D-Var type approach. This however, appears to be very costly to realize and is left for future research. Here, we propose a different solution, where we regularize the Kalman shift with a few well-chosen staggered iterations using the phase field model. Instead of a standard Gauss Newton approach to solve the individual equations, we treat each Newton step as a single-step approximation to a proximal operator, which serves to balance between the purely PDE-based regularisation and the data influence from the EnKF analysis. The reasoning behind this will be discussed in Section 5. The first step towards regularizing the posterior is to compute the displacement and phase field again at the same pseudo-time step. Instead of the monolithic approach used in the prediction, we solve for u and d
+
+individually and with a larger phase field length scale L > ℓ .1. Given the result from the EnKF update, i.e. aA,u n,i , solve 
+
+Rd(aA,u n,i , ˜aR,d n,i ; 0, L ) = 0 (28) for ˜ aR,d n,i .2. Solve for ˜ aR,u n,i subject to 
+
+Ru(˜ aR,u n,i , ˜aR,d n,i ; 0, L ) = 0 . (29) Note that, with φ = 0, we essentially removed the irreversibility constraint at this step. The notation 
+
+F1; n reflects, that we are still imposing the prescribed displacement at step n.The result is visible in Figure 6 b). The phase field appears much wider, while still pinning the reference solution accurately. The wider phase field covers most of the noise around the position of the crack. This is also reflected in the corresponding displacement, computed with the regularized phase field. A downside is that although the displacement indeed pins the correct reference position of the crack, the remaining stiffness at the crack is lower than in the reference solution. The reason for that is the increase in the overall, cumulated, damage in the domain due to the wider phase field. In turn, that leads to a faster propagation speed of the crack in higher dimensional settings. Once a crack is fully developed, the effect is not relevant any more. Nevertheless, we consider this effect to be preferable to the noisy, unphysical posterior. 11 The second part consists in recomputing the phase field from the regularized displacement, this time with the original length scale: 3. Given the regularized displacements, i.e. ˜ aR,u n,i , find aR,d n,i subject to 
+
+Rd(˜ aR,u n,i , aR,d n,i ; 0, ℓ ) = 0 . (30) 4. Using the phase field model without the reversibility constraint find aR,u n,i such that 
+
+Ru(aR,u n,i , aR,d n,i ; 0, ℓ ) = 0 . (31) The result is visible in Figure 6 c). Clearly, there is still some uncertainty left, which is expected due to a limited amount of sensors and measurement noise. For comparison, the regularization scheme is applied to a completely fractured 1D domain, i.e. with a phase field maximum of 1. These results are visible in Figure 7. Finally, the full state vector is reconstructed as 
+
+aR 
+
+> n
+
+=
+
+n
+
+(aR,u n,i , aR,d n,i )
+
+onens 
+
+> i=1
+
+(32) and serves as start value for the next pseudo time step. Algorithm 2 summarizes the described regularization procedure. 
+
+Algorithm 2 Regularizing the Kalman analysis 
+
+Require: aA 
+
+> n
+
+=
+
+n
+
+(aA,u n,i , aA,d n,i )
+
+onens 
+
+> i=1
+
+▷ Ensemble after EnKF analysis 
+
+Ensure: L > ℓ  
+
+> 1:
+
+for i = 1 to nens do ▷ Regularize each ensemble member  
+
+> 2:
+
+with aA,u n,i and φn−1!
+
+= 0  
+
+> 3:
+
+solve Rd(aA,u n,i , ˜aR,d n,i ; 0, L ) = 0 for ˜ aR,d n,i  
+
+> 4:
+
+with ˜ aR,d n,i and φn−1!
+
+= 0 ▷ Degrade stresses  
+
+> 5:
+
+solve Ru(˜ aR,u n,i , ˜aR,d n,i ; 0, L ) = 0 for ˜ aR,u n,i  
+
+> 6:
+
+with ˜ aR,u n,i and φn−1!
+
+= 0  
+
+> 7:
+
+solve Rd(˜ aR,u n,i , aR,d n,i ; 0, ℓ ) = 0 for aR,d n,i  
+
+> 8:
+
+for j = 1 to nstagger do ▷ Staggered solution scheme  
+
+> 9:
+
+with aR,d n,i and φn−1!
+
+= 0  
+
+> 10:
+
+solve Ru(aR,u n,i , aR,d n,i ; 0, ℓ ) = 0 for aR,u n,i  
+
+> 11:
+
+with aR,u n,i and φn−1!
+
+= 0  
+
+> 12:
+
+solve Rd(aR,u n,i , aR,d n,i ; 0, ℓ ) = 0 for aR,d n,i  
+
+> 13:
+
+aR 
+
+> n
+
+=
+
+n
+
+(aR,u n,i , aR,d n,i )
+
+onens 
+
+> i=1
+
+▷ Ensemble after regularization 
+
+The regularization process is similar to the staggered approach towards solving a phase field problem [33, 34] in the first place. If subsequent Newton iterations still fail to converge, the staggered scheme can be repeated. It is worth noting, however, that the stiffness can either decrease or increase further with every new iteration of the staggered scheme and hence the crack propagation speed either increases or decreases, as it can be noticed in Figure 6 c2). The inferred position of the crack will still be inferred correctly. This effect highlights that the proposed method is able to successfully perform crack localization, which is the desired functionality for higher dimensional settings, but when repeating the staggered scheme the method is less successful at accurately inferring the magnitude of the phase field at the crack front. After regularization, the next pseudo-time prediction can be computed. Figure 8 shows more snapshots of the analysis timeline: With more updates, the ensemble clusters more closely around the reference, hence the uncertainty decreases. The number of sensors has an influence on the quality of the posterior ensemble. Intuitively, more sensors imply a larger weight on the data and less on the prior. Figure 9 shows the analysis at the same time step, but with different numbers of sensors in the domain. 12 Figure 6: a): Posterior ensemble with prior smoothing through a Gaussian Process. The strongest artifacts are filtered out, but the unphysical phase field remains. b): The posterior ensemble in gray after the first regularization step compared to the reference solution in blue. By the projection on a solution space with larger phase field length scale L, most of the numerical artifacts are filtered. However, the larger length scale leads to more accumulated damage in the whole domain and therefore a loss in total stiffness, which reflects in a slightly larger displacement. This intermediate result corresponds to the results of rows 2 − 5 in Algorithm 2. 13 c) c1) c2) Figure 6: c): Correction with the original phase field length scale. On the left in c1), the process has been repeated once. On the right in c2), the process has been repeated four times. It is visible that a single repetition yields results closer to the reference. This is because inference takes place on two phenomena here: fracture initiation and fracture localization. Bayesian treatment of initiation appears much harder in this context; the iterations lead to results which indicate mostly complete damage or only very little damage. However, fracture localization works as desired: the correct position of the crack is found. We are mostly interested in fracture localization at this point. This regularized ensemble corresponds to row 13 in Algorithm 2. 0.000           
+
+> 0.005
+> 0.010
+> displacement in [m]  samples
+> reference
+> data
+> 0.5 0.4 0.3 0.2 0.1 0.0
+> x in [m]
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> phase field in [-]
+> 0.5 0.4 0.3 0.2 0.1 0.0
+> x in [m]
+
+Figure 7: Here, the EnKF analysis and regularization procedure have been performed at a later time step, where the reference solution and all ensemble members already indicate complete damage at a respective position. On the left, the process has been repeated once. On the right, the process has been repeated four times. It is visible that a single repetition yields good results already. Repeating the staggered scheme leads to similar results, but with converged ensemble member phase fields shapes. Crack nucleation does not play a role here, hence inference is simpler and the analysis exhibits a smaller standard deviation in the samples. 14 0.0000       
+
+> 0.0025
+> 0.0050
+> 0.0075
+> displacement in [m]  samples
+> reference
+> data
+> 0.4 0.2 0.0
+> x in [m]
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> phase field in [-]
+> 0.4 0.2 0.0
+> x in [m]
+> 0.4 0.2 0.0
+> x in [m]
+
+Figure 8: The more EnKF analysis steps are included at different time steps (82, 92 and 102), the smaller the uncertainty about the crack position becomes: Displacements and phase field converge towards the reference. At each time step, the staggered scheme has been repeated once. 0.0000       
+
+> 0.0025
+> 0.0050
+> 0.0075
+> displacement in [m]  samples
+> reference
+> data
+> 0.4 0.2 0.0
+> x in [m]
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> phase field in [-]
+> 0.4 0.2 0.0
+> x in [m]
+> 0.4 0.2 0.0
+> x in [m]
+
+Figure 9: The more sensors positions (5, 15, 50) are used in the data generation and analysis, the smaller the uncertainty about the crack position becomes. Compare to Figure 8 with 25 sensor positions. All plots show the first analysis at time step 82. 
+
+# 4 Numerical Study 
+
+# 4.1 Single Edge Notched specimen under Shear (SENS) 
+
+For a 2D example, the SENS benchmark is chosen. As visible in Figure 10, the mechanical setup consists of a unit square in [mm], fixed at the bottom. No vertical displacement is permitted at the left and right edges. A notch, depicted in red, of half of the edge length is modelled within the FEM mesh. The structure is loaded in a quasi-static manner at the top boundary. The Dirichlet boundary condition on the top boundary is used to prescribe a displacement increment of ∆ u = 1 e − 4 [mm] per pseudo time step for the first 70 pseudo time steps. The increment decreases to ∆ u = 1 e − 5 [mm] from that time step on. The ground truth, i.e. the solution fields from which noisy data are measured, is visible in Figure 11. Data 15 ∆uFigure 10: SENS numerical experiment. Edge length: 1.0mm, notch length: 0.5mm. 
+
+Parameter Value 
+
+Fracture Model AT2 Energy Split Volumetric-Deviatoric 
+
+E 210000 [N/mm 2]
+
+ν 0.3 [-] 
+
+Gc 2.7 [N/mm] 
+
+l 1.5e − 2 [mm] 
+
+α βG c/l 
+
+Table 2: Parameters for the phase field model of the 2D numerical example of the displacement in both spatial dimensions is collected at sparse sensor locations ( nsens << n dof ), denoted with a black cross. The parameters for the data assimilation are visible in Table 3. The prior ensemble is 
+
+Parameter Value 
+
+nens 100 
+
+nsens 100 
+
+nobs 20 
+
+σe 4e − 4
+
+ndof 34071 
+
+ndof ground truth 36070 
+
+r 1.05 
+
+lloc 0.45 Table 3: Parameters for the data as-similation problem 
+
+Parameter Value 
+
+lreg 4lniter 4Table 4: Regularization parameters 0.0 0.5 1.0
+
+x in [mm] 
+
+−0.4
+
+−0.20.00.20.4
+
+> y in [mm]
+
+0.0 0.5 1.0
+
+x in [mm] 
+
+0.00.51.0
+
+0.000 0.005 0.011 
+
+Figure 11: Data are collected from the displacement field of the depicted phase field solution. The EnKF is supposed to restore the phase field and displacements from a prior process and the measurements only. The sensor locations are marked with black crosses. constructed by randomly sampling nens different initial conditions for the phase field. Each sample is defined by a single pore in the x-y plane in proximity to the slit. The position of the pore is defined with two random 16 variables 
+
+X0 ∼ 0.51 + (0 .62 − 0.51) · Beta(8 , 8) (33) 
+
+Y0 ∼ − 0.11 + (0 .02 − (−0.11)) · Beta(8 , 8) . (34) In Figure 12, a single prior sample of displacement in x-direction and the corresponding phase field is visible along with the absolute error. The second column shows the timestep after an EnKF analysis step. Qualitatively, the absolute error reduced, i.e. the posterior phase field aligns more closely with the ground truth. The third column shows a later time step after a second analysis. The error remains small. The chosen ensemble member exhibits a particularly strong deviation from the ground truth. Still, the analysis leads to a small error. Notice that this is also the case for all other ensemble members, i.e. the error either decreases or stays low if there is already only a small deviation. In Figure 13, on the other hand, no analysis steps have been applied to the sample and hence the error increases over time, both in displacements and phase field. Hence, it can be stated that performing a Kalman shift on the prior ensemble indeed leads to a reduction in the error of the individual sample and therefore also in the uncertainty of the whole ensemble. 
+
+4.1.1 Reaction forces and extrapolation after the update 
+
+An important quantity for the evaluation of the effect of a certain crack path is the remaining strength of a structure. A different path can potentially lead to a different residual load bearing capacity, which could in practice be an important quantity to base decisions on. Naturally, each random sample in the EnKF ensemble shows a different reaction force per time step. Figure 14 shows the whole time line for the 2D SENS example. Regardless of the given initial damage, all samples behave similarly in the first, elastic only, part of the pseudo time line. Only when the fracture driving energy is large enough to initiate a crack that reaches the initial damage, differences become apparent. The spread of different reaction forces is visible in the plotted samples. At time step A, the EnKF analysis step is performed. A couple of interesting phenomena can be observed at this point: 
+
+• Firstly, the spread reduces. While there are some outliers and a noticeable but smaller spread, most ensemble members now show a similar reaction force. 
+
+• Further in time, the average reaction force still closely follows the reference, i.e. the solution from which sparse data are drawn. Notice that the spread increases over time also for the updated ensemble. For time step E, Figure 15 shows a histogram of the updated ensemble compared to the same ensemble simulation without the Kalman analysis step. The standard deviation of the resulting distribution is smaller than the one for the case with no analysis step at A. Also, the reference value is still captured within the PDF. 
+
+• Figure 16 captures the histogram of the peak force of each sample, i.e. the maximum load that the structure can resist. Also here, the variance reduces significantly compared to the prior. In Figure 17, two analysis steps are introduced, in alignment with Figure 12. Notice that, compared to only performing the Kalman shift once, the variance decreases even further. This is also visible in the histograms of the extrapolation time step E and the histogram of the peak force in Figures 18 and 19, respectively. 
+
+# 5 Discussion 
+
+Recalling the objective function of the ensemble Kalman update 
+
+Jn(aA
+
+> n,i
+
+) = 12 yn − Ha A 
+
+> n,i
+> 2Γ
+
++ 12 aA 
+
+> n,i
+
+− aF
+
+> n,i
+> 2
+> Cn
+
+, (35) reveals that the physical model only enters mildly through the simulation of the prior ensemble. Indeed, the ensemble Kalman update is not forced to respect the physical constraints of the phase field model, which is the origin of the stability problems observed in the numerical experiments. The regularization projects the data-driven ensemble update back towards the physically admissible manifold, while also filtering spurious oscillations through an increased length-scale. In this section we will interpret the regularization in terms of 17 −0.4
+
+−0.20.00.20.4
+
+> y in [mm]
+
+d381 ,i d385 ,i d485 ,i 
+
+−0.4
+
+−0.20.00.20.4
+
+> y in [mm]
+
+u1;381 ,i u1;385 ,i u1;485 ,i 
+
+−0.4
+
+−0.20.00.20.4
+
+> y in [mm]
+
+|d381 ,i − d381 ,ref | |d385 ,i − d385 ,ref | |d485 ,i − d485 ,ref |
+
+0.0 0.5 1.0
+
+x in [mm] 
+
+−0.4
+
+−0.20.00.20.4
+
+> y in [mm]
+
+|u1,381 ,i − u1,381 ,ref |
+
+0.0 0.5 1.0
+
+x in [mm] 
+
+|u1,385 ,i − u1,385 ,ref |
+
+0.0 0.5 1.0
+
+x in [mm] 
+
+|u1,485 ,i − u1,485 ,ref |
+
+01
+
+0.000 0.006 0.011 
+
+01
+
+0.000 0.006 0.011 Figure 12: SENS analysis timeline for a single ensemble member. From left to right, three different time steps are visible. At time step 381, no data assimilation has been performed yet. An error both in phase field and displacement is noticeable. At time step 382, the first data assimilation and regularization procedure has been performed. As the regularization introduced smoothing, a couple of time steps are necessary for the sample to obtain a sharp crack again. At time step 385, it is hence now visible that the sample changed and resembles the ground truth more closely. The error decreased. At time step 485, a second analysis has been performed. The error is still low. proximal correction and formulate an outlook towards strongly constrained variational data assimilation in this context. To this end, it is instructive to adopt the perspective of energy minimization on the discrete level, see Section 2. From this viewpoint, we can recast the regularization step of Section 3.3.3 in the following way: 18 −0.4
+
+−0.20.00.20.4
+
+> y in [mm]
+
+d381 ,i d385 ,i d485 ,i 
+
+−0.4
+
+−0.20.00.20.4
+
+> y in [mm]
+
+u1;381 ,i u1;385 ,i u1;485 ,i 
+
+−0.4
+
+−0.20.00.20.4
+
+> y in [mm]
+
+|d381 ,i − d381 ,ref | |d385 ,i − d385 ,ref | |d485 ,i − d485 ,ref |
+
+0.0 0.5 1.0
+
+x in [mm] 
+
+−0.4
+
+−0.20.00.20.4
+
+> y in [mm]
+
+|u1,381 ,i − u1,381 ,ref |
+
+0.0 0.5 1.0
+
+x in [mm] 
+
+|u1,385 ,i − u1,385 ,ref |
+
+0.0 0.5 1.0
+
+x in [mm] 
+
+|u1,485 ,i − u1,485 ,ref |
+
+01
+
+0.000 0.006 0.011 
+
+01
+
+0.000 0.006 0.011 Figure 13: SENS timeline for a single ensemble member, without data assimilation. It is visible that the error increases with every time step. given an EnKF-assimilated state ( uA
+
+> n,i
+
+, dA
+
+> n,i
+
+), consider ˜dR 
+
+> n,i
+
+= argmin d
+
+ τ ∥d − dA
+
+> n,i
+
+∥Cd + Eh;n(uA
+
+> n,i
+
+, d; 0, L ) , (36) where the irreversibility of cracks is lifted by setting φ′ = 0 and the phase fields are smoothed by employing 
+
+L > ℓ . This proximal step projects the purely data-driven Kalman shift back into the direction of the physical model and the parameter τ controls the balance between data and physics contribution. Moreover, the covariance matrix of the ensemble Kalman update naturally gives high weight to the ensemble parts with low variance. Nevertheless, as storing a complete covariance matrix in memory requires a lot of memory, we replace it with the identity matrix in the examples presented in this paper. Having highlighted the prominent role of the physical model in phase field data assimilation it appears 19 0.004 0.006 0.008 0.010 0.012 
+
+load increment in [mm] 
+
+0
+
+100 
+
+200 
+
+300 
+
+400 
+
+500 
+
+600 
+
+> reaction force in [N]
+
+A1 A2 E
+
+samples without EnKF samples reference Figure 14: Reaction forces for the SENS benchmark with a single analysis step at time step A1, visible in black. After the Kalman shift, the ensemble members cluster more closely around the reference solution. For comparison, the ensemble without Kalman shift is visible in green. 400 450 500 
+
+reaction force in [N] 
+
+0.00 
+
+0.02 
+
+0.04 
+
+0.06 
+
+> Density
+
+without EnKF with EnKF reference 
+
+Figure 15: Histogram of the distribution of reac-tion forces at extrapolation time step E for the SENS benchmark with a single analysis step at time step A. The spread (2 σ) reduced while the reference solution still lies in the range of the the posterior covariance. 480 500 520 540 
+
+maximum reaction force in [N] 
+
+0.00 
+
+0.05 
+
+0.10 
+
+0.15 
+
+> Density
+
+without EnKF with EnKF reference 
+
+Figure 16: Histogram of the distribution of the maximum reaction force for the SENS benchmark with a single analysis step at time step A. The spread (2 σ) reduced while the reference solution still lies in the range of the the posterior covari-ance. natural to target strongly constrained variational data assimilation in future work. The 4DVAR approach, for instance, considers smoothing instead of filtering over a time window with NT + 1 steps with the model entering as strong constraint. The respective optimization problem seeks to determine the solution vector at the beginning of that window aA0 such that 
+
+J0(aA0 ) = 12 
+
+> NT−1
+
+X
+
+> n=0
+
+yn+1 − H ˜aA 
+
+> n+1
+> 2
+> Γ
+
++ 12 aA0 − m0
+
+> 2
+> C0
+
+, (37) subject to the phase field update ˜aA 
+
+> n+1
+
+= M(˜ aA 
+
+> n
+
+), (38) is minimized. Here, m0 is an initial guess, e.g., the forecast aF 
+
+> n
+
+at that time step. Part of the optimization problem are all time steps with data inside the assimilation window. This implies that in each iteration 20 0.004 0.006 0.008 0.010 0.012 
+
+load increment in [mm] 
+
+0
+
+100 
+
+200 
+
+300 
+
+400 
+
+500 
+
+600 
+
+> reaction force in [N]
+
+A1 A2 E
+
+samples without EnKF samples reference Figure 17: Reaction forces for the SENS benchmark with with two analysis steps at timesteps A1 and A2,visible in black. After the Kalman shift, the ensemble members cluster more closely around the reference solution. For comparison, the ensemble without Kalman shift is visible in green. 400 450 500 
+
+reaction force in [N] 
+
+0.00 
+
+0.02 
+
+0.04 
+
+0.06 
+
+> Density
+
+without EnKF with EnKF reference 
+
+Figure 18: Histogram of the distribution of re-action forces at extrapolation time step E for the SENS benchmark with two analysis steps at timesteps A1 and A2. The spread (2 σ) reduced while the reference solution still lies in the range of the the posterior covariance. 480 500 520 540 
+
+maximum reaction force in [N] 
+
+0.00 
+
+0.05 
+
+0.10 
+
+0.15 
+
+> Density
+
+without EnKF with EnKF reference 
+
+Figure 19: Histogram of the distribution of the maximum reaction force for the SENS benchmark with two analysis steps at timesteps A1 and A2.The spread (2 σ) reduced while the reference so-lution still lies in the range of the the posterior covariance. of the optimizer, the model has to be solved from time 0 up until time NT , so that the objective function can be evaluated. Although 4DVAR is formulated for a mean vector instead of an ensemble, one could also replace the mean at time 0 with an ensemble member and the covariance C0 with the ensemble approximated covariance. In principle, the assimilation window could be reduced to a single time step, thereby enforcing the model to hold for the analysis vector and thus only permitting physically admissible solutions. A drawback is that no closed form solution exists for the 4DVAR optimization problem and hence, gradient descent methods or others need to be employed. This in turn leads to a huge computational cost because the model needs to be solved multiple times per time step in the assimilation window and also gradients are typically required. 21 6 Conclusion and Outlook 
+
+In this paper, we presented a way to quantify and reduce uncertainty in a phase field brittle fracture problem by means of data assimilation. Random initial conditions lead to randomness in the crack path and hence also the remaining stiffness of the structure under consideration. In practice, knowledge over both these quantities is desired. Therefore, reducing the uncertainty about it by using an Ensemble Kalman Filter, given sparse measurement data, makes it possible to make more precise statements about the load capacity of a given structure compared to a stochastic model or data alone. The stochastic phase field model is propagated in time up until a time step at which data are available. At that point, the measurement data are assimilated with the model and the result is regularized in order to form a suitable initial condition for the next pseudo time step. The procedure was analysed in detail along with an illustrative 1D example. A 2D numerical benchmark example served to demonstrate the applicability of the method in more relevant settings. It could be demonstrated that the displacement and phase field states can be updated very accurately. However, a plain Ensemble Kalman Filter doesn’t lead to acceptable results: A subsequent regularization is necessary to provide physically meaningful solutions. The problem of a lack of regularization can potentially be solved by adopting an variational perspective on data assimilation and using methods such as 4DVar, which constrain the analysis to a feasible model output without explicitly projecting the analysis after inference. However, an approach like that requires solving the model again for multiple time steps during inference, which leads to much higher computational cost. Also, different sources of uncertainty such as randomness in parameters and the mesh should be addressed, as well as an extension of the method toward dynamical phase field methods. These involve derivatives in time for which the EnKF needs to be adapted. 
+
+# A Covariance Inflation and Localization 
+
+An EnKF is usually not used in the large ensemble limit, i.e. with more ensemble members than degrees of freedom. In the present examples, much fewer ensemble members are used compared to the high number of degrees of freedom in the phase field problem, which are necessary to resolve the crack. This can lead to numerical issues such as spurious long-distance correlations and filter collapse due to the rank deficiency of the empirical covariance matrix [35]. Two countermeasures are commonly advised in the EnKF literature: Firstly, covariance inflation is used to ensure that the covariance doesn’t vanish. As put forth in [36], to inflate the covariance, each ensemble member is inflated individually before the analysis step. An inflation factor r, usually slightly greater than 1 .0, is used. For an ensemble member [ i] at time step n, we obtain 
+
+ainf  
+
+> n,i
+
+= r(an,i − ¯an) + ¯ an. (39) From the inflated ensemble members, an inflated covariance matrix Cinf  
+
+> n
+
+is computed. The second countermeasure is covariance localization which serves to prevent spurious correlations and hence, unphysical effects in the posterior state. According to e.g. [37], covariance localization is accomplished by performing the Schur product of a locally supported correlation matrix ρloc with the covariance matrix, i.e. 
+
+Cloc  
+
+> n
+
+= ρloc ◦ Cloc  
+
+> n
+
+. (40) The authors in [37] state that there are many suitable ρloc , while a commonly used one has been defined by [38] and closely resembles a squared exponential covariance. Hence, in this paper, we use a squared exponential covariance function for the localization which works well for the discussed problems. 
+
+# Acknowledgments 
+
+The source code which was developed along this paper will be made available on GitHub and Zenodo after acceptance of the paper. It is written mainly in Julia [39] with Ferrite.jl [40] as a FEM backend. 
+
+# Declarations 
+
+• Funding The research leading to these results received funding from the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) - Projektnummer 255042459 GRK2075/2. 22 • Competing interests The authors have no financial or proprietary interests in any material discussed in this article. 
+
+• Data availability: All data generated or analysed during this study are included in this published article. 
+
+• Author contribution: Conceptualization and Methodology: LH, UR, KAM, RJ; Formal analysis, investigation, validation and visualization: LH; Software: LH, KAM; Writing - original draft preparation: LH; Writing - review and editing: LH, UR, KAM, RJ; Funding acquisition, project administration and resources: UR, RJ; Supervision: UR, KAM, RJ. 
+
+# References 
+
+[1] G. A. Francfort, J. J. Marigo, Revisiting brittle fracture as an energy minimization problem, Journal of the Mechanics and Physics of Solids 46 (8) (1998) 1319–1342. doi:10.1016/S0022-5096(98)00034-9 .[2] C. Miehe, F. Welschinger, M. Hofacker, Thermodynamically consistent phase-field models of fracture: Variational principles and multi-field FE implementations, International Journal for Numerical Methods in Engineering 83 (10) (2010) 1273–1311. doi:10.1002/nme.2861 .[3] M. Ambati, T. Gerasimov, L. De Lorenzis, Phase-field modeling of ductile fracture, Computational Mechanics 55 (5) (2015) 1017–1040. doi:10.1007/s00466-015-1151-4 .[4] M. Kalina, T. Schneider, J. Brummund, M. K¨ astner, Overview of phase-field models for fatigue frac-ture in a unified framework, Engineering Fracture Mechanics 288 (2023) 109318. doi:10.1016/j. engfracmech.2023.109318 .[5] T. Gerasimov, U. R¨ omer, J. Vondˇ rejc, H. G. Matthies, L. De Lorenzis, Stochastic phase-field modeling of brittle fracture: Computing multiple crack patterns and their probabilities, Computer Methods in Applied Mechanics and Engineering 372 (2020) 113353. doi:10.1016/j.cma.2020.113353 .[6] S. Nagaraja, U. R¨ omer, H. G. Matthies, L. De Lorenzis, Deterministic and stochastic phase-field model-ing of anisotropic brittle fracture, Computer Methods in Applied Mechanics and Engineering 408 (2023) 115960. doi:10.1016/j.cma.2023.115960 .[7] TC. Chu, WF. Ranson, M. A. Sutton, Applications of digital-image-correlation techniques to experi-mental mechanics, Experimental mechanics 25 (1985) 232–244. [8] M. Girolami, E. Febrianto, G. Yin, F. Cirak, The statistical finite element method (statFEM) for coherent synthesis of observation data and model predictions, Computer Methods in Applied Mechanics and Engineering 375 (2021) 113533. doi:10.1016/j.cma.2020.113533 .[9] C. Duffin, E. Cripps, T. Stemler, M. Girolami, Statistical finite elements for misspecified models, Proceedings of the National Academy of Sciences 118 (2) (2021) e2015006118. doi:10.1073/pnas. 2015006118 .[10] T. Wu, B. Rosi´ c, L. De Lorenzis, H. G. Matthies, Parameter identification for phase-field modeling of fracture: A Bayesian approach with sampling-free update, Computational Mechanics 67 (2) (2021) 435–453. doi:10.1007/s00466-020-01942-x .[11] A. Pulikkathodi, E. Lacazedieu, L. Chamoin, Real-time inverse crack tracking in uncertain microstruc-tures using PGD-based model reduction and extended Kalman filtering, Computational Mechanics 71 (2) (2023) 311–332. doi:10.1007/s00466-022-02240-4 .[12] F. A. Rochinha, A. Peirce, Monitoring hydraulic fractures: State estimation using an extended Kalman filter, Inverse Problems 26 (2) (2010) 025009. doi:10.1088/0266-5611/26/2/025009 .[13] E. Kuncham, S. Sen, P. Kumar, H. Pathak, An online model-based fatigue life prediction approach using extended Kalman filter, Theoretical and Applied Fracture Mechanics 117 (2022) 103143. doi: 10.1016/j.tafmec.2021.103143 .23 [14] J. Ping, D. Zhang, History matching of fracture distributions by ensemble Kalman filter combined with vector based level set parameterization, Journal of Petroleum Science and Engineering 108 (2013) 288– 303. doi:10.1016/j.petrol.2013.04.018 .[15] M. Cervera, G. B. Barbat, M. Chiumenti, J.-Y. Wu, A Comparative Review of XFEM, Mixed FEM and Phase-Field Models for Quasi-brittle Cracking, Archives of Computational Methods in Engineering 29 (2) (2022) 1009–1083. doi:10.1007/s11831-021-09604-8 .[16] R. Bharali, F. Larsson, R. J¨ anicke, A micromorphic phase-field model for brittle and quasi-brittle frac-ture, Computational Mechanics 73 (3) (2024) 579–598. doi:10.1007/s00466-023-02380-1 .[17] L. De Lorenzis, T. Gerasimov, Numerical Implementation of Phase-Field Models of Brittle Fracture, in: L. De Lorenzis, A. D¨ uster (Eds.), Modeling in Engineering Using Innovative Numerical Methods for Solids and Fluids, Springer International Publishing, Cham, 2020, pp. 75–101. [18] D. Khimin, L. Kolditz, V. Kosin, K. Mang, T. Wick, Modeling, Discretization, Optimization, and Simulation of Phase-Field Fracture Problems (Nov. 2023). doi:10.15488/15172 .[19] T. Heister, M. F. Wheeler, T. Wick, A primal-dual active set method and predictor-corrector mesh adap-tivity for computing fracture propagation using a phase-field approach, Computer Methods in Applied Mechanics and Engineering 290 (2015) 466–495. doi:10.1016/j.cma.2015.03.009 .[20] P. Kristensen, Phase field methods for fracture - With a special focus on hydrogen assisted fracture, Ph.D. thesis, Technical University of Denmark (2022). [21] G. Evensen, Data Assimilation: The Ensemble Kalman Filter, Springer, Berlin, Heidelberg, 2009. doi: 10.1007/978-3-642-03711-5 .[22] C. E. Rasmussen, C. K. I. Williams, Gaussian Processes for Machine Learning, Adaptive Computation and Machine Learning, MIT Press, Cambridge, Mass, 2006. [23] D. Sanz-Alonso, A. M. Stuart, A. Taeb, Inverse Problems and Data Assimilation (Feb. 2023). arXiv: 1810.06191 , doi:10.48550/arXiv.1810.06191 .[24] G. Evensen, The Ensemble Kalman Filter: Theoretical formulation and practical implementation, Ocean Dynamics 53 (4) (2003) 343–367. doi:10.1007/s10236-003-0036-9 .[25] N. Gordon, D. Salmond, A. Smith, Novel approach to nonlinear/non-Gaussian Bayesian state estimation, IEE Proceedings F Radar and Signal Processing 140 (2) (1993) 107. doi:10.1049/ip-f-2.1993.0015 .[26] M. C. Kennedy, A. O’Hagan, Bayesian calibration of computer models, Journal of the Royal Statistical Society: Series B (Statistical Methodology) 63 (3) (2001) 425–464. doi:10.1111/1467-9868.00294 .[27] J. P. Kaipio, E. Somersalo, Statistical and Computational Inverse Problems, Vol. 160 of Applied Math-ematical Sciences, Springer, New York, NY, 2005. doi:10.1007/b138659 .[28] A. Doucet, S. Godsill, C. Andrieu, On sequential Monte Carlo sampling methods for Bayesian filtering, Statistics and Computing 10 (3) (2000) 197–208. doi:10.1023/a:1008935410038 .[29] D. Giles, M. M. Graham, M. Giordano, T. Koskela, A. Beskos, S. Guillas, ParticleDA.jl v.1.0: A real-time data assimilation software platform, Geoscientific Model Development 17 (6) (2024) 2427–2445. 
+
+doi:10.5194/gmd-2023-38 .[30] T. Bengtsson, P. Bickel, B. Li, Curse-of-dimensionality revisited: Collapse of the particle filter in very large scale systems, in: Probability and Statistics: Essays in Honor of David A. Freedman, Vol. 2, Institute of Mathematical Statistics, 2008, pp. 316–335. doi:10.1214/193940307000000518 .[31] E. Calvello, J. A. Carrillo, F. Hoffmann, P. Monmarch´ e, A. M. Stuart, U. Vaes, Statistical accuracy of the ensemble Kalman filter in the near-linear setting (Mar. 2025). arXiv:2503.16154 , doi:10.48550/ arXiv.2503.16154 .[32] E. Calvello, P. Monmarch´ e, A. M. Stuart, U. Vaes, Accuracy of the Ensemble Kalman Filter in the Near-Linear Setting (Feb. 2025). arXiv:2409.09800 , doi:10.48550/arXiv.2409.09800 .24 [33] M. Kirkesæther Brun, T. Wick, I. Berre, J. M. Nordbotten, F. A. Radu, An iterative staggered scheme for phase field brittle fracture propagation with stabilizing parameters, Computer Methods in Applied Mechanics and Engineering 361 (2020) 112752. doi:10.1016/j.cma.2019.112752 .[34] M. Hofacker, C. Miehe, Continuum phase field modeling of dynamic fracture: Variational principles and staggered FE implementation, International Journal of Fracture 178 (1-2) (2012) 113–129. doi: 10.1007/s10704-012-9753-8 .[35] C. Schillings, A. M. Stuart, Analysis of the Ensemble Kalman Filter for Inverse Problems, SIAM Journal on Numerical Analysis 55 (3) (2017) 1264–1290. doi:10.1137/16M105959X .[36] T. M. Hamill, J. S. Whitaker, Accounting for the Error due to Unresolved Scales in Ensemble Data Assimilation: A Comparison of Different Approaches, Monthly Weather Review 133 (11) (2005) 3132– 3147. doi:10.1175/MWR3020.1 .[37] P. L. Houtekamer, H. L. Mitchell, A Sequential Ensemble Kalman Filter for Atmospheric Data Assimi-lation, Monthly Weather Review 129 (1) (2001) 123–137. [38] G. Gaspari, S. E. Cohn, Construction of correlation functions in two and three dimensions, Quarterly Journal of the Royal Meteorological Society 125 (554) (1999) 723–757. doi:10.1002/qj.49712555417 .[39] J. Bezanson, A. Edelman, S. Karpinski, V. B. Shah, Julia: A Fresh Approach to Numerical Computing, SIAM Review 59 (1) (2017) 65–98. doi:10.1137/141000671 .[40] K. Carlsson, F. Ekre, Ferrite. jl contributors, Ferrite.jl, Zenodo (Jan. 2026). doi:10.5281/ZENODO. 13862652 .25

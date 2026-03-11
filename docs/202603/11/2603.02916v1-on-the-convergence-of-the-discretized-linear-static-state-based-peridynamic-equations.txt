@@ -1,0 +1,6507 @@
+Title: On The Convergence of the Discretized Linear Static State-Based Peridynamic Equations
+
+URL Source: https://arxiv.org/pdf/2603.02916v1
+
+Published Time: Wed, 04 Mar 2026 01:59:59 GMT
+
+Number of Pages: 42
+
+Markdown Content:
+# On The Convergence of the Discretized Linear Static State-Based Peridynamic Equations 
+
+Lukas Pflug ∗ Michael Stingl † Max Zetzmann ‡
+
+Friday 20th February, 2026 
+
+Abstract 
+
+In this paper, the convergence of the solutions for a discretized linear state-based static peridynamic system to the corresponding continuous solution is analytically proven. To obtain an implementable model, we further apply one-point-quadrature to the terms in the discrete equations. The resulting system coincides with the com-monly used meshfree discretization using a regular lattice, including the possibility of using partial area algorithms to improve the numerical behavior. We again prove convergence, this time for fixed choices of a weighting function commonly used in literature and stronger assumptions on the input data. We note however, that these assumptions are not significantly restrictive for practical purposes. In particular, they still allow discontinuities in the material parameters and external body forces. 
+
+Keywords— peridynamics, state-based, meshfree, convergence 
+
+# 1 Introduction 
+
+Peridynamics is a relatively new approach to modeling a solid body in continuum me-chanics first introduced by Silling in [26]. It uses a non-local integral equation instead of partial differential equations that, in contrast to the classical theory, does not rely on any spatial derivatives of the displacement u, making peridynamics naturally relevant for fracture-modeling (See e.g. [27], [5], [8]). It has also inspired similar models for fracture analysis (See [14], [16], [15], as well as the model introduced in [9] used for fracture in [7]). Further applications include Topology Optimization with pre-imposed cracks (see [13]). The original peridynamic model as introduced in [26] is the so-called bond-based model, which, while being simple to implement and numerically efficient, has the disadvantage of only being able to replicate a fixed Poisson’s ratio. This shortcoming motivated the formulation of a generalized, so-called state-based model. This generalized formulation allows for the modeling of materials with arbitrary bulk and shear moduli. A particularly important instance of such a state-based model is stated in [24], 5.3 Example 3. One should note that the bond-based model is a special case of the state-based model. Therefore, all results in this paper are also applicable without any further effort to bond-based models. 
+
+> ∗
+
+FAU Competence Center Scientific Computing, Friedrich-Alexander University of Erlangen-Nuremberg, Martensstr. 5a, 91058 Erlangen, Germany 
+
+> †
+
+Department of Continuous Optimization, Friedrich-Alexander University of Erlangen-Nuremberg, Cauerstraße 11, 91058 Erlangen, Germany 
+
+> ‡
+
+Department of Continuous Optimization, Friedrich-Alexander University of Erlangen-Nuremberg, Cauerstraße 11, 91058 Erlangen, Germany, Corresponding author. E-mail: max.zetzmann@fau.de 
+
+1
+
+> arXiv:2603.02916v1 [math.NA] 3 Mar 2026
+
+If desired, a more detailed and complete overview of peridynamics can be found in [28] and [3]. This paper focuses on the linearization of this state-based model, and aims to prove the convergence of the solutions for the discretized equations to the continuous solution. Numerical analysis on the convergence and convergence behavior in this setting has been carried out before in [21], [20] and [2]. In the context of the latter, we are dealing with the so-called m-convergence in this paper, meaning the horizon of the model will remain the same as the discretization becomes finer. This paper aims to prove the convergence rigorously. However, proving a rate for the convergence is not part of the scope of this paper. We will do so in two different ways: A general setting allowing more general input data and in turn requiring the exact evaluation of multiple integrals in the constituents of the equation, and in a numerical setting using one-point quadrature on these integrals, but in turn requiring the specific choice of the weighting function ω given by ζ 7 → ρ(ζ)χ[0 ,δ )(‖ζ‖), ρ(ζ) = 1 
+
+> ‖ζ‖
+
+. A remark generalizing the choice for the weighting function to include more regular functions ρ will also be stated at the end. This choice for the weighting function is frequently found in literature, e.g. in Silling’s works on the discretization of peridynamics [27] and the PMB (prototype microelastic brittle) material defined in it. In contrast to this PMB model however, we do not yet consider fracture in this paper. See also [23], which studies the effect of different choices of the weighting function on the non-local constitutive behavior. The discretization scheme we use for the numerical model coincides with the spatial discretization described in [27] on a regular lattice, extended to state-based models and is frequently encountered in numerical simulations. One should note that similar rigorous convergence results for the dynamical problem given by the peridynamics-inspired non-linear model described in [14], [16] and [15] have already been shown in [10], [11] and [12]. Specifically, in [10], an approximation using linear continuous interpolation on triangular or tetrahedral elements was used in the context of a finite element scheme, and it was assumed that the right hand side and the initial values are in H2(Ω) d ∩ H10 (Ω) d. Furthermore, the material parameters were assumed to be constant. In [11] and [12], a spatially piecewise constant approximation was chosen and the regularity of the input data and right-hand side was assumed to be Hölder continuous, while the material parameters remained constant. We note that the model used in [11], [12] and [10] differs from and does not include the model considered in this paper. Other results for the linear bond-based model include [32], which proved the conver-gence using Fourier analysis. This approach, however, imposes significant restrictions on the geometry of Ω - a finite interval was considered in one dimension, and a box in two dimensions. On those domains, convergence was proven for a generic inner approximation in the context of a Galerkin–Ritz scheme. Most notably, none of the above papers rigorously proved the convergence of the dis-crete solutions when one-point quadrature was additionally applied to the discrete equa-tions. This is relevant since most practical computations make use of quadrature to simplify the integrals involved in the underlying non-local peridynamic model. Instead, if quadrature was addressed, the convergence of the discretized solutions using one-point quadrature was only numerically compared with the bounds and rate of the solutions without one-point quadrature (See [12], Section 6). This paper aims to fill this gap between the commonly used mesh-free discretization with one-point quadrature and the continuous formulation for the state-based linear model. 2To the best of our knowledge, there has not yet been a rigorous proof for the convergence of the mesh-free discretization of the static linear state-based model - whether or not one-point quadrature is used - that further does not assume continuity of the material parameters or right-hand side, nor impose significant restrictions on the domain Ω. The structure of this paper is as follows: after introducing the model used in this paper in Section 1, showing the convergence of the discrete solutions without one-point quadrature will be the subject of Section 2. Therein, the main result, Theorem 2.7, will be proven under the Assumptions 1.1, showing the convergence of the discrete solutions to the continuous solution in the L2(Ω) d norm. Notably, no continuity assumptions are needed for the material parameters or external body forces. The main step here is showing the density of the inner approximation, proven in Proposition 2.6, which builds on Proposition 2.5. The rest follows from Galerkin Theory. Section 3 will introduce the numerical model in (16) and (23), which results from the discrete model in Section 2 by applying one-point quadrature. To improve the practical convergence, we also include partial area weights in the numerical formulation as sug-gested in [22], which can be freely chosen up to mild consistency assumptions. Then, we prove the convergence of the resulting numerical solutions in Proposition 3.8 under the Assumptions 3.3. For this, we need stronger assumptions on both the material parameters and the right-hand side. We assume boundedness and almost everywhere local L-Lipschitz continuity for some L > 0. In particular, discontinuities on sets of measure zero are still allowed. To prove Proposition 3.8, a convergence result for the linear operators associated to the corresponding discrete and continuous problems is proven in Corollary 3.18, and a uniform coercitivity result is obtained in Corollary 3.22. These results are all based on Lemma 3.4 and Proposition 2.5 leading to Proposition 3.5, which allow us to deal with the discontinuities of the input data in Proposition 3.17, finally yielding Corollary 3.18. Finally, Remark 3.23 will show that the convergence proof can be easily adapted to other weighting functions ω, in particular those of the form ω(ζ) = χ[0 ,δ )(‖ζ‖)ρ(ζ) for a ρ ∈ C0(Rd), as well as ω(ζ) = χ[0 ,δ )(‖ζ‖) pn(‖ζ‖) 
+
+> ‖ζ‖α
+
+for a suitable polynomial pn ≥ 0 and 
+
+α ∈ { 0, 1} as described in [22], [20], [21]. 
+
+1.1 The Linear State-Based Model 
+
+Let d ∈ { 2, 3} denote the space dimension. Following [18], the variational linear static state-based problem is given using the bilinear form B as defined in (2), by Find u ∈ V such that ∀v ∈ V : B(u, v ) = 
+
+> ∫
+> Ω
+
+b(x) · v(x) dx, (1) for an open and bounded reference configuration Ω ⊂ Rd and the external body forces 
+
+b : Ω → Rd. V is a subspace of L2(Ω) d disjoint with Π := {f ∈ L2(Ω) d : ∃c ∈ Rd, Rd×d ∋ A = −A⊤ : f (x) = Ax + c, ∀x ∈ Ω}.
+
+The subspace V ⊂ L2(Ω) d realizes the homogeneous Dirichlet conditions imposed on the problem. For example, for a given open subset Θ ⊂ Ω on which the solution should be 0, 
+
+V takes the form 
+
+V := {u ∈ L2(Ω) d : u|Θ ≡ 0}.
+
+Choices for V of this form are by construction disjoint with Π. This method of imposing boundary conditions has known drawbacks. Specifically, it causes unwanted artifacts at 3the interface between Θ and the rest of the body. Suggestions for improved approaches can be found in [31]. We will stick to this method nonetheless because of its simplicity as well as its compatibility with the theory in [18]. To formulate the bilinear form B in (1), we require the following non-local operators stemming from [4]. [D∗ 
+
+> ω
+
+u]( x) := −
+
+> ∫
+> Ω
+
+(u(x′) − u(x)) ⊗ 
+
+> (
+
+x′ − x
+
+‖x′ − x‖2
+
+> )
+
+ω(x, x ′) dx′,
+
+[D∗u]( x, x ′) := −(u(x′) − u(x)) ⊗ 
+
+> (
+
+x′ − x
+
+‖x′ − x‖2
+
+> )
+
+.
+
+These can be understood as non-local divergence and gradient operators justified by con-vergence results stated in [4] Section 5, as well as algebraic identities that resemble those from the local operators, see [4], Proposition 3.2. and Theorem 4.1. We further define Tr : Rd×d → R to be the usual trace function. Choosing a weighting function ω ∈ L1(Rd) and material parameters α, k : Ω → R>0,the bilinear form in (1) is given for u, v ∈ V by 
+
+B(u, v ):= 
+
+> ∫
+> Ω
+> (
+
+k(x) − α(x)m(x)
+
+d2
+
+> )
+
+Tr([ D∗ 
+
+> ω
+
+u]( x))Tr([ D∗ 
+
+> ω
+
+v]( x)) + α(x)
+
+> ∫
+> Ω
+
+ω(x′ − x)‖x′ − x‖2(Tr([ D∗u]( x, x ′)))(Tr([ D∗v]( x, x ′))) dx′ dx, 
+
+(2) where 
+
+ω(x, x ′) := d
+
+m(x) ω(x′ − x)‖x′ − x‖2, m(x) := 
+
+> ∫
+> Ω
+
+ω(x′ − x)‖x′ − x‖2 dx′.
+
+For the well-posedness of the continuous problem and the first convergence result, we fur-ther assume the following. 
+
+Assumptions 1.1 (Assumptions for the Continuous Model )A1 Integrability, Non-Negativity and Symmetry of the Weighting Function :
+
+ω(·) ∈ L1(Rd), with ω ≧ 0 and ω(ζ) = ω(−ζ) for all ζ ∈ Rd.A2 Bounds for the Support of the Weighting Functions :There exist 0 < λ, δ < ∞ such that Bλ(0) ⊂ supp( ω) ⊂ Bδ (0). A3 Boundedness of the Material Parameters :
+
+α, k : Ω → R measurable and bounded, i.e., there are α0, α 1, k 0, k 1 > 0 such that 
+
+α0 ≤ α(x) ≤ α1 < ∞ and k0 ≤ k(x) ≤ k1 < ∞ for all x ∈ Ω. A4 Regularity of the External Body Forces :
+
+b ∈ L2(Ω) d.A5 Regularity of the Domain :Ω is a bounded and connected Lipschitz domain. In particular, it satisfies an interior cone condition for some angle θ > 0 and radius h > 0. 4A6 Regularity of the Boundary Conditions :Θ ⊂ Ω is open, non-empty and vol( ∂Θ) = 0. As shown in [18], the assumptions above are sufficient to obtain the well-posedness of the problem stated in (1). Note that [18] proves the well-posedness under even more general assumptions on ω, requiring only ω(·)‖ · ‖ 2 ∈ L1(Rd). 
+
+# 2 Convergence of an Analytical Model 
+
+To obtain the discrete equations, a piecewise constant approximation is chosen where Ω is being partitioned as follows. 
+
+Definition 2.1 (Subdivision of Ω into (Ω i)i∈Iκ )1. Subdivide Rd into half-open cubes/squares ( Bi)i∈Zκ of side-length κ and midpoints xi
+
+on a uniform grid κZd. The cube containing 0 is therefore defined to be [ − κ 
+
+> 2
+
+, κ 
+
+> 2
+
+[d.2. Define the index family corresponding to all such cubes Bi that intersect Ω non-trivially (vol( Bi ∩ Ω) > 0) as Iκ ( Zκ.3. For all i ∈ Iκ, define Ω i as the intersection of Bi with Ω. With this subdivision, we define the following operators to simplify the notation. 
+
+Definition 2.2 (Piecewise Constant Projection Operators )Let χB (x) denote the characteristic function for a set B ⊂ Rn. Let Kκ : ( Rd)|Iκ| → L2(Ω) d
+
+and Pκ : L2(Ω) d → (Rd)|Iκ| be defined by 
+
+Kκ~u := ∑
+
+> i∈Iκ
+
+~uiχΩi , (Pκu)i := 1
+
+Vi
+
+∫
+
+> Ωi
+
+u(x) dx. (3) Further, define Pκ := Kκ ◦ P κ as the projection from L2(Ω) d onto a piecewise constant approximation with respect to the Ω i.For these operators we can show the following. 
+
+Lemma 2.3 (Approximation by Piecewise Constant Functions ) Both Kκ and Pκ are bounded linear operators fulfilling Pκ ◦ K κ = id Rd|Iκ| , and the Pκ are uniformly bounded in norm by 1, that is ‖Pκ‖ ≤ 1 for all κ > 0. Finally, 
+
+‖(id L2 − Pκ)u‖L2 (Ω) d
+
+> κց0
+
+−−−→ 0. (4) for all u ∈ L2(Ω) d.
+
+Proof. The identity Pκ ◦ K κ = id Rd|Iκ| follows directly from the definition of Pκ and Kκ.Their boundedness easily follows from Jensen’s Inequality. Similarly, the boundedness of 
+
+Pκ follows from 
+
+‖Pκu‖2 
+
+> L2(Ω) d
+
+= ∑
+
+> i
+
+∫
+
+> Ωi
+
+∥∥∥∥
+
+1
+
+Vi
+
+∫
+
+> Ωi
+
+u(x′) dx′
+
+∥∥∥∥
+
+> 2
+
+dx
+
+≤ ∑
+
+> i
+
+Vi
+
+1
+
+Vi
+
+∫
+
+> Ωi
+
+‖u(x)‖2 dx ≤ ‖ u‖2  
+
+> L2(Ω) d
+
+.
+
+5Using this, we follow [1] section 7.21 in order to prove the last convergence claim. It is sufficient to show 
+
+‖(id L2 − Pκ)f ‖L2(Ω) d
+
+> κց0
+
+−−−→ 0only for f ∈ C00 (Ω) d, due to C00 (Ω) d being a dense subset of L2(Ω) d.The claim then follows from Hölder’s inequality, 
+
+‖(id L2 − Pκ)f ‖2 
+
+> L2(Ω) d
+
+≤ vol(Ω) ‖(id L2 − Pκ)f ‖2
+
+> L∞(Ω;( Rd,‖·‖ 2))
+
+≤ vol(Ω) 
+
+ ∑
+
+> 1≤i≤d
+
+sup 
+
+> ‖x′−x‖≤ √dκ
+
+|fi(x′) − fi(x)|2
+
+ κց0
+
+−−−−−−→ 
+
+> fi∈C00(Ω)
+
+0.
+
+We now construct the familiar algebraic form of the static linear peridynamic equation as given in (8). The partition of Ω into (Ω i)i∈Iκ is also used to define 
+
+Wκ := 
+
+{ ∑
+
+> i∈Iκ
+
+χΩi ~ui : ~ui ∈ Rd for all i ∈ Iκ
+
+}
+
+⊂ L∞(Ω) d.
+
+Now set Vκ := Wκ ∩ V to impose the boundary conditions, and pose the discrete problem as Find uκ ∈ V κ such that ∀v ∈ V κ : B(uκ, v ) = 
+
+∫
+
+> Ω
+
+b(x) · v(x) dx. (5) Since Wκ is a finite dimensional vector space isomorphic to ( Rd)|Iκ| ∼= R|Iκ|d, one can define the discrete right hand side ~b ∈ (Rd)|Iκ| and bilinear form ~B ∈ (Rd×d)|Iκ|×| Iκ| for all 
+
+i, j ∈ Iκ and 1 ≤ k, l ≤ d, as 
+
+~bi = ( ~b1 
+
+> i
+
+, . . . , ~bdi )⊤, ~bki := 
+
+∫
+
+> Ωi
+
+b(x)⊤ek dx~Bij = ( ~Bkl ij )kl , ~Bkl ij := B(χΩi ek, χ Ωj el).
+
+(6) Further defining 
+
+~Vκ := 
+
+{
+
+~b ∈ (Rd)|Iκ| : Kκ~b = ∑
+
+> i∈Iκ
+
+χΩi~bi ∈ V κ
+
+}
+
+,
+
+we now rewrite equation (5) into its algebraic form given by Find ~uκ ∈ ~Vκ such that ∀~v ∈ ~Vκ : ~u⊤ 
+
+> κ
+
+~B~ v = ~b ⊤~v. (7) To prove the well-posedness of (7), note that ~Vκ is a linear subspace of Rd|Iκ| ∼= Wκ defined by having a zero entry at every index i for which vol(Θ ∩ Ωi) > 0. Denote the set of all indices i for which vol(Θ ∩ Ωi) = 0 with Jκ. Then, define ˜B ∈ Rd|Jκ|× d|Jκ| as the matrix resulting from ~B after removing every row and column with an index i ∈ Iκ\Jκ. Similarly, define ˜b as the vector ~b with all entries with an index in Iκ\Jκ removed. Using these new definitions, (7) reduces down to the following final form, Find ˜ uκ ∈ Rd|Jκ| s.t. ˜B ˜uκ = ˜b. (8) We define the following injection for convenience, 
+
+E : ( Rd)|Jκ| → (Rd)|Iκ|, ˜u 7 → ~u, ~ ui := 
+
+{˜ui i ∈ Jκ
+
+0 else. 6Note that ˜ u solves (8) if and only if E(˜ u) solves (7). Therefore, the piecewise constant solutions uκ of (5) are in a one to one correspondence with solutions ˜ uκ of (8), as the Dirichlet boundary conditions ensure that any solution of (7) must lie in the image of E.Due to the coercitivity of B as shown in [18], Lemma 3, there exists a c > 0 such that for all u ∈ V ,
+
+c‖u‖2  
+
+> L2(Ω) d
+
+≤ B(u, u ). (9) We define Vi := vol(Ω i) = vol( Bi ∩ Ω). Using this, one obtains for all 0 6 = ˜ u ∈ Rd|Jκ|, that ˜u⊤ ˜B ˜u = ( E ˜u)⊤ ~B(E ˜u) = B
+
+( ∑
+
+> i∈Jκ
+
+χΩi ˜ui, ∑
+
+> i∈Jκ
+
+χΩi ˜ui
+
+)
+
+≥ c
+
+∥∥∥∥∥∑
+
+> i∈Jκ
+
+χΩi ˜ui
+
+∥∥∥∥∥
+
+> 2
+> L2(Ω) d
+
+≥ c
+
+(
+
+min  
+
+> i∈Jκ
+
+Vi
+
+)
+
+‖˜u‖2
+
+︸ ︷︷ ︸
+
+> >0
+
+.
+
+This implies that ˜B is symmetric positive definite and in particular invertible. This im-mediately yields the well-posedness of the discrete problems posed in (8). The proof of the convergence of the resulting sequence ( Kκ ˜uκ)κ of solutions indexed over κ ց 0 towards the solution of the continuous problem u, mainly builds on a density result for the Vκ, as the rest follows from Galerkin theory. For the sake of completeness we will still give the entire proof. To this end, we need the following lemma, which is a slight adaptation of the characterization of sets of measure zero. To formulate it, we define a cube to be half-open if it is of the form [ a1, b 1[×.... × [ad, b d[ for a, b ∈ Rd.
+
+Lemma 2.4 (Characterization of Compact Sets of Measure Zero ) Let A be a compact set of measure zero. Then, for each ǫ > 0, there exists a finite family ( W ǫf )f ∈F of half-open cubes of uniform side length l, such that 
+
+A ⊂ ⋃ 
+
+> f∈F
+
+W ǫf , vol 
+
+ ⋃ 
+
+> f∈F
+
+W ǫf
+
+ < ǫ. 
+
+Proof. See Lemma A.1. 
+
+This lemma then gives us the following important result. 
+
+Proposition 2.5 (( Bi)i Covering of Zero Measure Sets )Let the ( Bi)i be defined as in Definition 2.1. Then, for any compact set A ⊂ Rd of measure zero, one has 0 ≤ vol 
+
+ ⋃ 
+
+> i:Bi∩A6=∅
+
+Bi
+
+ ≤ vol 
+
+ ⋃ 
+
+> i:Bi∩A6=∅
+
+Bi
+
+ κց0
+
+−−−→ 0.
+
+Proof. Let ǫ > 0. Invoking Lemma 2.4 now gives a finite family of half-open cubes ( Wf )f ∈F
+
+of uniform side length q, such that 
+
+A ⊂ ⋃ 
+
+> f∈F
+
+Wf , vol 
+
+ ⋃ 
+
+> f∈F
+
+Wf
+
+ < 1 
+
+> 2
+
+ǫ. (10) 7Now, by setting Lf := {i : Bi ∩ Wf 6 = ∅}, one has 
+
+Sκ := ⋃ 
+
+> i:Bi∩A6=∅
+
+Bi ⊂ ⋃ 
+
+> f∈F
+
+⋃
+
+> i∈Lf
+
+Bi. (11) We now claim that, uniformly for every f ∈ F , we have 0 ≤ lim  
+
+> κց0
+
+vol 
+
+ ⋃
+
+> i∈Lf
+
+Bi
+
+ − vol( Wf ) = 0 ,
+
+which follows from 0 ≤ vol 
+
+ ⋃
+
+> i∈Lf
+
+Bi
+
+ − vol( Wf ) ≤ (2 κ + q)d − qd κց0
+
+−−−→ 0.
+
+So there exists an N ∈ N, such that for all n ≥ N and all f ∈ F ,0 ≤ vol 
+
+ ⋃
+
+> i∈Lf
+
+Bi
+
+ − vol( Wf ) ≤ (2 κn + q)d − qd ≤ ǫ
+
+2|F | ,
+
+where Lf and Bi depend on n through κn. One then finally has for all n ≥ N ,vol( Sκ) ≤ vol 
+
+ ⋃ 
+
+> f∈F
+
+⋃
+
+> i∈Lf
+
+Bi
+
+ ≤ vol 
+
+ ⋃ 
+
+> f∈F
+
+Wf
+
+ + 1 
+
+> 2
+
+ǫ < ǫ. 
+
+The last inequality follows from (10). 
+
+With this, we obtain the main contribution of this chapter, the density result, as follows. 
+
+Proposition 2.6 (Density of the Discrete Admissible Sets ) For every sequence κn ց 0, the set ˜V := ⋃
+
+> n∈N
+
+Vκn
+
+is (strongly) dense in V with respect to the norm of L2(Ω) d.
+
+Proof. Let v ∈ V . We already know that due to Lemma 2.3, there is a sequence of piecewise constant functions v′ 
+
+> κ
+
+:= Pκ(v) ∈ L2(Ω) d such that v′ 
+
+> κ
+
+→ v as κ ց 0. The index 
+
+n is again omitted unless relevant. One can modify this sequence to lie in ˜V by restricting 
+
+v′ 
+
+> κ
+
+to ∪i∈Jκ Ωi =: SQ Jκ , thereby defining vκ := v′ 
+
+> κ|SQ Jκ
+
+. Recall that Jκ ⊂ Iκ was the set of indices i ∈ Iκ for which vol(Ω i ∩ Θ) = 0. We now split the group of the Ω i for i ∈ Iκ\Jκ into those completely inside of Θ and those intersecting both Ω \Θ and Θ. This leads to the following definitions, Ω ⊃ SQ Kκ := ⋃
+
+> i∈Kκ
+
+Ωi, K κ := {i ∈ Iκ\Jκ : Ω i 6 ⊂ Θ},
+
+Ω ⊃ SQ Rκ := Ω \(SQ Kκ ∪ SQ Jκ ) = N ˙∪ ⋃
+
+> i∈Rκ
+
+Ωi, R κ := {i ∈ Iκ : Ω i ⊂ Θ},
+
+8where N ⊂ Ω is some set of measure zero. Then, one obtains 
+
+‖vκ − v‖2  
+
+> L2(Ω) d
+
+≤ ‖ Pκ(v) − v‖2  
+
+> L2(SQ Jκ)d
+
++ ‖vκ − v‖2  
+
+> L2(SQ Kκ)d
+
++ ‖vκ − v‖2  
+
+> L2(SQ Rκ)d
+
+≤ ‖ Pκ(v) − v‖2
+
+> L2(Ω) d
+
+︸ ︷︷ ︸
+
+> L
+
+2.3
+
+−−−→0
+
++‖v‖2  
+
+> L2(SQ Kκ)d
+
+since vκ ≡ 0 on SQ Kκ ∪ SQ Rκ and v ≡ 0 on SQ Rκ because of v ∈ V .Because of the absolute continuity of the Lebesgue integral, one now only has to show that vol( SQ Kκ ) κց0
+
+−−−→ 0.
+
+This is where we will need assumption A6 in 1.1, which gives us a more concrete description of SQ Kκ as 
+
+SQ Kκ ⊂ ⋃ 
+
+> i:Bi∩∂Θ6=0
+
+Bi =: Sκ.
+
+This follows from the openness of Θ and the path-connectedness of the half-open cubes 
+
+Bi. More specifically, for any Ω i with i ∈ Kκ, one has Ωi ∩ Θ = Bi ∩ Θ 6 = ∅
+
+Ωi ∩ (Ω \Θ) = Bi ∩ (Ω \Θ) 6 = ∅.
+
+Now, a typical connectedness argument implies that Bi ∩ ∂Θ 6 = ∅. So that Ω i ⊂ Bi ⊂ Sκ.The last part of the proof now uses that ∂Θ is by assumption a compact set of measure zero to apply Proposition 2.5. 
+
+With the density proven, the rest of the convergence follows from Galerkin theory as follows. 
+
+Theorem 2.7 (The Convergence of the Discrete Solutions ) Let the Assumptions 1.1 hold. Then, let κn ց 0. Let uκn be the unique solution to (5) for each κn and u the unique solution to (1), then 
+
+‖u − uκn ‖L2(Ω) d
+
+> κnց0
+
+−−−−→ 0.
+
+Proof. This proof uses the fact that the bilinear form B can also be represented as a self-adjoint operator L ∈ L2(Ω) d → L2(Ω) d, such that 
+
+B(u, v ) = 〈−L u, v 〉L2 (Ω) d = 〈u, −L v〉L2(Ω) d
+
+for all u, v ∈ L2(Ω) d (See [18], Lemma 5). The proof then begins by showing a boundedness statement for the uκ. For convenience, we drop the index n from the κn when it is not needed. Using the coercitivity of the bilinear form as in (9), one has 0 ≤ c‖uκ‖2 
+
+> L2(Ω) d
+
+≤ B(uκ, u κ) = 〈b, u κ〉L2(Ω) d ≤ ‖ b‖L2 (Ω) d ‖uκ‖L2(Ω) d
+
+leading to 1 
+
+> c
+
+‖b‖L2(Ω) d ≥ ‖ uκ‖L2(Ω) d being uniformly bounded. Applying the Banach-Alaoglu theorem, one obtains a weakly-L2 convergent subse-quence uκnk , renamed to just uκn for simplicity, with some weak limit u′ ∈ L2(Ω) d. Due to the weak closedness of V, we have u′ ∈ V .9The next step is proving u′ = u by showing that u′ solves (1), thereby proving that the entire original sequence weakly converges to u. Let v ∈ V , then, by Proposition 2.6, there is a sequence of ( vκn )n∈N, such that vκn → v strongly in L2(Ω) d and vκn ∈ V κn for all 
+
+n ∈ N. Then, since L is a bounded operator and therefore Lvκn → L v strongly in L2(Ω) d,
+
+B(uκ, v κ) = 〈uκ, −L vκ〉L2(Ω) d
+
+> κց0
+
+−−−→ 〈 u′, −L v〉L2(Ω) d .
+
+This immediately yields 
+
+B(u′, v ) = lim  
+
+> n→∞
+
+B(uκn , v κn ) sol 
+
+= lim 
+
+> n→∞
+
+〈b, v κn 〉L2(Ω) d = 〈b, v 〉L2 (Ω) d .
+
+The only thing left to show now is that the series also converges to u in the L2(Ω) d norm. This is done by using the fact that Vκ ⊂ V and therefore B(u, u κ) = 〈uκ, b 〉L2(Ω) d =
+
+B(uκ, u κ) to obtain 
+
+c‖u − uκ‖2 
+
+> L2(Ω) d
+
+≤ B(u − uκ, u − uκ) = B(u, u − uκ) − B(uκ, u ) + B(uκ, u κ)= 〈u − uκ, b 〉L2(Ω) d
+
+> κց0
+
+−−−→ 0.
+
+We used the fact that u solves (1) in the last equality. 
+
+Remark 2.8 Note that by setting the material parameter α ≡ d2k 
+
+> m
+
+in (2), the state-based model reduces to the bond-based model. Therefore Theorem 2.7 is applicable for bond-based models as well, as A5 of Assumptions 1.1 implies 0 < m 0 ≦ m ≦ m1 for some 
+
+m0, m 1 > 0 and therefore bounds on α ≡ d2k 
+
+> m
+
+as required by A3. 
+
+# 3 Convergence of a Numerical Model 
+
+The above framework relies on the exact computation of the ~Bkl ij and ~bki factors involved in (6). In practice, the exact computation of these factors is impractical, giving rise to the need to develop a numerically feasible model for which one can obtain a convergence result similar to Theorem 2.7 in Section 2. To this end, we now give explicit formulas for the constituents of the analytical discretization to which we want to apply one point quadrature. To make the use of one point quadrature possible, we will have to rewrite the integrals in the bilinear form into a sum of integrals on vanishing domains as κ → 0. The right hand side does not need any further treatment, as it is given by 
+
+~bki =
+
+∫
+
+> Ωi
+
+e⊤ 
+
+> k
+
+b(x) dx. 
+
+So, to deal with the ~Bkl ij terms from (6), first writing out the terms in the definition of B
+
+in (2) , one has 
+
+B(u, v ) = 
+
+∫
+
+> Ω
+
+(
+
+k(x) − α(x)m(x)
+
+d2
+
+) ∫ 
+
+> Ω
+
+(u(x′) − u(x)) ⊤
+
+( x′ − x
+
+‖x′ − x‖2
+
+)
+
+ω(x, x ′) dx′
+
+×
+
+∫
+
+> Ω
+
+(v(x′) − v(x)) ⊤
+
+( x′ − x
+
+‖x′ − x‖2
+
+)
+
+ω(x, x ′) dx′ dx
+
++
+
+∫
+
+> Ω
+
+α(x)
+
+∫
+
+> Ω
+
+ω(x′ − x)‖x′ − x‖2(u(x′) − u(x)) ⊤
+
+( x′ − x
+
+‖x′ − x‖2
+
+)
+
+× (v(x′) − v(x)) ⊤
+
+( x′ − x
+
+‖x′ − x‖2
+
+)
+
+dx′ dx. 
+
+(12) 10 We then define 
+
+τ (x) := k(x)d2
+
+m(x)2 − α(x)
+
+m(x) ,
+
+with which (12) can further be rewritten to 
+
+B(u, v )=
+
+∫
+
+> Ω
+
+τ (x)
+
+∫
+
+> Ω
+
+(u(x′) − u(x)) ⊤ (x′ − x) ω(x′ − x) dx′
+
+×
+
+∫
+
+> Ω
+
+(v(x′) − v(x)) ⊤ (x′ − x) ω(x′ − x) dx′ dx
+
++
+
+∫
+
+> Ω
+
+α(x)
+
+∫
+
+> Ω
+
+ω(x′ − x)
+
+‖x′ − x‖2 (u(x′) − u(x)) ⊤ (x′ − x) (v(x′) − v(x)) ⊤ (x′ − x) dx′ dx. 
+
+Then, plugging in u = χΩi ek and v = χΩj el yields that 
+
+~Bkl ij =
+
+∫
+
+> Ω
+
+τ (x)
+
+∫
+
+> Ω
+
+(χΩi (x′) − χΩi (x)) e⊤
+
+> k
+
+(x′ − x) ω(x′ − x) dx′
+
+×
+
+∫
+
+> Ω
+
+(χΩj (x′) − χΩj (x)) e⊤
+
+> l
+
+(x′ − x) ω(x′ − x) dx′ dx
+
++
+
+∫
+
+> Ω
+
+α(x)
+
+∫
+
+> Ω
+
+ω(x′ − x)
+
+‖x′ − x‖2 (χΩi (x′) − χΩi (x)) e⊤
+
+> k
+
+(x′ − x)
+
+× (χΩj (x′) − χΩj (x)) e⊤
+
+> l
+
+(x′ − x) dx′ dx, 
+
+for i 6 = j we then obtain =
+
+∫
+
+> Ωi
+
+τ (x)
+
+∫
+
+> Ω\Ωi
+
+−e⊤
+
+> k
+
+(x′ − x) ω(x′ − x) dx′
+
+∫
+
+> Ωj
+
+e⊤
+
+> l
+
+(x′ − x) ω(x′ − x) dx′ dx
+
++
+
+∫
+
+> Ωj
+
+τ (x)
+
+∫
+
+> Ωi
+
+e⊤
+
+> k
+
+(x′ − x) ω(x′ − x) dx′
+
+∫
+
+> Ω\Ωj
+
+−e⊤
+
+> l
+
+(x′ − x) ω(x′ − x) dx′ dx
+
++
+
+∫ 
+
+> Ω\(Ω j∪Ωi)
+
+τ (x)
+
+∫
+
+> Ωi
+
+e⊤
+
+> k
+
+(x′ − x) ω(x′ − x) dx′
+
+∫
+
+> Ωj
+
+e⊤
+
+> l
+
+(x′ − x) ω(x′ − x) dx′ dx
+
+−
+
+∫
+
+> Ωi
+
+∫
+
+> Ωj
+
+(α(x) + α(x′)) ω(x′ − x)
+
+‖x′ − x‖2 e⊤
+
+> k
+
+(x′ − x) e⊤
+
+> l
+
+(x′ − x) dx′ dx
+
+and for i = j we have =
+
+∫
+
+> Ωi
+
+τ (x)
+
+∫
+
+> Ω\Ωi
+
+e⊤
+
+> k
+
+(x′ − x) ω(x′ − x) dx′
+
+∫
+
+> Ω\Ωi
+
+e⊤
+
+> l
+
+(x′ − x) ω(x′ − x) dx′ dx
+
++
+
+∫
+
+> Ω\Ωi
+
+τ (x)
+
+∫
+
+> Ωi
+
+e⊤
+
+> k
+
+(x′ − x) ω(x′ − x) dx′
+
+∫
+
+> Ωi
+
+e⊤
+
+> l
+
+(x′ − x) ω(x′ − x) dx′ dx
+
++
+
+∫
+
+> Ωi
+
+∫
+
+> Ω\Ωi
+
+(α(x) + α(x′)) ω(x′ − x)
+
+‖x′ − x‖2 e⊤
+
+> k
+
+(x′ − x) e⊤
+
+> l
+
+(x′ − x) dx′ dx. (13) Summarizing this form and rewriting integrals over Ω \Ωi or Ω \(Ω i ∪ Ωj ) as sums over all relevant Ω k making up the integration domain, one would then only have to evaluate the following integrals for i, j, m ∈ Iκ, 1 ≤ k, l ≤ d,
+
+I2 
+
+> ijm ;kl
+
+:= 
+
+∫
+
+> Ωi
+
+τ (x)
+
+∫
+
+> Ωj
+
+e⊤
+
+> k
+
+(x′ − x) ω(x′ − x) dx′
+
+∫
+
+> Ωm
+
+e⊤
+
+> l
+
+(x′ − x) ω(x′ − x) dx′ dx
+
+I1 
+
+> ij ;kl
+
+:= 
+
+∫
+
+> Ωi
+
+∫
+
+> Ωj
+
+(α(x) + α(x′)) ω(x′ − x)
+
+‖x′ − x‖2 e⊤
+
+> k
+
+(x′ − x) e⊤
+
+> l
+
+(x′ − x) dx′ dx. 
+
+(14) 11 Using only these integrals, the bilinear form is then given by 
+
+~Bkl ij =
+
+∑
+
+> m6∈{ i,j }
+
+I2 
+
+> mij ;kl
+
+− ∑
+
+> m6=i
+
+I2 
+
+> imj ;kl
+
+− ∑
+
+> m6=j
+
+I2 
+
+> jim ;kl
+
+− I 1 
+
+> ij ;kl
+
+for i 6 = j
+
+∑ 
+
+> n6=i
+
+∑
+
+> m6=i
+
+I2 
+
+> inm ;kl
+
++ ∑
+
+> m6=i
+
+I2 
+
+> mii ;kl
+
++ ∑
+
+> m6=i
+
+I1 
+
+> im ;kl
+
+for i = j. (15) In this chapter we will study the numerical version of the model considered above assuming 
+
+ω(ζ) = ρ(ζ)χ[0 ,δ )(‖ζ‖) with ρ(ζ) = 1 
+
+> ‖ζ‖
+
+for all ζ ∈ Rd and some fixed δ > 0. This numerical version is obtained by applying a one-point quadrature rule to the integrals in (14) and then using (15) to obtain the numerical bilinear form Bnum . This approach to discretize the peridynamic equations is not new, and was originally introduced in [27] on bond-based models; it was merely brought into the usual variational framework here after being canonically extended to state-based models. One should note that [27] only mathematically proved the convergence for one-dimensional models and twice continuously differentiable material parameters and displacements. For consistency between the numerical models and the continuous models, as well as the continuous PD model and the classical theory, we will substitute α(x) with l(x) 
+
+> m(x)
+
+for a function l : Ω → R.First, we write the integrals in (14) in matrix form I1 
+
+> ijm
+
+:= ( I1
+
+> ijm ;kl
+
+)1≤k,l ≤d to simplify the notation. We then apply a one-point quadrature rule to obtain, using the notation 
+
+Vi := vol(Ω i), 
+
+I2,num  
+
+> ijm
+
+:= ViVj Vmτ num (xi)ρ(xj − xi)ρ(xm − xi) ( xj − xi) ( xm − xi)⊤ wij wim ,
+
+I1,num  
+
+> ij
+
+:= ViVj ρ(xj − xi)( αnum (xi) + αnum (xj )) (xj − xi) ( xj − xi)⊤
+
+‖xj − xi‖‖ xj − xi‖ wij , (16) with, for x ∈ Ωi,
+
+τ num (x) := k(xi)d2 − l(xi)
+
+mnum (xi)2 , α num (x) = l(xi)
+
+mnum (xi) , m num (x) := ∑
+
+> j
+
+wij Vj ρ(xj −xi)‖xj −xi‖2.
+
+The wij terms now replace the χ[0 ,δ )(‖xi − xj ‖) terms and allow the usage of partial area algorithms for better convergence behavior (See [20] for an in-depth analysis on partial area/volume weights and convergence behavior). There will be requirements for these terms later in Assumptions 3.3 justifying this substitution. Due to our choice to evaluate l, k and b at the mid-points xi of the Bi, it is necessary to extend the input data suitably beyond Ω as the xi do not necessarily lie in Ω. However, any extension of the input data by a constant, for example 0, is compatible with our regularity requirements on the input data stated later in Assumptions 3.3. 
+
+Remark 3.1 As a short demonstration of the advantage of including these weights, we compared the convergence of the solutions for a simple 2d bar problem under tensile loading using two sets of weights 
+
+wFA  
+
+> ij
+
+:= χ[0 ,δ )(‖xj − xi‖) and wPAAC  
+
+> ij
+
+:= vol(Ω j ∩ Bδ (xi)) /V j . (17) The FA weights correspond to keeping the characteristic function without using weights in the discretized terms (16). The PAAC terms correspond to using the exact area of the 12 intersection of the horizon with the discrete elements Ω i. Formulas for the wFA  
+
+> ij
+
+weights and a much more detailed comparison of the convergence using a broader variety of weights can be found in [20]. Moreover, it contains schemes which additionally choose suitable quadrature points to further improve convergence. This was ignored in this paper to keep the analysis simple. Accurate choices for partial volume weights for the case of d = 3 can be found in [19]. For the comparison, we calculated the norm ‖uκ − u∗‖L2(Ω) d for the solutions uκ to the discrete problems and a reference solution u∗ calculated by using a relatively small κ∗. The first problem is defined by 
+
+k ≡ 100 , l ≡ 800 , (18) as well as δ = 1 
+
+> 20
+
+, ν ≡ 0, Ω = [0 , 2] ×[0 , 1], Θ = [0 , 2δ]×[0 , 1] and b ≡ (100 , 0) T χ[2 −2δ, 2] ×[0 ,1] .This models a short bar being pulled on the right and held in place on the left. The κn
+
+where chosen as κn = (40 + 20 n)−1 for n ∈ { 0, ... 7} and u∗ was obtained using κ∗ = 360 −1
+
+and the PAAC weights. An additional comparison for a second problem featuring discontinuous input data is also shown in Figure 1. It has the same data except for 
+
+k(x) = 
+
+
+
+0.01 x ∈ B0.3
+
+(
+
+(1 , 0.5) ⊤ )
+
+100 else . , l (x) = 
+
+
+
+0.08 x ∈ B0.3
+
+(
+
+(1 , 0.5) ⊤ )
+
+800 else . (19) As visible in Figure 1, the models with the weights, namely the wPAAC  
+
+> i
+
+j weights, demonstrate a more consistent convergence behavior. For a more detailed description of the oscillatory behavior found in the plots for the ωF A weights, we refer to [20]. 
+
+Remark 3.2 As outlined in Remark 2.8, to obtain the bond-based model from the state-based model on the continuous level, one would have to set α(x) := d2k(x) 
+
+> m(x)
+
+. Doing so would require the exact evaluation of m in all points xi if this model was discretized using α(xi)in the above numerical integrals instead of αnum (xi). Another significant drawback is that it would not imply τ num (xi) = 0 if 
+
+τ num (xi) = k(xi)d2 
+
+> mnum (xi)2
+
+− α(xi) 
+
+> mnum (xi)
+
+had been used instead, as in general m(xi) 6 = mnum (xi). This would mean that the dis-cretized bond-based model would contain state-based terms. With the substitution α(x) = l(x) 
+
+> m(x)
+
+however, the m(x) is also numerically approximated. So with l(x) = d2k(x), the discretization of the bond-based continuous model is equal to the usual discretization of the bond-based model, that is, all state-based terms vanish. This implies that the following results are all also valid for bond-based models without any further comment. Additionally, since α = cdμ(x) 
+
+> m(x)
+
+(See [25], Section 15) for a constant 
+
+cd depending on the dimension d and μ(x) being the shear modulus from the classical theory, modeling materials from classical theory in this discrete peridynamic setting does not require the exact evaluation of m(x) either. The right hand side of the continuous equation can also be numerically approximated as ~bk num  
+
+> i
+
+= b(xi)⊤ek (20) defining one possible choice for a vector ~bnum  
+
+> κ
+
+∈ (Rd)|Iκ|.13 Figure 1: Comparison of the convergence behavior between the two choices of partial area weights as given in (17). A sequence of solutions for increasingly finer discretizations of a state-based model was calculated for both choices of the partial area weights (See (17)) for two distinct problems defined by (18) and (19). The y-axis shows the logarithm of the L2(Ω) d norm of the difference between the solution uκ and a reference solution 
+
+u∗ calculated at κ = 360 −1 using the PAAC weights. The x-axis was chosen to be a logarithmic scale for κ, shifted such that κ0 = 40 −1 appears at 0. The data of the first problem is shown plotted by the circles, while the crosses correspond to the second problem. The blue markers correspond to the solutions using the wPAAC  
+
+> ij
+
+weights, the red markers correspond to the solutions for the wFA  
+
+> ij
+
+weights. Any such choice leads to the final discrete problem Find ~uκ ∈ ~Vκ such that ∀~v ∈ ~Vκ : ~u⊤ 
+
+> κ
+
+~Bnum ~v = M~bnum ⊤ 
+
+> κ
+
+~v, (21) with the matrix M ∈ (Rd×d)|Iκ|×| Iκ| given by Mii = diag( Vi, ..., V i) and 0 elsewhere. To solve this system, note that it can also be reduced to Find ˜ uκ ∈ Rd|Jκ| s.t. ˜Bnum ˜uκ = ˜bnum (22) just like (8), again without changing the well-posedness or solution space compared to (21). Note, that the dependency of ˜Bnum , ~Bnum and ˜bnum on κ is omitted from the notation when not needed. The matrix ~Bnum is interpreted as a ( Rd×d)|Iκ|×| Iκ| matrix and given just like in (15) 14 by 
+
+~Bnum  
+
+> ij
+
+=
+
+∑
+
+> m6∈{ i,j }
+
+I2,num  
+
+> mij
+
+− ∑
+
+> m6=i
+
+I2,num  
+
+> imj
+
+− ∑
+
+> m6=j
+
+I2,num  
+
+> jim
+
+− I 1,num  
+
+> ij
+
+for i 6 = j
+
+∑ 
+
+> n6=i
+
+∑
+
+> m6=i
+
+I2,num  
+
+> inm
+
++ ∑
+
+> m6=i
+
+I2,num  
+
+> mii
+
++ ∑
+
+> m6=i
+
+I1,num  
+
+> im
+
+for i = j. (23) The goal of this chapter will be to show that the solutions ~unum  
+
+> κ
+
+∈ Rd|Iκ| of (21), embedded into L2(Ω) d via Kκ, converge to the continuous solution u of (1), that is, 
+
+Kκ~unum 
+
+> κκց0
+
+−−−−→ 
+
+> L2(Ω) d
+
+u. 
+
+For this we will need assumptions on the input data which will be specified next. 
+
+3.1 The Convergence Proof 
+
+For the numerical convergence proof, we assume the following. 
+
+Assumptions 3.3 (Assumptions on the Model for the Numerical Discretization )We assume κ < δ√d and further, A1 The Choice for the Weighting Function : We set ∀ζ ∈ Rd : ω(ζ) = ρ(ζ)χ[0 ,δ )(‖ζ‖) for some δ > 0 and ρ(z) = 1 
+
+> ‖z‖
+
+.A2 Regularity of the Material Parameters : l, k : Ω → R a.e. locally L, K -Lipschitz con-tinuous for some L, K > 0 respectively, and 0 < l 0 ≦ l ≦ l1 as well as 0 < k 0 ≦ k ≦ k1
+
+for some constants 0 < l 0, l 1, k 0, k 1 ∈ R.A3 Convergence of the Right-Hand Side : The choice of the numerical right hand side 
+
+~bnum  
+
+> κ
+
+∈ Rd|I|κ
+
+has to fulfill 
+
+‖b − K κ~bnum  
+
+> κ
+
+‖L2(Ω) d → 0.
+
+A4 Limitations for the Partial Area Weights : The wij terms fulfill the following require-ments for all i, j ∈ Iκ.(a) If ‖xi − xj ‖ ≥ δ + √d κ 
+
+> 2
+
+, then wij = 0. (b) If ‖xi − xj ‖ ≤ δ − √d κ 
+
+> 2
+
+, then wij = 1. (c) 0 ≤ wij ≤ 1. (d) wij = wji .A5 Regularity of the Domain : Ω is a bounded and connected Lipschitz domain, in partic-ular, it satisfies an interior cone condition for some angle θ > 0 and radius h > 0. A6 Regularity of the Dirichlet Boundary Condition : Θ is open, non-empty with vol( ∂Θ) = 0. The main idea behind the assumptions involving the a.e. local L-Lipschitz continuity is to allow bounded jumps (in the sense of discontinuities) on a set of measure zero, while keeping sufficient control over the function everywhere else, uniform with respect to x. Be-sides the material parameters, this can also be applied to the external body forces b. This 15 is shown in Corollary 3.6, which will prove that choosing b to be a.e. locally L-Lipschitz is a sufficient condition for ~bnum  
+
+> κ
+
+:= ( b(xi)) i∈Iκ to fulfill the assumptions above. We begin with the following fundamental lemma that allows extending the local Lip-schitz continuity to a global one on convex sets that don’t intersect the set where the function behaves undesirably. 
+
+Lemma 3.4 (Globalization of a.e. Local L-Lipschitz Continuity )Let f : Ω → Rn be a bounded, a.e. locally F -Lipschitz continuous function with F > 0, and LFS F (f ) := {x ∈ Ω : f fails to be locally F -Lipschitz in x}.
+
+Then, for all convex sets B ⊂ Ω with B ∩ LFS F (f ) = ∅, we have f|B ∈ C0,1(B)n with the same Lipschitz constant F .
+
+Proof. By assumption, for any x, x ′ ∈ B, the line segment between x and x′ lies in B.Since this line segment is also compact, it can be covered by finitely many neighborhoods on which f is F -Lipschitz. Appropriately subdividing the line segment between x and x′
+
+and applying the F -Lipschitz bound on each segment then yields the claim after summing the bounds back together. 
+
+The next proposition states a convergence result for these functions. 
+
+Proposition 3.5 (Convergence of Midpoint Approximation ) Let u : Ω → Rd be a bounded, almost everywhere locally L-Lipschitz function, then 
+
+‖ num κ(u) − u‖L2 (Ω) d
+
+> κց0
+
+−−−→ 0,
+
+with 
+
+L2(Ω) d ∋ num κ(u) := ∑
+
+> i∈Iκ
+
+χΩi u(xi).
+
+Proof. We first split Iκ into two sets as follows, ˆI := {i ∈ Iκ : Bi ∩ (∂Ω ∪ LFS L(u)) 6 = ∅}, ˆII := Iκ\ ˆI. 
+
+One then has, using ‖ · ‖ ∞ to denote the supremum norm, 
+
+‖ num κ(u) − u‖2 
+
+> L2(Ω) d
+
+= ∑
+
+> i∈Iκ
+
+∫
+
+> Ωi
+
+‖u(x) − u(xi)‖2 dx
+
+= ∑ 
+
+> i∈ˆI
+
+∫
+
+> Ωi
+
+‖u(x) − u(xi)‖2 dx + ∑ 
+
+> i∈ˆII
+
+∫
+
+> Ωi
+
+‖u(x) − u(xi)‖2 dx
+
+≤ 4‖u‖2 
+
+> ∞
+
+vol 
+
+⋃ 
+
+> i∈ˆI
+
+Bi
+
+ + ∑ 
+
+> i∈ˆII
+
+∫
+
+> Ωi
+
+‖u(x) − u(xi)‖2 dx. 
+
+Invoking Proposition 2.5 now yields vol 
+
+⋃ 
+
+> i∈ˆI
+
+Bi
+
+ = vol 
+
+ ⋃ 
+
+> i:Bi∩S6=∅
+
+Bi
+
+ κց0
+
+−−−→ 0,
+
+16 since S := ( ∂Ω ∪ LFS L(u)) is by definition a compact zero set. Further, i ∈ ˆII implies that Ω i = Bi as Bi is path connected and Ω is open, so that one could apply a connectedness argument to show Ωi 6 = Bi =⇒ ∅ 6 = Bi ∩ ∂Ω ⊂ Bi ∩ (∂Ω ∪ LFS L(u)) = ⇒ i 6 ∈ ˆII. 
+
+Due to Lemma 3.4, one obtains that u has to be L-Lipschitz continuous on Ω i = Bi due to Bi ∩ LFS L(u) = ∅, ultimately yielding  
+
+> ∑
+> i∈ˆII
+> ∫
+> Ωi
+
+‖u(x) − u(xi)‖2 dx ≤ L2 vol(Ω) dκ 2 κց0
+
+−−−→ 0,
+
+finishing the proof. 
+
+Corollary 3.6 (Sufficient Conditions for Assumption A3 ) Proposition 3.5 implies that the choice ~bnum  
+
+> κ
+
+=: ( b(xi)) i∈Iκ as defined in (20) fulfills A3 in Assumptions 3.3 if b is bounded and a.e. locally L-Lipschitz for some L > 0. 
+
+Remark 3.7 Note that both choices for weights used in Remark 3.1 fulfill requirement A4 in Assumptions 3.3. In fact, all that A4 requires through the constraints (a) and (b) is that elements that geometrically fully lie outside or inside the neighborhood of xi due to the distance of xj to xi have to have exact weights, which we used in Lemma 3.13. These conditions are fulfilled by many practically used weights since testing the distance 
+
+‖xj − xi‖ is already part of the algorithm to calculate the weights, or is otherwise feasible. For example, additionally to the weights in Remark 3.1 and those suggested in [19], the PD-LAMMPS algorithm outlined in [20] also fulfills these assumptions. However, the assumptions as they are posed here are too strict for the weights mentioned in [17] based on Monte Carlo integration to approximate the exact weights in an efficient manner. They are also too strict for the weights constructed in [30], aiming to find an asymptotically consistent quadrature rule resulting from a least squares problem under the constraint that a given subspace is being exactly reproduced. This is because last two choices do not guarantee that the weights wij fulfill requirement (b) of A4. The next steps to prove the convergence of this numerical model are structured as follows. We will first rewrite the numerical bilinear form into two equivalent forms to show point-wise convergence of the induced linear operator as well as coercitivity. These reformulations are lengthy, yet in essence no different than in the continuous case (See [18], proof of Lemma 5, Proposition 1). We begin with the operator form Lnum  
+
+> κ
+
+, motivated by the continuous equivalent 
+
+B(u, v ) = 〈u, −L v〉L2(Ω) d −→ ~u ~Bnum ~v =: 〈K κ~u, −L num  
+
+> κ
+
+Kκ~v〉L2(Ω) d ,
+
+then we will use the potential form W num  
+
+> κ
+
+, motivated by 
+
+B(u, u ) = 2 
+
+> ∫
+> Ω
+
+W (u, x ) dx −→ ~u ~Bnum ~u =: 2 ∑
+
+> i
+
+ViW num  
+
+> κ
+
+(~u, x i).
+
+The first step is then to show that, for some C > 0, 
+
+∀v ∈ L2(Ω) d : Lnum  
+
+> κ
+
+v κց0
+
+−−−−→ 
+
+> L2(Ω) d
+
+Lv, and ‖L num  
+
+> κ
+
+‖ ≦ C independent of κ, (24) 17 which will be done in Corollary 3.18. The second step will be to prove that for κ > 0small enough and for all ~u ∈ ~Vκ,
+
+cnum ‖K κ~u‖2 
+
+> L2(Ω) d
+
+≤ 2 ∑
+
+> i
+
+ViW num  
+
+> κ
+
+(~u, x i) (25) for a cnum > 0 independent of 0 < κ << 1. This will be proven later in Corollary 3.22. The latter property is based on the proof of the coercitivity of the continuous bilinear form (See [18], Proposition 1 and Proposition 2). These two requirements are sufficient for us to now prove the convergence. 
+
+Theorem 3.8 (Convergence of the Numerical Discretization ) Let ~unum  
+
+> κ
+
+be the solutions to the numerical discrete systems (21), then under Assumptions 3.3, as well as (24) and (25), 
+
+Kκ~unum 
+
+> κκց0
+
+−−−−→ 
+
+> L2(Ω) d
+
+u. 
+
+Proof. Let κ > 0 be small enough for (25) to hold, as well as 
+
+‖K κ~bnum  
+
+> κ
+
+− b‖L2(Ω) d ≤ 1 
+
+> 2
+
+‖b‖
+
+made possible by Kκ~bnum  
+
+> κ
+
+→ b as assumed in A3 of Assumptions 3.3. Then, using (25) and the fact that ~unum  
+
+> κ
+
+is the solution of (21), 
+
+cnum ‖K κ~unum  
+
+> κ
+
+‖2 
+
+> L2(Ω) d
+
+≤ 2 ∑
+
+> i
+
+ViW num  
+
+> κ
+
+(~unum  
+
+> κ
+
+, x i) = ~unum ⊤ 
+
+> κ
+
+~Bnum ~unum 
+
+> κ
+
+= M~bnum ⊤ 
+
+> κ
+
+~unum  
+
+> κ
+
+= 〈K κ~bnum  
+
+> κ
+
+, Kκ~unum  
+
+> κ
+
+〉L2(Ω) d
+
+≤ ‖K κ~bnum  
+
+> κ
+
+‖L2 (Ω) d ‖K κ~unum  
+
+> κ
+
+‖L2(Ω) d
+
+≤ 1.5‖b‖L2 (Ω) d ‖K κ~unum  
+
+> κ
+
+‖L2(Ω) d ,
+
+implying that the sequence Kκ~unum  
+
+> κ
+
+is uniformly bounded in L2(Ω) d. By applying Banach-Alaoglu, one obtains a subsequence, written like the original sequence for convenience, and a weak limit u′ ∈ L2(Ω) d. This weak limit must lie in V due to the weak closedness of V.We will now show u′ = u. Let v ∈ V . Using Proposition 2.6, there exist ~vκ ∈ ~Vκ such that 
+
+Kκ~vκ → v in L2(Ω) d, then, 
+
+M~bnum ⊤ 
+
+> κ
+
+~vκ = 〈K κ~bnum  
+
+> κ
+
+, Kκ~vκ〉L2(Ω) d
+
+> κց0
+
+−−−→ 〈 b, v 〉L2 (Ω) d ,
+
+as well as, using (24), 
+
+M~bnum ⊤ 
+
+> κ
+
+~vκ = ~unum ⊤ 
+
+> κ
+
+~Bnum ~vκ = 〈K κ~unum  
+
+> κ
+
+, −L num  
+
+> κ
+
+Kκ~vκ〉L2(Ω) d .
+
+Further, again with (24), 
+
+‖L num  
+
+> κ
+
+Kκ~vκ − L v‖L2(Ω) d ≤ ‖ (Lnum  
+
+> κ
+
+− L )v‖L2 (Ω) d + ‖L num  
+
+> κ
+
+‖‖ v − K κ~vκ‖L2(Ω) d
+
+> κց0
+
+−−−→ 0leads to 
+
+〈K κ~unum ⊤ 
+
+> κ
+
+, −L num  
+
+> κ
+
+Kκ~vκ〉L2(Ω) d
+
+> κց0
+
+−−−→ 〈 u′, −L v〉L2(Ω) d .
+
+18 In summary, 
+
+〈u′, −L v〉L2(Ω) d = 〈b, v 〉L2 (Ω) d
+
+for all v ∈ V , therefore u′ = u. Further, the uniqueness of u implies that the whole sequence Kκ~unum  
+
+> κ
+
+is weakly convergent to u.We now show that the sequence Kκ~unum  
+
+> κ
+
+also strongly converges to u with respect to the 
+
+L2(Ω) d norm. Let ~sκ ∈ ~Vκ such that Kκ~sκ → u in L2(Ω) d obtained just like in Proposition 2.6. We then have the inequality 
+
+‖K κ~unum  
+
+> κ
+
+− u‖L2(Ω) d ≤ ‖K κ(~unum  
+
+> κ
+
+− ~sκ)‖L2 (Ω) d + ‖K κ~sκ − u‖L2(Ω) d ,
+
+where we know the second summand vanishes. Turning our attention to the first, for κ > 0small enough, one has using (25), 
+
+cnum ‖K κ(~unum  
+
+> κ
+
+− ~sκ)‖2 
+
+> L2(Ω) d
+
+≤ (~unum  
+
+> κ
+
+− ~sκ)⊤ ~Bnum (~unum  
+
+> κ
+
+− ~sκ)
+
+≤ (~unum  
+
+> κ
+
+)⊤ ~Bnum (~unum  
+
+> κ
+
+− ~sκ) + ~s⊤ 
+
+> κ
+
+~Bnum ~sκ − ~s⊤ 
+
+> κ
+
+~Bnum ~unum 
+
+> κ
+
+= M~bnum ⊤ 
+
+> κ
+
+(~unum  
+
+> κ
+
+− ~sκ) + ~s⊤ 
+
+> κ
+
+~Bnum ~sκ − M~bnum ⊤ 
+
+> κ
+
+~sκ.
+
+Where in the last line, we used that ~unum  
+
+> κ
+
+solves (21). Note that Kκ~sκ → u, Kκ~unum  
+
+> κ
+
+⇀ u and Kκ~bnum  
+
+> κ
+
+→ b, which leads to 
+
+M~bnum ⊤ 
+
+> κ
+
+(~unum  
+
+> κ
+
+− ~sκ) = 〈K κ~bnum  
+
+> κ
+
+, Kκ(~unum  
+
+> κ
+
+− ~sκ)〉L2(Ω) d
+
+> κց0
+
+−−−→ 0,
+
+as well as 
+
+M~bnum ⊤ 
+
+> κ
+
+~sκ = 〈K κ~bnum  
+
+> κ
+
+, ~ sκ〉L2(Ω) d
+
+> κց0
+
+−−−→ 〈 b, u 〉L2 (Ω) d .
+
+So what’s left to show is 
+
+~s⊤ 
+
+> κ
+
+~Bnum ~sκ → 〈 b, u 〉L2(Ω) d = B(u, u ).
+
+First, we see that 
+
+~s⊤ 
+
+> κ
+
+~Bnum ~sκ = 〈K κ~sκ, −L num  
+
+> κ
+
+Kκ~sκ〉L2(Ω) d
+
+= 〈K κ~sκ, −L num  
+
+> κ
+
+u〉L2(Ω) d + 〈K κ~sκ, −L num  
+
+> κ
+
+(u − K κ~sκ)〉L2(Ω) d .
+
+Note that due to (24), there is a C > 0 such that ‖L num  
+
+> κ
+
+‖ ≤ C, leading to 
+
+|〈K κ~sκ, −L num  
+
+> κ
+
+(u − K κ~sκ)〉L2(Ω) d | ≤ C‖K κ~sκ‖L2(Ω) d ‖K κ~sκ − u‖L2 (Ω) d
+
+> κց0
+
+−−−→ 0.
+
+This leaves us with only having to show 
+
+〈K κ~sκ, −L num  
+
+> κ
+
+u〉L2(Ω) d → B(u, u ) = 〈u, −L u〉L2 (Ω) d .
+
+Due the strong convergence of the Kκ~sκ to u in L2(Ω) d, this follows again from (24). 
+
+19 All that is left to prove now is (24) and (25). We begin with (24). First, the continuous operator can be split as follows (See [18], Lemma 5), [Lu]( x) := 
+
+∫
+
+> Ω
+
+C(x′, x )( u(x′) − u(x)) dx′
+
+C(x′, x ) := k1(x′, x ) + k2(x′, x ),k1(x′, x ) := ( α(x) + α(x′)) ρ(x′ − x) χ[0 ,δ )(‖x′ − x‖)
+
+‖x′ − x‖2 (x′ − x)( x′ − x)⊤,k2(x′, x ) := 
+
+∫
+
+> Ω
+
+τ (p)χ[0 ,δ )(‖p − x‖)χ[0 ,δ )(‖x′ − p‖)ρ(x − p)ρ(p − x′)( x − p)( p − x′)⊤
+
+−τ (x′)χ[0 ,δ )(‖x′ − x‖)χ[0 ,δ )(‖p − x′‖)ρ(x − x′)ρ(x′ − p)( x − x′)( x′ − p)⊤
+
++τ (x)χ[0 ,δ )(‖p − x‖)χ[0 ,δ )(‖x′ − x‖)ρ(x − p)ρ(x − x′)( x − p)( x − x′)⊤ dp
+
+(26) We now split the integral in k2 into three terms corresponding to the summands in the integrand, therefore splitting k2(x′, x ) into kp
+
+> 2
+
+(x′, x ), kx′ 
+
+> 2
+
+(x′, x ) and kx 
+
+> 2
+
+(x′, x ). Then, we split L into four operators by splitting the integral in L at the sum defining C, to finally obtain [L1u]( x) := 
+
+∫
+
+> Ω
+
+k1(x′, x )( u(x′) − u(x)) dx′,
+
+[Lx 
+
+> 2
+
+u]( x) := 
+
+∫
+
+> Ω
+
+kx 
+
+> 2
+
+(x′, x )( u(x′) − u(x)) dx′,
+
+[Lx′ 
+
+> 2
+
+u]( x) := 
+
+∫
+
+> Ω
+
+kx′ 
+
+> 2
+
+(x′, x )( u(x′) − u(x)) dx′,
+
+[Lp
+
+> 2
+
+u]( x) := 
+
+∫
+
+> Ω
+
+kp 
+
+> 2
+
+(x′, x )( u(x′) − u(x)) dx′.
+
+The numerical operator will now be split in a similar way and the convergence and uniform boundedness claims will then be shown for each operator individually. The proofs for each operator are usually very similar and therefore partially omitted. For notational simplicity we define V (i) 
+
+> j
+
+:= Vj wij .
+
+Lemma 3.9 (Splitting the Numerical Linear Operator ) The operator Lnum  
+
+> κ
+
+can be split into 
+
+Lnum  
+
+> κ
+
+= Lnum  
+
+> 1
+
++ Lx, num  
+
+> 2
+
++ Lx′,num  
+
+> 2
+
++ Lp, num  
+
+> 2
+
+,
+
+with, for u ∈ L2(Ω) d and x ∈ Ωi,[Lnum  
+
+> 1
+
+u]( x) := 1
+
+Vi
+
+∑ 
+
+> j6=i
+
+[
+
+ViV (i) 
+
+> j
+
+ρ(xj − xi)( αnum (xi) + αnum (xj )) (xj −xi)( xj −xi)⊤   
+
+> ‖xj−xi‖‖ xj−xi‖
+
+([ Pκu]j − [Pκu]i)
+
+]
+
+[Lx, num  
+
+> 2
+
+u]( x) := 1
+
+Vi
+
+∑ 
+
+> j6=im6=i
+
+[
+
+ViV (i) 
+
+> m
+
+V (i) 
+
+> j
+
+τ num (xi)ρ(xm − xi)ρ(xj − xi)
+
+× (xm − xi) ( xj − xi)⊤ ([ Pκu]j − [Pκu]i)
+
+]
+
+[Lx′,num  
+
+> 2
+
+u]( x) := − 1
+
+Vi
+
+∑ 
+
+> j6=im6=j
+
+[
+
+Vj V (j) 
+
+> i
+
+V (j) 
+
+> m
+
+τ num (xj )ρ(xi − xj )ρ(xm − xj )
+
+× (xi − xj ) ( xj − xm)⊤ ([ Pκu]j − [Pκu]i)
+
+]
+
+20 [Lp, num  
+
+> 2
+
+u]( x) := 1
+
+Vi
+
+∑ 
+
+> j6=im6∈{ i,j }
+
+[
+
+VmV (m) 
+
+> i
+
+V (m) 
+
+> j
+
+τ num (xm)ρ(xi − xm)ρ(xj − xm)
+
+× (xi − xm) ( xm − xj )⊤ ([ Pκu]j − [Pκu]i)
+
+]
+
+.
+
+(27) 
+
+Proof. See Lemma A.2. 
+
+We will now show the convergence and uniform boundedness claims for each of the above operators. Dealing first with the uniform boundedness claims. For this, we need the following well-known bound on the harmonic series obtainable using Abel’s partial summation formula (See [29], Chapter I.0, Theorem 0.3 and Theorem 0.8). 
+
+Lemma 3.10 (Growth Bound for the Harmonic Series ) The following inequality is valid for all N ≥ 1. N∑
+
+> n=1
+
+1
+
+n ≤ log N + 1 .
+
+
+
+With this we can prove the following Lemma. 
+
+Lemma 3.11 (Uniform Bound for the Integrals over the Numerical Weighting Function )Let R > 0 and define Rκ := R + 2 √dκ . Then there is a constant CR depending only on 
+
+R, such that one has for all δ√d > κ > 0, 0 ≤
+
+∫ 
+
+> BRκ (0)
+
+step κ(x) dx < C R < ∞,
+
+where step κ(x) := 
+
+
+
+0 x ∈ [− κ 
+
+> 2
+
+, κ 
+
+> 2
+
+)d
+
+ρ(xi) x ∈ Bi ⊂ BRκ (0) 0 else. 
+
+Proof. The domain BRκ (0) is partitioned into two sets, A and B, defined as 
+
+A := BRκ (0) ∩ ⋃
+
+> i∈Zκ
+
+Bi, Z κ := {i ∈ Iκ : xi has a zero coordinate }, B := BRκ (0) \A. 
+
+We now show ∫
+
+> A
+
+step κ(x) dx κց0
+
+−−−→ 0,
+
+∫
+
+> B
+
+step κ(x) dx ≤
+
+∫ 
+
+> BR+2 δ(0)
+
+1
+
+‖x‖ dx < ∞.
+
+21 Due to the piecewise constant nature of step κ(x), one can rewrite the integral over A as a sum. For d = 3, this leads to 
+
+∫
+
+> A
+
+step κ(x) dx ≤ 6κ3 ∑
+
+> Rκ/κ ≥i≥1
+
+1
+
+κi + 12 κ3 ∑
+
+> Rκ/κ ≥i≥1
+
+∑
+
+> Rκ/κ ≥j≥1
+
+1
+
+κ√i2 + j2
+
+≤ 6κ2(1 + 2( R+2 δ) 
+
+> κ
+
+) ∑
+
+> Rκ/κ ≥i≥1
+
+1
+
+i
+
+≤ 6( δ/ √d + 2( R + 2 δ)) κ
+
+(
+
+log 
+
+( R+2 δ
+
+> κ
+
+)
+
++ 1 
+
+) κց0
+
+−−−→ 0.
+
+The last inequality was implied by Proposition 3.10. Similarly, we obtain for d = 2, 
+
+∫
+
+> A
+
+step κ(x) dx ≤ 4κ2 ∑
+
+> Rκ/κ ≥i≥1
+
+1
+
+κi ≤ 4κ
+
+(
+
+log 
+
+( R+2 δ
+
+> κ
+
+)
+
++ 1 
+
+) κց0
+
+−−−→ 0.
+
+For the integral over B, one has for all x ∈ B,0 ≤ step κ(( x1, . . . , x d)⊤) ≤
+
+( ∑
+
+> d≥i≥1
+
+(xi − κ 
+
+> 2
+
+sgn( xi)) 2
+
+)−1/2
+
+=: F κ(( x1, . . . , x d)⊤).
+
+Then, since F κ is just a modified version of x 7 → 1 
+
+> ‖x‖
+
+, one has 0 ≤
+
+∫
+
+> B
+
+step κ(x) dx ≤
+
+∫
+
+> B
+
+F κ(x) dx ≤
+
+∫ 
+
+> BR+2 δ(0)
+
+1
+
+‖x‖ dx < ∞.
+
+We will later apply the above bounds together with the following lemma. 
+
+Lemma 3.12 (Uniform Boundedness for Discrete Finite Difference Operators ) Let kij (κ) ∈
+
+Rd×d be a family of matrices over the index set Iκ × Iκ parameterized by 0 < κ < δ√d ,then the operators Aκ : L2(Ω) d → L2(Ω) d defined for u ∈ L2(Ω) d and x ∈ Ωi by [Aκu]( x) = ∑ 
+
+> j6=i
+
+Vj kij (κ)([ Pκu]j − [Pκu]i)are uniformly bounded with respect to κ, if 
+
+∃C > 0 : ∀0 < κ < δ√d : ∀i ∈ Iκ : max 
+
+∑ 
+
+> j6=i
+
+‖Vj kij (κ)‖, ∑ 
+
+> j6=i
+
+‖Vj kji (κ)‖
+
+ ≤ C. (28) 
+
+Proof. The operators Aκ are split into a convolutional and a point-wise part, defined for 
+
+x ∈ Ωi by [A∗
+
+> κ
+
+u]( x) := ∑ 
+
+> j6=i
+
+Vj kij (κ)[ Pκu]j
+
+[AΣ 
+
+> κ
+
+u]( x) := 
+
+( ∑ 
+
+> j6=i
+
+−Vj kij (κ)
+
+)
+
+[Pκu]i,
+
+22 each of which will be shown to be bounded, beginning with the second, 
+
+‖AΣ 
+
+> κ
+
+u‖2 
+
+> L2
+
+≤ ∑
+
+> i
+
+Vi
+
+( ∑ 
+
+> j6=i
+
+‖Vj kij (κ)‖
+
+)2
+
+‖[Pκu]i‖2 ≤ C2 ∑
+
+> i
+
+Vi‖[Pκu]i‖2 ≤ C2‖u‖2 
+
+> L2
+
+,
+
+where we used Jensen’s inequality to obtain 
+
+∑
+
+> i
+
+Vi‖[Pκu]i‖2 ≤ ∑
+
+> i
+
+Vi
+
+( 1
+
+Vi
+
+∫
+
+> Ωi
+
+‖u(x)‖ dx
+
+)2
+
+≤ ∑
+
+> i
+
+∫
+
+> Ωi
+
+‖u(x)‖2 dx = ‖u‖2 
+
+> L2
+
+. (29) For the convolutional part, we use Cauchy-Schwartz to obtain 
+
+‖A∗
+
+> κ
+
+u‖2 
+
+> L2
+
+= ∑
+
+> i
+
+Vi
+
+( ∑ 
+
+> j6=i
+
+Vj ‖kij (κ)‖‖ [Pκu]j ‖
+
+)2
+
+≤ ∑
+
+> i
+
+Vi
+
+( ∑ 
+
+> j6=i
+
+Vj ‖kij (κ)‖
+
+)( ∑ 
+
+> j6=i
+
+Vj ‖kij (κ)‖‖ [Pκu]j ‖2
+
+)
+
+applying (28), then swapping the sums yields 
+
+≤ C ∑
+
+> i
+
+∑ 
+
+> j6=i
+
+ViVj ‖kij (κ)‖‖ [Pκ u]j ‖2
+
+≤ C ∑
+
+> j
+
+Vj ‖[Pκu]j ‖2 ∑
+
+> i6=j
+
+Vi‖kij (κ)‖≤ C2‖u‖2 
+
+> L2
+
+.
+
+The last inequality was obtained using (29) and (28). 
+
+To apply this lemma, we still need the necessary bounds on the terms involved in the operators in (27), for which we need the following lemmas. 
+
+Lemma 3.13 (Convergence of the Partial Area Weights ) For all i ∈ Iκ, one has for all 
+
+x ∈ Ωi, ∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+|wij − χ[0 ,δ )(‖x′ − x‖)| dx′ ≤ Dδκκց0
+
+−−−→ 0for some Dδκ > 0 dependent only on δ and κ.
+
+Proof. We first obtain 
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+|wij − χ[0 ,δ )(‖x′ − x‖)| dx′
+
+≤ ∑ 
+
+> j6=i
+
+∫
+
+> Bj
+
+|wij − χ[0 ,δ )(‖x′ − xi‖)| dx′ +
+
+∫
+
+> Rd
+
+|χ[0 ,δ )(‖x′ − x‖) − χ[0 ,δ )(‖x′ − xi‖)| dx′
+
+≤ Bδ+√dκ (0) − Bδ−√dκ (0) + √dκδ 
+
+which directly follows from the assumptions on the weights wij in Assumptions 3.3, and 
+
+‖x − xi‖ ≤ 1
+
+> 2
+
+√dκ .
+
+23 We can now apply these lemmas to obtain bounds on τ num , αnum and mnum similarly to those on τ , m and α used in the previous chapter. Note that A5 from Assumptions 3.3 implies that there are m0, m 1 > 0 such that m0 ≦ m ≦ m1 on Ω. 
+
+Lemma 3.14 (Bounds on the Numerical Model Parameters ) Let Assumptions 3.3 hold, then there exists a t1 > 0 such that for κ > 0 small enough, 0 < 1 
+
+> 2
+
+m0 ≦ mnum ≦ 2m1, |τ num | ≦ t1, 0 < α 0 ≦ αnum , α ≦ α1.
+
+Let i ∈ Iκ be such that 
+
+Bi ∩ (∂Ω ∪ LF S L(l) ∪ LF S K (k)) = ∅,
+
+then one has for all x ∈ Ωi,
+
+|τ (x) − τ num (xi)| ≤ Tκκց0
+
+−−−→ 0,
+
+where Tκ is independent of i. Similarly, for all i ∈ Iκ such that 
+
+Bi ∩
+
+(
+
+∂Ω ∪ LF S L(l)
+
+)
+
+= ∅,
+
+we obtain for all x ∈ Ωi,
+
+|α(x) − αnum (xi)| ≤ Aκκց0
+
+−−−→ 0,
+
+with an Aκ independent of i.
+
+Proof. First, remember that 0 < m 0 ≤ m(x) := 
+
+∫
+
+> Ω
+
+ω(x′ − x)‖x′ − x‖2 dx′ =
+
+∫
+
+> Ω
+
+χ[0 ,δ )(‖x′ − x‖)‖x′ − x‖ dx′.
+
+For any x ∈ Ωi and any i, we then have 
+
+|m(x) − mnum (xi)|≤
+
+∣∣∣∣∣∣∑
+
+> j
+
+∫
+
+> Ωj
+
+χ[0 ,δ )(‖x′ − x‖)‖x′ − x‖ − wij ‖xj − xi‖ dx′
+
+∣∣∣∣∣∣
+
+≤ ∑
+
+> j
+
+∫
+
+> Ωj
+
+|χ[0 ,δ )(‖x′ − x‖) − wij |‖ x′ − x‖ dx′
+
++ ∑
+
+> j
+
+∫
+
+> Ωj
+
+wij |‖ x′ − x‖ − ‖ xj − xi‖| dx′
+
+≤ diam(Ω) Dδκ + √dκ vol(Ω) κց0
+
+−−−→ 0.
+
+(30) Lemma 3.13 was used in the last inequality. The other claims then follow from this bound and Lemma 3.4. 
+
+This leads to the uniform boundedness result as follows. 
+
+Proposition 3.15 (Uniform Boundedness of the Numerical Operators ) The operators 
+
+Lnum  
+
+> 1
+
+, Lx, num  
+
+> 2
+
+, Lx′,num  
+
+> 2
+
+and Lp, num  
+
+> 2
+
+in (27) are uniformly bounded with respect to any sequence 0 < κ n ≤ δ√d with κn ց 0. 24 Proof. We apply Lemma 3.12, so that we only have to show (28) for each operator, which follows from the symmetry of the kernels and Lemma 3.11, yielding for Lnum  
+
+> 1
+
+and small enough 0 < κ ,
+
+∑ 
+
+> j6=i
+
+Vj wij ρ(xj − xi)|αnum (xi) + αnum (xj )| ≤ 2α1Cδ ,
+
+for Lx, num  
+
+> 2
+
+,
+
+∑ 
+
+> j6=i
+
+∑
+
+> m6=i
+
+Vj Vm|τ num (xi)|wij wim ≤ t1 vol(Ω) 2,
+
+for Lx′,num  
+
+> 2
+
+,
+
+∑ 
+
+> j6=i
+
+∑
+
+> m6=i
+
+Vj Vm|τ num (xj )|wji wjm ≤ t1 vol(Ω) 2,
+
+for Lp, num  
+
+> 2
+
+,
+
+∑ 
+
+> j6=i
+
+∑
+
+> m6={i,j }
+
+Vj Vm|τ num (xm)|wmj wmi ≤ t1 vol(Ω) 2.
+
+With this uniform boundedness result and the boundedness of L, we only need to show the pointwise convergence of Lnum  
+
+> κ
+
+to L on a dense subspace of L2(Ω) d such as C0,1(Ω) d.For this we need the following inequalities. 
+
+Lemma 3.16 (Auxiliary Bounds ) The following estimates hold for all i, j ∈ Iκ, with i 6 = j.• Let x′ ∈ Ωj , x ∈ Ωi, then 
+
+∥∥ρ(x′ − x)( x′ − x) − ρ(xj − xi)( xj − xi)∥∥ ≤ min 
+
+( 2√dκ 
+
+‖x′ − x‖ , 2√dκ 
+
+‖xj − xi‖
+
+)
+
+.
+
+• For all x ∈ Ωi,
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∣∣ρ(x′ − x) − ρ(xj − xi)∣∣ ‖x′ − x‖ dx′ ≤ √dκC diam(Ω) .
+
+Proof. For the second claim, note that ρ(ζ) = 1 
+
+> ‖ζ‖
+
+, leading to 
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∣∣∣∣∣
+
+1
+
+‖x′ − x‖ − 1
+
+‖xj − xi‖
+
+∣∣∣∣∣ ‖x′ − x‖ dx′
+
+≤ ∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+|‖ x′ − x‖ − ‖ xj − xi‖| 
+
+‖x′ − x‖‖ xj − xi‖ ‖x′ − x‖ dx′
+
+≤ ∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+‖x′ − x − xj + xi‖
+
+‖x′ − x‖‖ xj − xi‖ ‖x′ − x‖ dx′
+
+≤ √dκ ∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+1
+
+‖xj − xi‖ dx′
+
+≤ √dκC diam(Ω) .
+
+25 The last inequality above made use of Lemma 3.11. The first claim follows similarly. 
+
+We now prove the point-wise convergence of the numerical operators to their continuous counterparts. 
+
+Proposition 3.17 (Pointwise Convergence on C0,1(Ω) d) Let Assumptions 3.3 hold. The operators Lnum  
+
+> 1
+
+, Lx, num  
+
+> 2
+
+, Lx′,num  
+
+> 2
+
+and Lp, num  
+
+> 2
+
+converge pointwise to their continuous equiva-lents L1, Lx 
+
+> 2
+
+, Lx′ 
+
+> 2
+
+and Lp 
+
+> 2
+
+on C0,1(Ω) d.
+
+Proof. Using the triangle inequality, one obtains 
+
+‖(Aκ − A)v‖L2 (Ω) d ≤ ‖ (Aκ − Pκ ◦ A)v‖L2 (Ω) d + ‖(id L2 − Pκ)Av ‖L2 (Ω) d
+
+︸ ︷︷ ︸
+
+> →0
+
+for any operators A and Aκ, so that we only need to show the convergence of the first term on the right hand side for all u ∈ C0,1(Ω) d. Therefore, let u be Lipschitz-continuous with Lipschitz constant L > 0. For x ∈ Ωi, we first get [( Lnum  
+
+> 1
+
+− Pκ ◦ L 1)u]( x)= 1
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+(
+
+wij ρ(xi − xj )( αnum (xi) + αnum (xj )) (xj − xi) ( xj − xi)⊤
+
+‖xj − xi‖‖ xj − xi‖− χ[0 ,δ )(‖x′ − x‖)ρ(x′ − x)( α(x) + α(x′)) (x′ − x) ( x′ − x)⊤
+
+‖x′ − x‖‖ x′ − x‖
+
+)
+
+(u(x′) − u(x)) dx′ dx
+
+− 1
+
+Vi
+
+∫
+
+> Ωi
+
+∫
+
+> Ωi
+
+χ[0 ,δ )(‖x′ − x‖)ρ(x′ − x)( α(x) + α(x′)) (x′−x)( x′−x)⊤ 
+
+> ‖x′−x‖‖ x′−x‖
+
+(u(x′) − u(x)) dx′ dx. 
+
+(31) The latter term satisfies 
+
+∥∥∥∥∥
+
+1
+
+Vi
+
+∫
+
+> Ωi
+
+∫
+
+> Ωi
+
+χ[0 ,δ )(‖x′ − x‖) α(x) + α(x′)
+
+‖x′ − x‖
+
+(x′ − x) ( x′ − x)⊤
+
+‖x′ − x‖‖ x′ − x‖ (u(x′) − u(x)) dx′ dx
+
+∥∥∥∥∥
+
+≤ L 1
+
+Vi
+
+∫
+
+> Ωi
+
+∫
+
+> Ωi
+
+|α(x) + α(x′)| dx′ dx
+
+≤ 2α1Lκ d κց0
+
+−−−→ 0.
+
+(32) Before we treat the first term, we define Pκ := {i : Bi ∩ (∂Ω ∪ LF S (l) ∪ LF S (k)) = ∅}.We will now show 
+
+‖(Lnum  
+
+> 1
+
+− Pκ ◦ L 1)u‖2
+
+> L2
+> κ<< 1
+
+≤ ∑
+
+> i∈P κ
+
+∫
+
+> Ωi
+
+‖[( Lnum  
+
+> 1
+
+− Pκ ◦ L 1)u]( x)‖2
+
+︸ ︷︷ ︸
+
+> ∗
+
+==⇒
+
+> unif
+> 0
+
+dx
+
++
+
+(
+
+sup 
+
+> 0<κ<< 1
+
+max 
+
+> i6∈Pκ
+
+sup 
+
+> x∈Ωi
+
+‖[( Lnum  
+
+> 1
+
+− Pκ ◦ L 1)u]( x)‖2
+
+)︸ ︷︷ ︸
+
+> ∗
+> <∞
+
+vol 
+
+ ⋃
+
+> i6∈Pκ
+
+Bi
+
+ .
+
+︸ ︷︷ ︸
+
+> κց0
+
+−−−→
+
+> ∗∗
+> 0
+
+26 The claims left to prove are marked with a star. The claim marked with ∗∗ follows from Proposition 2.5. This strategy will remain roughly the same for each operator. Using it, we only have to show the convergence on the Ω i corresponding to i ∈ Pκ
+
+and show the uniform boundedness on the rest. The former will be proven by showing a uniform convergence, ‖[( Lnum  
+
+> 1
+
+− Pκ ◦ L 1)u]( x)‖ ≤ Cρ, Ω,α,τ κκց0
+
+−−−→ 0 for all x ∈ Ωi and i ∈ Pκ.Note that due to the uniform convergence of the second summand in (31) as shown in (32), we only have to show the boundedness and convergence claims for the first. It follows for i ∈ Pκ, from Lemma 3.13, 3.16, 3.11 and applying Lemma 3.4 on Bi to obtain the Lipschitz continuity of α|Bi ,
+
+L 1
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∥∥∥∥∥wij (αnum (xi) + αnum (xj )) ρ(xj − xi) (xj − xi) ( xj − xi)⊤
+
+‖xj − xi‖‖ xj − xi‖− χ[0 ,δ )(‖x′ − x‖)( α(x) + α(x′)) ρ(x′ − x) (x′ − x) ( x′ − x)⊤
+
+‖x′ − x‖‖ x′ − x‖
+
+∥∥∥∥∥‖x′ − x‖ dx′ dx
+
+≤ L 1
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∣∣∣wij − χ[0 ,δ )(‖x′ − x‖)
+
+∣∣∣ |α(x) + α(x′)|
+
+‖x′ − x‖ ‖x′ − x‖ dx′ dx
+
++ L 1
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij 
+
+|α(x) − αnum (xi) + α(x′) − αnum (xj )|
+
+‖x′ − x‖ ‖x′ − x‖ dx′ dx
+
++ L 2
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij α1
+
+∣∣ρ(x′ − x) − ρ(xj − xi)∣∣ ‖x′ − x‖ dx′ dx
+
++ L 4
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi)α1
+
+∥∥∥∥∥
+
+x′ − x
+
+‖x′ − x‖ − xj − xi
+
+‖xj − xi‖
+
+∥∥∥∥∥ ‖x′ − x‖ dx′ dx
+
+≤ 2Lα 1Dδκ + L2Aκ vol(Ω) + L vol 
+
+ ⋃ 
+
+> j6∈Pκ
+
+Bj
+
+ (Aκ + 2 α1)+ 2 Lα 1
+
+√dκC diam(Ω) + L8α1
+
+√dκC diam(Ω) 
+
+> κց0
+
+−−−→ 
+
+> P
+
+2.5 0.
+
+The boundedness claims follow directly from 
+
+L 1
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∥∥∥∥∥wij 
+
+|αnum (xi) + αnum (xj )|
+
+‖xj − xi‖
+
+(xj − xi) ( xj − xi)⊤
+
+‖xj − xi‖‖ xj − xi‖− χ[0 ,δ )(‖x′ − x‖) |α(x) + α(x′)|
+
+‖x′ − x‖
+
+(x′ − x) ( x′ − x)⊤
+
+‖x′ − x‖‖ x′ − x‖
+
+∥∥∥∥∥‖x′ − x‖ dx′ dx
+
+≤ 2Lα 1 diam(Ω) Cdiam(Ω) + L vol(Ω)2 α1 < ∞.
+
+This implies the convergence of Lnum  
+
+> 1
+
+u to Lu for u ∈ C0,1(Ω) d. The convergence of the 27 other operators follow similarly; assuming i ∈ P κ,[( Lx, num  
+
+> 2
+
+− Pκ ◦ L x 
+
+> 2
+
+)u]( x)= 1
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∑
+
+> m6=i
+
+∫
+
+> Ωm
+
+(
+
+τ num (xi)ρ(xm − xi) ( xm − xi) ρ(xj − xi) ( xj − xi)⊤ wij wim 
+
+− τ (x)ρ(p − x) ( p − x) ρ(x′ − x) (x′ − x)⊤ χ[0 ,δ )(‖x′ − x‖)χ[0 ,δ )(‖p − x‖)
+
+)
+
+× (u(x′) − u(x)) dp dx′ dx
+
+− 1
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∫
+
+> Ωi
+
+τ (x) (p − x) ( x′ − x)⊤
+
+‖p − x‖‖ x′ − x‖ χ[0 ,δ )(‖x′ − x‖)
+
+× χ[0 ,δ )(‖p − x‖)( u(x′) − u(x)) dp dx′ dx
+
+− 1
+
+Vi
+
+∫
+
+> Ωi
+
+∫
+
+> Ωi
+
+∫
+
+> Ω
+
+τ (x) (p − x) ( x′ − x)⊤
+
+‖p − x‖‖ x′ − x‖ χ[0 ,δ )(‖x′ − x‖)
+
+× χ[0 ,δ )(‖p − x‖)( u(x′) − u(x)) dp dx′ dx. 
+
+The last two terms above converge to 0 as their integration domains vanish as κ ց 0 while the integrand stays bounded. The convergence for the first term and i ∈ P κ is given by Lemma 3.14, as well as 
+
+L 1
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∑
+
+> m6=i
+
+∫
+
+> Ωm
+
+|τ (x) − τ num (xi)|‖ x′ − x‖ dp dx′ dx
+
++ L 1
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∑
+
+> m6=i
+
+∫
+
+> Ωm
+
+|τ num (xi)| 2√dκ 
+
+‖xm − xi‖ ‖x′ − x‖ dp dx′ dx
+
++ L 1
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∑
+
+> m6=i
+
+∫
+
+> Ωm
+
+|τ num (xi)| 2√dκ 
+
+‖x′ − x‖ ‖x′ − x‖ dp dx′ dx
+
++ L 1
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∑
+
+> m6=i
+
+∫
+
+> Ωm
+
+|τ num (xi)|| wij − χ[0 ,δ )(‖x′ − x‖)|‖ x′ − x‖ dp dx′ dx
+
++ L 1
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∑
+
+> m6=i
+
+∫
+
+> Ωm
+
+|τ num (xi)|| χ[0 ,δ )(‖p − x‖) − wim |‖ x′ − x‖ dp dx′ dx
+
+≤ LT κ vol(Ω) 2 diam(Ω) + 2 Lt 1
+
+√dκ diam(Ω) Cdiam(Ω) vol(Ω) + 2 Lt 1
+
+√dκ vol(Ω) 2
+
++ Lt 1 diam(Ω) vol(Ω) Dδκ + Lt 1 diam(Ω) vol(Ω) Dδκκ κց0
+
+−−−→ 0.
+
+The boundedness follows from 
+
+∥∥∥∥∥
+
+1
+
+Vi
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∑
+
+> m6=i
+
+∫
+
+> Ωm
+
+(
+
+τ num (xi) (xm−xi)( xj −xi)⊤  
+
+> ‖xm−xi‖‖ xj−xi‖
+
+wij wim 
+
+− τ (x) (p−x)( x′−x)⊤ 
+
+> ‖p−x‖‖ x′−x‖
+
+χ[0 ,δ )(‖x′ − x‖)χ[0 ,δ )(‖p − x‖)
+
+)
+
+(u(x′) − u(x)) dp dx′ dx
+
+∥∥∥∥∥
+
+≤ 2Lt 1 diam(Ω) vol(Ω) 2.
+
+This gives the pointwise convergence of the second operator. The convergence of Lx′,num 
+
+> 2
+
+and Lp, num  
+
+> 2
+
+follows from splitting the sums into j ∈ Pκ and j 6 ∈ Pκ or m ∈ Pκ and m 6 ∈ Pκ,respectively, and showing the convergence of both parts with similar tools as above. 
+
+28 As described prior, this yields the statement in (24). 
+
+Corollary 3.18 (Uniform Boundedness and Pointwise Convergence ) Let Assumptions 3.3 hold. Then the operators Lnum  
+
+> κ
+
+are uniformly bounded with respect to κ and pointwise convergent to L on L2(Ω) d.
+
+Proof. Note that C∞ 
+
+> 0
+
+(Ω) d ⊂ C0,1(Ω) d is dense in L2(Ω) d. Further, the operators Lnum  
+
+> κ
+
+are uniformly bounded, and L is bounded. This implies, together with Proposition 3.17, that the point-wise convergence holds on all of L2(Ω) d.
+
+The only thing now left to prove are the coercitivity claims stated in (25), for which we require the following result. Its rather lengthy but elementary proof is given in the appendix. 
+
+Lemma 3.19 (Potential Form of The Bilinear Form ) One has for all ~u ∈ ~Vκ,
+
+~u⊤ ~Bnum ~u = 2 ∑
+
+> i
+
+ViW num  
+
+> κ
+
+(~u, x i),
+
+with 
+
+W num  
+
+> κ
+
+(~u, x i) = k(xi)
+
+2
+
+ d
+
+mnum (xi)
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi) ( xj − xi)⊤ (~uj − ~ui) dx′
+
+
+
+> 2
+
++ αnum (xi)
+
+2
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi)‖xj − xi‖2
+
+( (xj − xi)⊤ (~uj − ~ui)
+
+‖xj − xi‖2
+
+− 1
+
+mnum (xi)
+
+∑
+
+> m6=i
+
+∫
+
+> Ωm
+
+wim ρ(xm − xi) ( xm − xi)⊤ (~um − ~ui) dp
+
+)2
+
+dx′
+
+(33) 
+
+Proof. See Lemma A.3. 
+
+The form given in (33) is the numerical equivalent to the continuous potential, and just like for the continuous potential, one can derive a corresponding lower estimate as follows (compare with [18], Proposition 1). 
+
+Lemma 3.20 (Helper Term Lower Bound ) There is a c′ > 0 such that for all κ > 0 small enough, one has for all ~u ∈ ~Vκ,
+
+c′ ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi)‖xj − xi‖2
+
+( (xj − xi)⊤ (~uj − ~ui)
+
+‖xj − xi‖2
+
+)2
+
+dx′ dx
+
+≤ ∑
+
+> i
+
+ViW num  
+
+> κ
+
+(~u, x i).
+
+(34) 29 Proof. 
+
+∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi)‖xj − xi‖2
+
+( (xj − xi)⊤ (~uj − ~ui)
+
+‖xj − xi‖2
+
+)2
+
+dx′ dx
+
+= ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi)‖xj − xi‖2
+
+( (xj − xi)⊤ (~uj − ~ui)
+
+‖xj − xi‖2
+
+− 1
+
+mnum (xi)
+
+∑
+
+> m6=i
+
+∫
+
+> Ωm
+
+wim ρ(xm − xi) ( xm − xi)⊤ (~um − ~ui) dp
+
+)2
+
+dx′
+
++ mnum (xi)
+
+d2
+
+ d
+
+mnum (xi)
+
+∑
+
+> m6=i
+
+∫
+
+> Ωm
+
+wim ρ(xm − xi) ( xm − xi)⊤ (~um − ~ui) dp
+
+
+
+> 2
+
+dx
+
+≤ ∑
+
+> i
+
+∫
+
+> Ωi
+
+1
+
+α0
+
+αnum (xi) ∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi)‖xj − xi‖2
+
+( (xj − xi)⊤ (~uj − ~ui)
+
+‖xj − xi‖2
+
+− 1
+
+mnum (xi)
+
+∑
+
+> m6=i
+
+∫
+
+> Ωm
+
+wim ρ(xm − xi) ( xm − xi)⊤ (~um − ~ui) dp
+
+)2
+
+dx′
+
++ m1
+
+d2k0
+
+k(xi)
+
+ d
+
+mnum (xi)
+
+∑
+
+> m6=i
+
+∫
+
+> Ωm
+
+wim ρ(xm − xi) ( xm − xi)⊤ (~um − ~ui) dp
+
+
+
+> 2
+
+dx
+
+≤
+
+( 1 
+
+> α0
+
++ 2m1
+
+> d2k0
+
+)
+
+2 ∑
+
+> i
+
+ViW num  
+
+> κ
+
+(~u, x i).
+
+The last inequality follows from Lemma 3.14. 
+
+To finally obtain (25), the left-hand side of the numerical lower bound given in (34) is compared to its continuous counterpart. Using the continuous coercitivity bound then results in a uniform numerical bound for small enough κ.
+
+Lemma 3.21 (Uniform Coercitivity of the Helper Term ) There exists a c′′ > 0 such that for small enough κ > 0, one has 
+
+c′′ ‖K κ~u‖2 
+
+> L2(Ω) d
+
+≤ ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi)‖xj − xi‖2
+
+( (xj − xi)⊤ (~uj − ~ui)
+
+‖xj − xi‖2
+
+)2
+
+dx′ dx
+
+for all ~u ∈ ~Vκ.
+
+Proof. First, for κ << 1, 1
+
+(diam(Ω) + √d)4
+
+∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ‖xj − xi‖
+
+(
+
+(xj − xi)⊤ (~uj − ~ui)
+
+)2
+
+dx′ dx
+
+≤ ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ‖xj − xi‖
+
+( (xj − xi)⊤ (~uj − ~ui)
+
+‖xj − xi‖2
+
+)2
+
+dx′ dx. 
+
+30 This reduces the proof to showing the desired lower bound holds for the first term. Using [18], Proposition 2, in the first inequality, one has for ~u ∈ ~Vκ,
+
+c‖K κ~u‖2
+
+> L2
+
+≤
+
+∫
+
+> Ω
+
+∫
+
+> Ω
+
+χ[0 ,δ )(‖x′ − x‖)ρ(x′ − x)‖x′ − x‖2 ((x′ − x)⊤ ([ Kκ~u]( x′) − [Kκ~u]( x)) 
+
+)2
+
+dx′ dx
+
+= ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+χ[0 ,δ )(‖x′ − x‖)ρ(x′ − x)‖x′ − x‖2 ((x′ − x)⊤ (~uj − ~ui)
+
+)2
+
+dx′ dx. 
+
+(35) To obtain a bound for the numerical term that is independent of κ for small enough 
+
+κ << 1, we compare it to the continuous term above, working towards inequality (37) below. To this end, we have 
+
+∣∣∣∣∣∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ‖xj − xi‖
+
+(
+
+(xj − xi)⊤ (~uj − ~ui)
+
+)2
+
+dx′ dx
+
+− ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+χ[0 ,δ )(‖x′ − x‖)‖x′ − x‖
+
+((x′ − x)⊤ (~uj − ~ui)
+
+)2
+
+dx′ dx
+
+∣∣∣∣∣
+
+≤
+
+∣∣∣∣∣∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ‖xj − xi‖
+
+(
+
+(xj − xi)⊤ (~uj − ~ui)
+
+)2
+
+− χ[0 ,δ )(‖x′ − x‖)‖x′ − x‖
+
+((x′ − x)⊤ (~uj − ~ui)
+
+)2
+
+dx′ dx
+
+∣∣∣∣∣
+
+≤ ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+|χ[0 ,δ )(‖x′ − x‖) − wij |‖ x′ − x‖
+
+((x′ − x)⊤ (~uj − ~ui)
+
+)2
+
+dx′ dx
+
++ ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij |‖ x′ − x‖ − ‖ xj − xi‖| 
+
+((x′ − x)⊤ (~uj − ~ui)
+
+)2
+
+dx′ dx
+
++ ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ‖xj − xi‖
+
+∣∣∣∣∣((x′ − x)⊤ (~uj − ~ui)
+
+)2
+
+−
+
+(
+
+(xj − xi)⊤ (~uj − ~ui)
+
+)2
+
+∣∣∣∣∣ dx′ dx
+
+≤ ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+|χ[0 ,δ )(‖x′ − x‖) − wij |‖ x′ − x‖3
+
+× (‖[Kκ~u]( x′)‖ + ‖[Kκ~u]( x)‖)2 dx′ dx
+
++ ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+‖x′ − x − xj + xi‖‖ x′ − x‖2(‖[Kκ~u]( x′)‖ + ‖[Kκ~u]( x)‖)2 dx′ dx
+
++ ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+‖xj − xi‖‖ xj − xi + x′ − x‖ ∥∥xj − xi − x′ + x∥∥
+
+× (‖[Kκ~u]( x′)‖ + ‖[Kκ~u]( x)‖)2 dx′ dx
+
+≤ diam(Ω) 3 ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+|χ[0 ,δ )(‖x′ − x‖) − wij |× (‖[Kκ~u]( x′)‖ + ‖[Kκ~u]( x)‖)2 dx′ dx
+
+31 + 3 √d(diam(Ω) + √d)2κ ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+(‖[Kκ~u]( x′)‖ + ‖[Kκ~u]( x)‖)2 dx′ dx. (36) We now use 
+
+∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+(‖[Kκ~u]( x′)‖ + ‖[Kκ~u]( x)‖)2 dx′ dx
+
+≤ ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑
+
+> j
+
+∫
+
+> Ωj
+
+‖[Kκ~u]( x′)‖2 + ‖[Kκ~u]( x)‖2 + 2 ‖[Kκ~u]( x′)‖‖ [Kκ~u]( x)‖ dx′ dx
+
+≤ 2 vol(Ω) ‖K κ~u‖2 
+
+> L2(Ω) d
+
++ 2 
+
+(∫ 
+
+> Ω
+
+‖[Kκ~u]( x)‖ dx
+
+)2
+
+≤ 4 vol(Ω) ‖K κ~u‖2 
+
+> L2(Ω) d
+
+.
+
+Jensen’s Inequality was used to obtain the last inequality. In order to deal with the first summand of the last expression in (36), for κ < δ√d , we use 
+
+∑
+
+> i
+
+∑ 
+
+> j6=i
+
+(∫
+
+> Ωi
+
+∫
+
+> Ωj
+
+|χ[0 ,δ )(‖x′ − x‖) − wij | dx′ dx
+
+)
+
+(‖~uj ‖ + ‖~ui‖)2
+
+= ∑
+
+> i
+
+‖~ui‖2 ∑ 
+
+> j6=i
+
+(∫
+
+> Ωi
+
+∫
+
+> Ωj
+
+|χ[0 ,δ )(‖x′ − x‖) − wij | dx′ dx
+
+)
+
++ ∑
+
+> j
+
+‖~uj ‖2 ∑
+
+> i6=j
+
+(∫
+
+> Ωi
+
+∫
+
+> Ωj
+
+|χ[0 ,δ )(‖x′ − x‖) − wij | dx′ dx
+
+)
+
++ 2 ∑
+
+> j
+
+∑
+
+> i6=j
+
+‖~uj ‖‖ ~ui‖
+
+(∫
+
+> Ωi
+
+∫
+
+> Ωj
+
+|χ[0 ,δ )(‖x′ − x‖) − wij | dx′ dx
+
+)
+
+using Lemma 3.13 we then obtain = ∑
+
+> i
+
+Vi‖~ui‖2Dδκ + ∑
+
+> j
+
+Vj ‖~uj ‖2Dδκ
+
++ 2 ∑
+
+> j
+
+∑
+
+> i6=j
+
+‖~uj ‖‖ ~ui‖
+
+(∫
+
+> Ωi
+
+∫
+
+> Ωj
+
+|χ[0 ,δ )(‖x′ − x‖) − wij | dx′ dx
+
+)
+
+≤ 2Dδκ‖K κ~u‖2
+
+> L2(Ω) d
+
++ 2 ∑
+
+> j
+
+∑
+
+> i6=j
+
+‖~uj ‖‖ ~ui‖
+
+(∫
+
+> Ωi
+
+∫
+
+> Ωj
+
+|χ[0 ,δ )(‖x′ − x‖) − wij | dx′ dx
+
+)
+
+where finally, 
+
+∑
+
+> j
+
+∑
+
+> i6=j
+
+‖~uj ‖‖ ~ui‖
+
+( ∫
+
+> Ωi
+
+∫
+
+> Ωj
+
+|χ[0 ,δ )(‖x′ − x‖) − wij | dx′ dx
+
+)
+
+= ∑
+
+> j
+
+‖~uj ‖
+
+( ∫
+
+> Ωj
+
+∑
+
+> i6=j
+
+∫
+
+> Ωi
+
+‖[Kκ~u]( x)‖∣∣χ[0 ,δ )(‖x′ − x‖) − wij 
+
+∣∣ dx dx′
+
+)
+
+applying Hölder’s Inequality yields with Lemma 3.13, 
+
+≤ ∑
+
+> j
+
+‖~uj ‖
+
+( ∫
+
+> Ωj
+
+∑
+
+> i6=j
+
+∫
+
+> Ωi
+
+|χ[0 ,δ )(‖x′ − x‖) − wij | dx dx′
+
+)1/2
+
+32 ×
+
+( ∫
+
+> Ωj
+
+∫
+
+> Ω
+
+‖[Kκ~u]( x)‖2 dx dx′
+
+)1/2
+
+≤ ∑
+
+> j
+
+‖~uj ‖(Vj Dδκ)1/2(Vj ‖K κ~u‖2 
+
+> L2(Ω) d
+
+)1/2
+
+≤ ∑
+
+> j
+
+Vj ‖~uj ‖‖K κ~u‖L2(Ω) d
+
+√
+
+Dδκ
+
+≤
+
+√
+
+Dδκ‖K κ~u‖L2(Ω) d ‖K κ~u‖L1(Ω) d ≤
+
+√
+
+Dδκ vol(Ω) ‖K κ~u‖2 
+
+> L2(Ω) d
+
+.
+
+In summary, 
+
+∣∣∣∣∣∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ‖xj − xi‖
+
+(
+
+(xj − xi)⊤ (~uj − ~ui)
+
+)2
+
+dx′ dx
+
+− ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+χ[0 ,δ )(‖x′ − x‖)‖x′ − x‖
+
+((x′ − x)⊤ (~uj − ~ui)
+
+)2
+
+dx′ dx
+
+∣∣∣∣∣
+
+≤ CΩ,δ,κ ‖K κ~u‖2 
+
+> L2(Ω) d
+
+.
+
+(37) For some CΩ,δ,κ κց0
+
+−−−→ 0. This implies 
+
+∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ‖xj − xi‖
+
+(
+
+(xj − xi)⊤ (~uj − ~ui)
+
+)2
+
+dx′ dx
+
+≥
+
+∣∣∣∣∣∫
+
+> Ω
+
+∫
+
+> Ω
+
+χ[0 ,δ )(‖x′ − x‖)‖x′ − x‖
+
+((x′ − x)⊤ ([ Kκ~u]( x′) − [Kκ~u]( x)) 
+
+)2
+
+dx′ dx
+
+−
+
+∣∣∣∣∣∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ‖xj − xi‖
+
+(
+
+(xj − xi)⊤ (~uj − ~ui)
+
+)2
+
+dx′ dx
+
+− ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+χ[0 ,δ )(‖x′ − x‖)‖x′ − x‖
+
+((x′ − x)⊤ (~uj − ~ui)
+
+)2
+
+dx′ dx
+
+∣∣∣∣∣∣∣∣∣∣.
+
+(38) Choosing κ such that CΩ,δ,κ ′ 2 < q 2c2 for all 0 < κ ′ < κ for some 0 < q < 1, allows using (35) to estimate the last line of (38) above as follows, 
+
+≥
+
+∫
+
+> Ω
+
+∫
+
+> Ω
+
+χ[0 ,δ )(‖x′ − x‖)‖x′ − x‖
+
+((x′ − x)⊤ ([ Kκ~u]( x′) − [Kκ~u]( x)) 
+
+)2
+
+dx′ dx
+
+−
+
+∣∣∣∣∣∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ‖xj − xi‖
+
+(
+
+(xj − xi)⊤ (~uj − ~ui)
+
+)2
+
+dx′ dx
+
+− ∑
+
+> i
+
+∫
+
+> Ωi
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+χ[0 ,δ )(‖x′ − x‖)‖x′ − x‖
+
+((x′ − x)⊤ (~uj − ~ui)
+
+)2
+
+dx′ dx
+
+∣∣∣∣∣
+
+≥ (c − CΩ,d,δ,κ ′
+
+)‖K κ~u‖2 
+
+> L2(Ω) d
+
+≥ (1 − q)c‖K κ~u‖2 
+
+> L2(Ω) d
+
+.
+
+Corollary 3.22 (Uniform Coercitivity of the Numerical Operators ) Let Assumptions 3.3 hold. For small enough 1 >> κ > 0 and for all ~u ∈ ~Vκ, we have 
+
+cnum ‖K κ~u‖2 
+
+> L2
+
+≤ ~u⊤ ~Bnum ~u, 
+
+33 for some cnum > 0. 
+
+Proof. This is obtained by combining Lemma 3.19, Lemma 3.20 and finally Lemma 3.21. 
+
+Remark 3.23 The concrete choice for the weighting function ω as asserted by A1 in Assumptions 3.3, was used to show uniform bound on the discrete integrals over the weighting function in Lemma 3.11, the bounds and convergence results in Lemma 3.14 and the bounds in 3.16 needed for the boundedness in Proposition 3.15 and convergence in Proposition 3.17. It was also used for the coercitivity claims in Lemma 3.21. However, Lemma 3.9, 3.20 and 3.19 can be analogously formulated for other ω.Therefore, it is evident that the convergence can also be shown for other choices of ω, as long as suitable boundedness, convergence and coercitivity results can be shown. Most notably, if ω = χ[0 ,δ )(‖x′ − x‖)ρ(x′ − x) with some ρ ∈ C0(Rd) fulfilling Assumptions 1.1, then ρ is both bounded and uniformly continuous on every compact neighborhood of 0. This significantly simplifies corresponding results in Lemma 3.11, 3.14, as well as Lemma 3.16, Proposition 3.17 and Lemma 3.21, by making use of 
+
+‖ρ‖L∞ < ∞ and ‖R‖L∞(Ω ×Ω) 
+
+> κց0
+
+−−−→ 0for 
+
+R(x′, x ) := ∑ 
+
+> ij6=i
+
+χΩi (x)χΩj (x′)ρ(xi − xj ) − ρ(x′ − x).
+
+Most importantly, Proposition 2 in [18] used in Lemma 3.21 Equation (35) stays valid, as well as Lemma 5 in [18] used in (26) to split the continuous operator. In other words, the singular weighting function assumed in Chapter 3 using ρ(ζ) = 1 
+
+> ‖ζ‖
+
+6 ∈
+
+C0(Rd) represents a more difficult, however practically relevant special case. Therefore it is not surprising that the proof above can easily be simplified to yield corresponding convergence results for more regular weighting functions defined by a ρ ∈ C0(Rd). In particular, one can obtain similar convergence results for the following choices by adapting the steps in Chapter 3. 1. Constant functions: ρ ≡ 1 yielding ω(x′ − x) = χ[0 ,δ )(‖x′ − x‖). 2. Conical functions for some C > 0 (See [2], [8]) 
+
+ω(ζ) = χ[0 ,δ )(‖ζ‖)ρ(ζ) := C max 
+
+> (
+
+0, 1 − ‖ζ‖
+
+δ
+
+> )
+
+.
+
+3. Polynomials (See [22], [20], [21]) 
+
+ω(ζ) = χ[0 ,δ )(‖ζ‖)ρ(ζ) := χ[0 ,δ )(‖ζ‖) pn(‖ζ‖)
+
+‖ζ‖α (39) for some polynomial pn : [0 , δ ] → R≥0 such that Assumptions 1.1 are fulfilled and 
+
+α ∈ { 0, 1}. The proof for α = 0 follows from pn(‖ · ‖ ) ∈ C0(Rd). If α = 1, then 
+
+pn(‖ζ‖)
+
+‖ζ‖α = C
+
+‖ζ‖ + p′
+
+> n
+
+(‖ζ‖)34 for another polynomial p′
+
+> n
+
+(‖ζ‖). Since the terms besides mnum ,αnum and τ num in Lemma 3.21, 3.16, Proposition 3.17 and the m(x) − mnum (xi) term in Lemma 3.14 are (sub)linear in ρ, this allows combining the proof using ρ(‖ζ‖) = 1 
+
+> ‖ζ‖
+
+with the proof using ρ(‖ζ‖) = p′
+
+> n
+
+(‖ζ‖) to obtain the convergence for the case in (39) using 
+
+α = 1 as well. Note that Lemma 3.14 handles the convergence of the mnum ,αnum and 
+
+τ num terms. 
+
+# Acknowledgment 
+
+This research was funded by the Deutsche Forschungsgemeinschaft (DFG, German Re-search Foundation) - 377472739/GRK 2423/2-2023. The authors are very grateful for this support. The authors declare that they have no conflict of interest. 
+
+# References 
+
+[1] Hans Wilhelm Alt. Lineare Funktionalanalysis . Springer Berlin, Heidelberg, 2012. ISBN 978-3-642-22260-3. URL https://doi.org/10.1007/978-3-642-22261-0 .[2] Florin Bobaru, Mijia Yang, Leonardo Frota Alves, Stewart A. Silling, Ebrahim Askari, and Jifeng Xu. Convergence, adaptive refinement, and scaling in 1d peridynamics. International Journal for Numerical Methods in Engineer-ing , 77(6):852–877, 2009. doi: https://doi.org/10.1002/nme.2439. URL 
+
+https://onlinelibrary.wiley.com/doi/abs/10.1002/nme.2439 .[3] Florin Bobaru, John T. Foster, Philippe H. Geubelle, and Stewart A. Silling. Hand-book of Peridynamic Modeling (1st ed.) . Chapman and Hall/CRC, 2016. URL 
+
+https://doi.org/10.1201/9781315373331 .[4] Qiang Du, Max Gunzburger, R. B. Lehoucq, and Kun Zhou. A nonlocal vector calculus, nonlocal volume-constrained problems, and nonlocal balance laws. Mathe-matical Models and Methods in Applied Sciences , 23(03):493–540, 2013. doi: 10.1142/ S0218202512500546. URL https://doi.org/10.1142/S0218202512500546 .[5] Qiang Du, Yunzhe Tao, and Xiaochuan Tian. A peridynamic model of fracture mechanics with bond-breaking. Journal of Elasticity , 132(2):197– 218, Aug 2018. ISSN 1573-2681. doi: 10.1007/s10659-017-9661-2. URL 
+
+https://doi.org/10.1007/s10659-017-9661-2 .[6] Otto Forster. Analysis 3 . Springer Spektrum Wiesbaden, 2017. ISBN 978-3-658-16746-2. URL https://doi.org/10.1007/978-3-658-16746-2 .[7] Kai Friebertshäuser, Christian Wieners, and Kerstin Weinberg. Dynamic frac-ture with continuum-kinematics-based peridynamics. AIMS Materials Science ,9(6):791–807, 2022. ISSN 2372-0484. doi: 10.3934/matersci.2022049. URL 
+
+https://www.aimspress.com/article/doi/10.3934/matersci.2022049 .35 [8] Youn Doh Ha and Florin Bobaru. Studies of dynamic crack propagation and crack branching with peridynamics. International Journal of Fracture , 162(1): 229–244, Mar 2010. ISSN 1573-2673. doi: 10.1007/s10704-010-9442-4. URL 
+
+https://doi.org/10.1007/s10704-010-9442-4 .[9] A. Javili, A.T. McBride, and P. Steinmann. Continuum-kinematics-inspired peridynamics. mechanical problems. Journal of the Me-chanics and Physics of Solids , 131:125–146, 2019. ISSN 0022-5096. doi: https://doi.org/10.1016/j.jmps.2019.06.016. URL 
+
+https://www.sciencedirect.com/science/article/pii/S0022509619300456 .[10] P. K. Jha and R. Lipton. Finite element approximation of nonlocal dy-namic fracture models. Discrete and Continuous Dynamical Systems - B, 26 (3):1675–1710, 2021. ISSN 1531-3492. doi: 10.3934/dcdsb.2020178. URL 
+
+https://www.aimsciences.org/article/id/7e1359b9-fe44-49f6-be2f-f88830a1746d .[11] Prashant K Jha and Robert Lipton. Numerical analysis of nonlocal fracture models in holder space. SIAM Journal on Numerical Analysis , 56(2):906–941, 2018. [12] Prashant K. Jha and Robert Lipton. Numerical convergence of finite dif-ference approximations for state based peridynamic fracture models. Com-puter Methods in Applied Mechanics and Engineering , 351:184–225, 2019. ISSN 0045-7825. doi: https://doi.org/10.1016/j.cma.2019.03.024. URL 
+
+https://www.sciencedirect.com/science/article/pii/S0045782519301537 .[13] Adnan Kefal, Abdolrasoul Sohouli, Erkan Oterkus, Mehmet Yildiz, and Afzal Suleman. Topology optimization of cracked structures using peri-dynamics. Continuum Mechanics and Thermodynamics , 31(6):1645–1672, Nov 2019. ISSN 1432-0959. doi: 10.1007/s00161-019-00830-x. URL 
+
+https://doi.org/10.1007/s00161-019-00830-x .[14] Robert Lipton. Cohesive dynamics and brittle fracture. Journal of Elasticity , 124 (2):143–191, Aug 2016. ISSN 1573-2681. doi: 10.1007/s10659-015-9564-z. URL 
+
+https://doi.org/10.1007/s10659-015-9564-z .[15] Robert Lipton, Eyad Said, and Prashant K. Jha. Dynamic Brittle Fracture from Nonlocal Double-Well Potentials: A State-Based Model , pages 1265–1291. Springer International Publishing, Cham, 2019. ISBN 978-3-319-58729-5. doi: 10.1007/ 978-3-319-58729-5 _33. URL https://doi.org/10.1007/978-3-319-58729-5_33 .[16] Robert P. Lipton and Prashant K. Jha. Nonlocal elastodynamics and frac-ture. Nonlinear Differential Equations and Applications NoDEA , 28(3):23, Mar 2021. ISSN 1420-9004. doi: 10.1007/s00030-021-00683-x. URL 
+
+https://doi.org/10.1007/s00030-021-00683-x .[17] Hengjie Liu and Ziguang Chen. On the one-point quadrature dis-cretization in peridynamics: A novel perspective from monte carlo integration. Computer Physics Communications , 298:109115, 2024. ISSN 0010-4655. doi: https://doi.org/10.1016/j.cpc.2024.109115. URL 
+
+https://www.sciencedirect.com/science/article/pii/S0010465524000389 .36 [18] Tadele Mengesha and Qiang Du. Nonlocal constrained value problems for a linear peridynamic navier equation. Journal of Elasticity , 116(1):27– 51, Jun 2014. ISSN 1573-2681. doi: 10.1007/s10659-013-9456-z. URL 
+
+https://doi.org/10.1007/s10659-013-9456-z .[19] Francesco Scabbia, Mirco Zaccariotto, and Ugo Galvanetto. Accurate computa-tion of partial volumes in 3d peridynamics. Engineering with Computers , 39(1): 959–991, Feb 2023. ISSN 1435-5663. doi: 10.1007/s00366-022-01725-3. URL 
+
+https://doi.org/10.1007/s00366-022-01725-3 .[20] Pablo Seleson. Improved one-point quadrature algorithms for two-dimensional peridynamic models based on analytical calculations. Com-puter Methods in Applied Mechanics and Engineering , 282:184–217, 2014. ISSN 0045-7825. doi: https://doi.org/10.1016/j.cma.2014.06.016. URL 
+
+https://www.sciencedirect.com/science/article/pii/S0045782514002023 .[21] Pablo Seleson and David J. Littlewood. Convergence studies in meshfree peridy-namic simulations. Computers & Mathematics with Applications , 71(11):2432–2448, 2016. ISSN 0898-1221. doi: https://doi.org/10.1016/j.camwa.2015.12.021. URL 
+
+https://www.sciencedirect.com/science/article/pii/S0898122115005891 .[22] Pablo Seleson and David J. Littlewood. Numerical Tools for Improved Convergence of Meshfree Peridynamic Discretizations , pages 1–27. Springer International Publishing, Cham, 2018. ISBN 978-3-319-22977-5. doi: 10.1007/978-3-319-22977-5_39-1. URL 
+
+https://doi.org/10.1007/978-3-319-22977-5_39-1 .[23] Pablo Seleson and Michael Parks. On the role of the influence function in the peri-dynamic theory. International Journal for Multiscale Computational Engineering , 9: 689–706, 01 2011. doi: 10.1615/IntJMultCompEng.2011002527. [24] S. A. Silling. Linearized theory of peridynamic states. Journal of Elasticity , 99 (1):85–111, Mar 2010. ISSN 1573-2681. doi: 10.1007/s10659-009-9234-0. URL 
+
+https://doi.org/10.1007/s10659-009-9234-0 .[25] S. A. Silling, M. Epton, O. Weckner, J. Xu, and E. Askari. Peridy-namic states and constitutive modeling. Journal of Elasticity , 88(2):151– 184, Aug 2007. ISSN 1573-2681. doi: 10.1007/s10659-007-9125-1. URL 
+
+https://doi.org/10.1007/s10659-007-9125-1 .[26] S.A. Silling. Reformulation of elasticity theory for discontinuities and long-range forces. Journal of the Mechanics and Physics of Solids , 48:175–209, 2000. [27] S.A. Silling and E. Askari. A meshfree method based on the peridynamic model of solid mechanics. Computers & Structures , 83(17):1526–1535, 2005. ISSN 0045-7949. doi: https://doi.org/10.1016/j.compstruc.2004.11.026. URL 
+
+https://www.sciencedirect.com/science/article/pii/S0045794905000805 .Advances in Meshfree Methods. [28] S.A. Silling and R.B. Lehoucq. Peridynamic theory of solid mechanics. In Hassan Aref and Erik van der Giessen, editors, Advances in Applied Me-chanics , volume 44 of Advances in Applied Mechanics , pages 73–168. El-sevier, 2010. doi: https://doi.org/10.1016/S0065-2156(10)44002-8. URL 
+
+https://www.sciencedirect.com/science/article/pii/S0065215610440028 .37 [29] Gérald Tenenbaum. Introduction to Analytic and Probabilistic Number Theory: Third Edition . American Mathematical Society, 2015. ISBN 978-0-8218-9854-3. URL 
+
+https://doi.org/10.1090/gsm/163 .[30] Nathaniel Trask, Huaiqian You, Yue Yu, and Michael L. Parks. An asymptoti-cally compatible meshfree quadrature rule for nonlocal problems with applications to peridynamics. Computer Methods in Applied Mechanics and Engineering , 343:151– 165, 2019. ISSN 0045-7825. doi: https://doi.org/10.1016/j.cma.2018.08.016. URL 
+
+https://www.sciencedirect.com/science/article/pii/S004578251830402X .[31] Jiangming Zhao, Siavash Jafarzadeh, Ziguang Chen, and Florin Bobaru. En-forcing local boundary conditions in peridynamic models of diffusion with sin-gularities and on arbitrary domains. Engineering with Computers , 41(1):247– 266, Feb 2025. ISSN 1435-5663. doi: 10.1007/s00366-024-01995-z. URL 
+
+https://doi.org/10.1007/s00366-024-01995-z .[32] Kun Zhou and Qiang Du. Mathematical and numerical analysis of lin-ear peridynamic models with nonlocal boundary conditions. SIAM Jour-nal on Numerical Analysis , 48(5):1759–1780, 2010. ISSN 00361429. URL 
+
+http://www.jstor.org/stable/41149024 .
+
+# A Appendix 
+
+Lemma A.1 Lemma 2.4 holds true. 
+
+Proof. We use [6], §3, Satz 8, with a slight modification, namely replacing the closed cubes with open ones by suitably extending them then taking their interior. We then obtain a series of open cubes Wn with rational side lengths pn/q n, p n, q n ∈ N for every ǫ > 0 such that 
+
+A ⊂ ⋃
+
+> n∈N
+
+Wn, vol 
+
+( ⋃
+
+> n∈N
+
+Wn
+
+)
+
+< ǫ. 
+
+Due to the compactness of A and the openness of the Wn, only a finite subset of cubes is sufficient. Let Fǫ be the set of indices of this finite subset of cubes. Then, subdivide each cube into smaller cubes of side length (lcm n∈Fǫ qn)−1. Extending these cubes to half-closed cubes of equal volume then finishes the proof. 
+
+Lemma A.2 The statement in Lemma 3.9 holds. 
+
+Proof. Let x ∈ Ωi and ~u ∈ Rd|Iκ|, then 
+
+−[Lnum  
+
+> κ
+
+Kκ~u]( x) = 1
+
+Vi
+
+∑ 
+
+> j6=i
+
+Bnum  
+
+> ij
+
+~uj + 1
+
+Vi
+
+Bnum  
+
+> ii
+
+~ui
+
+= 1
+
+Vi
+
+∑ 
+
+> j6=i
+
+ ∑
+
+> m6∈{ i,j }
+
+I2,num  
+
+> mij
+
+− ∑
+
+> m6=i
+
+I2,num  
+
+> imj
+
+− ∑
+
+> m6=j
+
+I2,num  
+
+> jim
+
+− I 1,num 
+
+> ij
+
+ ~uj
+
++ 1
+
+Vi
+
+∑ 
+
+> n6=i
+
+∑
+
+> m6=i
+
+I2,num  
+
+> inm
+
++ ∑
+
+> m6=i
+
+I2,num  
+
+> mii
+
++ ∑
+
+> m6=i
+
+I1,num 
+
+> im
+
+ ~ui.
+
+38 Separating out the terms involving I1,num , one has 
+
+1
+
+Vi
+
+∑
+
+j6 =i
+
+I1,num 
+
+ij (~ui − ~uj )= 1
+
+Vi
+
+∑
+
+j6 =i
+
+ViV (i)
+
+j ρ(xj − xi)( αnum (xi) + αnum (xj )) (xj − xi) ( xj − xi)⊤
+
+‖xj − xi‖‖ xj − xi‖ (~ui − ~uj ) dx′ dx, 
+
+which is the −L num 
+
+1 term. For the rest of the terms, 
+
+1
+
+Vi
+
+∑
+
+j6 =i
+
+ ∑
+
+m6∈{ i,j }
+
+I2,num 
+
+mij − ∑
+
+m6=i
+
+I2,num 
+
+imj − ∑
+
+m6=j
+
+I2,num 
+
+jim 
+
+ ~uj
+
++ 1
+
+Vi
+
+∑
+
+n6 =i
+
+∑
+
+m6=i
+
+I2,num 
+
+inm + ∑
+
+m6=i
+
+I2,num 
+
+mii 
+
+ ~ui
+
+= 1
+
+Vi
+
+∑
+
+j6 =i
+
+( ∑
+
+m6∈{ i,j }
+
+VmV (m)
+
+i V (m)
+
+j τ num (xm)ρ(xi − xm)ρ(xj − xm) ( xi − xm) ( xj − xm)⊤
+
+− ∑
+
+m6=i
+
+ViV (i)
+
+m V (i)
+
+j τ num (xi)ρ(xm − xi)ρ(xj − xi) ( xm − xi) ( xj − xi)⊤
+
+− ∑
+
+m6=j
+
+Vj V (j)
+
+i V (j)
+
+m τ num (xj )ρ(xi − xj )ρ(xm − xj ) ( xi − xj ) ( xm − xj )⊤
+
+)
+
+~uj
+
++ 1
+
+Vi
+
+( ∑
+
+n6 =i
+
+∑
+
+m6=i
+
+ViV (i)
+
+n V (i)
+
+m τ num (xi)ρ(xn − xi)ρ(xm − xi) ( xn − xi) ( xm − xi)⊤
+
++ ∑
+
+m6=i
+
+VmV (m)
+
+i V (m)
+
+i τ num (xm)ρ(xi − xm)ρ(xi − xm) ( xi − xm) ( xi − xm)⊤
+
+)
+
+~ui
+
+= −L num ,x 
+
+2 (~ui − ~uj )+ 1
+
+Vi
+
+∑
+
+j6 =i
+
+( ∑
+
+m6∈{ i,j }
+
+VmV (m)
+
+i V (m)
+
+j τ num (xm)ρ(xi − xm)ρ(xj − xm) ( xi − xm) ( xj − xm)⊤
+
+− ∑
+
+m6={j,i }
+
+Vj V (j)
+
+i V (j)
+
+m τ num (xj )ρ(xi − xj )ρ(xm − xj ) ( xi − xj ) ( xm − xj )⊤
+
+)
+
+~uj
+
++ 1
+
+Vi
+
+( ∑
+
+j6 =i
+
+Vj V (j)
+
+i V (j)
+
+i τ num (xj )ρ(xi − xj )ρ(xi − xj ) ( xi − xj ) ( xi − xj )⊤
+
+)
+
+(~ui − ~uj )= −L num ,x 
+
+2 (~ui − ~uj ) − L num ,x ′
+
+2 (~ui − ~uj ) − L num ,p 
+
+2 (~ui − ~uj )+ 1
+
+Vi
+
+( ∑
+
+j6 =i
+
+∑
+
+m6∈{ i,j }
+
+VmV (m)
+
+i V (m)
+
+j τ num (xm)ρ(xi − xm)ρ(xj − xm) ( xi − xm) ( xj − xm)⊤
+
+− ∑
+
+j6 =i
+
+∑
+
+m6={j,i }
+
+Vj V (j)
+
+i V (j)
+
+m τ num (xj )ρ(xi − xj )ρ(xm − xj ) ( xi − xj ) ( xm − xj )⊤
+
+)
+
+~ui,
+
+where, by swapping indices in the sums on the last two lines, 
+
+1
+
+Vi
+
+( ∑
+
+j6 =i
+
+∑
+
+m6∈{ i,j }
+
+VmV (m)
+
+i V (m)
+
+j τ num (xm)ρ(xi − xm)ρ(xj − xm) ( xi − xm) ( xj − xm)⊤
+
+39 − ∑ 
+
+> j6=i
+
+∑
+
+> m6={j,i }
+
+Vj V (j) 
+
+> i
+
+V (j) 
+
+> m
+
+τ num (xj )ρ(xi − xj )ρ(xm − xj ) ( xi − xj ) ( xm − xj )⊤
+
+)
+
+= 1
+
+Vi
+
+( ∑ 
+
+> j6=i
+
+∑
+
+> m6∈{ i,j }
+
+VmV (m) 
+
+> i
+
+V (m) 
+
+> j
+
+τ num (xm)ρ(xi − xm)ρ(xj − xm) ( xi − xm) ( xj − xm)⊤
+
+− ∑ 
+
+> j6=i
+
+∑
+
+> m6={j,i }
+
+VmV (m) 
+
+> i
+
+V (m) 
+
+> j
+
+τ num (xm)ρ(xi − xm)ρ(xj − xm) ( xi − xm) ( xj − xm)⊤
+
+)
+
+= 0 .
+
+Lemma A.3 The claims in Lemma 3.19 hold true. 
+
+Proof. We begin by using the explicit forms shown in Lemma A.2, 
+
+~u⊤ ~Bnum ~u = 〈K κ~u, −L num Kκ~u〉L2(Ω) d
+
+= ∑
+
+> i
+
+∫
+
+> Ωi
+
+~u⊤
+
+> i
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi)( αnum (xi) + αnum (xj )) (xj −xi)( xj −xi)⊤   
+
+> ‖xj−xi‖‖ xj−xi‖
+
+(~ui − ~uj ) dx′ dx
+
++ ∑
+
+> i
+
+∫
+
+> Ωi
+
+~u⊤
+
+> i
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∑
+
+> m6∈{ i,j }
+
+∫
+
+> Ωm
+
+wmj wmi τ num (xm)
+
+× ρ(xi − xm)ρ(xj − xm) ( xi − xm) ( xj − xm)⊤ (~uj − ~ui) dp dx′ dx
+
+− ∑
+
+> i
+
+∫
+
+> Ωi
+
+~u⊤
+
+> i
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∑
+
+> m6=i
+
+∫
+
+> Ωm
+
+wij wim τ num (xi)
+
+× ρ(xm − xi)ρ(xj − xi) ( xm − xi) ( xj − xi)⊤ (~uj − ~ui) dp dx′ dx
+
+− ∑
+
+> i
+
+∫
+
+> Ωi
+
+~u⊤
+
+> i
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+∑
+
+> m6=j
+
+∫
+
+> Ωm
+
+wjm wji τ num (xj )
+
+× ρ(xi − xj )ρ(xm − xj ) ( xi − xj ) ( xm − xj )⊤ (~uj − ~ui) dp dx′ dx. 
+
+The first summand then easily transforms into the following by splitting the sum at the 
+
+α terms and renaming the constants, 
+
+∑
+
+> i
+
+∫
+
+> Ωi
+
+~u⊤
+
+> i
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi)( αnum (xi) + αnum (xj )) (xj − xi) ( xj − xi)⊤
+
+‖xj − xi‖‖ xj − xi‖ (~ui − ~uj ) dx′ dx
+
+= ∑
+
+> i
+
+∫
+
+> Ωi
+
+~u⊤
+
+> i
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi)αnum (xi) (xj − xi) ( xj − xi)⊤
+
+‖xj − xi‖‖ xj − xi‖ (~ui − ~uj ) dx′ dx
+
++ ∑
+
+> i
+
+∫
+
+> Ωi
+
+~u⊤
+
+> i
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi)αnum (xj ) (xj − xi) ( xj − xi)⊤
+
+‖xj − xi‖‖ xj − xi‖ (~ui − ~uj ) dx′ dx
+
+= ∑
+
+> i
+
+∫
+
+> Ωi
+
+(~ui − ~uj )⊤ ∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi)αnum (xi) (xj − xi) ( xj − xi)⊤
+
+‖xj − xi‖‖ xj − xi‖ (~ui − ~uj ) dx′ dx
+
+= ∑
+
+> i
+
+∫
+
+> Ωi
+
+αnum (xi) ∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi)
+
+( (xj − xi)⊤ (~ui − ~uj )
+
+‖xj − xi‖
+
+)2
+
+dx′ dx. 
+
+40 The rest of the terms, after renaming and shifting the indices, are equal to 
+
+∑
+
+> j
+
+∑
+
+> m6=j
+
+∑
+
+> i6∈{ m,j }
+
+∫
+
+> Ωj
+
+∫
+
+> Ωm
+
+∫
+
+> Ωi
+
+~u⊤ 
+
+> j
+
+wim wij τ num (xi)
+
+× ρ(xj − xi)ρ(xm − xi) ( xj − xi) ( xm − xi)⊤ (~um − ~uj ) dp dx′ dx
+
+− ∑
+
+> i
+
+∑ 
+
+> j6=i
+
+∑
+
+> m6=i
+
+∫
+
+> Ωi
+
+∫
+
+> Ωj
+
+∫
+
+> Ωm
+
+~u⊤ 
+
+> i
+
+wim wij τ num (xi)
+
+× ρ(xm − xi)ρ(xj − xi) ( xm − xi) ( xj − xi)⊤ (~uj − ~ui) dp dx′ dx
+
++ ∑
+
+> j
+
+∑
+
+> i6=j
+
+∑
+
+> m6=i
+
+∫
+
+> Ωj
+
+∫
+
+> Ωi
+
+∫
+
+> Ωm
+
+~u⊤ 
+
+> j
+
+wim wij τ num (xi)
+
+× ρ(xj − xi)ρ(xm − xi) ( xj − xi) ( xm − xi)⊤ (~uj − ~ui) dp dx′ dx
+
+adding summand 1 and 3 together after rearranging the sums yields 
+
+= ∑
+
+> j
+
+∑
+
+> m6=j
+
+∑
+
+> i6∈{ m,j }
+
+∫
+
+> Ωj
+
+∫
+
+> Ωm
+
+∫
+
+> Ωi
+
+~u⊤ 
+
+> j
+
+wim wij τ num (xi)
+
+× ρ(xj − xi)ρ(xm − xi) ( xj − xi) ( xm − xi)⊤ (~um − ~ui) dp dx′ dx
+
+− ∑
+
+> i
+
+∑ 
+
+> j6=i
+
+∑
+
+> m6=i
+
+∫
+
+> Ωi
+
+∫
+
+> Ωj
+
+∫
+
+> Ωm
+
+~u⊤ 
+
+> i
+
+wim wij τ num (xi)
+
+× ρ(xm − xi)ρ(xj − xi) ( xm − xi) ( xj − xi)⊤ (~uj − ~ui) dp dx′ dx
+
++ ∑
+
+> j
+
+∑
+
+> i6=j
+
+∫
+
+> Ωj
+
+∫
+
+> Ωi
+
+∫
+
+> Ωj
+
+~u⊤ 
+
+> j
+
+w2 
+
+> ij
+
+τ num (xi)
+
+× ρ(xj − xi)ρ(xj − xi) ( xj − xi) ( xj − xi)⊤ (~uj − ~ui) dp dx′ dx
+
+adding the first two summands after rearranging the sums gives 
+
+= ∑
+
+> j
+
+∑
+
+> m6=j
+
+∑
+
+> i6∈{ j,m }
+
+∫
+
+> Ωj
+
+∫
+
+> Ωm
+
+∫
+
+> Ωi
+
+wij wim τ num (xi)ρ(xj − xi) ( xj − xi)⊤ (~uj − ~ui)
+
+× ρ(xm − xi) ( xm − xi)⊤ (~um − ~ui) dp dx′ dx
+
+− ∑
+
+> i
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωi
+
+∫
+
+> Ωj
+
+∫
+
+> Ωj
+
+w2 
+
+> ij
+
+~u⊤ 
+
+> i
+
+τ num (xi)
+
+× ρ(xj − xi)ρ(xj − xi) ( xj − xi) ( xj − xi)⊤ (~uj − ~ui) dp dx′ dx
+
++ ∑
+
+> j
+
+∑
+
+> i6=j
+
+∫
+
+> Ωj
+
+∫
+
+> Ωi
+
+∫
+
+> Ωj
+
+w2 
+
+> ij
+
+~u⊤ 
+
+> j
+
+τ num (xi)
+
+× ρ(xj − xi)ρ(xj − xi) ( xj − xi) ( xj − xi)⊤ (~uj − ~ui) dp dx′ dx
+
+adding all summands together, first the last two, then the rest, leads to 
+
+= ∑
+
+> i
+
+∫
+
+> Ωi
+
+τ num (xi) ∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi) ( xj − xi)⊤ (~uj − ~ui) dx′
+
+× ∑
+
+> m6=i
+
+∫
+
+> Ωm
+
+wim ρ(xm − xi) ( xm − xi)⊤ (~um − ~ui) dp dx
+
+= ∑
+
+> i
+
+∫
+
+> Ωi
+
+τ num (xi)
+
+∑ 
+
+> j6=i
+
+∫
+
+> Ωj
+
+wij ρ(xj − xi) ( xj − xi)⊤ (~uj − ~ui) dx′
+
+
+
+> 2
+
+dx. 
+
+41 Together with the previous terms, we obtain the following form of ~u⊤ ~Bnum ~u,
+
+∑
+
+i
+
+∫
+
+Ωi
+
+(
+
+k(xi) − l(xi)
+
+d2
+
+)  d
+
+mnum (xi)
+
+∑
+
+j6 =i
+
+∫
+
+Ωj
+
+wij ρ(xj − xi) ( xj − xi)⊤ (~uj − ~ui) dx′
+
+
+
+2
+
++ αnum (xi) ∑
+
+j6 =i
+
+∫
+
+Ωj
+
+wij ρ(xj − xi)
+
+( (xj − xi)⊤ (~uj − ~ui)
+
+‖xj − xi‖
+
+)2
+
+dx′ dx
+
+= ∑
+
+i
+
+∫
+
+Ωi
+
+k(xi)
+
+ d
+
+mnum (xi)
+
+∑
+
+j6 =i
+
+∫
+
+Ωj
+
+wij ρ(xj − xi) ( xj − xi)⊤ (~uj − ~ui) dx′
+
+
+
+2
+
+− 2 αnum (xi)mnum (xi)
+
+d2
+
+ d
+
+mnum (xi)
+
+∑
+
+j6 =i
+
+∫
+
+Ωj
+
+wij ρ(xj − xi) ( xj − xi)⊤ (~uj − ~ui) dx′
+
+
+
+2
+
++ αnum (xi)mnum (xi)
+
+ 1
+
+mnum (xi)
+
+∑
+
+j6 =i
+
+∫
+
+Ωj
+
+wij ρ(xj − xi) ( xj − xi)⊤ (~uj − ~ui) dx′
+
+
+
+2
+
++ αnum (xi) ∑
+
+j6 =i
+
+∫
+
+Ωj
+
+wij ρ(xj − xi)
+
+( (xj − xi)⊤ (~uj − ~ui)
+
+‖xj − xi‖
+
+)2
+
+dx′ dx
+
+= ∑
+
+i
+
+∫
+
+Ωi
+
+k(xi)
+
+ d
+
+mnum (xi)
+
+∑
+
+j6 =i
+
+∫
+
+Ωj
+
+wij ρ(xj − xi) ( xj − xi)⊤ (~uj − ~ui) dx′
+
+
+
+2
+
+− 2αnum (xi)
+
+∑
+
+j6 =i
+
+∫
+
+Ωj
+
+wij ρ(xj − xi) ( xj − xi)⊤ (~uj − ~ui) dx′
+
+
+
+×
+
+ 1
+
+mnum (xi)
+
+∑
+
+j6 =i
+
+∫
+
+Ωj
+
+wij ρ(xj − xi) ( xj − xi)⊤ (~uj − ~ui) dx′
+
+
+
++ αnum (xi) ∑
+
+j6 =i
+
+∫
+
+Ωj
+
+wij ρ(xj − xi)‖xj − xi‖2
+
+ 1
+
+mnum (xi)
+
+∑
+
+m6=i
+
+∫
+
+Ωj
+
+wim ρ(xm − xi) ( xm − xi)⊤ (~um − ~ui) dp
+
+
+
+2
+
+dx′
+
++ αnum (xi) ∑
+
+j6 =i
+
+∫
+
+Ωj
+
+wij ρ(xj − xi)‖xj − xi‖2
+
+( (xj − xi)⊤ (~uj − ~ui)
+
+‖xj − xi‖2
+
+)2
+
+dx′ dx
+
+= ∑
+
+i
+
+∫
+
+Ωi
+
+k(xi)
+
+ d
+
+mnum (xi)
+
+∑
+
+j6 =i
+
+∫
+
+Ωj
+
+wij ρ(xj − xi) ( xj − xi)⊤ (~uj − ~ui) dx′
+
+
+
+2
+
++ αnum (xi) ∑
+
+j6 =i
+
+∫
+
+Ωj
+
+wij ρ(xj − xi)‖xj − xi‖2
+
+( (xj − xi)⊤ (~uj − ~ui)
+
+‖xj − xi‖2
+
+− 1
+
+mnum (xi)
+
+∑
+
+m6=i
+
+∫
+
+Ωm
+
+wim ρ(xm − xi) ( xm − xi)⊤ (~um − ~ui) dp
+
+)2
+
+dx′
+
+42

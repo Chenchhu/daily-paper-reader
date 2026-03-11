@@ -1,0 +1,4239 @@
+Title: Global Weak Solutions of a Navier-Stokes-Cahn-Hilliard System for Incompressible Two-phase flows with Thermo-induced Marangoni Effects
+
+URL Source: https://arxiv.org/pdf/2603.07118v1
+
+Published Time: Tue, 10 Mar 2026 00:37:25 GMT
+
+Number of Pages: 43
+
+Markdown Content:
+# Global Weak Solutions of a Navier–Stokes–Cahn–Hilliard System for Incompressible Two-phase flows with Thermo-induced Marangoni Effects 
+
+Lingxi Chen ∗ and Hao Wu †
+
+Abstract 
+
+We study a diffuse-interface model that describes the dynamics of two-phase incompressible flows driven by the thermo-induced Marangoni effect. The hydrodynamic system consists of the Navier–Stokes equations for the fluid velocity, the convective Cahn–Hilliard equation for the phase-field variable, and a convective heat equation for the (relative) temperature. For the initial-boundary value problem with variable viscosity, mobility, thermal diffusivity, and a physically relevant singular potential, we establish the existence of global weak solutions in two and three dimensions. When the spatial dimension is two, we also prove the uniqueness of weak solutions for the case with matched densities under suitable assumptions on the initial temperature, mobility, and thermal diffusivity. 
+
+Keywords: Two-phase flow, Marangoni effect, thermo capillarity, Navier–Stokes equations, Cahn–Hilliard equation, global weak solution, existence, uniqueness. 
+
+MSC 2020: 35Q35; 35A01; 35A02. 
+
+# 1 Introduction 
+
+The Marangoni effect, named after Carlo Marangoni, describes the fluid motion generated along an interface due to gradients in surface tension [41]. This inhomogeneity of surface tension typically arises from spatial variations in temperature (thermocapillarity) or solute concentration (soluto-capillarity) [32, 49]. When thermal effects are considered, for most fluids, the surface tension de-creases with increasing temperature [33], and consequently, the resulting tangential stress induces a convective flow from the warmer regions (lower surface tension) to the cooler regions (higher surface tension). This ubiquitous phenomenon was recognized as a primary driving mechanism that contributes to fluid motion alongside buoyancy effects in the classic Bénard experiments [11]. Marangoni convection can influence the spreading behavior near interfaces and lead to the appear-ance of dynamic organized patterns. It has become a fundamental subject of research, with diverse applications in crystal growth/welding, electron beam melting, nanotechnology, and biology (see, e.g., [35, 42, 44, 46]). Phase-field models have emerged as an efficient method for studying interfacial dynamics and phase transitions in multi-component fluids [9, 20]. In this approach, the sharp interface between 
+
+> ∗
+
+School of Mathematical Sciences, Fudan University, Handan Road 220, Shanghai 200433, P. R. China. Email: 
+
+chenlingxi@gmail.com 
+
+> †
+
+Corresponding author. School of Mathematical Sciences, Fudan University, Handan Road 220, Shanghai 200433, P. R. China. Email: haowufd@fudan.edu.cn 
+
+1
+
+> arXiv:2603.07118v1 [math.AP] 7 Mar 2026
+
+immiscible fluids (see, e.g., [14, 47]) is regularized as a thin transition layer where physical vari-ables vary continuously but steeply, i.e., the so-called diffuse interface. The diffuse interface reg-ularization avoids explicit interface tracking while naturally incorporates thermodynamic driving forces, facilitating both the mathematical analysis and numerical implementation for multi-phase flows [9, 12, 21]. Let Ω ⊂ Rd (d = 2 or 3) be a bounded domain with a C3-boundary ∂Ω. We consider the following hydrodynamic phase-field system that models the evolution of non-isothermal binary incompressible viscous Newtonian fluids under the influence of thermally induced surface tension gradients: 
+
+∂t(ρ(ϕ)u) + div( u ⊗ (ρ(ϕ)u + J)) − div (2 ν(ϕ, θ )Du) + ∇p
+
+= −div σ + fb(ϕ, θ ), (1.1) 
+
+div u = 0 , (1.2) 
+
+∂tϕ + u · ∇ ϕ = div( m(ϕ, θ )∇μ), (1.3) 
+
+μ = −∆ϕ + W ′(ϕ), (1.4) 
+
+∂tθ + u · ∇ θ = div ( κ(ϕ, θ )∇θ), (1.5) in Ω × (0 , ∞), subject to the boundary and initial conditions: 
+
+u = 0, ∂nϕ = ∂nμ = 0 , θ = θb, on ∂Ω × (0 , ∞), (1.6) 
+
+u|t=0 = u0, ϕ|t=0 = ϕ0, θ|t=0 = θ0, in Ω. (1.7) In (1.6), n = n(x) denotes the outward unit normal vector on ∂Ω and ∂n denotes the outward normal derivative on the boundary, θb = θb(x) is a given function on ∂Ω. The state variables of the system (1.1)–(1.5) are denoted by (u, p, ϕ, μ, θ ). More precisely, u : Ω × (0 , ∞) → Rd denotes the volume-averaged velocity of the binary fluid mixture and p : Ω × (0 , ∞) → R the pressure, which are governed by a modified Navier–Stokes system (1.1)–(1.2); ϕ : Ω × (0 , ∞) → [−1, 1] is the phase-field variable and μ : Ω × (0 , ∞) → R the chemical potential, together forming the convective Cahn–Hilliard equation (1.3)–(1.4); and θ : Ω × (0 , ∞) → R denotes the relative temperature (with respect to a given constant ambient temperature), which satisfies the convective heat transport equation (1.5). The coupled system (1.1)–(1.7) presents a nontrivial coupling between fluid dynamics, phase separation process, and thermal convection, leading to complex interfacial phenomena [49, 52]. It not only generalizes the phase-field model for thermo-induced Marangoni effects derived in [30, 50] via the energetic variational approach, but also incorporates the thermodynamically consistent framework proposed in [5] for the general scenario with unmatched densities, based on the utilization of a volume-averaged velocity u that keeps the binary fluid mixture incompressible (cf. (1.2)). The phase-field variable ϕ serves as a conserved order parameter that represents the difference in volume fractions of the fluid mixture, such that {ϕ = −1} represents fluid 1 and {ϕ = 1 } represents fluid 
+
+2. Then the average density ρ is assumed to be the typical linear form 
+
+ρ(ϕ) = ρ2 − ρ1
+
+2 ϕ + ρ1 + ρ2
+
+2 , (1.8) where the positive constants ρ1, ρ2 denote the homogeneous positive density of the unmixed compo-nents of the fluid. For simplicity, the density variation with respect to the temperature is explicitly considered in the buoyancy force fb and assumed to satisfy the linearized thermal expansion ap-proximation (see e.g., [30]), that is, 
+
+fb(ϕ, θ ) = −ρ(ϕ)(1 − αθ )ged. (1.9) 2Here, α is the coefficient of thermal expansion, g is the gravitational acceleration, and ed denotes the unit upward vector, i.e., e2 = (0 , 1) T , e3 = (0 , 0, 1) T . In the equation of momentum balance (1.1), the matrix-valued function Du := 12 (∇u + ∇uT ) denotes the symmetric gradient of u, while the relative flux related to the diffusion of the fluid components is given by 
+
+J = − ρ2 − ρ1
+
+2 m(ϕ, θ )∇μ. (1.10) The Cauchy stress tensor σ is defined as 
+
+σ = λ(θ)( ∇ϕ ⊗ ∇ ϕ) + λ(θ) 
+
+> (
+
+12 |∇ ϕ|2 + W (ϕ)
+
+> )
+
+Id, (1.11) where Id denotes the d-dimensional unit matrix, and the temperature-dependent surface tension coefficient λ follows the empirical Eötvös law: 
+
+λ(θ) = λ0(a − bθ ), (1.12) with constant coefficients λ0, a, b > 0. Since the surface tension depends on temperature, its spatial variation along the interface induces tangential stresses that drive interfacial fluid motion, i.e., the Marangoni convection. The mixing energy of binary fluids is given by the classical Ginzburg– Landau type free energy (cf. [9, 15]) 
+
+Emix (ϕ) = 
+
+> ∫
+> Ω
+
+12 |∇ ϕ|2 + W (ϕ) d x, (1.13) in which the gradient term contributes to the free-energy excess of the interfacial region and the nonlinear function W = W (ϕ) denotes the bulk energy density with a double well structure. Here, we set the width of the diffuse interface to 1 for simplicity, since we do not consider the sharp interface limit in this study. A physically relevant example of W is the logarithmic (Flory–Huggins) potential [15]: 
+
+W (ϕ) = A
+
+2 [(1 + ϕ) ln(1 + ϕ) + (1 − ϕ) ln(1 − ϕ)] − Ac
+
+2 ϕ2, ϕ ∈ (−1, 1) , (1.14) with constant coefficients A, A c satisfying 0 < A < A c. The chemical potential μ in the Cahn– Hilliard equation (1.3)–(1.4) is defined as the variational derivative of the mixing energy Emix with respect to ϕ (subject to the homogeneous Neumann boundary condition ∂nϕ = 0 ). Its gradient provides a driving force for the diffusion mechanism [21, 55]. The heat equation (1.5) gives a simplification of the thermal energy equation. In general, temperature dependent extensions of the Cahn–Hilliard equation for phase separation processes are rather involved, since different transport properties of the temperature and relations of the free energy can lead to different dynamical models, see [19, 29] and the references therein. In this study, we allow physical coefficients such as fluid viscosity ν, diffusion mobility m
+
+and thermal diffusivity κ to depend both on the order parameter ϕ and temperature θ. The temperature dependence of the fluid viscosity and thermal diffusivity is physically important in the investigation of the detailed motion in certain non-isothermal flows, see, for instance, [39] and the references therein. On the other hand, for multi-phase fluids, the dependence of structural coefficients on the mixture composition is physically meaningful and should be taken into account in order to accurately model the complex fluid dynamics, since different components may have distinct physical properties, see, e.g., [34, 50]. Several simplified versions of the coupled system (1.1)–(1.7) have been studied in the literature. For instance, assuming matched densities, constant mobility, and only temperature dependence 3of the viscosity and thermal diffusivity, in [16] the author proved the existence and uniqueness of global weak/strong solutions to the initial boundary value problem in two dimensions. When the Marangoni effect is neglected, still assuming matched densities and constant coefficients, problem (1.1)–(1.7) reduces to the so-called Cahn–Hilliard–Boussinesq system, which has been extensively analyzed. We refer to [28,58–60] for results on well-posedness, regularity, and long-time behavior of solutions. Research on related models such as the Cahn–Hilliard–Oberbeck–Boussinesq system can be found in [45], where weak and very weak solutions in two dimensions were investigated. When the Cahn–Hilliard equation is replaced by a second order Allen–Cahn equation (with a regular potential like W (ϕ) = 14 (ϕ2 − 1) 2), existence of global weak solutions, existence and uniqueness of strong solutions and long-time behavior of globally bounded solutions have been analyzed under suitable assumptions on the structural data, see [36,37,54,56] for detailed discussions. In addition, the local-in-time existence of weak solutions was established in [38] for the Allen–Cahn variant with a temperature-dependent interfacial thickness. All of the aforementioned works assumed matched densities for the fluid components and adopted the Boussinesq approximation for the thermally induced variation of the density. On the other hand, when the thermal effect is neglected, problem (1.1)–(1.7) reduces to the Abels– Garcke–Grün system (AGG for short, see [5]), which is a thermodynamically consistent and frame-indifferent diffuse interface model for isothermal viscous incompressible two-phase flows with un-matched densities. We refer to [2] for the existence of global weak solutions in two and three dimensions for a non-degenerate mobility m = m(ϕ). The corresponding result in the case of degenerate mobility was established in [3]. Concerning local strong well-posedness in three dimen-sions, we refer to [25], see also [7] for the case with a regular potential. When the spatial dimension is two, the existence of strong solutions locally in time for bounded domains and globally in time for periodic boundary conditions was obtained in [24]. Finally, we refer to [4] for global regularity and asymptotic stabilization of global weak solutions in three dimensions as well as the existence of global strong solutions in two-dimensional bounded domains. Extensions to multi-component systems can be found in the recent work [6]. To the best of our knowledge, there is no analytical result on the hydrodynamic system (1.1)– (1.7), which extends the isothermal AGG model by coupling with the energy transport equation (1.5) and incorporating thermal effects on both density (buoyancy forces) and surface tension (Marangoni effects). In this study, for the general scenario with unmatched densities and variable viscosity, mobility, as well as thermal diffusivity, we establish the existence of global weak solutions to problem (1.1)–(1.7) in both two and three dimensions, which are uniformly bounded in time (see Theorem 2.1). Furthermore, when the spatial dimension is two, we prove the uniqueness of global weak solutions under suitable assumptions on the structural data (see Theorem 2.2). The problem (1.1)–(1.7) satisfies two fundamental properties, i.e., mass conservation and energy balance, which serve as the basis for the subsequent analysis. Integrating (1.3) over Ω, using the boundary conditions (1.6) and the incompressibility condition (1.2), after integration by parts, we obtain 
+
+ddt
+
+> ∫
+> Ω
+
+ϕ dx = 0 , ∀ t > 0, (1.15) which implies that the mass of the binary fluids is conserved for all time. Next, for sufficiently smooth solutions, multiplying (1.1) by u, (1.3) by λ0aμ and (1.5) by θ, integrating over Ω (assuming for simplicity here θb = 0 ), and adding the resultants together, we formally arrive at the following energy identity 
+
+ddt Etot (u, ϕ, θ ) + 
+
+> ∫
+> Ω
+> (
+
+2ν(ϕ, θ )|Du|2 + λ0am (ϕ, θ )|∇ μ|2 + κ(ϕ, θ )|∇ θ|2) dx
+
+4=
+
+> ∫
+> Ω
+
+div [λ0bθ (∇ϕ ⊗ ∇ ϕ)] · u dx +
+
+> ∫
+> Ω
+
+fb(ϕ, θ ) · u dx, ∀ t > 0, (1.16) where the total energy Etot is given by 
+
+Etot (u, ϕ, θ ) =  
+
+> ∫
+> Ω
+> [
+
+12 ρ(ϕ)|u|2 + λ0a 
+
+> (
+
+12 |∇ ϕ|2 + W (ϕ)
+
+> )
+
++ 12 |θ|2
+
+> ]
+
+dx. (1.17) We observe that the Marangoni-driven capillary term div( λ(θ)∇ϕ⊗∇ ϕ) introduces a highly nonlin-ear coupling between the temperature and the phase-field variable, which significantly complicates the analysis. In view of (1.16), the Marangoni effect and the buoyancy force cause the loss of a standard energy dissipation structure for the system, compared to the corresponding isothermal case [5]. This poses significant difficulties in obtaining global weak solutions that are uniformly bounded in time. In addition, though physically meaningful, the nonhomogeneous Dirichlet bound-ary condition for the temperature introduces additional obstacles to the derivation of the necessary estimates. To achieve our goal, we adopt a partially implicit time-discretization scheme that main-tains the uniform boundedness of the temperature along time steps (see (3.11)–(3.15)). This scheme is inspired by [2] for the isothermal AGG model. By working directly with a singular potential like (1.14), it also keeps the physical range of the phase-filed variable, i.e., ϕ ∈ [−1, 1] . The uni-form L∞-bounds of the approximate solutions (ϕ, θ ) help us to handle some troublesome terms that are highly nonlinear. Furthermore, by exploring the coupling structure of the system, we derive a suitable discrete energy inequality that enables us to control the energy growth and obtain uniform-in-time estimates for approximate solutions (see (3.29)). Our analysis does not require any assumption of smallness on the initial temperature, thereby improving the conditions in [54,56] for the corresponding Navier–Stokes–Allen–Cahn system. In the two-dimensional setting, we further establish the improved regularity of θ using the Hölder estimate (4.12) (cf. [16]). Based on this improved regularity property, we can prove the uniqueness of global weak solutions by assuming that the fluid mixture has matched densities, the mobility depends only on the concentration, and the thermal diffusivity depends solely on the temperature. Whether uniqueness holds under more general assumptions remains an open question; we refer the readers to Remarks 2.6 and 2.7 for detailed discussions. 
+
+Plan of the paper. In Section 2, we present the notation, mathematical tools, and main results. Section 3 is devoted to the proof of the existence of a global weak solution in both two and three dimensions. In Section 4, we prove the existence and uniqueness of global weak solutions with improved regularity for the temperature in two dimensions. 
+
+# 2 Main Results 
+
+2.1 Notation 
+
+We first introduce the notation and conventions used throughout this work. Let B be a Banach space whose norm is denoted by ∥ · ∥ B . We denote its dual by B′ and the dual product by ⟨· , ·⟩ B . If B is a Hilbert space, we write (·, ·)B for the associated inner product. The bold letter B denotes the generic space of vectors or matrices, with each component belonging to B. Let I ⊂ [0 , ∞] be an open set. We denote by Lp(I; B) the space that consists of Bochner measurable p-integrable functions (if p ∈ [1 , ∞)) or essentially bounded functions (if p = ∞). In the case I = ( t1, t 2), we simply write Lp(t1, t 2; B). Moreover, Lp
+
+> uloc
+
+([ t0, ∞); B) denotes the uniform local variant of Lp(t0, ∞; B) consisting of all strongly measurable functions f : [ t0, ∞) → B such that 
+
+∥f ∥Lp 
+
+> uloc ([ t0,∞); B)
+
+= sup 
+
+> t⩾t0
+
+∥f ∥Lq (t,t +1; B) < ∞.
+
+5For any T ∈ (t0, ∞), we simply have Lp
+
+> uloc
+
+([ t0, T ); B) = Lp(t0, T ; B). For p ∈ [1 , ∞], T ∈ (0 , ∞), f ∈
+
+W 1,p (0 , T ; B) if and only if f , ddt f ∈ Lp(0 , T ; B), where ddt f denotes the vector-valued distributional derivative of f . The uniformly local space W 1,p 
+
+> uloc
+
+([ t0, ∞); B) is defined by replacing Lp(0 , T ; B)
+
+with Lp
+
+> uloc
+
+([ t0, ∞); B). If p = 2 , we simply set H1(0 , T ; B) = W 1,2(0 , T ; B) and H1uloc ([ t0, ∞); B) = 
+
+W 1,2uloc ([ t0, ∞); B). Let I = [0 , T ] if T ∈ (0 , ∞) or I = [0 , ∞) if T = ∞. Then C(I; B) denotes the Banach space of all continuous functions f : I → B equipped with the supremum norm. We also denote by Cw(I; B) the topological vector space of all weakly continuous functions f : I → B. In addition, we denote by C∞ 
+
+> 0
+
+(0 , T ; B) the abstract vector space of all smooth functions f : (0 , T ) → B
+
+with supp f ⊂⊂ (0 , T ). Given any two matrices X = ( Xij )di,j =1 , Y = ( Yij )di,j =1 ∈ Rd×d, we have 
+
+(XY )ik = ∑dj=1 Xij Yjk . Then we denote the Frobenius inner product by X : Y = trace( Y T X) = 
+
+∑di,k =1 Xik Yik and its associated norm |X| = √X : X.Let Ω ⊂ Rd, d ∈ { 2, 3}, be a bounded domain with sufficiently smooth boundary ∂Ω. We write C(Ω) (or Cα(Ω) with α ∈ (0 , 1) ) for the set of continuous (or α-Hölder continuous) functions defined in the closure of Ω. The symbol C∞ 
+
+> 0
+
+(Ω) refers to the space of functions that are infinitely differentiable and compactly supported in Ω. For the standard Lebesgue and Sobolev spaces in Ω,we use the notation Lp(Ω) , W k,p (Ω) for any p ∈ [1 , ∞] and k ∈ N, equipped with the corresponding norms ∥ · ∥ Lp(Ω) , ∥ · ∥ W k,p (Ω) , respectively. Besides, W k,p  
+
+> 0
+
+(Ω) represents the closure of C∞ 
+
+> 0
+
+(Ω) in 
+
+W k,p (Ω) , and W −k,p ′
+
+(Ω) = ( W k,p  
+
+> 0
+
+(Ω)) ′ refers to the corresponding dual space, where p′ is the dual exponent of p. When p = 2 , these spaces are Hilbert spaces and we use the standard conventions 
+
+Hk(Ω) := W k, 2(Ω) , Hk 
+
+> 0
+
+(Ω) := W k, 20 (Ω) and H−1(Ω) = ( H10 (Ω)) ′. For s ⩾ 0 and p ∈ [1 , ∞),we denote by Hs,p (Ω) the Bessel-potential spaces and by W s,p (Ω) the Slobodeckij spaces. We have Hs, 2(Ω) = W s, 2(Ω) for all s, but for p̸ = 2 the identity Hs,p (Ω) = W s,p (Ω) is only true if 
+
+s ∈ N. In addition, for s ∈ N, Hs,p (Ω) and W s,p (Ω) coincide with the usual Sobolev spaces. The corresponding function spaces on the boundary ∂Ω are defined using local charts. For convenience, we define 
+
+H2
+
+> n
+
+(Ω) = {f ∈ H2(Ω) : ∂nf = 0 on ∂Ω},
+
+and denote the inner product and norm of L2(Ω) by (·, ·) and ∥ · ∥ without ambiguity. For every f ∈ (H1(Ω)) ′, its generalized mean value over Ω is defined as f = |Ω|−1⟨f, 1⟩H1(Ω) . If 
+
+f ∈ L1(Ω) , then the mean value is given by f = |Ω|−1 ∫ 
+
+> Ω
+
+f dx. For any M ∈ R, we set 
+
+L2(M )(Ω) := 
+
+{
+
+f ∈ L2(Ω) : f = M
+
+}
+
+.
+
+The orthogonal projection P0 : L2(Ω) → L2(0) (Ω) is defined as P0f = f − f . Besides, we introduce the linear spaces 
+
+V(0) := 
+
+{
+
+f ∈ H1(Ω) : f = 0 
+
+}
+
+, V ′ 
+
+> (0)
+
+:= {f ∈ (H1(Ω)) ′ : f = 0 },
+
+and recall the well-known Poincaré–Wirtinger inequality: 
+
+∥∥∥f − f
+
+∥∥∥ ⩽ CP W ∥∇ f ∥, ∀ f ∈ H1(Ω) ,
+
+where the positive constant CP W depends only on Ω. Consider the Neumann problem 
+
+{ −∆u = f, in Ω,∂nu = 0 , on ∂Ω.
+
+We define the solution operator G : V ′ 
+
+> (0)
+
+→ V(0) in the following sense: for every f ∈ V ′
+
+> (0)
+
+, Gf ∈ V(0) 
+
+is the unique function satisfying 
+
+⟨f, v ⟩H1(Ω) = ( ∇G f, ∇v), ∀ v ∈ V(0) . (2.1) 6For f ∈ V ′
+
+> (0)
+
+, it is easy to check that ∥∇G f ∥ is a norm on V ′ 
+
+> (0)
+
+equivalent to the standard one. Thus, we also write it as ∥ · ∥ V ′ 
+
+> (0)
+
+. In order to handle the nonconstant mobility, we also consider the following Neumann problem  
+
+> {
+
+−div( m(q)∇u) = f, in Ω,m(q)∂nu = 0 , on ∂Ω. (2.2) Here, q : Ω → [−1, 1] is a measurable function. Define the solution operator Gq as 
+
+⟨f, v ⟩H1(Ω) = ( m(q)∇G qf, ∇v), ∀ v ∈ V(0) . (2.3) As has been shown in [17, Section 2], for f ∈ V ′
+
+> (0)
+
+, ∥∇G qf ∥ and ∥∇G f ∥ are equivalent norms to the (H1(Ω)) ′-norm. Further properties of the operator Gq can be found in, e.g., [17]. Suppose that 
+
+m ∈ C1([ −1, 1]) and q ∈ H2(Ω) . Then for any f ∈ L2(0) (Ω) , we find Gqf ∈ H2
+
+> n
+
+(Ω) and the following estimate when the spatial dimension is two (see [17, Equation (2.15)]): 
+
+∥G qf ∥H2(Ω) ⩽ C(∥∇ q∥∥ q∥H2(Ω) ∥∇G qf ∥ + ∥f ∥), d = 2 . (2.4) Here, the positive constant C depends only on Ω and the function m.Next, we recall some function spaces for the Navier–Stokes equations. Let C∞
+
+> 0,σ
+
+(Ω) be the space of divergence free vector fields in (C∞ 
+
+> 0
+
+(Ω)) d. We define Hσ and Vσ as the closure of C∞
+
+> 0,σ
+
+(Ω) with respect to the L2 and H1 norms, respectively. The space Vσ is equipped with the scalar product 
+
+(u, v)Vσ := ( ∇u, ∇v) for all u, v ∈ Vσ and the norm ∥u∥Vσ = ∥∇ u∥. We recall the classical Korn’s inequality 
+
+∥∇ u∥ ⩽ √2∥Du∥ ⩽ √2∥∇ u∥, ∀ u ∈ Vσ. (2.5) Besides, Poincaré’s inequality entails that 
+
+∥u∥ ⩽ CP ∥∇ u∥, ∀ u ∈ Vσ, (2.6) where the positive constant CP depends only on Ω. It is well known that L2(Ω) can be decomposed into Hσ ⊕ G(Ω) , where G(Ω) := {f ∈ L2(Ω) : ∃ g ∈ H1(Ω) , f = ∇g}. Then we introduce the Helmholtz–Leray projection in the space of divergence free functions P : L2(Ω) → Hσ. Recall the Stokes operator S : Vσ ∩ H2(Ω) → Hσ such that 
+
+(Su , ζ) = ( ∇u, ∇ζ), ∀ ζ ∈ Vσ,
+
+with the domain D(S) = Vσ ∩ H2(Ω) (see, e.g., [48, Chapter III]). The operator S is a canonical isomorphism from Vσ to V ′ 
+
+> σ
+
+with the inverse S−1 : V ′ 
+
+> σ
+
+→ Vσ. For any f ∈ V ′
+
+> σ
+
+, there is a unique 
+
+u = S−1f ∈ Vσ such that 
+
+(∇(S−1f ), ∇ζ) = ⟨f , ζ⟩Vσ , ∀ ζ ∈ Vσ,
+
+and ∥∇ (S−1f )∥ = ⟨f , S−1f ⟩ 12 
+
+> Vσ
+
+is an equivalent norm on V ′
+
+> σ
+
+. In addition, there exists a positive constant C such that ∥u∥H2(Ω) ⩽ C∥Su ∥ for any u ∈ D (S).Throughout this paper, the symbols C, Ci, i ∈ N, denote generic positive constants that may depend on coefficients of the system, norms of the initial data, Ω and time. Their values may change from line to line, and specific dependencies will be pointed out when necessary. 72.2 Statement of results 
+
+First, we introduce the assumptions used in the subsequent analysis. 
+
+(A0 ) Ω ⊂ Rd, d ∈ { 2, 3}, is a bounded domain with C3-boundary ∂Ω.
+
+(A1 ) The viscosity ν : R2 → R+ belongs to C1(R2) and there exists ν > 0 such that ν(s1, s 2) ⩾ ν, ∀ (s1, s 2) ∈ R2.
+
+(A2 ) The mobility m : R2 → R+ belongs to C1(R2) and there exists m > 0 such that m(s1, s 2) ⩾ m, ∀ (s1, s 2) ∈ R2.
+
+(A3 ) The thermal diffusivity κ : R2 → R+ belongs to C2(R2) and there exists κ > 0 such that κ(s1, s 2) ⩾ κ, ∀ (s1, s 2) ∈ R2.
+
+(A4 ) The singular potential W belongs to the class of functions C([ −1, 1]) ∩ C2(−1, 1) and it can be decomposed into the following form 
+
+W (s) = W1(s) + W2(s).
+
+The singular convex part W1 fulfills 
+
+lim  
+
+> s→± 1
+
+W ′
+
+> 1
+
+(s) = ±∞ , and W ′′  
+
+> 1
+
+(s) ⩾ 0, ∀ s ∈ (−1, 1) .
+
+Besides, we make the extension W1(s) = + ∞ for any s / ∈ [−1, 1] . Concerning the regular (possibly concave) part W2, we assume that there exists cW > 0 such that |W ′′  
+
+> 2
+
+(s)| ⩽ cW , ∀ s ∈ R.
+
+(A5 ) The averaged density ρ is given by (1.8), the relative flux J satisfies (1.10) and the buoyancy force fb takes the form of (1.9). The Cauchy stress tensor σ is defined as in (1.11) with the surface tension coefficient λ determined by (1.12). ρ1, ρ2, λ0, a, b, α, g are given positive constants. 
+
+Remark 2.1. It is straightforward to check that the logarithmic potential (1.14) with continuous extension to the interval [−1, 1] satisfies the structural assumption (A4 ). Moreover, for any function 
+
+W that satisfies (A4 ), we can write 
+
+W (s) = F (s) − cW s2, (2.7) with F (s) = W1(s) + W2(s) + cW s2. Then F ∈ C([ −1, 1]) ∩ C2(−1, 1) satisfies 
+
+lim  
+
+> s→± 1
+
+F ′(s) = ±∞ , and F ′′ (s) ⩾ cW , ∀ s ∈ (−1, 1) .
+
+We also have F (s) = + ∞ for any s / ∈ [−1, 1] . In the subsequent analysis, we shall always use the reformulation (2.7) for any given potential W that satisfies (A4 ).8Remark 2.2. Since both the phase-field variable ϕ and the temperature θ are bounded as in the definition of solutions, in (A1 )–(A3 ), we can alternatively assume that (cf. [40, 54]) 
+
+ν(s1, s 2) > 0, m(s1, s 2) > 0, κ(s1, s 2) > 0, ∀ (s1, s 2) ∈ R2.
+
+We are now in a position to state the main results. 
+
+Theorem 2.1. Let d = 2 , 3. Suppose that the assumptions (A0 )–(A5 ) are satisfied. For any initial data u0 ∈ Hσ, ϕ0 ∈ H1(Ω) , ∥ϕ0∥L∞(Ω) ⩽ 1, |ϕ0| < 1, θ0 ∈ L∞(Ω) and the boundary datum 
+
+θb ∈ H 52 (∂Ω) , problem (1.1) –(1.7) admits a global weak solution (u, ϕ, μ, θ ) on [0 , ∞) such that 
+
+u ∈ L∞(0 , ∞; Hσ) ∩ L2uloc ([0 , ∞); Vσ),ϕ ∈ L∞(0 , ∞; H1(Ω)) ∩ L4uloc ([0 , ∞); H2
+
+> n
+
+(Ω)) ∩ L2uloc ([0 , ∞); W 2,p (Ω)) ∩ H1uloc ([0 , ∞); ( H1(Ω)) ′),ϕ ∈ L∞(Ω × (0 , ∞)) , with |ϕ(x, t )| < 1 a.e. in Ω × (0 , ∞),μ ∈ L2uloc ([0 , ∞); H1(Ω)) , F ′(ϕ) ∈ L2uloc ([0 , ∞); Lp(Ω)) ,θ ∈ L∞(0 , ∞; L∞(Ω)) ∩ L2uloc ([0 , ∞); H1(Ω)) ∩ H1uloc ([0 , ∞); H−1(Ω)) ,
+
+where p ∈ [2 , ∞) if d = 2 , and p = 6 if d = 3 . The solution fulfills the following weak formulations 
+
+−
+
+∫ ∞
+
+> 0
+
+(ρu, ∂ tv) d t −
+
+∫ ∞
+
+> 0
+
+[( ρu ⊗ u, ∇v) + ( u ⊗ J, ∇v)] d t +
+
+∫ ∞
+
+> 0
+
+(2 ν(ϕ, θ )Du, D v) d t
+
+=
+
+∫ ∞
+
+> 0
+
+(λ0aμ ∇ϕ, v) d t −
+
+∫ ∞
+
+> 0
+
+(λ0bθ (∇ϕ ⊗ ∇ ϕ), ∇v) d t +
+
+∫ ∞
+
+> 0
+
+(fb(ϕ, θ ), v) d t, (2.8) 
+
+−
+
+∫ ∞
+
+> 0
+
+(ϕ, ∂ tζ) d t −
+
+∫ ∞
+
+> 0
+
+(ϕu) · ∇ ζ dt +
+
+∫ ∞
+
+> 0
+
+(m(ϕ, θ )∇μ, ∇ζ) d t = 0 , (2.9) 
+
+−
+
+∫ ∞
+
+> 0
+
+(θ, ∂ tξ) d t −
+
+∫ ∞
+
+> 0
+
+(θu) · ∇ ξ dt +
+
+∫ ∞
+
+> 0
+
+(κ(ϕ, θ )∇θ, ∇ξ) d t = 0 , (2.10) 
+
+for all test functions v ∈ C∞ 
+
+> 0
+
+(0 , ∞; C∞
+
+> 0,σ
+
+(Ω)) , ζ ∈ C∞ 
+
+> 0
+
+(0 , ∞; C∞(Ω)) , ξ ∈ C∞ 
+
+> 0
+
+(0 , ∞; C∞ 
+
+> 0
+
+(Ω)) . More-over, it holds 
+
+J = − ρ2 − ρ1
+
+2 m(ϕ, θ )∇μ and μ = −∆ϕ + W ′(ϕ), a.e. in Ω × (0 , ∞). (2.11) 
+
+The initial conditions (1.7) are satisfied almost everywhere in Ω and the boundary condition θ = θb
+
+is satisfied almost everywhere on ∂Ω × (0 , ∞). Furthermore, for almost all t ⩾ 0, the following 
+
+L∞-estimate holds for θ:
+
+min 
+
+{
+
+inf  
+
+> Ω
+
+θ0, min  
+
+> ∂Ω
+
+θb
+
+}
+
+⩽ θ(x, t ) ⩽ max 
+
+{
+
+sup 
+
+> Ω
+
+θ0, max  
+
+> ∂Ω
+
+θb
+
+}
+
+, a.e. in Ω. (2.12) 
+
+Remark 2.3. Indeed, we have 
+
+u ∈ Cw([0 , ∞); Hσ), ϕ ∈ Cw([0 , ∞); H1(Ω)) , θ ∈ C([0 , ∞); L2(Ω)) 
+
+so that the initial data can be attained. 
+
+Remark 2.4. In the weak formulation (2.8), the vectorial term div( λ(θ)( 12 |∇ ϕ|2 + W (ϕ)) Id) is absorbed into the pressure, and thus vanishes after being tested by the divergence free function v.Furthermore, we rewrite the term ∫ 
+
+> Ω
+
+λ(θ)( ∇ϕ ⊗ ∇ ϕ) : ∇v dx using the definition (1.12) and the fact div v = 0 such that 
+
+∫
+
+> Ω
+
+λ(θ)( ∇ϕ ⊗ ∇ ϕ) : ∇v dx = λ0a(∇ϕ ⊗ ∇ ϕ, ∇v) − λ0b(θ∇ϕ ⊗ ∇ ϕ, ∇v)
+
+9= −λ0a
+
+> (
+
+∇ϕ∆ϕ + ∇ |∇ ϕ|2
+
+2 , v
+
+> )
+
+− λ0b(θ∇ϕ ⊗ ∇ ϕ, ∇v)= λ0a(−∆ϕ∇ϕ + W ′(ϕ)∇ϕ, v) − λ0b(θ∇ϕ ⊗ ∇ ϕ, ∇v)= λ0a(μ∇ϕ, v) − λ0b(θ∇ϕ ⊗ ∇ ϕ, ∇v).
+
+On the right-hand side of the above equality, the first term corresponds to the usual Korteweg force (see, e.g., [9]), and the second term arises due to the thermo-induced Marangoni effect (see, e.g., [30, 50]). 
+
+Remark 2.5. We note that the regularity assumption on the boundary data θb can be relaxed. Here, we assume θb ∈ H 52 (∂Ω) for the purpose of the estimate in (3.46), and this condition can be weakened to θb ∈ H 32 (∂Ω) by a standard density argument. This is possible because the C3-regularity of the boundary ∂Ω ensures that any θb ∈ H 32 (∂Ω) is the limit of a sequence {θk
+
+> b
+
+} ⊂ 
+
+H 52 (∂Ω) (see, e.g., [31]). By solving the extension problem (3.8) for each approximation θk 
+
+> b
+
+and then passing to the limit, all subsequent arguments follow with straightforward adaptations. Next, in the two-dimensional case, we establish the uniqueness of global weak solutions under the assumptions that the fluid mixture has matched densities, the thermal diffusivity depends only on the temperature, the mobility depends only on the concentration, and the initial temperature is more regular. 
+
+Theorem 2.2. Let d = 2 . Suppose that the assumptions (A0 )–(A5 ) are satisfied. For any initial data u0 ∈ Hσ, ϕ0 ∈ H1(Ω) , ∥ϕ0∥L∞(Ω) ⩽ 1, |ϕ0| < 1, θ0 ∈ Cγ (Ω) ∩ H1(Ω) with γ ∈ (0 , 1) and 
+
+θ0|∂Ω = θb ∈ H 32 (∂Ω) , problem (1.1) –(1.7) admits a global weak solution (u, ϕ, μ, θ ) on [0 , ∞)
+
+satisfying the additional regularity properties (cf. Theorem 2.1): 
+
+θ ∈ L∞(0 , ∞; H1(Ω) ∩ Cβ (Ω)) ∩ L2uloc ([0 , ∞); H2(Ω)) ∩ H1uloc ([0 , ∞); L2(Ω)) ,
+
+for some β ∈ (0 , γ ]. Assume, in addition, 
+
+ρ1 = ρ2, m(ϕ, θ ) ≡ m(ϕ), κ(ϕ, θ ) ≡ κ(θ).
+
+Then the global weak solution is unique. 
+
+Remark 2.6. In the general case of unmatched densities, the uniqueness of weak solutions in two dimensions remains an open question even without the coupling of thermal effects (see [4, 24] for the AGG model). 
+
+Remark 2.7. In the case where mobility and thermal diffusivity depend on both ϕ and θ, we need the following additional regularity property to ensure uniqueness: 
+
+θ1 ∈ L4uloc ([0 , ∞); H2(Ω)) ,
+
+where (u1, ϕ 1, μ 1, θ 1), (u2, ϕ 2, μ 2, θ 2) are global weak solutions obtained in Theorem 2.2. However, it is not known whether θ1 can satisfy this condition. 
+
+# 3 Existence of Global Weak Solutions 
+
+In this section, we prove Theorem 2.1 on the existence of global weak solutions to problem (1.1)– (1.7). The proof is based on a partially implicit time-discretization scheme in the spirit of [2, 53], with suitable modifications according to new structures of the coupled system. Without loss of generality, we present the argument for the three-dimensional case while pointing out necessary changes in two dimensions. 10 3.1 Preliminaries 
+
+To begin with, let us recall some properties of subgradients related to the Ginzburg–Landau free energy (see [1, 8]). Concerning the convex part of the free energy (cf. Remark 2.1) 
+
+E(ϕ) =  
+
+> ∫
+> Ω
+> (
+
+12 |∇ ϕ|2 + F (ϕ)
+
+> )
+
+dx, (3.1) we define 
+
+> ˜
+
+E(ϕ) = 
+
+> {
+
+E(ϕ), for ϕ ∈ D ( ˜E),
+
++∞, else , (3.2) with the effective domain 
+
+D( ˜E) := 
+
+> {
+
+ϕ ∈ H1(Ω) : −1 ⩽ ϕ ⩽ 1 a.e. in Ω
+
+> }
+
+.
+
+Then we define the subgradient 
+
+∂ ˜E(ϕ) = −∆ϕ + F ′(ϕ),
+
+with the domain 
+
+D(∂ ˜E) = 
+
+> {
+
+ϕ ∈ H2
+
+> n
+
+(Ω) : F ′(ϕ) ∈ L2(Ω) , F ′′ (ϕ)|∇ ϕ|2 ∈ L1(Ω) 
+
+> }
+
+.
+
+Similarly, for any given M ∈ (−1, 1) , we define 
+
+> ˜
+
+EM (ϕ) = 
+
+> {
+
+E(ϕ), for ϕ ∈ D ( ˜EM ),
+
++∞, else , (3.3) with the effective domain 
+
+D( ˜EM ) := 
+
+> {
+
+ϕ ∈ H1(Ω) ∩ L2(M )(Ω) : −1 ⩽ ϕ ⩽ 1 a.e. in Ω
+
+> }
+
+,
+
+as well as the subgradient 
+
+∂ ˜EM (ϕ) = −∆ϕ + P0(F ′(ϕ)) ,
+
+with the domain 
+
+D(∂ ˜EM ) = 
+
+> {
+
+ϕ ∈ H2
+
+> n
+
+(Ω) ∩ L2(M )(Ω) : F ′(ϕ) ∈ L2(Ω) , F ′′ (ϕ)|∇ ϕ|2 ∈ L1(Ω) 
+
+> }
+
+.
+
+According to [1, Theorem 5], the following estimates hold 
+
+∥ϕ∥2 
+
+> H2(Ω)
+
++ ∥F ′(ϕ)∥2 +
+
+> ∫
+> Ω
+
+F ′′ (ϕ)|∇ ϕ|2 dx ⩽ C
+
+> (
+
+∥∂ ˜E(ϕ)∥2 + ∥ϕ∥2 + 1 
+
+> )
+
+, (3.4) for all ϕ ∈ D (∂ ˜E), and 
+
+∥ϕ∥2 
+
+> H2(Ω)
+
++ ∥F ′(ϕ)∥2 +
+
+> ∫
+> Ω
+
+F ′′ (ϕ)|∇ ϕ|2 dx ⩽ C
+
+> (
+
+∥∂ ˜EM (ϕ)∥2 + ∥ϕ∥2 + 1 
+
+> )
+
+, (3.5) for all ϕ ∈ D (∂ ˜EM ). The positive constant C in (3.4) (resp. (3.5)) is independent of ϕ ∈ D (∂ ˜E)
+
+(resp. ϕ ∈ D (∂ ˜EM )). Next, we recall some results for the following Neumann problem with singular nonlinearity, which will be useful in the subsequent analysis (see [1, 18, 26, 43]):  
+
+> {
+
+−∆ϕ + F ′(ϕ) = f, in Ω,∂nϕ = 0 , on ∂Ω. (3.6) 11 Lemma 3.1. Let Ω be a bounded C2-domain in Rd, d = 2 , 3. Assume that F is determined by 
+
+(2.7) with the corresponding assumptions. 
+
+(1) For any f ∈ L2(Ω) , problem (3.6) admits a unique strong solution ϕ ∈ H2
+
+> n
+
+(Ω) with F ′(ϕ) ∈
+
+L2(Ω) , satisfying the equation −∆ϕ + F ′(ϕ) = f almost everywhere in Ω. In particular, 
+
+∥ϕ∥L∞(Ω) ⩽ 1.
+
+(2) Assume, in addition, f ∈ Lp(Ω) with p ∈ [2 , ∞) if d = 2 and p ∈ [2 , 6] if d = 3 , then we have 
+
+∥ϕ∥W 2,p (Ω) + ∥F ′(ϕ)∥Lp(Ω) ⩽ C(p)(1 + ∥f ∥Lp(Ω) ), (3.7) 
+
+where the positive constant C(p) depends on Ω and p.
+
+3.2 The partially implicit time-discretization scheme 
+
+Let us now present the partially implicit time-discretization scheme for problem (1.1)–(1.7). In order to handle the nonhomogeneous Dirichlet boundary condition for θ, we choose Θb as the harmonic extension of the boundary datum θb, that is, 
+
+{ −∆Θ b = 0 , in Ω,
+
+Θb = θb, on ∂Ω. (3.8) Since θb ∈ H 52 (∂Ω) , we find 
+
+Θb ∈ H3(Ω) and ∥Θb∥H3(Ω) ⩽ C∥θb∥H 52 (∂Ω) ,
+
+for some constant C > 0 depending only on Ω. Introducing the new variable 
+
+ϑ = θ − Θb,
+
+we can reformulate the heat equation (1.5) as follows (cf. [40]): 
+
+∂tϑ + u · ∇ ϑ − div ( κ(ϕ, ϑ + Θ b)∇ϑ) = −u · ∇ Θb + div ( κ(ϕ, ϑ + Θ b)∇Θb). (3.9) Moreover, ϑ satisfies the following homogeneous Dirichlet boundary condition and the initial con-dition 
+
+ϑ = 0 on ∂Ω × (0 , T ), ϑ|t=0 = ϑ0 := θ0 − Θb in Ω. (3.10) Due to the Sobolev embedding theorem H2(Ω) ↪→ L∞(Ω) for d = 2 , 3, we have ϑ0 ∈ L∞(Ω) since 
+
+θ0 ∈ L∞(Ω) and Θb ∈ H2(Ω) .For any given positive integer N , we take the time step as h = 1 
+
+> N
+
+. Next, for every k ∈ N,let uk ∈ Hσ, ϕk ∈ H2
+
+> n
+
+(Ω) with ϕk ∈ [−1, 1] almost everywhere in Ω, ϕk ∈ (−1, 1) , and ϑk ∈
+
+H2(Ω) ∩ H10 (Ω) . Define ρk = ρ(ϕk) by (1.8). Then, we look for a quadruple 
+
+(u, ϕ, μ, ϑ ) = (uk+1 , ϕ k+1 , μ k+1 , ϑ k+1 ) ∈ Vσ × D (∂ ˜E) × H2
+
+> n
+
+(Ω) × (H2(Ω) ∩ H10 (Ω)) 
+
+as a solution of the following time-discrete system at the time step k + 1 :
+
+( ρu − ρkuk
+
+h , v
+
+)
+
++ (div( ρku ⊗ u), v) + (div( u ⊗ J), v)
+
+12 + (2ν(ϕk, ϑ k + Θ b)Du, D v) − λ0a(μ∇ϕk, v)= −λ0b((ϑk + Θ b)( ∇ϕ ⊗ ∇ ϕ), ∇v) + (fb(ϕk, ϑ k + Θ b), v), ∀ v ∈ Vσ, (3.11) 
+
+J = − ρ2 − ρ1
+
+2 m(ϕk, ϑ k + Θ b)∇μ, a.e. in Ω, (3.12) 
+
+ϕ − ϕk
+
+h + u · ∇ ϕk = div( m(ϕk, ϑ k + Θ b)∇μ), a.e. in Ω, (3.13) 
+
+μ + cW (ϕ + ϕk) = −∆ϕ + F ′(ϕ), a.e. in Ω, (3.14) 
+
+ϑ − ϑk
+
+h + u · ∇ ϑ − div( κ(ϕk, ϑ k + Θ b)∇ϑ)= −u · ∇ Θb + div( κ(ϕk, ϑ k + Θ b)∇Θb), a.e. in Ω. (3.15) 
+
+Remark 3.1. In the subsequent analysis, we shall use the notation θ, θ k such that 
+
+θ = ϑ + Θ b and θk = ϑk + Θ b. (3.16) For the initial time step k = 0 , the given data is determined by 
+
+(u0, ϕ 0, ϑ 0) = ( u0, ϕ N 
+
+> 0
+
+, ϑ N 
+
+> 0
+
+),
+
+where ϕN 
+
+> 0
+
+∈ H2
+
+> n
+
+(Ω) is a suitable regularization of the initial datum ϕ0 ∈ D ( ˜E) satisfying ϕN 
+
+> 0
+
+∈
+
+[−1, 1] almost everywhere in Ω and ϕN 
+
+> 0
+
+= ϕ0, while ϑN 
+
+> 0
+
+∈ H2(Ω) ∩H10 (Ω) is a suitable regularization of the initial datum ϑ0 ∈ L∞(Ω) with an L∞-bound independent of N . Detailed construction is presented in Section 3.3. 
+
+Remark 3.2. Both explicit and implicit formulations are adopted in the discrete approximation (3.11)–(3.15). Our aim is two-fold: (1) at each time step, the resulting discrete problem can be solved by a Leray–Schauder fixed point argument, (2) the discrete solution satisfies a sufficiently simple energy inequality that can yield uniform-in-time estimates (see (3.29) below). To this end, all variable-dependent “coefficients” are treated explicitly to reduce the order of nonlinearity for unknown variables. Moreover, we use the implicit form u · ∇ θ in (3.15), which enables us to maintain an L∞-estimate for θ as well as its shifted variant ϑ (see Lemma 3.2). Since we work directly with the singular potential F , which guarantees the bound ∥ϕk∥L∞(Ω) ⩽ 1 for all k in induction, instead of (3.14) (like in [2]) we can also use the well-known convex-splitting formulation such that μ + 2 cW ϕk = −∆ϕ + F ′(ϕ).Applying the Stampacchia truncation method for equation (3.15), we obtain the following result: 
+
+Lemma 3.2. Suppose that ϕk, θ k ∈ L∞(Ω) . If (u, ϑ ) ∈ Vσ × H10 (Ω) is a weak solution to (3.15) ,then we have θ, ϑ ∈ L∞(Ω) and the following estimate holds 
+
+min 
+
+> {
+
+inf  
+
+> Ω
+
+θk, min  
+
+> ∂Ω
+
+θb
+
+> }
+
+⩽ θ(x) ⩽ max 
+
+> {
+
+sup 
+
+> Ω
+
+θk, max  
+
+> ∂Ω
+
+θb
+
+> }
+
+, a.e. in Ω. (3.17) 
+
+Proof. The proof follows an argument similar to that for [39, Lemma 3.1]. We sketch it for the sake of completeness. The weak solution ϑ satisfies  
+
+> (
+
+ϑ − ϑk
+
+h , ξ 
+
+> )
+
++ ( u · ∇ ϑ, ξ ) + 
+
+> (
+
+κ(ϕk, ϑ k + Θ b)∇ϑ, ∇ξ
+
+> )
+
+= −(u · ∇ Θb, ξ ) −
+
+> (
+
+κ(ϕk, ϑ k + Θ b)∇Θb, ∇ξ
+
+> )
+
+, ∀ ξ ∈ H10 (Ω) . (3.18) 13 Set Ku = max 
+
+> {
+
+sup Ω θk, max ∂Ω θb
+
+> }
+
+. Since θ ∈ H1(Ω) , we see that θ+ := max {θ − Ku, 0} satisfies 
+
+θ+ ∈ H10 (Ω) . Next, testing (3.18) by ξ = θ+, using (3.16) and integration by parts, we obtain 
+
+1
+
+h
+
+> ∫
+> Ω
+
+(θ − Ku)θ+ dx − 1
+
+h
+
+> ∫
+> Ω
+
+(θk − Ku)θ+ dx +
+
+> ∫
+> Ω
+
+(u · ∇ (θ − Ku)) θ+ dx
+
++
+
+> ∫
+> Ω
+
+κ(ϕk, θ k)∇(θ − Ku) · ∇ θ+ dx = 0 ,
+
+which implies 
+
+1
+
+h
+
+> ∫
+> Ω
+
+(θ+)2 dx +
+
+> ∫
+> Ω
+
+κ(ϕk, θ k)|∇ θ+|2 dx = 1
+
+h
+
+> ∫
+> Ω
+
+(θk − Ku)θ+ dx ⩽ 0.
+
+Here, we have used the facts that θk − Ku ⩽ 0 almost everywhere in Ω and u is divergence free. This yields |θ+|2 = 0 almost everywhere in Ω. Since θ+ ∈ H10 (Ω) , we can conclude that θ+ = 0 
+
+almost everywhere in Ω, i.e., the right-hand side of (3.17) holds. The left-hand side of (3.17) can be proven in a similar way. This yields θ ∈ L∞(Ω) . By the definition of ϑ, we also get ϑ ∈ L∞(Ω) .Next, we show that the discrete solution ϕ satisfies the property of mass conservation. 
+
+Lemma 3.3. Assume that (u, ϕ, μ ) ∈ Vσ × D (∂ ˜E) × H2
+
+> n
+
+(Ω) satisfies the equation (3.13) with a given function ϕk ∈ H1(Ω) , then it holds 
+
+ϕ = ϕk. (3.19) 
+
+Proof. Taking the spatial average on both sides of the equation (3.13) along with the divergence theorem, we obtain the conclusion. 
+
+Remark 3.3. The properties (3.17), (3.19) hold for all k ∈ N, as long as the discrete solutions exist. By induction, we easily get 
+
+min 
+
+> {
+
+inf  
+
+> Ω
+
+θ0, min  
+
+> ∂Ω
+
+θb
+
+> }
+
+⩽ θk(x) ⩽ max 
+
+> {
+
+sup 
+
+> Ω
+
+θ0, max  
+
+> ∂Ω
+
+θb
+
+> }
+
+, a.e. in Ω, (3.20) 
+
+ϕk = ϕ0, (3.21) for any positive integer k. For convenience, we set 
+
+Θ∗ = max 
+
+> {∣ ∣∣∣
+
+min 
+
+> {
+
+inf  
+
+> Ω
+
+θ0, min  
+
+> ∂Ω
+
+θb 
+
+> }∣∣∣∣
+
+,
+
+> ∣∣∣∣
+
+max 
+
+> {
+
+sup 
+
+> Ω
+
+θ0, max  
+
+> ∂Ω
+
+θb
+
+> }∣∣∣∣}
+
+. (3.22) The following lemma gives a refinement of Lemma 3.1 under the specific choice f = μ + cW (ϕ +
+
+ϕk) as in the discrete approximation (3.14). 
+
+Lemma 3.4. Assume that (ϕ, μ ) ∈ D (∂ ˜E) × H1(Ω) satisfies the equation (3.14) with ϕk ∈ H1(Ω) ,
+
+ϕk ∈ [−1, 1] almost everywhere, and ϕ = ϕk ∈ (−1, 1) . Then we have 
+
+∥∂ ˜E(ϕ)∥ ⩽ C(∥μ∥ + 1) , (3.23) 
+
+|μ| ⩽ C(∥∇ μ∥ + 1) , (3.24) 
+
+∥ϕ∥W 2,p (Ω) + ∥F ′(ϕ)∥Lp(Ω) ⩽ C(∥∇ μ∥ + 1) , (3.25) 
+
+∥ϕ∥2 
+
+> H2(Ω)
+
+⩽ C∥∇ μ∥∥∇ ϕ∥ + C, (3.26) 
+
+where C is a positive constant that may depend on Ω and ϕ, p ∈ [2 , ∞) if d = 2 and p ∈ [2 , 6] if 
+
+d = 3 .
+
+14 Proof. By definition, from ϕ ∈ D (∂ ˜E) we infer that ϕ ∈ [−1, 1] almost everywhere in Ω. This, combined with the assumption ϕk ∈ [−1, 1] almost everywhere in Ω easily yields (3.23). Next, from 
+
+(A4 ) and the assumption ϕ ∈ (−1, 1) , we can obtain the estimate (3.24) using the same argument as that for [18, Theorem 3.6]. To obtain (3.25), we apply (3.7) with f = μ + cW (ϕ + ϕk) together with the Poincaré–Wirtinger inequality and (3.24) such that 
+
+∥ϕ∥W 2,p (Ω) + ∥F ′(ϕ)∥Lp(Ω) ⩽ C(1 + ∥μ∥Lp(Ω) + ∥ϕ∥Lp(Ω) + ∥ϕk∥Lp(Ω) )
+
+⩽ C(1 + ∥μ − μ∥Lp(Ω) + |μ|) ⩽ C(∥∇ μ∥ + 1) .
+
+Concerning the last conclusion (3.26), we introduce the globally Lipschitz function hj : R → R as in [18, Appendix A]: for every integer j ⩾ 2,
+
+hj (s) = 
+
+
+
+−1 + 1 
+
+> j
+
+, if s < −1 + 1 
+
+> j
+
+,s, if s ∈ [−1 + 1 
+
+> j
+
+, 1 − 1 
+
+> j
+
+],
+
+1 − 1 
+
+> j
+
+, if s > 1 − 1 
+
+> j
+
+.
+
+Define ϕj = hj ◦ ϕ. Since ϕ ∈ H1(Ω) , then ϕj ∈ H1(Ω) and ∇ϕj = ∇ϕ · χ[−1+ 1   
+
+> j,1−1
+> j]
+
+(ϕ). Testing equation (3.14) by −∆ϕ, we have 
+
+∥∆ϕ∥2 + ( F ′(ϕj ), −∆ϕ) = −(μ, ∆ϕ) − cW (ϕ + ϕk, ∆ϕ) + ( F ′(ϕ) − F ′(ϕj ), ∆ϕ). (3.27) As in the proof of [18, Lemma A.1], we infer from the convexity of F that 
+
+(F ′(ϕj ), −∆ϕ) = ( F ′′ (ϕj )∇ϕ · χ[−1+ 1   
+
+> j,1−1
+> j]
+
+(ϕ), ∇ϕ) ⩾ 0.
+
+Besides, it holds 
+
+(F ′(ϕ) − F ′(ϕj ), ∆ϕ) → 0 as j → ∞ .
+
+Using integration by parts, Hölder’s inequality and the Cauchy–Schwarz inequality, we observe that 
+
+− (μ, ∆ϕ) = ( ∇μ, ∇ϕ) ⩽ ∥∇ μ∥∥∇ ϕ∥,
+
+− cW (ϕ + ϕk, ∆ϕ) ⩽ 12 ∥∆ϕ∥2 + c2 
+
+> W
+
+(∥ϕ∥2 + ∥ϕk∥2).
+
+Inserting the above estimates into (3.27) and passing to the limit as j → ∞ , we can conclude 
+
+∥∆ϕ∥2 ⩽ 2∥∇ μ∥∥∇ ϕ∥ + C, (3.28) where the positive constant C depends only on Ω and cW . This, combined with the elliptic theory for the Neumann problem, yields 
+
+∥ϕ∥2 
+
+> H2(Ω)
+
+⩽ C(∥∆ϕ∥ + ∥ϕ∥)2 ⩽ C∥∇ μ∥∥∇ ϕ∥ + C. 
+
+The proof is complete. Let N be an arbitrarily given positive integer. We establish the existence of a solution to the discrete problem (3.11)–(3.15). 
+
+Proposition 3.1. For any k ∈ N, assume that the data at the time step k satisfy uk ∈ Hσ,
+
+ϕk ∈ H2
+
+> n
+
+(Ω) with ϕk ∈ [−1, 1] almost everywhere in Ω, ϕk ∈ (−1, 1) , and ϑk ∈ H2(Ω) ∩ H10 (Ω) .
+
+15 (1) The discrete problem (3.11) –(3.15) admits a solution 
+
+(u, ϕ, μ, ϑ ) ∈ Vσ × D (∂ ˜E) × H2
+
+> n
+
+(Ω) × (H2(Ω) ∩ H10 (Ω)) 
+
+at the time step k + 1 . Moreover, θ = ϑ + Θ b satisfies (3.17) .
+
+(2) The solution (u, ϕ, μ, ϑ ) satisfies the following discrete energy inequality: 
+
+(1 + C1h)Etot (u, ϕ, ϑ ) + h
+
+4
+
+(
+
+ν∥∇ u∥2 + λ0am ∥∇ μ∥2 + κ∥∇ ϑ∥2)
+
+⩽ Etot (uk, ϕ k, ϑ k) + C2h, (3.29) 
+
+where the modified total energy Etot is given by 
+
+Etot (u, ϕ, ϑ ) = 
+
+∫
+
+> Ω
+
+12 ρ|u|2 dx + λ0a
+
+( 12 ∥∇ ϕ∥2 +
+
+∫
+
+> Ω
+
+W (ϕ) d x
+
+)
+
++ 12 ∥ϑ∥2. (3.30) 
+
+The positive constants C1, C2 in (3.29) depend on Ω, coefficients of the system, ∥θb∥H 32 (∂Ω) ,
+
+∥θ0∥L∞(Ω) , but they are independent of h and k.Proof. Part A. Discrete energy inequality. We first verify that if (u, ϕ, μ, ϑ ) ∈ Vσ × D (∂ ˜E) ×
+
+H2
+
+> n
+
+(Ω) × (H2(Ω) ∩ H10 (Ω)) is a solution to problem (3.11)–(3.15) at the time step k + 1 subject to the given data (uk, ϕ k, μ k, ϑ k), then it satisfies the discrete energy inequality (3.29). The key feature of (3.29) is that this energy inequality is based on the maximum principle, namely, uniform 
+
+L∞-estimates (with respect to k, h) for ϕ, ϕk, θ, θk play a crucial role in the derivation. Taking v = u in (3.11), using the following identities (see [2]) 
+
+∫
+
+> Ω
+
+(
+
+(div J) u
+
+2 + ( J · ∇ )u
+
+)
+
+· u dx = 0 ,
+
+∫
+
+> Ω
+
+(
+
+div( ρku ⊗ u) − (∇ρk · u) u
+
+2
+
+)
+
+· u dx = 0 ,
+
+(ρu − ρkuk) · u =
+
+(
+
+ρ |u|2
+
+2 − ρk |uk|2
+
+2
+
+)
+
++ ( ρ − ρk) |u|2
+
+2 + ρk |u − uk|2
+
+2 ,
+
+we obtain 
+
+∫
+
+> Ω
+
+( ρ|u|2
+
+2h − ρk|uk|2
+
+2h + ρk|u − uk|2
+
+2h
+
+)
+
+dx +
+
+∫
+
+> Ω
+
+2ν(ϕk, θ k)|Du|2 dx
+
+= λ0a(μ∇ϕk, u) − λ0b(θk(∇ϕ ⊗ ∇ ϕ), ∇u) + (fb(ϕk, θ k), u). (3.31) Testing (3.13) by λ0aμ and (3.14) by λ0ah (ϕ−ϕk), adding the resultants together, by some straight-forward calculations, we get 
+
+λ0a
+
+∫
+
+> Ω
+
+( |∇ ϕ|2
+
+2h − |∇ ϕk|2
+
+2h + |∇ (ϕ − ϕk)|2
+
+2h
+
+)
+
+dx + λ0a
+
+∫
+
+> Ω
+
+m(ϕk, θ k)|∇ μ|2 dx
+
++ λ0ah
+
+∫
+
+> Ω
+
+F ′(ϕ)( ϕ − ϕk) d x − λ0ac W
+
+h
+
+∫
+
+> Ω
+
+(|ϕ|2 − | ϕk|2) d x
+
+= −λ0a(u · ∇ ϕk, μ ). (3.32) 16 Finally, taking ξ = ϑ in (3.15) yields 
+
+∫
+
+> Ω
+
+( |ϑ|2
+
+2h − |ϑk|2
+
+2h + |ϑ − ϑk|2
+
+2h
+
+)
+
+dx +
+
+∫
+
+> Ω
+
+κ(ϕk, θ k)|∇ ϑ|2 dx
+
+= −(u · ∇ Θb, ϑ ) − (κ(ϕk, θ k)∇Θb, ∇ϑ). (3.33) We observe that the first term on the right-hand side of (3.31) cancels with the first term on the right-hand side of (3.32). In what follows, we estimate the other terms in (3.31)–(3.33). Let us first treat the right-hand side of (3.31). Using the fact ϕ = ϕk ∈ (−1, 1) , the L∞-estimates (3.20), ∥ϕk∥L∞(Ω) ⩽ 1, ∥ϕ∥L∞(Ω) ⩽ 1, and the estimate (3.26) for ∥ϕ∥H2(Ω) , we find 
+
+−λ0b(θk(∇ϕ ⊗ ∇ ϕ), ∇u) ⩽ |b|| λ0|∥ θk∥L∞(Ω) ∥∇ ϕ∥2
+
+> L4(Ω)
+
+∥∇ u∥
+
+⩽ ν
+
+6 ∥∇ u∥2 + C∥ϕ∥2
+
+> H2(Ω)
+
+∥ϕ∥2
+
+> L∞(Ω)
+
+⩽ ν
+
+6 ∥∇ u∥2 + C(∥∇ μ∥∥∇ ϕ∥ + 1) 
+
+⩽ ν
+
+6 ∥∇ u∥2 + λ0am 
+
+4 ∥∇ μ∥2 + C3∥∇ ϕ∥2 + C. (3.34) Here, we have also used Young’s inequality and the following Gagliardo–Nirenberg inequality (valid for d = 2 , 3)
+
+∥∇ ϕ∥L4(Ω) ⩽ C∥ϕ∥ 12
+
+> H2(Ω)
+
+∥ϕ∥ 12
+
+> L∞(Ω)
+
+, ∀ ϕ ∈ H2(Ω) , (3.35) In order to absorb the term C3∥∇ ϕ∥2 on the right-hand side of (3.34), we test (3.14) by 2C3(ϕ − ϕ),after integration by parts, we get 
+
+2C3∥∇ ϕ∥2 + 2 C3(F ′(ϕ), ϕ − ϕ) = 2 C3(μ, ϕ − ϕ) + 2 C3cW (ϕ + ϕk, ϕ − ϕ). (3.36) By Taylor’s expansion, it follows from the convexity of F and (3.21) that 
+
+(F ′(ϕ), ϕ − ϕ) ⩾
+
+∫
+
+> Ω
+
+F (ϕ) d x −
+
+∫
+
+> Ω
+
+F (ϕ) d x ⩾
+
+∫
+
+> Ω
+
+F (ϕ) d x − C. 
+
+On the other hand, it follows from the Poincaré–Wirtinger inequality and ∥ϕ∥L∞(Ω) ⩽ 1 that 
+
+2C3(μ, ϕ − ϕ) = 2 C3(μ − μ, ϕ ) ⩽ C∥∇ μ∥∥ ϕ∥ ⩽ λ0am 
+
+4 ∥∇ μ∥2 + C, 
+
+and 
+
+2C3cW (ϕ + ϕk, ϕ − ϕ) ⩽ C(∥ϕ∥ + ∥ϕk∥)∥ϕ∥ ⩽ C. 
+
+Inserting the above estimates into (3.36), we obtain 
+
+2C3∥∇ ϕ∥2 + 2 C3
+
+∫
+
+> Ω
+
+F (ϕ) d x ⩽ λ0am 
+
+4 ∥∇ μ∥2 + C. (3.37) Next, using (A5 ), Poincaré’s inequality (2.6) and Young’s inequality, we see that the last term on the right-hand side of (3.31) can be estimated as follows 
+
+(fb(ϕk, θ k), u) ⩽ C∥u∥ ⩽ ν
+
+6 ∥∇ u∥2 + C. (3.38) 17 Concerning (3.32), we apply once again the convexity of F to get 
+
+∫
+
+> Ω
+
+F ′(ϕ)( ϕ − ϕk) d x ⩾
+
+∫
+
+> Ω
+
+F (ϕ) d x −
+
+∫
+
+> Ω
+
+F (ϕk) d x. (3.39) Finally, let us consider (3.33). By the definition of Θb, the L∞-estimate for θ, ∥ϕk∥L∞(Ω) ⩽ 1,Hölder’s inequality, Poincaré’s inequality and Young’s inequality, we can control the two terms on the right-hand side as follows 
+
+−(u · ∇ Θb, ϑ ) ⩽ ∥u∥L6(Ω) ∥∇ Θb∥L3(Ω) ∥θ − Θb∥
+
+⩽ C∥∇ u∥∥ Θb∥H2(Ω) (∥θ∥ + ∥Θb∥)
+
+⩽ ν
+
+6 ∥∇ u∥2 + C, (3.40) and 
+
+−(κ(ϕk, θ k)∇Θb, ∇ϑ) ⩽ ∥κ(ϕk, θ k)∥L∞(Ω) ∥∇ Θb∥∥∇ ϑ∥
+
+⩽ κ
+
+2 ∥∇ ϑ∥2 + C. (3.41) Adding (3.31), (3.32), (3.33) and (3.37) together, using the estimates (3.34), (3.38), (3.39), (3.40) and (3.41), we can deduce from the assumptions (A1 )–(A3 ) and Korn’s inequality (2.5) that 
+
+Etot (u, ϕ, ϑ ) + h
+
+( ν
+
+2 ∥∇ u∥2 + λ0am 
+
+2 ∥∇ μ∥2 + κ
+
+2 ∥∇ ϑ∥2
+
+)
+
++ Ch 
+
+( 12 ∥∇ ϕ∥2 +
+
+∫
+
+> Ω
+
+F (ϕ) d x
+
+)
+
+⩽ Etot (uk, ϕ k, ϑ k) + Ch, (3.42) where the positive constant C depends on Ω, coefficients of the system, ∥θb∥H 32 (∂Ω) , ∥θ0∥L∞(Ω) ,but not on h and k. The assumption (A4 ) together with the estimate ∥ϕ∥L∞(Ω) ⩽ 1 implies that the energy functional ∫ 
+
+> Ω
+
+W (ϕ) d x is bounded from below by a constant that depends only on Ω
+
+and cW . As a consequence, we can conclude the discrete energy inequality (3.29) from (3.42) and Poincaré’s inequality for u, ϑ.
+
+Part B. Solvability of the discrete problem (3.11) –(3.15) . In what follows, we prove the existence of a solution (u, ϕ, μ, ϑ ) to problem (3.11)–(3.15). For convenience, we will use the notation w = ( u, ϕ, μ, ϑ ) in the subsequent analysis. Using the identities 
+
+div( u ⊗ J) = (div J)u + ( J · ∇ )u, div J = − ρ − ρk
+
+h − u · ∇ ρk,
+
+div [θk(∇ϕ ⊗ ∇ ϕ)] = ( ∇ϕ ⊗ ∇ ϕ)∇θk + θk
+
+[
+
+−(μ + cW (ϕ + ϕk))∇ϕ + ∇
+
+( |∇ ϕ|2
+
+2 + F (ϕ)
+
+)] 
+
+,
+
+we rewrite equation (3.11) as 
+
+( ρu − ρkuk
+
+h , v
+
+)
+
++ (div( ρku ⊗ u), v) +
+
+((
+
+div J − ρ − ρk
+
+h − u · ∇ ρk) u
+
+2 , v
+
+)
+
++ (( J · ∇ )u, v) + (2ν(ϕk, θ k)Du, D v) − λ0a(μ∇ϕk, v)
+
+= λ0b((∇ϕ ⊗ ∇ ϕ)∇(ϑk + Θ b), v) − λ0b((ϑk + Θ b)[μ + cW (ϕ + ϕk)]∇ϕ, v)
+
+18 − λ0b
+
+2
+
+(∇(ϑk + Θ b)( |∇ ϕ|2 + 2 F (ϕ)) , v) + (fb(ϕk, ϑ k + Θ b), v), ∀ v ∈ Vσ. (3.43) Define 
+
+X = Vσ × D (∂ ˜E) × H2
+
+> n
+
+(Ω) × (H10 (Ω) ∩ H2(Ω)) ,Y = V ′ 
+
+> σ
+
+× L2(Ω) × L2(Ω) × L2(Ω) .
+
+We note that X is not a Banach space due to nonlinear constraints. In view of (3.13)–(3.15) and (3.43), we consider two operators Lk, Fk : X → Y given by 
+
+Lk(w) = 
+
+
+
+L(1)  
+
+> k
+
+(u)
+
+−div( m(ϕk, θ k)∇μ) + 
+
+∫
+
+> Ω
+
+μ dx∂ ˜E(ϕ)
+
+−div( κ(ϕk, θ k)∇ϑ)
+
+
+
+,
+
+and 
+
+Fk(w) = 
+
+[
+
+− ρu − ρkuk
+
+h − div( ρku ⊗ u) −
+
+(
+
+div J − ρ − ρk
+
+h − u · ∇ ρ
+
+) u
+
+2
+
+−(J · ∇ )u + λ0aμ ∇ϕk − λ0bθ k[μ + cW (ϕ + ϕk)]∇ϕ
+
++λ0b(∇ϕ ⊗ ∇ ϕ)∇θk − λ0b
+
+2 ∇θk(|∇ ϕ|2 + 2 F (ϕ)) + fb(ϕk, θ k)
+
+]
+
+− ϕ − ϕk
+
+h − u · ∇ ϕk +
+
+∫
+
+> Ω
+
+μ dxμ + cW (ϕ + ϕk)
+
+− ϑ − ϑk
+
+h − u · ∇ ϑ − u · ∇ Θb + div( κ(ϕk, θ k)∇Θb)
+
+
+
+.
+
+For convenience, we denote the ith (i = 1 , 2, 3, 4) element of Lk (resp. Fk) by L(i) 
+
+> k
+
+(resp. F(i) 
+
+> k
+
+). The linear operator L(1)  
+
+> k
+
+: Vσ → V ′ 
+
+> σ
+
+is defined by 
+
+〈L(1)  
+
+> k
+
+(u), v〉 
+
+> Vσ
+
+=
+
+∫
+
+> Ω
+
+2ν(ϕk, θ k)Du : Dv dx, ∀ v ∈ Vσ,
+
+and F(1)  
+
+> k
+
+(u, ϕ, μ ) (that is, the first three lines in Fk) should also be understood in the sense of a weak formulation. After establishing the above framework, we see that solving the discrete problem (3.11)–(3.15) is equivalent to solving the abstract equation 
+
+Lk(w) − F k(w) = 0 .
+
+Analysis of Lk. Our aim is to show that the operator Lk : X → Y is invertible. Given (ϕk, θ k) with described regularity properties, using Korn’s inequality, Poincaré’s inequal-ity, the Poincaré–Wirtinger inequality, and the positive lower/upper bounds on the coefficients ν,
+
+m, κ, we can apply the Lax–Milgram theorem to conclude that 
+
+L(1)  
+
+> k
+
+: Vσ → V ′
+
+> σ
+
+, L(2)  
+
+> k
+
+: H1(Ω) → (H1(Ω)) ′, L(4)  
+
+> k
+
+: H10 (Ω) → H−1(Ω) ,
+
+are all invertible (cf., e.g., [2]). Moreover, it is straightforward to check that the corresponding inverse operators are continuous. 19 Consider the elliptic problem associated with L(2)  
+
+> k
+
+such that 
+
+
+
+−div( m(ϕk, θ k)∇μ) + 
+
+∫
+
+> Ω
+
+μ dx = f, in Ω,∂nμ = 0 , on ∂Ω.
+
+(3.44) We can extend the bootstrapping argument in [2] to show that for every f ∈ L2(Ω) , the unique solution μ to problem (3.44) satisfies μ ∈ H2
+
+> n
+
+(Ω) . Indeed, the solution μ satisfies μ ∈ H1(Ω) and can be viewed as a weak solution to the following equation: 
+
+−∆μ = 1
+
+m(ϕk, θ k)
+
+(
+
+∇m(ϕk, θ k) · ∇ μ −
+
+∫
+
+> Ω
+
+μ dx + f
+
+)
+
+subject to the homogeneous Neumann boundary condition for μ. From assumptions ϕk, θ k ∈ H2(Ω) ,
+
+(A2 ), and Sobolev embedding theorems H2(Ω) ↪→ L∞(Ω) , H1(Ω) ↪→ L6(Ω) , we have 
+
+∥∥∥∥
+
+1
+
+m(ϕk, θ k) ∇m(ϕk, θ k) · ∇ μ
+
+∥∥∥∥L 32 (Ω) 
+
+⩽ 1
+
+m
+
+(
+
+∥∂1m∥L∞(Ω) ∥∇ ϕk∥L6(Ω) + ∥∂2m∥L∞(Ω) ∥∇ θk∥L6(Ω) 
+
+)
+
+∥∇ μ∥
+
+⩽ Cm
+
+(
+
+∥ϕk∥H2(Ω) + ∥θk∥H2(Ω) 
+
+)
+
+∥∇ μ∥,
+
+which together with the assumption f ∈ L2(Ω) yields ∆μ ∈ L 32 (Ω) . Here, ∂im denotes the partial derivative of m with respect to its ith component ( i = 1 , 2). By the elliptic theory, we get μ ∈
+
+W 2, 32 (Ω) ↪→ W 1,3(Ω) . This property combined with the following estimate 
+
+∥∥∥∥
+
+1
+
+m(ϕk, θ k) ∇m(ϕk, θ k) · ∇ μ
+
+∥∥∥∥
+
+⩽ Cm
+
+(
+
+∥∂1m∥L∞(Ω) ∥∇ ϕk∥L6(Ω) + ∥∂2m∥L∞(Ω) ∥∇ θk∥L6(Ω) 
+
+)
+
+∥∇ μ∥L3(Ω) ,
+
+implies that ∆μ ∈ L2(Ω) . Hence, we can conclude that μ ∈ H2
+
+> n
+
+(Ω) . Analogously, we consider the Dirichlet problem 
+
+{ −div( κ(ϕk, θ k)∇ϑ) = f, in Ω,ϑ = 0 , on ∂Ω. (3.45) From assumptions ϕk, θ k ∈ H2(Ω) , (A3 ), we see that for every f ∈ L2(Ω) , the unique solution ϑ
+
+to the problem (3.45) satisfies ϑ ∈ H2(Ω) ∩ H10 (Ω) . Hence, the operators 
+
+L(2)  
+
+> k
+
+: H2
+
+> n
+
+(Ω) → L2(Ω) , L(4)  
+
+> k
+
+: H2(Ω) ∩ H10 (Ω) → L2(Ω) ,
+
+are both invertible (cf. [2]), and their corresponding inverse operators are continuous. Finally, we consider L(3)  
+
+> k
+
+= ∂ ˜E. Since F is strictly convex, then the nonlinear operator L(3) 
+
+> k
+
+is maximal monotone and L(3)  
+
+> k
+
+: D(∂ ˜E) → L2(Ω) is invertible (see also Lemma 3.1). Concern-ing the inverse operator (L(3)  
+
+> k
+
+)−1 = ( ∂ ˜E)−1 : L2(Ω) → D (∂ ˜E), the estimate (3.4) implies that 
+
+sup f ∈U ∥F ′((L(3)  
+
+> k
+
+)−1(f ))∥ is bounded, provided that U is a bounded set in L2(Ω) . Moreover, it has been shown in [2, Lemma 4.3] that for s ∈ (0 , 14 ), its inverse (L(3)  
+
+> k
+
+)−1 : L2(Ω) → H2−s(Ω) is continuous and compact. 20 In summary, we have shown that Lk : X → Y is invertible with the inverse L−1 
+
+> k
+
+: Y → X.Define the Banach spaces 
+
+˜X = Vσ × H2−s(Ω) × H2
+
+> n
+
+(Ω) × (H2(Ω) ∩ H10 (Ω)) , for some s ∈
+
+(
+
+0, 14
+
+)
+
+,
+
+˜Y = L 32 (Ω) × W 1, 32 (Ω) × H1(Ω) × W 1, 32 (Ω) ,
+
+Then we infer that the mapping L−1 
+
+> k
+
+: Y → ˜X is continuous. Furthermore, due to the compact embedding ˜Y ↪ →↪→ Y , the restriction L−1 
+
+> k
+
+: ˜Y → ˜X is also a compact operator. 
+
+Analysis of Fk. Define ̂
+
+X = Vσ × H2−sF (Ω) × H2
+
+> n
+
+(Ω) × (H2(Ω) ∩ H10 (Ω)) ⊂ ˜X, 
+
+where 
+
+H2−sF (Ω) = {ϕ ∈ H2−s(Ω) : F ′(ϕ) ∈ L2(Ω) }.
+
+Remark 3.4. We note that H2−sF (Ω) is not a Banach space. Nevertheless, it has the following property. Let {ϕj }j⩾1 be a sequence in H2−sF (Ω) such that ϕj → ϕ strongly in H2−s(Ω) as j → ∞ 
+
+and {∥ F ′(ϕj )∥} j⩾1 be uniformly bounded with respect to j. By the Sobolev embedding H2−s(Ω) ↪→
+
+C(Ω) for s ∈ (0 , 14 ), we have ϕj → ϕ point-wisely in Ω. Since −1 < ϕ j < 1 almost everywhere in Ω, then ϕ ∈ L∞(Ω) and −1 ⩽ ϕ ⩽ 1 almost everywhere in Ω. From (A4 ), it follows that 
+
+F ′(ϕj ) → ˜F ′(ϕ) almost everywhere in Ω, where ˜F ′(s) = F ′(s) if s ∈ (−1, 1) and ˜F ′(±1) = ±∞ . By Fatou’s lemma, we get ∥˜F ′(ϕ)∥2 ⩽ lim inf j→∞ ∥F ′(ϕj )∥2 < ∞, which implies that ˜F ′(ϕ) ∈ L2(Ω) .Thus, −1 < ϕ < 1 almost everywhere in Ω, implying that ˜F ′(ϕ) = F ′(ϕ) almost everywhere in Ω.Consequently, the limit function ϕ ∈ H2−sF (Ω) .In the following, we show that Fk :̂ X → ˜Y is continuous and maps bounded sets into bounded sets. For this purpose, we derive estimates for every term in the expression of Fk(w). Using the assumptions ϕk, θ k ∈ H2(Ω) ↪→ L∞(Ω) (and thus ρk ∈ H2(Ω) ), (A2 )–(A5 ), Hölder’s inequality, the Sobolev embedding theorems and (3.7), we can deduce that 
+
+∥ρu∥L 32 (Ω) ⩽ ∥ρ∥∥ u∥L6(Ω) ⩽ C(1 + ∥ϕ∥)∥u∥Vσ ,
+
+∥ρkuk∥L 32 (Ω) ⩽ C(1 + ∥ϕk∥)∥uk∥Vσ , ∥ρku∥L 32 (Ω) ⩽ C(1 + ∥ϕk∥)∥u∥Vσ ,
+
+∥div( ρk(u ⊗ u)) ∥L 32 (Ω) ⩽ ∥ρk∥L∞(Ω) ∥∇ u∥∥ u∥L6(Ω) + ∥∇ ρk∥L6(Ω) ∥u∥2
+
+> L4(Ω)
+
+⩽ C(1 + ∥ϕk∥H2(Ω) )∥u∥2 
+
+> Vσ
+
+,
+
+∥(div J)u∥L 32 (Ω) ⩽ C(∥∂1m∥L∞(Ω) ∥∇ ϕk∥L6(Ω) + ∥∂2m∥L∞(Ω) ∥∇ θk∥L6(Ω) )∥∇ μ∥L4(Ω) ∥u∥L4(Ω) 
+
++ C∥m∥L∞(Ω) ∥∆μ∥∥ u∥L6(Ω) 
+
+⩽ C(1 + ∥ϕk∥H2(Ω) + ∥θk∥H2(Ω) )∥μ∥H2(Ω) ∥u∥Vσ ,
+
+∥(J · ∇ )u∥L 32 (Ω) ⩽ C∥m∥L∞(Ω) ∥∇ μ∥L6(Ω) ∥∇ u∥ ⩽ C∥μ∥H2(Ω) ∥u∥Vσ ,
+
+∥(u · ∇ ρ)u∥L 32 (Ω) ⩽ ∥∇ ρ∥L4(Ω) ∥u∥L6(Ω) ∥u∥L4(Ω) ⩽ C(1 + ∥ϕ∥H 74 (Ω) 
+
+)∥u∥2 
+
+> Vσ
+
+,
+
+∥μ∇ϕk∥L 32 (Ω) ⩽ C∥μ∥L6(Ω) ∥∇ ϕk∥ ⩽ C∥μ∥H1(Ω) ∥ϕk∥H1(Ω) ,
+
+∥θk[μ + cW (ϕ + ϕk)]∇ϕ∥L 32 (Ω) 
+
+21 ⩽ C∥θk∥L∞(Ω) (∥μ∥L6(Ω) + ∥ϕ∥L6(Ω) + ∥ϕk∥L6(Ω) )∥∇ ϕ∥
+
+⩽ C∥θk∥H2(Ω) (∥μ∥H1(Ω) + ∥ϕ∥H1(Ω) + ∥ϕk∥H1(Ω) )∥ϕ∥H1(Ω) ,
+
+∥(∇ϕ ⊗ ∇ ϕ)∇θk∥L 32 (Ω) + ∥∇ θk(|∇ ϕ|2 + 2 F (ϕ)) ∥L 32 (Ω) 
+
+⩽ C∥∇ θk∥L6(Ω) ∥∇ ϕ∥2 
+
+> L4(Ω)
+
++ C∥∇ θk∥L6(Ω) ∥F (ϕ)∥
+
+⩽ C∥θk∥H2(Ω) 
+
+(1 + ∥ϕ∥2  
+
+> H74(Ω)
+
+),
+
+∥fb(ϕk, θ k)∥L 32 (Ω) ⩽ C(1 + ∥ϕk∥L6(Ω) )(1 + ∥θk∥) ⩽ C(1 + ∥ϕk∥H1(Ω) )(1 + ∥θk∥),
+
+∥u · ∇ ϕk∥W 1, 32 (Ω) ⩽ ∥∇ u∥∥∇ ϕk∥L6(Ω) + C∥u∥L6(Ω) ∥ϕk∥H2(Ω) 
+
+⩽ C∥u∥Vσ ∥ϕk∥H2(Ω) ,
+
+∥∥∥∥∫
+
+> Ω
+
+μ dx
+
+∥∥∥∥W 1, 32 (Ω) 
+
+⩽ C
+
+∥∥∥∥∫
+
+> Ω
+
+μ dx
+
+∥∥∥∥ ⩽ C∥μ∥,
+
+∥μ + cW (ϕ + ϕk)∥H1(Ω) ⩽ ∥μ∥H1(Ω) + cW (∥ϕ∥H1(Ω) + ∥ϕk∥H1(Ω) ),
+
+∥u · ∇ θ∥W 1, 32 (Ω) ⩽ ∥∇ u∥∥∇ θ∥L6(Ω) + C∥u∥L6(Ω) ∥θ∥H2(Ω) 
+
+⩽ C∥u∥Vσ (∥ϑ∥H2(Ω) + ∥Θb∥H2(Ω) ),
+
+and finally, 
+
+∥div( κ(ϕk, ϑ k)∇Θb)∥W 1, 32 (Ω) ⩽ ∥κ(ϕk, ϑ k)∇Θb∥W 2, 32 (Ω) 
+
+⩽ ∥κ∥L∞(Ω) ∥Θb∥W 3, 32 (Ω) + (∥∂21 κ∥L∞(Ω) ∥∇ ϕk∥2 
+
+> L3(Ω)
+
++ ∥∂1κ∥L∞(Ω) ∥ϕk∥W 2, 32 (Ω) 
+
++ ∥∂22 κ∥L∞(Ω) ∥∇ θk∥2 
+
+> L3(Ω)
+
++ ∥∂2κ∥L∞(Ω) ∥θk∥W 2, 32 (Ω) 
+
++ ∥∂1∂2κ∥L∞(Ω) ∥∇ ϕk∥L3(Ω) ∥∇ θk∥L3(Ω) 
+
+)∥∇ Θb∥L∞(Ω) 
+
++ ( ∥∂1κ∥L∞(Ω) ∥∇ ϕk∥ + ∥∂2κ∥L∞(Ω) ∥∇ θk∥)∥Θb∥W 2,6(Ω) 
+
+⩽ C(1 + ∥ϕk∥H2(Ω) + ∥θk∥H2(Ω) )∥Θb∥H3(Ω) . (3.46) Here, ∂iκ denotes the partial derivative of κ with respect to its ith component ( i = 1 , 2). Therefore, 
+
+Fk :̂ X → ˜Y maps bounded sets into bounded sets. We note that in the above reasoning, ∥F (ϕ)∥
+
+is controlled using the assumption (A4 ) and the estimate ∥ϕ∥L∞(Ω) ⩽ 1 (since F ′(ϕ) ∈ L2(Ω) ). To verify the continuity of Fk :̂ X → ˜Y , below we only treat the most difficult term F (ϕ)∇θk,since the continuous dependence estimate for the other terms in Fk(w) are straightforward in view of the above argument for boundedness. Let ϕ1, ϕ 2 ∈ H2−sF (Ω) . Using Hölder’s inequality and the Sobolev embedding theorem, we obtain 
+
+∥(F (ϕ1) − F (ϕ2)) ∇θk∥L 43 (Ω) ⩽ ∥∇ θk∥L6(Ω) ∥F (ϕ1) − F (ϕ2)∥L 12 7 (Ω) 
+
+⩽ C∥θk∥H2(Ω) ∥F (ϕ1) − F (ϕ2)∥L 12 7 (Ω) .
+
+Thus, it remains to control ∥F (ϕ1) − F (ϕ2)∥L 12 7 (Ω) . From the assumption F ′(ϕ1), F ′(ϕ2) ∈ L2(Ω) 
+
+and the singularity of F ′ at ±1, we infer that ϕ1, ϕ 2 ∈ (−1, 1) almost everywhere in Ω. Therefore, for almost all x ∈ Ω and any r ∈ [0 , 1] , it holds 
+
+−1 < min {ϕ1(x), ϕ 2(x)} ⩽ rϕ 1(x) + (1 − r)ϕ2(x) ⩽ max {ϕ1(x), ϕ 2(x)} < 1.
+
+22 On the other hand, from (A4 ) it follows that F ′ ∈ C1(−1, 1) is strictly increasing. Thus, we find 
+
+|F ′(rϕ 1 + (1 − r)ϕ2)| ⩽ |F ′(ϕ1)| + |F ′(ϕ2)|, a.e. in Ω, ∀ r ∈ [0 , 1] .
+
+As a consequence, F ′(rϕ 1 + (1 − r)ϕ2) ∈ L2(Ω) for every r ∈ [0 , 1] . Using Taylor’s expansion 
+
+F (ϕ1) − F (ϕ2) = 
+
+∫ 10
+
+F ′(rϕ 1 + (1 − r)ϕ2)( ϕ1 − ϕ2) d r, 
+
+we infer that 
+
+∥F (ϕ1) − F (ϕ2)∥L 12 7 (Ω) ⩽
+
+∫ 10
+
+∥F ′(rϕ 1 + (1 − r)ϕ2)∥∥ ϕ1 − ϕ2∥L12 (Ω) dr
+
+⩽ C(∥F ′(ϕ1)∥ + ∥F ′(ϕ2)∥)∥ϕ1 − ϕ2∥H 74 (Ω) ,
+
+where the positive constant C depends only on Ω. This yields the continuity of F (ϕ)∇θk from 
+
+H2−sF (Ω) to L 43 (Ω) for any s ∈ (0 , 14 ). Besides, thanks to the fact θk ∈ H2(Ω) and (A4 ), it is straightforward to check that ∥(F (ϕ1)−F (ϕ2)) ∇θk∥L6(Ω) ⩽ C∥θk∥H2(Ω) , for some universal positive constant C. By interpolation, the continuity actually holds from H2−sF (Ω) to L 32 (Ω) . Hence, we can conclude that the mapping Fk :̂ X → ˜Y is continuous. 
+
+Existence via the Leray–Schauder fixed point theorem. Like in [2], in order to find a solution w ∈ X satisfying the equation Lk(w) − F k(w) = 0 , we set g = Lk(w) and consider the following equation 
+
+g − F k ◦ L −1 
+
+> k
+
+(g) = 0 .
+
+Because L−1 
+
+> k
+
+: Y → X is well defined and ˜Y ⊂ Y , so is the restriction L−1 
+
+> k
+
+: ˜Y → X ⊂̂ X ⊂ ˜X.Since L−1 
+
+> k
+
+: ˜Y → ˜X is compact, Fk :̂ X ⊂ ˜X → ˜Y is continuous and maps bounded sets into bounded sets, recalling the above mentioned properties of (L(3)  
+
+> k
+
+)−1 and Remark 3.4, we can check that the operator 
+
+Kk := Fk ◦ L −1 
+
+> k
+
+: ˜Y → ˜Y
+
+is well defined and also compact. The problem then reduces to finding a fixed point for the operator Kk in ˜Y , which can be done by applying the Leray–Schauder fixed point theorem (see, for instance, [57, Theorem 6.A]). To this aim, we only need to verify the following assertion: there exists some R > 0 such that 
+
+if g ∈ ˜Y and 0 ⩽ Λ ⩽ 1 fulfills g = Λ Kk(g), then ∥g∥˜Y ⩽ R. (3.47) Let g ∈ ˜Y and 0 ⩽ Λ ⩽ 1 satisfy g = Λ Kk(g). For (u, ϕ, μ, ϑ ) = w = L−1 
+
+> k
+
+(g) ∈ X, we have 
+
+Lk(w) = Λ Fk(w).
+
+Rewriting the above equation as a system of partial differential equations, we obtain 
+
+Λ
+
+( ρu − ρkuk
+
+h , v
+
+)
+
++ Λ (div( ρku ⊗ u), v) + Λ(div( u ⊗ J), v)+ (2ν(ϕk, ϑ k + Θ b)Du, D v) − Λλ0a(μ∇ϕk, v)= −Λλ0b((ϑk + Θ b)( ∇ϕ ⊗ ∇ ϕ), ∇v) + Λ (fb(ϕk, ϑ k + Θ b), v), ∀ v ∈ Vσ, (3.48) 23 with 
+
+J = − ρ2 − ρ1
+
+2 m(ϕk, ϑ k + Θ b)∇μ, a.e. in Ω, (3.49) and 
+
+Λ ϕ − ϕk
+
+h + Λ u · ∇ ϕk − Λ
+
+∫
+
+> Ω
+
+μ dx = div( m(ϕk, ϑ k + Θ b)∇μ) −
+
+∫
+
+> Ω
+
+μ dx, a.e. in Ω, (3.50) 
+
+Λμ + Λ cW (ϕ + ϕk) = −∆ϕ + F ′(ϕ), a.e. in Ω, (3.51) 
+
+Λ ϑ − ϑk
+
+h + Λ u · ∇ ϑ − div( κ(ϕk, ϑ k + Θ b)∇ϑ)= −Λu · ∇ Θb + Λdiv( κ(ϕk, ϑ k + Θ b)∇Θb), a.e. in Ω. (3.52) Taking v = u in (3.48), testing (3.50) by λ0aμ , (3.51) by λ0ah (ϕ−ϕk), and (3.52) by ϑ, summing up the resultants, we get the energy identity 
+
+Λ
+
+∫
+
+> Ω
+
+ρ|u|2
+
+2h − ρk|uk|2
+
+2h + Λ ρk|u − uk|2
+
+2h dx +
+
+∫
+
+> Ω
+
+2ν(ϕk, θ k)|Du|2 dx
+
++ λ0a
+
+∫
+
+> Ω
+
+|∇ ϕ|2
+
+2h − |∇ ϕk|2
+
+2h + |∇ (ϕ − ϕk)|2
+
+2h dx + λ0a
+
+∫
+
+> Ω
+
+m(ϕk, θ k)|∇ μ|2 dx
+
++ Λ 
+
+∫
+
+> Ω
+
+|ϑ|2
+
+2h − |ϑk|2
+
+2h + |ϑ − ϑk|2
+
+2h dx +
+
+∫
+
+> Ω
+
+κ(ϕk, θ k)|∇ ϑ|2 dx
+
++ (1 − Λ) λ0a
+
+(∫ 
+
+> Ω
+
+μ dx
+
+)2
+
++ λ0ah
+
+∫
+
+> Ω
+
+F ′(ϕ)( ϕ − ϕk) d x − Λ λ0ac W
+
+h
+
+∫
+
+> Ω
+
+(|ϕ|2 − | ϕk|2) d x
+
+= −Λλ0b(θk(∇ϕ ⊗ ∇ ϕ), ∇u) + Λ (fb(ϕk, θ k), u) − Λ( u · ∇ Θb, ϑ )
+
+− Λ( κ(ϕk, θ k)∇Θb, ∇ϑ). (3.53) Since w ∈ X, ∥ϕ∥L∞(Ω) ⩽ 1 holds for any Λ ∈ [0 , 1] . Concerning the L∞-estimate for θ, for any given Λ ∈ (0 , 1] , we can apply Lemma 3.2 to conclude (3.17). When Λ = 0 , (3.52) becomes an elliptic equation. In this case, we infer from [39, Lemma 3.1] that 
+
+min  
+
+> ∂Ω
+
+θb ⩽ θ(x) ⩽ max  
+
+> ∂Ω
+
+θb, a.e. in Ω.
+
+Hence, we obtain L∞-estimates for both ϕ, θ (as well as ϑ) that are independent of the parameter 
+
+Λ ∈ [0 , 1] .Based on the above observation, using the fact Λ ∈ [0 , 1] and accordingly modifying the argu-ments in Part A, we can deduce from (3.53) that 
+
+∫
+
+> Ω
+
+Λ2 ρ|u|2 dx + λ0a
+
+( 12 ∥∇ ϕ∥2 +
+
+∫
+
+> Ω
+
+W (ϕ) d x
+
+)
+
++ Λ2 ∥ϑ∥2
+
++ h
+
+( ν
+
+2 ∥∇ u∥2 + λ0am 
+
+2 ∥∇ μ∥2 + κ
+
+2 ∥∇ ϑ∥2
+
+)
+
++ C′h
+
+( 12 ∥∇ ϕ∥2 +
+
+∫
+
+> Ω
+
+F (ϕ) d x
+
+)
+
++ (1 − Λ) λ0a
+
+(∫ 
+
+> Ω
+
+μ dx
+
+)2
+
+⩽
+
+∫
+
+> Ω
+
+Λ2 ρk|uk|2 dx + λ0a
+
+( 12 ∥∇ ϕk∥2 +
+
+∫
+
+> Ω
+
+W (ϕk) d x
+
+)
+
++ Λ2 ∥ϑk∥2 + C′′ h, (3.54) 24 where the positive constants C′, C′′ are independent of Λ ∈ [0 , 1] . Since h ∈ (0 , 1] , it follows that 
+
+√1 − Λ
+
+∣∣∣∣∫
+
+> Ω
+
+μ dx
+
+∣∣∣∣ + ∥u∥Vσ + ∥∇ μ∥ + ∥ϕ∥H1(Ω) + ∥ϑ∥H10 (Ω) ⩽ Ck,h ,
+
+where the positive constant Ck,h is independent of Λ ∈ [0 , 1] . As in [2], the estimate for | ∫ 
+
+> Ω
+
+μ dx|
+
+should be distinguished in two cases. For Λ ∈ [0 , 12 ), it easily follows from the above estimate that 
+
+| ∫ 
+
+> Ω
+
+μ dx| ⩽ √2Ck,h . For Λ ∈ [ 12 , 1] , we can apply (3.24) to conclude | ∫ 
+
+> Ω
+
+μ dx| ⩽ C(∥∇ μ∥ + 1) ⩽ C
+
+for some positive constant C depending on Ck,h , ϕ, but not on Λ. Finally, using the H2-estimate for elliptic problems (3.44), (3.45), we can deduce that 
+
+∥u∥Vσ + ∥μ∥H2(Ω) + ∥ϕ∥H1(Ω) + ∥θ∥H2(Ω) ⩽ Ck,h .
+
+In view of equation (3.51), we infer from the fact Λ ∈ [0 , 1] and a similar argument as in the proof for (3.25) that ∥ϕ∥H2(Ω) + ∥F ′(ϕ)∥ ⩽ Ck,h . As a consequence, it holds 
+
+∥w∥ ˜X + ∥F ′(ϕ)∥ ⩽ Ck,h , (3.55) where the positive constant Ck,h is independent of Λ ∈ [0 , 1] and g. Recalling that g satisfies 
+
+g = Λ Kk(g) = Λ Fk(w), we infer from (3.55) and the above verified properties of Fk :̂ X → ˜Y that 
+
+∥g∥˜Y = ∥ΛFk(w)∥˜Y ⩽ Ck(∥w∥ ˜X ) ⩽ ˜Ck,h ,
+
+where the positive constant ˜Ck,h is independent of Λ ∈ [0 , 1] and g. Choosing R = ˜Ck,h , we thus successfully verify the assertion (3.47). This enables us to apply the Leray–Schauder fixed point theorem and establish the existence of a weak solution of the time discrete problem (3.11)–(3.15). The proof of Proposition 3.1 is complete. 
+
+3.3 Existence of weak solutions to the continuous problem 
+
+The proof of Theorem 2.1 consists of several steps. 
+
+Step 1. Construction of the initial data for induction. Let N be a given positive integer and h = 1 
+
+> N
+
+. We first construct the initial data (u0, ϕ 0, ϑ 0) for the induction associated with the discrete problem (3.11)–(3.15). Given ϕ0 ∈ H1(Ω) satisfying ∥ϕ0∥L∞(Ω) ⩽ 1, |ϕ0| < 1, as in [2], we take 
+
+ϕN 
+
+> 0
+
+= φ
+
+( 1
+
+N
+
+)
+
+,
+
+where φ is the (unique) solution of the following linear parabolic problem 
+
+
+
+∂tφ = ∆ φ, in Ω × (0 , ∞),∂nφ = 0 , on ∂Ω × (0 , ∞),φ|t=0 = ϕ0, in Ω.
+
+By the classical theory of linear parabolic equations, we easily find φ ∈ C([0 , ∞); H1(Ω)) ∩
+
+C((0 , ∞); H2
+
+> n
+
+(Ω)) such that ∥φ(t)∥L∞(Ω) ⩽ 1, φ(t) = ϕ0 ∈ (−1, 1) for all t ⩾ 0. As a consequence, we have 
+
+ϕN 
+
+> 0
+
+→ ϕ0 in H1(Ω) as N → ∞ ,
+
+25 and due to the convexity of F ,
+
+F (ϕN 
+
+> 0
+
+) → F (ϕ0) in L1(Ω) .
+
+Given θ0 ∈ L∞(Ω) , we choose 
+
+θN 
+
+> 0
+
+= ϖN , ϑN 
+
+> 0
+
+= θN 
+
+> 0
+
+− Θb,
+
+where ϖN is the (unique) solution to the following linear elliptic problem 
+
+
+
+− 1
+
+N ∆ϖN + ϖN = θ0, in Ω,ϖN = θb, on ∂Ω,
+
+and the function Θb is given by (3.8). Applying the classical theory for linear elliptic equations, we have ϖN − Θb ∈ H2(Ω) ∩ H10 (Ω) . In addition, an argument similar to that for Lemma 3.2 yields 
+
+min 
+
+{
+
+inf  
+
+> Ω
+
+θ0, min  
+
+> ∂Ω
+
+θb
+
+}
+
+⩽ ϖN (x) ⩽ max 
+
+{
+
+sup 
+
+> Ω
+
+θ0, max  
+
+> ∂Ω
+
+θb
+
+}
+
+, a.e. in Ω,
+
+which is consistent with (3.17). Testing the equation for ϖN by ϖN − Θb, using Hölder’s inequality and Poincaré’s inequality, we obtain 
+
+1
+
+N ∥∇ (ϖN − Θb)∥2 + ∥ϖN − Θb∥2 ⩽ ∥θ0 − Θb∥∥ ϖN − Θb∥ ⩽ C∥θ0 − Θb∥∥∇ (ϖN − Θb)∥,
+
+which implies 
+
+∥ϖN − Θb∥ ⩽ ∥θ0 − Θb∥, 1
+
+N ∥∇ (ϖN − Θb)∥ ⩽ C∥θ0 − Θb∥.
+
+Next, testing the equation for ϖN by (−∆D)−1(ϖN −θ0) ∈ H2(Ω) ∩H10 (Ω) (here (−∆D)−1 denotes the inverse Laplacian subject to the homogeneous Dirichlet boundary condition), we infer from the fact ∆Θ b = 0 in Ω, Hölder’s inequality and the above estimates that 
+
+∥ϖN − θ0∥2 
+
+> H−1(Ω)
+
+= − 1
+
+N (ϖN − Θb, ϖ N − θ0)
+
+⩽ 1
+
+N ∥ϖN − Θb∥(∥ϖN − Θb∥ + ∥Θb − θ0∥)
+
+⩽ 2
+
+N ∥θ0 − Θb∥2.
+
+As a consequence, it holds 
+
+ϖN → θ0 in H−1(Ω) as N → ∞ .
+
+By the uniform L2-bound for ϖN and the uniqueness of the limit, we also have 
+
+ϖN ⇀ θ 0 in L2(Ω) as N → ∞ .
+
+Hence, we observe that 
+
+∥ϖN − θ0∥2 = ( ϖN − Θb, ϖ N − θ0) − (θ0 − Θb, ϖ N − θ0)= 1
+
+N (ϖN − Θb, ∆( ϖN − Θb)) − (θ0 − Θb, ϖ N − θ0)
+
+26 = − 1
+
+N ∥∇ (ϖN − Θb)∥2
+
+︸ ︷︷ ︸
+
+> ⩽0
+
+−(θ0 − Θb, ϖ N − θ0).
+
+This together with the weak convergence of ϖN in L2(Ω) yields 
+
+0 ⩽ lim sup  
+
+> N→∞
+
+∥ϖN − θ0∥2 ⩽ lim sup  
+
+> N→∞
+
+[ − (θ0 − Θb, ϖ N − θ0)] = 0 ,
+
+that is, the strong convergence of ϖN in L2(Ω) . Hence, we have 
+
+θN 
+
+> 0
+
+→ θ0 and ϑN 
+
+> 0
+
+→ θ0 − Θb in L2(Ω) as N → ∞ .
+
+Therefore, for the discrete problem (3.11)–(3.15), we set the initial data 
+
+(u0, ϕ 0, ϑ 0) = ( u0, ϕ N 
+
+> 0
+
+, ϑ N 
+
+> 0
+
+).
+
+Step 2. Construction of approximate solutions and uniform estimates. Like in [2], we define the piecewise constant interpolant f N (t) on [−h, ∞) through f N (t) = f k for t ∈ [( k−1) h, kh ),where k ∈ N and f ∈ { u, ϕ, μ, ϑ }. We also define ρN := ρ(ϕN ). Due to the implicit formulation for 
+
+μ, we simply set μN (t) = 0 for t ∈ [−h, 0) . Moreover, we introduce the time shifts fh := f (t − h)
+
+and the notation for time differences as well as difference quotients: 
+
+(
+
+∆+ 
+
+> h
+
+f
+
+)
+
+(t) := f (t + h) − f (t), ∂+
+
+> t,h
+
+f (t) := 1
+
+h
+
+(
+
+∆+ 
+
+> h
+
+f
+
+)
+
+(t),
+
+(
+
+∆− 
+
+> h
+
+f
+
+)
+
+(t) := f (t) − f (t − h), ∂−
+
+> t,h
+
+f (t) := 1
+
+h
+
+(
+
+∆− 
+
+> h
+
+f
+
+)
+
+(t).
+
+From (3.11)–(3.15), we can derive the corresponding time-continuous equations. For an arbi-trary vector v ∈ C∞
+
+> 0
+
+(0, ∞; C∞
+
+> 0,σ
+
+(Ω) ), we choose ˜v := ∫ (k+1) hkh v dt as a test function in the weak formulation (3.11) and sum over k ∈ Z+ to get 
+
+∫ ∞
+
+> 0
+
+∫
+
+> Ω
+
+[
+
+−(ρN uN ) · ∂+
+
+> t,h
+
+v − (ρNh uN ⊗ uN ) : ∇v − (uN ⊗ JN ) : ∇v
+
+]
+
+dxdt
+
++
+
+∫ ∞
+
+> 0
+
+∫
+
+> Ω
+
+2ν(ϕNh , ϑ Nh + Θ b)DuN : Dv dxdt −
+
+∫ ∞
+
+> 0
+
+∫
+
+> Ω
+
+λ0aμ N ∇ϕNh · v dxdt
+
+= −
+
+∫ ∞
+
+> 0
+
+∫
+
+> Ω
+
+λ0b(ϑNh + Θ b)( ∇ϕN ⊗ ∇ ϕN ) : ∇v dxdt
+
++
+
+∫ ∞
+
+> 0
+
+∫
+
+> Ω
+
+fb(ϕNh , ϑ Nh + Θ b) · v dxdt, (3.56) where 
+
+JN = − ρ2 − ρ1
+
+2 m(ϕNh , ϑ Nh + Θ b)∇μN , a.e. in Ω × (0 , ∞), (3.57) 
+
+μN + cW (ϕN + ϕNh ) = −∆ϕN + F ′(ϕN ), a.e. in Ω × (0 , ∞). (3.58) Concerning the first term of (3.56), we have also used the following integration by parts with respect to time ∫ ∞
+
+> 0
+
+∫
+
+> Ω
+
+∂−
+
+> t,h
+
+(ρN uN ) · v dxdt = −
+
+∫ ∞
+
+> 0
+
+∫
+
+> Ω
+
+(ρN uN ) · ∂+
+
+> t,h
+
+v dxdt. (3.59) Analogously, we have 
+
+∫ ∞
+
+> 0
+
+∫
+
+> Ω
+
+(
+
+∂−
+
+> t,h
+
+ϕN ζ − (ϕNh uN ) · ∇ ζ
+
+)
+
+dxdt +
+
+∫ ∞
+
+> 0
+
+∫
+
+> Ω
+
+m(ϕNh , ϑ Nh + Θ b)∇μN · ∇ ζ dxdt = 0 , (3.60) 27 ∫ ∞
+
+> 0
+
+∫
+
+> Ω
+
+(
+
+∂−
+
+> t,h
+
+ϑN ξ − (ϑN uN ) · ∇ ξ
+
+)
+
+dxdt +
+
+∫ ∞
+
+> 0
+
+∫
+
+> Ω
+
+κ(ϕNh , ϑ Nh + Θ b)∇ϑN · ∇ ξ dxdt
+
+=
+
+∫ ∞
+
+> 0
+
+∫
+
+> Ω
+
+[
+
+(Θ buN ) · ∇ ξ − κ(ϕNh , ϑ Nh + Θ b)∇Θb · ∇ ξ
+
+]
+
+dxdt, (3.61) for all ζ ∈ C0((0 , ∞); C∞(Ω)) , ξ ∈ C0((0 , ∞); C∞ 
+
+> 0
+
+(Ω)) .Define ̂
+
+Etot (uk, ϕ k, ϑ k) = (1 + C1h)kEtot (uk, ϕ k, ϑ k), k ∈ N.
+
+From the discrete energy inequality (3.29), we obtain ̂
+
+Etot (uk+1 , ϕ k+1 , ϑ k+1 ) −̂ Etot (uk, ϕ k, ϑ k)
+
+h
+
+= (1 + C1h)k
+
+( Etot (uk+1 , ϕ k+1 , ϑ k+1 ) − Etot (uk, ϕ k, ϑ k)
+
+h + C1Etot (uk+1 , ϕ k+1 , ϑ k+1 )
+
+)
+
+⩽ C2(1 + C1h)k. (3.62) Summation over k yields the following result ̂
+
+Etot (uk, ϕ k, ϑ k) ⩽̂ Etot (u0, ϕ 0, ϑ 0) + C2h
+
+> k−1
+
+∑
+
+> j=0
+
+(1 + C1h)j , ∀ k ∈ Z+,
+
+which implies 
+
+Etot (uk, ϕ k, ϑ k) ⩽ (1 + C1h)−kEtot (u0, ϕ 0, ϑ 0) + C2
+
+C1
+
+[
+
+1 − (1 + C1h)−k]
+
+⩽ (1 + C1h)−kEtot (u0, ϕ 0, ϑ 0) + C2
+
+C1
+
+, ∀ k ∈ Z+. (3.63) Let EN (t) be the piecewise linear interpolant of Etot (uk, ϕ k, ϑ k) at tk = kh given by 
+
+EN (t) = (k + 1) h − th Etot (uk, ϕ k, ϑ k) + t − kh h Etot (uk+1 , ϕ k+1 , ϑ k+1 )
+
+for t ∈ [kh, (k + 1) h), k ∈ N. For t ∈ (kh, (k + 1) h), we also define the dissipation function 
+
+DN (t) = 14
+
+∫
+
+> Ω
+
+(
+
+ν|∇ uk+1 |2 + λ0am |∇ μk+1 |2 + κ|∇ ϑk+1 |2)
+
+dx. 
+
+Then it follows from (3.29) that 
+
+ddt EN (t) + DN (t) ⩽ −C1Etot (uk+1 , ϕ k+1 , ϑ k+1 ) + C2, (3.64) for all t ∈ (kh, (k + 1) h). Recalling that for all k ∈ N, Etot (uk+1 , ϕ k+1 , ϑ k+1 ) ⩾ −C4 for some positive constant C4 that depends only on Ω, we infer from (3.64) that 
+
+Etot (uj , ϕ j , ϑ j ) + 
+
+∫ ti
+
+> tj
+
+DN (t) d τ ⩽ Etot (ui, ϕ i, ϑ i) + ( C1C4 + C2)( tj − ti), (3.65) for all ti = ih , tj = jh with i, j ∈ N and j ⩾ i.From (3.63), (3.65), the construction of the initial data (u0, ϕ 0, ϑ 0) and the L∞-estimates for 
+
+ϕk, θk, we can deduce that 
+
+uN is bounded in L∞(0 , ∞; Hσ) ∩ L2uloc ([0 , ∞); Vσ),
+
+28 ϕN is bounded in L∞(0 , ∞; H1(Ω)) , ∥ϕN ∥L∞(Ω) ⩽ 1 for all t ⩾ 0,F (ϕN ) is bounded in L∞(0 , ∞; L1(Ω)) ,
+
+∇μN is bounded in L2uloc ([0 , ∞); L2(Ω)) ,
+
+JN is bounded in L2uloc ([0 , ∞); L2(Ω)) ,ϑN is bounded in L∞(0 , ∞; L∞(Ω)) ∩ L2uloc ([0 , ∞); H1(Ω)) .
+
+Recalling (3.16), for θN := ϑN + Θ b, we have 
+
+θN is bounded in L∞(0 , ∞; L∞(Ω)) ∩ L2uloc ([0 , ∞); H1(Ω)) ,
+
+and moreover, 
+
+min 
+
+{
+
+inf  
+
+> Ω
+
+θ0, min  
+
+> ∂Ω
+
+θb
+
+}
+
+⩽ θN (x) ⩽ max 
+
+{
+
+sup 
+
+> Ω
+
+θ0, max  
+
+> ∂Ω
+
+θb
+
+}
+
+, a.e. in Ω. (3.66) Applying Lemma 3.4, we can further deduce that 
+
+μN is bounded in L2uloc ([0 , ∞)) ,μN is bounded in L2uloc ([0 , ∞); H1(Ω)) ,ϕN is bounded in L4uloc ([0 , ∞); H2(Ω)) ∩ L2uloc ([0 , ∞); W 2,p (Ω)) ,F ′(ϕN ) is bounded in L2uloc ([0 , ∞); Lp(Ω)) ,
+
+for p ∈ [2 , 6] if d = 3 , p ∈ [2 , ∞) if d = 2 .In order to pass to the limit for all nonlinearities, we need to show strong convergence of uN ,
+
+ϕN , ϑN (and also θN ), by investigating time derivatives of suitable approximate solutions. Let ˜ϕN be the piecewise linear interpolant of ϕN (tk), where tk = kh , k ∈ N, that is, ˜ϕN = 
+
+> 1
+> h
+
+χ[0 ,h ] ∗t ϕN , where the convolution is taken only with respect to the time variable t. Similarly, we define ˜ϑN = 1 
+
+> h
+
+χ[0 ,h ] ∗t ϑN . Then it follows that 
+
+∂t ˜ϕN = ∂−
+
+> t,h
+
+ϕN , ∂t ˜ϑN = ∂−
+
+> t,h
+
+ϑN , for almost all t ∈ (0 , ∞),
+
+and 
+
+∥ ˜ϕN − ϕN ∥(H1(Ω)) ′ ⩽ h∥∂t ˜ϕN ∥(H1(Ω)) ′ , ∥ ˜ϑN − θN ∥H−1(Ω) ⩽ h∥∂t ˜ϑN ∥H−1(Ω) . (3.67) From (3.60), (3.61), we can obtain 
+
+∂−
+
+> t,h
+
+ϕN is bounded in L2uloc ([0 , ∞); ( H1(Ω)) ′),∂−
+
+> t,h
+
+ϑN is bounded in L2uloc ([0 , ∞); H−1(Ω)) ,
+
+the first follows from the boundedness of ϕN uN , ∇μN in L2uloc ([0 , ∞); L2(Ω)) , while the second follows from the boundedness of ϑN uN and ∇ϑN in L2uloc ([0 , ∞); L2(Ω)) .Next, let ˜ρuN be the piecewise linear interpolant of ρN uN (tk), where tk = kh , k ∈ N. We can check that P ( ˜ρuN ) is bounded in L 43
+
+> uloc
+
+([0 , ∞); Vσ), which is a consequence of the boundedness of uN in L∞(0 , ∞, Hσ) ∩ L2uloc ([0 , ∞); Vσ) and the boundedness of ϕN in L2uloc ([0 , ∞); W 2,6(Ω)) ∩
+
+L∞(0 , ∞; L∞(Ω)) . Recalling the estimates (cf. [2]) 
+
+ρNh uN ⊗ uN is bounded in L2uloc ([0 , ∞); L 32 (Ω)) ,
+
+29 uN ⊗ JN is bounded in L 87
+
+> uloc
+
+([0 , ∞); L 43 (Ω)) ,μN ∇ϕNh is bounded in L2uloc ([0 , ∞); L 32 (Ω)) ,
+
+and the following fact 
+
+∥(ϑNh + Θ b)( ∇ϕN ⊗ ∇ ϕN )∥L2(Ω) ⩽ ∥θNh ∥L∞(Ω) ∥∇ ϕN ∥L∞(Ω) ∥∇ ϕN ∥
+
+⩽ C∥θNh ∥L∞(Ω) ∥ϕN ∥W 2,4(Ω) ∥ϕN ∥H1(Ω) ,
+
+which implies 
+
+(ϑNh + Θ b)( ∇ϕN ⊗ ∇ ϕN ) is bounded in L2uloc ([0 , ∞); L2(Ω)) ,
+
+then from (3.56) and (3.59), we can deduce that 
+
+∂t( ˜ρuN ) = ∂−
+
+> t,h
+
+(ρN uN ) is bounded in L 87
+
+> uloc
+
+([0 , ∞); W −1,4(Ω)) .
+
+Step 3. Passage to the limit as N → ∞ . In Step 2, we have collected all the ingredients necessary to draw the conclusion of Theorem 2.1. In particular, all the estimates obtained above are independent of the parameters N , h and k. Hence, applying the same compactness argument as in [2, 53] with minor modifications, we can pass to the limit as N → ∞ (always understood in the sense of a convergent subsequence) to obtain a global weak solution (u, ϕ, μ, ϑ ) (and thus 
+
+θ = ϑ + Θ b) of problem (1.1)–(1.7) on [0 , ∞) with required regularity properties. 
+
+Remark 3.5. When applying the compactness argument in [2, 53], since iteration step k can be taken arbitrarily large, for any given final time L ∈ Z+, we can extract a convergent subsequence 
+
+{(uN , ϕ N , μ N , θ N )} on the finite interval [0 , L ] to find a weak solution (u, ϕ, μ, θ ) to problem (1.1)– (1.7) defined on [0 , L ]. However, since the uniqueness of weak solutions is not known, with uniform-in-time estimates for the approximate solutions, we cannot simply “extend” the weak solution from 
+
+[0 , L ] to the whole interval [0 , ∞) by letting L → ∞ . This issue can be solved by applying a diagonal argument as in [13] for the classical Navier–Stokes equations. Roughly speaking, whenever we obtain a convergent subsequence {(uN , ϕ N , μ N , θ N )} on [0 , L ], L ∈ Z+, we extract a further subsequence that converges on [0 , L + 1] . The diagonal argument then enables us to obtain a sequence {(uN , ϕ N , μ N , θ N )} (not relabeled for simplicity) that converges on [0 , T ] for any T > 0,as N → ∞ .In the following, we will not repeat the limiting process as N → ∞ mentioned above. To finish the proof, we just sketch the convergence for the nonlinear term θNh (∇ϕN ⊗ ∇ ϕN ) due to the Marangoni effect. Below the convergence as N → ∞ will be understood in the sense of a subsequence, and the convergent subsequence will not be relabeled for simplicity. With the uniform estimates obtained in Step 2, we recall that the following weak and strong convergence results can be obtained for ϕN as N → ∞ (see [2, Section 5.1]) 
+
+ϕN → ϕ, weakly star in L∞(0 , ∞; H1(Ω)) ,ϕN → ϕ, strongly in L2(0 , T ; H1(Ω)) for any T ∈ (0 , ∞),
+
+for some function ϕ ∈ L∞(0 , ∞; H1(Ω)) ∩ Cw([0 , ∞); H1(Ω)) . Moreover, the boundedness of ϕN in 
+
+L4uloc ([0 , ∞); H2(Ω)) ∩ L2uloc ([0 , ∞); W 2,6(Ω)) also implies 
+
+ϕN → ϕ, weakly in L4(0 , T ; H2(Ω)) ∩ L2(0 , T ; W 2,6(Ω)) for any T ∈ (0 , ∞),
+
+30 with ϕ ∈ L4uloc ([0 , ∞); H2(Ω)) ∩ L2uloc ([0 , ∞); W 2,6(Ω)) . The linear dependence of ρ on ϕ enables us to derive analogous results for ρN . Similar arguments also apply to ϑN . First, we easily find that as N → ∞ , it holds 
+
+ϑN → ϑ, weakly star in L∞(0 , ∞; L∞(Ω)) ,ϑN → ϑ, weakly in L2(0 , T ; H1(Ω)) , for any T ∈ (0 , ∞),
+
+for some function ϑ ∈ L∞(0 , ∞; L∞(Ω)) ∩ L2uloc (0 , ∞; H1(Ω)) . Next, by the Aubin–Lions–Simon compactness lemma, we get 
+
+˜ϑN → ˜ϑ, strongly in C([0 , T ]; L2(Ω)) for any T ∈ (0 , ∞),
+
+for some ˜ϑ ∈ L∞(0 , ∞; L2(Ω)) ∩ C([0 , ∞); L2(Ω)) . On the other hand, (3.67) implies that 
+
+ϑN − ˜ϑN → 0 strongly in L2(0 , ∞; H−1(Ω)) .
+
+As a result, we have ϑ = ˜ϑ. From the fact 
+
+∥ϑN − ϑ∥ ⩽ ∥ϑN − ˜ϑN ∥ + ∥ ˜ϑN − ˜ϑ∥
+
+⩽ ∥ϑN − ˜ϑN ∥ 12
+
+> H1(Ω)
+
+∥ϑN − ˜ϑN ∥ 12 
+
+> H−1(Ω)
+
++ ∥ ˜ϑN − ˜ϑ∥,
+
+we arrive at 
+
+ϑN → ϑ strongly in L2(0 , T ; L2(Ω)) for any T ∈ (0 , ∞).
+
+By the L∞-boundedness of ϑN , ϑ and the interpolation, for any q ∈ (2 , ∞), we get 
+
+ϑN → ϑ strongly in Lq(0 , T ; Lq(Ω)) for any T ∈ (0 , ∞).
+
+Recalling the definition of ϑNh , we also find that 
+
+ϑNh → ϑ strongly in Lq(0 , T ; Lq(Ω)) for any T ∈ (0 , ∞).
+
+Let T ∈ (0 , ∞) be given. With the above convergence results, for any v ∈ L4(0 , T ; W 1,3(Ω)) ,we consider the difference 
+
+∫ T
+
+> 0
+
+∫
+
+> Ω
+
+[θNh (∇ϕN ⊗ ∇ ϕN ) − θ(∇ϕ ⊗ ∇ ϕ)] : ∇v dxdt
+
+=
+
+∫ T
+
+> 0
+
+∫
+
+> Ω
+
+(ϑNh − ϑ)( ∇ϕN ⊗ ∇ ϕN ) : ∇v dxdt +
+
+∫ T
+
+> 0
+
+∫
+
+> Ω
+
+[θ∇ϕN ⊗ (∇ϕN − ∇ ϕ)] : ∇v dxdt
+
++
+
+∫ T
+
+> 0
+
+∫
+
+> Ω
+
+[θ(∇ϕN − ∇ ϕ) ⊗ ∇ ϕ] : ∇v dxdt. 
+
+The first term on the right-hand side can be estimated as follows 
+
+∣∣∣∣∣∫ T
+
+> 0
+
+∫
+
+> Ω
+
+(ϑNh − ϑ)( ∇ϕN ⊗ ∇ ϕN ) : ∇v dxdt
+
+∣∣∣∣∣
+
+⩽
+
+∫ T
+
+> 0
+
+∥ϑNh − ϑ∥L6(Ω) ∥∇ ϕN ∥2
+
+> L4(Ω)
+
+∥∇ v∥L3(Ω) dt
+
+⩽ C
+
+∫ T
+
+> 0
+
+∥ϑNh − ϑ∥L6(Ω) ∥ϕN ∥ 32
+
+> H2(Ω)
+
+∥ϕN ∥ 12
+
+> H1(Ω)
+
+∥∇ v∥L3(Ω) dt
+
+31 ⩽ ∥ϑNh − ϑ∥L6(0 ,T ;L6(Ω)) ∥ϕN ∥ 32 
+
+> L4(0 ,T ;H2(Ω))
+
+∥ϕN ∥ 12 
+
+> L∞(0 ,T ;H1(Ω))
+
+∥∇ v∥L 24 11 (0 ,T ;L3(Ω)) 
+
+→ 0 as N → ∞ .
+
+Concerning the second term, we see that 
+
+∣∣∣∣∣∫ T
+
+> 0
+
+∫
+
+> Ω
+
+[θ∇ϕN ⊗ (∇ϕN − ∇ ϕ)] : ∇v dxdt
+
+∣∣∣∣∣
+
+⩽
+
+∫ T
+
+> 0
+
+∥θ∥L∞(Ω) ∥∇ ϕN ∥L6(Ω) ∥∇ ϕN − ∇ ϕ∥∥∇ v∥L3(Ω) dt
+
+⩽ C∥θ∥L∞(0 ,T ;L∞(Ω)) ∥ϕN ∥L4(0 ,T ;H2(Ω)) ∥ϕN − ϕ∥L2(0 ,T ;H1(Ω)) ∥∇ v∥L4(0 ,T ;L3(Ω)) 
+
+→ 0 as N → ∞ .
+
+Finally, noticing that ∇ϕN → ∇ ϕ weakly in L4(0 , T ; L6(Ω)) and 
+
+∥θ∂ iϕ∂ j v∥L 43 (0 ,T ;L 65 (Ω)) ⩽ ∥θ∥L∞(0 ,T ;L∞(Ω)) ∥∂iϕ∥L4(0 ,T ;L2(Ω)) ∥∂j v∥L2(0 ,T ;L3(Ω)) ,
+
+we obtain the convergence for the third term 
+
+∫ T
+
+> 0
+
+∫
+
+> Ω
+
+[θ(∇ϕN − ∇ ϕ) ⊗ ∇ ϕ] : ∇v dxdt → 0 as N → ∞ .
+
+Hence, for any test function v ∈ L4(0 , T ; W 1,3(Ω)) , it holds 
+
+∫ T
+
+> 0
+
+∫
+
+> Ω
+
+[θNh (∇ϕN ⊗ ∇ ϕN ) − θ(∇ϕ ⊗ ∇ ϕ)] : ∇v dxdt → 0 as N → ∞ .
+
+Using the convergence results above, we can pass to the limit as N → ∞ in (3.56)–(3.61) to obtain (2.8)–(2.11). In addition, following the argument in [2], we see that the initial data 
+
+(u0, ϕ 0, θ 0) can be attained. The proof of Theorem 2.1 is complete. 
+
+# 4 Uniqueness in Two Dimensions 
+
+This section is devoted to the proof of Theorem 2.2. We first investigate an auxiliary problem for the convective heat equation with a pair of given data (u, ϕ ). By analyzing the regularity of solutions to the auxiliary problem, we establish the existence of global weak solutions to the two-dimensional problem (1.1)–(1.7) with improved regularity properties for θ, provided that the initial temperature satisfies θ0 ∈ Cγ (Ω) ∩ H10 (Ω) for some γ ∈ (0 , 1) . After that, we prove the uniqueness result in two dimensions under additional structural assumptions. 
+
+4.1 An auxiliary problem 
+
+Let (u, ϕ ) be given functions. We consider the following initial boundary value problem of a convective heat equation: 
+
+∂tθ + u · ∇ θ = div( κ(ϕ, θ )∇θ), in Ω × (0 , ∞), (4.1) 
+
+θ|∂Ω = θb, on ∂Ω × (0 , ∞), (4.2) 
+
+θ|t=0 = θ0, in Ω. (4.3) 32 Proposition 4.1. Suppose that Ω ⊂ R2 is a bounded domain with C2-boundary ∂Ω, and the assumption (A3 ) is satisfied. 
+
+(i) Assume that u ∈ L2uloc ([0 , ∞); Hσ), ϕ ∈ L∞(0 , ∞; L∞(Ω)) , θ0 ∈ L∞(Ω) , θb ∈ H 32 (∂Ω) . Then problem (4.1) –(4.3) admits a global weak solution that satisfies 
+
+θ ∈ L∞(0 , ∞; L∞(Ω)) ∩ L2uloc ([0 , ∞); H1(Ω)) ∩ H1uloc ([0 , ∞); H−1(Ω)) .
+
+(ii) Assume that 
+
+u ∈ L∞(0 , ∞; Hσ) ∩ L2uloc ([0 , ∞); Vσ),ϕ ∈ L∞(0 , ∞; H1(Ω)) ∩ L2uloc ([0 , ∞); H2
+
+> n
+
+(Ω)) ∩ L∞(0 , ∞; L∞(Ω)) ,θ0 ∈ Cγ (Ω) ∩ H1(Ω) for some γ ∈ (0 , 1) , θ0|∂Ω = θb ∈ H 32 (∂Ω) .
+
+Then problem (4.1) –(4.3) admits a global strong solution that satisfies 
+
+θ ∈ L∞(0 , ∞; H1(Ω) ∩ Cβ (Ω)) ∩ L2uloc ([0 , ∞); H2(Ω)) ∩ H1loc ([0 , ∞); L2(Ω)) , (4.4) 
+
+for any β ∈ (0 , γ ].
+
+(iii) Let the assumptions in (ii) be satisfied. Suppose that θ1 is a global strong solution and θ2 is a global weak solution to problem (4.1) –(4.3) subject to the same boundary and initial data. Then we have θ1(t) = θ2(t) for all t ≥ 0.Proof. The existence of a global weak/strong solution to problem (4.1)–(4.3) can be proven by a standard argument as in [40]. In the following, we simply perform the necessary a priori estimates. (i) The Stampacchia method easily yields that θ ∈ L∞(0 , ∞; L∞(Ω)) , cf. [40, Lemma 3.1]. Next, using (3.8) with θb ∈ H 32 (∂Ω) , we rewrite (4.1) as (cf. (3.9)) 
+
+∂tϑ + u · ∇ ϑ − div ( κ(ϕ, ϑ + Θ b)∇ϑ) = −u · ∇ Θb + div ( κ(ϕ, ϑ + Θ b)∇Θb), (4.5) where ϑ = θ − Θb with Θb ∈ H2(Ω) . Multiplying (4.5) by ϑ and integrating over Ω, we have 
+
+12ddt ∥ϑ∥2 +
+
+∫
+
+> Ω
+
+κ(ϕ, θ )|∇ ϑ|2 dx
+
+= −
+
+∫
+
+> Ω
+
+(u · ∇ Θb)ϑ dx −
+
+∫
+
+> Ω
+
+κ(ϕ, θ )∇Θb · ∇ ϑ dx
+
+⩽ ∥u∥∥∇ Θb∥L4(Ω) ∥ϑ∥L4(Ω) + ∥κ∥L∞(Ω) ∥∇ Θb∥∥∇ ϑ∥
+
+⩽ κ
+
+2 ∥∇ ϑ∥2 + C∥Θb∥2
+
+> H2(Ω)
+
+∥u∥2 + C∥Θb∥2
+
+> H1(Ω)
+
+. (4.6) In the above estimate, we have used the L∞-bounds of ϕ, θ and the assumption (A3 ). By Poincaré’s inequality and the elliptic estimate, we get 
+
+ddt ∥ϑ∥2 + Cκ ∥ϑ∥2 ⩽ C∥θb∥2  
+
+> H32(∂Ω)
+
+(∥u∥2 + 1) , (4.7) where C > 0 depends on Ω, κ and L∞-bounds of ϕ, θ. Since u ∈ L2uloc ([0 , ∞); Hσ), we can apply a Gronwall-type inequality (see [23, Lemma 2.5]) and obtain 
+
+∥ϑ(t)∥2 ⩽ 2∥ϑ(0) ∥2e−Cκt + 2eCκ 
+
+1 − e−Cκ sup 
+
+> t≥0
+
+∫ t+1 
+
+> t
+
+∥u(τ )∥2 dτ. (4.8) 33 Integrating (4.6) with respect to time, we infer from (4.8) that 
+
+∫ t+1 
+
+> t
+
+∥∇ ϑ(τ )∥2 dτ ⩽ C, ∀ t ≥ 0, (4.9) where C > 0 is independent of t. The estimates (4.8), (4.9) imply that θ ∈ L2uloc ([0 , ∞); H1(Ω)) .By comparison in the equation for θ, we further get ∂tθ ∈ L2uloc ([0 , ∞); H−1(Ω)) .(ii) Keeping in mind that Θb is independent of time and ∆Θ b = 0 , we test (4.5) by −∆ϑ and integrate over Ω. This gives 
+
+12ddt ∥∇ ϑ∥2 +
+
+∫
+
+> Ω
+
+κ(ϕ, θ )|∆ϑ|2 dx
+
+=
+
+∫
+
+> Ω
+
+(u · ∇ θ)∆ ϑ dx −
+
+∫
+
+> Ω
+
+∂1κ(∇ϕ · ∇ θ)∆ ϑ dx −
+
+∫
+
+> Ω
+
+∂2κ|∇ θ|2∆ϑ dx. (4.10) The first term on the right-hand side can be estimated using (3.35) for θ and the elliptic estimate, namely, 
+
+∫
+
+> Ω
+
+(u · ∇ θ)∆ ϑ dx =
+
+∫
+
+> Ω
+
+(u · ∇ θ)∆ θ dx = −
+
+∫
+
+> Ω
+
+∇u : ( ∇θ ⊗ ∇ θ) d x
+
+⩽ C∥∇ u∥∥∇ θ∥2
+
+> L4(Ω)
+
+⩽ C∥∇ u∥∥ θ∥L∞(Ω) 
+
+(∥∆θ∥ + ∥θ∥ + ∥θb∥H 32 (∂Ω) 
+
+)
+
+⩽ κ
+
+6 ∥∆ϑ∥2 + C(∥∇ u∥2 + 1) .
+
+Since u ∈ L∞(0 , ∞; Hσ) ∩ L2uloc ([0 , ∞); Vσ), by interpolation we have u ∈ L4uloc ([0 , ∞); L4(Ω)) .For initial datum θ0 ∈ Cγ (Ω) ∩ H1(Ω) , we can apply the same argument as in [51, Lemma 3.2] to conclude that 
+
+∥θ∥L∞(0 ,∞;Cβ (Ω)) ⩽ C, (4.11) for some β ∈ (0 , γ ]. By the Hölder estimate (4.11) and the elliptic estimate, we deduce that 
+
+−
+
+∫
+
+> Ω
+
+∂2κ|∇ θ|2∆ϑ dx ⩽ ∥∂2κ∥L∞(Ω) ∥∇ θ∥2
+
+> L4(Ω)
+
+∥∆ϑ∥
+
+⩽ C∥θ∥2ξCβ (Ω) ∥θ∥2−2ξH2(Ω) ∥∆ϑ∥
+
+⩽ C∥θ∥2ξCβ (Ω) 
+
+(∥∆θ∥ + ∥θ∥ + ∥θb∥H 32 (∂Ω) 
+
+)2−2ξ∥∆ϑ∥
+
+⩽ κ
+
+6 ∥∆ϑ∥2 + C. 
+
+Here, we have used the following interpolation inequality (see [16, Lemma 2.2]) 
+
+∥θ∥W 1,4(Ω) ⩽ C∥θ∥ξCβ (Ω) ∥θ∥1−ξH2(Ω) , for some ξ ∈
+
+( 12 , 1
+
+)
+
+. (4.12) Finally, applying the Gagliardo–Nirenberg inequality, Hölder’s inequality and Young’s inequality, we have 
+
+−
+
+∫
+
+> Ω
+
+∂1κ(∇ϕ · ∇ θ)∆ ϑ dx ⩽ ∥∂1κ∥L∞(Ω) ∥∇ ϕ∥L4(Ω) ∥∇ θ∥L4(Ω) ∥∆ϑ∥
+
+⩽ C∥ϕ∥ 12
+
+> H1(Ω)
+
+∥ϕ∥ 12
+
+> H2(Ω)
+
+∥θ∥ξCβ (Ω) ∥θ∥1−ξH2(Ω) ∥∆ϑ∥
+
+34 ⩽ C∥ϕ∥ 12
+
+> H1(Ω)
+
+∥ϕ∥ 12
+
+> H2(Ω)
+
+∥θ∥ξCβ (Ω) 
+
+(∥∆θ∥ + ∥θ∥ + ∥θb∥H 32 (∂Ω) 
+
+)1−ξ∥∆ϑ∥
+
+⩽ κ
+
+6 ∥∆ϑ∥2 + C(∥ϕ∥ 
+
+> 1
+> ξ
+> H2(Ω)
+
++ 1) 
+
+⩽ κ
+
+6 ∥∆θ∥2 + C(∥ϕ∥2 
+
+> H2(Ω)
+
++ 1) .
+
+Combining the above estimates, from (4.10) we infer that 
+
+ddt ∥∇ ϑ∥2 + κ∥∆ϑ∥2 ⩽ C(∥∇ u∥2 + ∥ϕ∥2 
+
+> H2(Ω)
+
++ 1) . (4.13) Using arguments similar to those for (4.8), (4.9), we can deduce from (4.13) that 
+
+ϑ ∈ L∞(0 , ∞; H1(Ω)) ∩ L2uloc ([0 , ∞); H2(Ω) ∩ H10 (Ω)) .
+
+Again, a comparison in (4.5) yields ∂tϑ ∈ L2uloc ([0 , ∞); H−1(Ω)) . Using θ = ϑ + Θ b, we arrive at the conclusion (4.4). (iii) Now we investigate the weak-strong uniqueness. The difference of solutions θ1 − θ2 satisfies 
+
+∂t(θ1 − θ2) + u · ∇ (θ1 − θ2) = div ((κ(ϕ, θ 1) − κ(ϕ, θ 2)) ∇θ1 + κ(ϕ, θ 2)∇(θ1 − θ2)), (4.14) in the sense of distributions. Since θ1 (resp. θ2) is a strong (resp. weak) solution, θ1 − θ2 admits the same regularity property as the weak solution θ2 and thus is valid as a test function. Multiplying (4.14) by θ1 − θ2, integrating over Ω, we get 
+
+12ddt ∥θ1 − θ2∥2 +
+
+∫
+
+> Ω
+
+κ(ϕ, θ 2)|∇ (θ1 − θ2)|2 dx = −
+
+∫
+
+> Ω
+
+(κ(ϕ, θ 1) − κ(ϕ, θ 2)) ∇θ1 · ∇ (θ1 − θ2) d x. 
+
+Using the Gagliardo–Nirenberg inequality, the term on the right-hand side can be estimated as follows 
+
+−
+
+∫
+
+> Ω
+
+(κ(ϕ, θ 1) − κ(ϕ, θ 2)) ∇θ1 · ∇ (θ1 − θ2) d x
+
+⩽ ∥∂2κ∥L∞(Ω) ∥θ1 − θ2∥L4(Ω) ∥∇ θ1∥L4(Ω) ∥∇ (θ1 − θ2)∥
+
+⩽ C∥θ1 − θ2∥ 12 ∥∇ (θ1 − θ2)∥ 32 ∥θ1∥ 12
+
+> L∞(Ω)
+
+∥θ1∥ 12
+
+> H2(Ω)
+
+⩽ κ
+
+2 ∥∇ (θ1 − θ2)∥2 + C∥θ1∥2
+
+> H2(Ω)
+
+∥θ1 − θ2∥2. (4.15) This leads to the following inequality 
+
+ddt ∥θ1 − θ2∥2 + κ∥∇ (θ1 − θ2)∥2 ⩽ C∥θ1∥2 
+
+> H2
+
+∥θ1 − θ2∥2.
+
+Since θ1 ∈ L2uloc ([0 , ∞); H2(Ω)) , we can apply Gronwall’s Lemma to conclude that θ1(t) = θ2(t) in 
+
+[0 , T ] for any T > 0.The proof of Proposition 4.1 is complete. 
+
+4.2 Proof of Theorem 2.2 
+
+We are ready to prove Theorem 2.2. 
+
+Step 1. Existence. Let (u∗, ϕ ∗, μ ∗, θ ∗) be a global weak solution to problem (1.1)–(1.7) constructed in Theorem 2.1. Under the additional assumption θ0 ∈ Cγ (Ω) ∩ H1(Ω) for some 35 γ ∈ (0 , 1) , θ0|∂Ω = θb ∈ H 32 (∂Ω) , we consider the auxiliary problem (4.1)–(4.3) with the given data 
+
+u = u∗, ϕ = ϕ∗. According to Proposition 4.1-(ii), (iii), problem (4.1)–(4.3) admits a unique global strong solution θ. Noticing that θ∗ can be regarded as a global weak solution of problem (4.1)–(4.3) with the same structural data, then by the weak-strong uniqueness result Proposition 4.1-(iii), we have θ∗(t) = θ(t) for t ≥ 0.Therefore, under the additional assumption on θ0 mentioned above, (u∗, ϕ ∗, μ ∗, θ ∗) indeed gives a global weak solution to problem (1.1)–(1.7) with improved regularity properties for the temper-ature as stated in Theorem 2.2. 
+
+Step 2. Uniqueness. In the case of unmatched densities ρ1̸ = ρ2, the uniqueness of weak solutions is beyond reach even in the absence of temperature coupling (recall Remark 2.6). On the other hand, if the mobility and thermal diffusivity depend both on the order parameter and on the temperature, additional regularity assumptions on θ1 seem necessary to guarantee the uniqueness (see Remark 2.7), as will become apparent in the subsequent proof. Therefore, in the following, we focus on the special case such that 
+
+ρ1 = ρ2, m(ϕ, θ ) ≡ m(ϕ), κ(ϕ, θ ) ≡ κ(θ).
+
+Let (ui, ϕ i, μ i, θ i), i = 1 , 2, be two global weak solutions to problem (1.1)–(1.7) constructed in Step 1 satisfying the same boundary and initial conditions. For simplicity, we denote their difference by 
+
+u = u1 − u2, ϕ = ϕ1 − ϕ2, μ = μ1 − μ2, θ = θ1 − θ2.
+
+We first consider the equation satisfied by u. For every v ∈ Vσ, it holds 
+
+⟨∂tu, v⟩Vσ +
+
+> ∫
+> Ω
+
+(u1 · ∇ u + u · ∇ u2) · v dx +
+
+> ∫
+> Ω
+
+2ν(ϕ1, θ 1)Du : Dv dx
+
++
+
+> ∫
+> Ω
+
+2( ν(ϕ1, θ 1) − ν(ϕ2, θ 2)) Du2 : Dv dx
+
+=
+
+> ∫
+> Ω
+> (
+
+λ(θ1)∇ϕ1 ⊗ ∇ ϕ1 − λ(θ2)∇ϕ2 ⊗ ∇ ϕ2 
+
+> )
+
+: ∇v dx +
+
+> ∫
+> Ω
+
+(fb(ϕ1, θ 1) − fb(ϕ2, θ 2)) v dx. (4.16) Taking v = S−1u in (4.16) yields 
+
+12ddt ∥∇ (S−1u)∥2 +
+
+> ∫
+> Ω
+
+2ν(ϕ1, θ 1)Du : D(S−1u) d x = I1 + I2 + I3 + I4, (4.17) where 
+
+I1 = −
+
+> ∫
+> Ω
+
+2( ν(ϕ1, θ 1) − ν(ϕ2, θ 2)) Du2 : D(S−1u) d x, I2 = −[(u1 ⊗ u, ∇(S−1u)) + ( u ⊗ u2, ∇(S−1u)) ],I3 =
+
+> ∫
+> Ω
+> (
+
+λ(θ1)∇ϕ1 ⊗ ∇ ϕ1 − λ(θ2)∇ϕ2 ⊗ ∇ ϕ2 
+
+> )
+
+: ∇(S−1u) d x, I4 =
+
+> ∫
+> Ω
+
+(fb(ϕ1, θ 1) − fb(ϕ2, θ 2)) S−1u dx. 
+
+By the definition of the Stokes operator, we have −∆( S−1u) + ∇π = u. Then it follows that 
+
+> ∫
+> Ω
+
+2ν(ϕ1, θ 1)Du : D(S−1u) d x
+
+= −2
+
+> ∫
+> Ω
+
+div( ν(ϕ1, θ 1)D(S−1u)) · u dx
+
+36 = −
+
+∫
+
+> Ω
+
+ν(ϕ1, θ 1)(∆ S−1u) · u dx − 2
+
+∫
+
+> Ω
+
+[D(S−1u)( ∂1ν∇ϕ1 + ∂2ν∇θ1)] · u dx
+
+=
+
+∫
+
+> Ω
+
+ν(ϕ1, θ 1)|u|2 dx − I5 − I6 − I7,
+
+where 
+
+I5 =
+
+∫
+
+> Ω
+
+ν(ϕ1, θ 1)∇π · u dx, I6 = 2 
+
+∫
+
+> Ω
+
+[D(S−1u)∂1ν∇ϕ1
+
+] · u dx, I7 = 2 
+
+∫
+
+> Ω
+
+[D(S−1u)∂2ν∇θ1
+
+] · u dx. 
+
+Therefore, we arrive at 
+
+12ddt ∥∇ (S−1u)∥2 +
+
+∫
+
+> Ω
+
+ν(ϕ1, θ 1)|u|2 dx =
+
+> 7
+
+∑
+
+> k=1
+
+Ik.
+
+We write I1 = I1a + I1b, where 
+
+I1a = −
+
+∫
+
+> Ω
+
+2( ν(ϕ1, θ 1) − ν(ϕ1, θ 2)) Du2 : D(S−1u) d x, I1b = −
+
+∫
+
+> Ω
+
+2( ν(ϕ1, θ 2) − ν(ϕ2, θ 2)) Du2 : D(S−1u) d x. 
+
+Using a similar reasoning as in [16, Section 3], we have the following estimates 
+
+I1a ⩽ ν
+
+20 ∥u∥2 + κ
+
+10 ∥∇ θ∥2 + C∥∇ u2∥2(∥θ∥2 + ∥∇ (S−1u)∥2),I2 ⩽ ν
+
+20 ∥u∥2 + C(∥u1∥2 
+
+> Vσ
+
++ ∥u2∥2 
+
+> Vσ
+
+)∥∇ (S−1u)∥2,I3 ⩽ 140 ∥∇ ϕ∥2 + κ
+
+10 ∥∇ θ∥2 + C(∥∇ ϕ1∥2 
+
+> L∞(Ω)
+
++ ∥∇ ϕ2∥2 
+
+> L∞(Ω)
+
++ ∥ϕ1∥2
+
+> H2(Ω)
+
+)∥∇ (S−1u)∥2,I4 ⩽ C∥θ∥2 + ∥∇ (S−1u)∥2,I7 ⩽ ν
+
+20 ∥u∥2 + C∥θ1∥2 
+
+> H2
+
+∥∇ (S−1u)∥2.
+
+Let us recall the L2-product estimate given in [27, Proposition C.1]: 
+
+∥ϕD (S−1u)∥ ⩽ C∥ϕ∥H1(Ω) ∥∇ (S−1u)∥ ln 12
+
+(
+
+e ∥∇ (S−1u)∥H1(Ω) 
+
+∥∇ (S−1u)∥
+
+)
+
+.
+
+Using the Poincaré–Wirtinger inequality, Poincaré’s inequality and Young’s inequality, we can deduce that 
+
+I1b ⩽ 2∥∂1ν∥L∞(Ω) ∥Du2∥∥ ϕD (S−1u)∥
+
+⩽ C∥∇ u2∥∥ ϕ∥H1(Ω) ∥∇ (S−1u)∥ ln 12
+
+(
+
+e ∥∇ (S−1u)∥H1(Ω) 
+
+∥∇ (S−1u)∥
+
+)
+
+⩽ 140 ∥∇ ϕ∥2 + C∥∇ u2∥2Y(t) ln 
+
+( C
+
+Y(t)
+
+)
+
+,
+
+37 where 
+
+Y(t) = ∥∇ (S−1u)( t)∥2 +
+
+∫
+
+> Ω
+
+m(ϕ1(t)) |∇G ϕ1 ϕ(t)|2 dx + ∥θ(t)∥2. (4.18) In the above estimate for I1b, we have used the fact that Y(t) ∈ L∞(0 , ∞) and the function s ln 
+
+( Cs
+
+)
+
+is increasing for s ∈ (0 , L ] if C ⩾ eL . As far as the term I5 is concerned, using the Gagliardo– Nirenberg inequality and the L4-estimate for the pressure π (see [22, Lemma 3.1]), we have 
+
+I5 = −
+
+∫
+
+> Ω
+
+(∂1ν∇ϕ1 + ∂2ν∇θ1) · uπ dx
+
+⩽ (∥∂1ν∥L∞(Ω) ∥∇ ϕ1∥L4(Ω) + ∥∂2ν∥L∞(Ω) ∥∇ θ1∥L4(Ω) )∥u∥∥ π∥L4(Ω) 
+
+⩽ C(∥ϕ1∥ 12
+
+> L∞(Ω)
+
+∥ϕ1∥ 12 
+
+> H2(Ω)
+
++ ∥θ1∥ 12
+
+> L∞(Ω)
+
+∥θ1∥ 12
+
+> H2(Ω)
+
+)∥u∥ 32 ∥∇ S−1u∥ 12
+
+⩽ ν
+
+20 ∥u∥2 + C(∥ϕ1∥2 
+
+> H2(Ω)
+
++ ∥θ1∥2
+
+> H2(Ω)
+
+)∥∇ S−1u∥2.
+
+Finally, the term I6 can be estimated as in [27]: 
+
+I6 ⩽ C∥∂1ν∥L∞ ∥∇ ϕ1∥L4(Ω) ∥DS−1u∥L4(Ω) ∥u∥
+
+⩽ C∥ϕ1∥ 12
+
+> L∞(Ω)
+
+∥ϕ1∥ 12
+
+> H2(Ω)
+
+∥∇ S−1u∥ 12 ∥u∥ 32
+
+⩽ ν
+
+20 ∥u∥2 + C∥ϕ1∥2
+
+> H2(Ω)
+
+∥∇ S−1u∥2.
+
+Next, we consider the equations for (ϕ, μ ), which read as follows 
+
+∂tϕ + u1 · ∇ ϕ + u · ∇ ϕ2 = div( m(ϕ1)∇μ) + div[( m(ϕ1) − m(ϕ2)) ∇μ2], (4.19) 
+
+μ = −∆ϕ + W ′(ϕ1) − W ′(ϕ2). (4.20) Multiply (4.19) by Gϕ1 ϕ and then integrate over Ω. Recalling the definition of Gϕ1 and the fact 
+
+W ′′ ⩾ −cW , we have 
+
+−(div( m(ϕ1)∇μ), Gϕ1 ϕ) = ( ∇μ, m (ϕ1)∇G ϕ1 ϕ)= ( μ, ϕ )
+
+≥ ∥∇ ϕ∥2 − cW ∥ϕ∥2
+
+⩾ 12 ∥∇ ϕ∥2 − c2
+
+> W
+
+2 ∥ϕ∥2 
+
+> V′
+> (0)
+
+.
+
+This implies that 
+
+(∂tϕ, Gϕ1 ϕ) + 12 ∥∇ ϕ∥2 ⩽ c2
+
+> W
+
+2 ∥ϕ∥2 
+
+> V′
+> (0)
+
++ ( ϕu1, ∇G ϕ1 ϕ) + ( ϕ2u, ∇G ϕ1 ϕ)
+
+− ((m(ϕ1) − m(ϕ2)) ∇μ2, ∇G ϕ1 ϕ). (4.21) Using the Gagliardo–Nirenberg inequality, the Sobolev embedding theorem, Poincaré’s inequality and Young’s inequality, we get 
+
+−(( m(ϕ1) − m(ϕ2)) ∇μ2, ∇G ϕ1 ϕ) ⩽ ∥m′∥L∞(Ω) ∥ϕ∥L4(Ω) ∥∇ μ2∥∥∇G ϕ1 ϕ∥L4(Ω) 
+
+⩽ C∥∇ μ2∥∥∇G ϕ1 ϕ∥ 12 ∥ϕ∥∥∇ ϕ∥ 12
+
+⩽ C∥∇ μ2∥∥∇G ϕ1 ϕ∥∥∇ ϕ∥
+
+38 ⩽ 140 ∥∇ ϕ∥2 + C∥∇ μ2∥2∥∇G ϕ1 ϕ∥2,
+
+and 
+
+(ϕu1, ∇G ϕ1 ϕ) ⩽ ∥ϕ∥L4(Ω) ∥u1∥L4(Ω) ∥∇G ϕ1 ϕ∥
+
+⩽ 140 ∥∇ ϕ∥2 + C∥u1∥2
+
+> L4(Ω)
+
+∥∇G ϕ1 ϕ∥2,
+
+(ϕ2u, ∇G ϕ1 ϕ) ⩽ ∥ϕ2∥L∞(Ω) ∥u∥∥∇G ϕ1 ϕ∥
+
+⩽ ν
+
+20 ∥u∥2 + C∥∇G ϕ1 ϕ∥2.
+
+The term (∂tϕ, Gϕ1 ϕ) can be treated as in [17] such that 
+
+(∂tϕ, Gϕ1 ϕ) = ddt
+
+12
+
+∫
+
+> Ω
+
+m(ϕ1)|∇G ϕ1 ϕ|2 dx + 12
+
+∫
+
+> Ω
+
+∇G ∂tϕ1 · m′′ (ϕ1)∇ϕ1|∇G ϕ1 ϕ|2 dx
+
++
+
+∫
+
+> Ω
+
+∇G ∂tϕ1 · m′(ϕ1)( ∇2Gϕ1 ϕ∇G ϕ1 ϕ) d x, (4.22) with the following estimates (see [17, (3.47),(3.50)]) 
+
+∣∣∣∣
+
+12
+
+∫
+
+> Ω
+
+∇G ∂tϕ1 · m′′ (ϕ1)∇ϕ1|∇G ϕ1 ϕ|2 dx
+
+∣∣∣∣ ⩽ 140 ∥∇ ϕ∥2 + C
+
+(
+
+∥∇G ∂tϕ1∥2 + ∥ϕ1∥4
+
+> H2(Ω)
+
+)
+
+∥∇G ϕ1 ϕ∥2,
+
+∣∣∣∣∫
+
+> Ω
+
+∇G ∂tϕ1 · m′(ϕ1)( ∇2Gϕ1 ϕ∇G ϕ1 ϕ) d x
+
+∣∣∣∣ ⩽ 140 ∥∇ ϕ∥2 + C
+
+(
+
+∥∇G ∂tϕ1∥2 + ∥ϕ1∥4
+
+> H2(Ω)
+
+)
+
+∥∇G ϕ1 ϕ∥2.
+
+As last, we investigate the equation for θ, that is, 
+
+∂tθ + u1 · ∇ θ + u · ∇ θ2 = div ((κ(θ1) − κ(θ2)) ∇θ1 + κ(θ2)∇θ). (4.23) Multiplying (4.23) by θ and integrating over Ω, we have 
+
+12ddt ∥θ∥2 +
+
+∫
+
+> Ω
+
+κ(θ2)|∇ θ|2 dx = −
+
+∫
+
+> Ω
+
+(u · ∇ θ2)θ dx −
+
+∫
+
+> Ω
+
+(κ(θ1) − κ(θ2)) ∇θ1 · ∇ θ dx. (4.24) The second term on the right-hand side can be estimated in the same way as in (4.15): 
+
+−
+
+∫
+
+> Ω
+
+(κ(θ1) − κ(θ2)) ∇θ1 · ∇ θ dx ⩽ κ
+
+10 ∥∇ θ∥2 + C∥θ1∥2
+
+> H2(Ω)
+
+∥θ∥2.
+
+Concerning the first term on the right-hand side, we apply the Gagliardo–Nirenberg inequality, Hölder’s inequality and Young’s inequality and obtain 
+
+−
+
+∫
+
+> Ω
+
+(u · ∇ θ2)θ dx ⩽ ∥u∥∥∇ θ2∥L4(Ω) ∥θ∥L4(Ω) 
+
+⩽ ν
+
+20 ∥u∥2 + C∥∇ θ2∥∥ θ2∥H2(Ω) ∥θ∥∥∇ θ∥
+
+⩽ ν
+
+20 ∥u∥2 + κ
+
+10 ∥∇ θ∥2 + C∥θ2∥2
+
+> H2(Ω)
+
+∥θ∥2.
+
+Combining all the above estimates, we deduce from (4.17), (4.21) and (4.24) that 
+
+ddt Y(t) + ν∥u∥2 + 12 ∥∇ ϕ∥2 + κ∥∇ θ∥2 ⩽ CH(t)Y(t) ln 
+
+( C
+
+Y(t)
+
+)
+
+, (4.25) 39 where C > 0 is sufficiently large, Y(t) is defined as in (4.18) and 
+
+H(t) = 1 + ∥u1(t)∥2 
+
+> Vσ
+
++ ∥u2(t)∥2 
+
+> Vσ
+
++ ∥ϕ1(t)∥2  
+
+> W2,3(Ω)
+
++ ∥ϕ2(t)∥2  
+
+> W2,3(Ω)
+
++ ∥ϕ1(t)∥4
+
+> H2(Ω)
+
++ ∥∇ μ2(t)∥2 + ∥∇G ∂tϕ1(t)∥2 + ∥θ1(t)∥2 
+
+> H2(Ω)
+
++ ∥θ2(t)∥2
+
+> H2(Ω)
+
+.
+
+Noticing that H(t) ∈ L1(0 , T ) for any T > 0, applying Osgood’s Lemma (see [10, Lemma 3.4]), we can deduce from (4.25) that, if Y(0) = 0 , then Y(t) = 0 for all t ∈ [0 , T ]. Since T > 0 is arbitrary, we thus prove the uniqueness of global weak solutions on [0 , ∞).The proof of Theorem 2.2 is complete. 
+
+Remark 4.1. In the more general case where m, κ depend on both ϕ and θ, additional difficulties may occur. For example, the identity (4.22) becomes (at least formally) 
+
+(∂tϕ, G(ϕ1,θ 1)ϕ) = ddt
+
+12
+
+∫
+
+> Ω
+
+m(ϕ1, θ 1)|∇G (ϕ1,θ 1)ϕ|2 dx + 12
+
+∫
+
+> Ω
+
+∇G ∂tϕ1 · ∂21 m∇ϕ1|∇G (ϕ1,θ 1)ϕ|2 dx
+
++
+
+∫
+
+> Ω
+
+∇G ∂tϕ1 · ∂1m(∇2G(ϕ1,θ 1)ϕ∇G (ϕ1,θ 1)ϕ) d x + 12
+
+∫
+
+> Ω
+
+∂2m∂ tθ1|∇G (ϕ1,θ 1)ϕ|2 dx
+
++ 12
+
+∫
+
+> Ω
+
+∇G ∂tϕ1 · ∂1∂2m∇θ1|∇G (ϕ1,θ 1)ϕ|2 dx. 
+
+Here, the notation G(ϕ1,θ 1) is defined analogously to (2.3), with the function q replaced by a pair of functions (p, q ). The second and third terms on the right-hand side have been analyzed as above. The fourth term on the right-hand side can be handled via the improved regularity ∂tθ1 ∈
+
+L2uloc ([0 , ∞); L2(Ω)) and the Gagliardo–Nirenberg inequality: 
+
+12
+
+∫
+
+> Ω
+
+∂2m∂ tθ1|∇G (ϕ1,θ 1)ϕ|2 dx ⩽ 140 ∥∇ ϕ∥2 + C(1 + ∥∂tθ1∥2)∥∇G (ϕ1,θ 1)ϕ∥2.
+
+However, the last term presents some challenges, necessitating the additional assumption posed in Remark 2.7. In particular, this term is structurally analogous to the second term, whose estimation requires ϕ1 ∈ L4uloc ([0 , ∞); H2(Ω)) .
+
+# Declarations 
+
+Conflict of interest. The authors have no competing interests to declare that are relevant to the content of this article. 
+
+Funding. The research of H. Wu was partially supported by Natural Science Foundation of Shang-hai (Grant number 25ZR1401023). 
+
+Acknowledgments. Part of the work was done during H. Wu’s participation in the Thematic Program on Free Boundary Problems at the Erwin Schrödinger International Institute for Mathe-matics and Physics (ESI), whose hospitality is gratefully acknowledged. H. Wu is a member of the Key Laboratory of Mathematics for Nonlinear Sciences (Fudan University), Ministry of Education of China. 
+
+# References 
+
+[1] H. Abels, On a diffuse interface model for two-phase flows of viscous, incompressible fluids with matched densities , Arch. Ration. Mech. Anal., 194: 463–506, 2009. 40 [2] H. Abels, D. Depner and H. Garcke, Existence of weak solutions for a diffuse interface model for two-phase flows of incompressible fluids with different densities , J. Math. Fluid Mech., 15: 453–480, 2013. [3] H. Abels, D. Depner and H. Garcke, On an incompressible Navier–Stokes/Cahn–Hilliard sys-tem with degenerate mobility , Ann. Inst. H. Poincaré Anal. Non Linéaire, 30: 1175–1190, 2013. [4] H. Abels, H. Garcke and A. Giorgini, Global regularity and asymptotic stabilization for the incompressible Navier–Stokes–Cahn–Hilliard model with unmatched densities , Math. Ann., 389(2): 1267–1321, 2024. [5] H. Abels, H. Garcke and G. Grün, Thermodynamically consistent, frame indifferent diffuse interface models for incompressible two-phase flows with different densities , Math. Models Methods Appl. Sci., 22(3): 1150013, 2012. [6] H. Abels, H. Garcke and A. Poiatti, Mathematical analysis of a diffuse interface model for multi-phase flows of incompressible viscous fluids with different densities , J. Math. Fluid Mech., 26(2): 29, 2024. [7] H. Abels and J. Weber, Local well-posedness of a quasi-incompressible two-phase flow , J. Evol. Equ., 21(3): 3477–3502, 2021. [8] H. Abels and M. Wilke, Convergence to equilibrium for the Cahn–Hilliard equation with a logarithmic free energy , Nonlinear Anal., 67(11): 3176–3193, 2007. [9] D. M. Anderson, G. B. McFadden and A. A. Wheeler, Diffuse-interface methods in fluid mechanics , Annu. Rev. Fluid Mech., 30: 139–165, 1998. [10] H. Bahouri, J.-Y. Chemin and R. Danchin, Fourier Analysis and Nonlinear Partial Differential Equations , Springer-Verlag, Heidelberg, 2011. [11] H. Bénard, Les tourbillons cellulaires dans une nappe liquide propageant de la chaleur par convection: en régime permanent , Gauthier-Villars, Paris, 1901. [12] J. L. Boldrini, Phase Field: A Methodology to Model Complex Material Behavior , Adv. Math. Appl., Springer-Verlag, Cham, 2018. [13] F. Boyer and P. Fabrie, Mathematical Tools for the Study of the Incompressible Navier–Stokes Equations and Related Models , Appl. Math. Sci., 183, Springer, New York, 2013. [14] G. Caginalp and W. Xie, Phase-field and sharp-interface alloy models , Phys. Rev. E, 48: 1897–1909, 1993. [15] J. W. Cahn and J. E. Hilliard, Free energy of a nonuniform system. I. Interfacial free energy ,J. Chem. Phys., 28: 258–267, 1958. [16] L.-X. Chen, Global well-posedness for a two-dimensional Navier–Stokes–Cahn–Hilliard– Boussinesq system with singular potential , Commun. Math. Sci., 23(2): 509–540, 2025. [17] M. Conti, P. Galimberti, S. Gatti and A. Giorgini, New results for the Cahn–Hilliard equation with non-degenerate mobility: well-posedness and long-time behavior , Calc. Var. Partial Differ. Equ., 64(3): 87, 2025. [18] M. Conti and A. Giorgini, Well-posedness for the Brinkman–Cahn–Hilliard system with un-matched viscosities , J. Differ. Equ., 268: 6350–6384, 2020. [19] F. De Anna, C. Liu, A. Schlömerkemper and J.-E. Sulzbach, Temperature dependent extensions of the Cahn–Hilliard equation , Nonlinear Anal. Real World Appl., 77: 104056, 2024. [20] Q. Du and X.-B. Feng, The phase field method for geometric moving interfaces and their numerical approximations , Handb. Numer. Anal., 21: 425–508, 2020. [21] P. C. Fife, Models for phase separation and their mathematics , Electron. J. Differ. Equ., 48: 1–26, 2000. 41 [22] C. G. Gal, A. Giorgini, M. Grasselli and A. Poiatti, Global well-posedness and convergence to equilibrium for the Abels–Garcke–Grün model with nonlocal free energy , J. Math. Pures Appl., 178: 46–109, 2023. [23] C. Giorgi, M. Grasselli and V. Pata, Uniform attractors for a phase-field model with memory and quadratic nonlinearity , Indiana Univ. Math. J., 48: 1395–1445, 1999. [24] A. Giorgini, Well-posedness of the two-dimensional Abels–Garcke–Grün model for two-phase flows with unmatched densities , Calc. Var. Partial Differ. Equ., 60(3): 1–40, 2021. [25] A. Giorgini, Existence and stability of strong solutions to the Abels–Garcke–Grün model in three dimensions , Interfaces Free Bound., 24(4): 565–608, 2022. [26] A. Giorgini, M. Grasselli and H. Wu, The Cahn–Hilliard–Hele–Shaw system with singular potential , Ann. Inst. H. Poincaré Anal. Non Linéaire, 35: 1079–1118, 2018. [27] A. Giorgini, A. Miranville and R. Temam, Uniqueness and regularity for the Navier–Stokes– Cahn–Hilliard system , SIAM J. Math. Anal., 51: 2535–2574, 2019. [28] M. Grasselli and A. Poiatti, The Cahn–Hilliard–Boussinesq system with singular potential ,Commun. Math. Sci., 20: 897–946, 2022. [29] Z. Guo, P. Lin, A thermodynamically consistent phase-field model for two-phase flows with thermocapillary effects , J. Fluid Mech., 766: 226–271, 2015. [30] Z. Guo, P. Lin and Y. Wang, Continuous finite element schemes for a phase field model in two-layer fluid Bénard–Marangoni convection computations , Comput. Phys. Commun., 185: 63–78, 2014. [31] E. Hebey, Sobolev Spaces on Riemannian Manifolds , vol. 1635, Springer Science & Business Media, 1996. [32] H. Hu and R. G. Larson, Marangoni effect reverses coffee-ring depositions , J. Phys. Chem. B, 110(14): 7090–7094, 2006. [33] D. Johnson and R. Narayanan, A tutorial on the Rayleigh–Marangoni–Bénard problem with multiple layers and side-wall effects , Chaos, 9(1): 124–140, 1999. [34] J. S. Kim, Phase-field models for multi-component fluid flows , Commun. Comput. Phys., 12:613–661, 2012. [35] P. Lee, P. Quested and M. McLean, Modelling of Marangoni effects in electron beam melting ,Philos. Trans. R. Soc. Lond. A, 356(1739): 1027–1043, 1998. [36] J. H. Lopes and G. Planas, Well-posedness for a non-isothermal flow of two viscous incom-pressible fluids , Commun. Pure Appl. Anal., 17: 2455–2477, 2018. [37] J. H. Lopes and G. Planas, On a non-isothermal incompressible Navier–Stokes–Allen–Cahn system , Monatsh. Math., 195(4): 687–715, 2021. [38] J. H. Lopes and G. Planas, Existence of solutions for a non-isothermal Navier–Stokes–Allen– Cahn system with thermo-induced coefficients , Electron. J. Differ. Equ., 72: 22, 2022. [39] S. A. Lorca and J. L. Boldrini, Stationary solutions for generalized Boussinesq models , J. Differ. Equ., 124(2): 389–406, 1996. [40] S. A. Lorca and J. L. Boldrini, The initial value problem for a generalized Boussinesq model ,Nonlinear Anal., 36: 457–480, 1999. [41] C. Marangoni, Sull’espansione delle goccie d’un liquido galleggianti sulla superfice di altro liquido , Fratelli Fusi, 1865. [42] K. Mills, B. Keene, R. Brooks and A. Shirali, Marangoni effects in welding , Philos. Trans. R. Soc. Lond. A, 356(1739): 911–925, 1998. [43] A. Miranville and S. Zelik, Robust exponential attractors for Cahn–Hilliard type equations with singular potentials , Math. Methods Appl. Sci., 27: 545–582, 2004. 42 [44] B. A. Nerger, P.-T. Brun and C. M. Nelson, Marangoni flows drive the alignment of fibrillar cell-laden hydrogels , Sci. Adv., 6: eaaz7748, 2020. [45] G. Peralta, Weak and very weak solutions to the viscous Cahn–Hilliard–Oberbeck–Boussinesq phase-field system on two-dimensional bounded domains , J. Evol. Equ., 22(1): 12, 2022. [46] A. Pimpinelli and J. Villain, Physics of Crystal Growth , Cambridge Univ. Press, Cambridge, 1999. [47] L. Rubinshtein, The Stefan Problem , Amer. Math. Soc., Providence, RI, 1971. [48] H. Sohr, The Navier–Stokes Equations: An Elementary Functional Analytic Approach ,Birkhäuser, Basel, 2012. [49] C. V. Sternling and L. Scriven, Interfacial turbulence: hydrodynamic instability and the Marangoni effect , AIChE J., 5: 514–523, 1959. [50] P. Sun, C. Liu and J. Xu, Phase field model of thermo-induced Marangoni effects in mixtures and its numerical simulations with a mixed finite element method , Commun. Comput. Phys., 6: 1095–1119, 2009. [51] Y. Sun and Z. Zhang, Global regularity for the initial-boundary value problem of the 2D Boussi-nesq system with variable viscosity and thermal diffusivity , J. Differ. Equ., 255: 1069–1085, 2013. [52] M. G. Velarde and R. K. Zeytounian, Interfacial Phenomena and the Marangoni Effect ,Springer-Verlag, Vienna/New York, 2002. [53] X.-M. Wang and H. Wu, Global weak solutions to the Navier–Stokes–Darcy–Boussinesq system for thermal convection in coupled free and porous media flows , Adv. Differ. Equ., 26: 1–44, 2021. [54] H. Wu, Well-posedness of a diffuse-interface model for two-phase incompressible flows with thermo-induced Marangoni effect , Eur. J. Appl. Math., 28: 380–434, 2017. [55] H. Wu, A review on the Cahn–Hilliard equation: classical results and recent advances in dy-namic boundary conditions , Electron. Res. Arch., 30(8): 2788–2832, 2022. [56] H. Wu and X. Xu, Analysis of a diffuse-interface model for binary viscous incompressible fluids with thermo-induced Marangoni effects , Commun. Math. Sci., 11: 603–633, 2013. [57] E. Zeidler, Nonlinear Functional Analysis and Its Applications I , Springer, New York, 1992. [58] K. Zhao, Global regularity for a coupled Cahn–Hilliard–Boussinesq system on bounded domains ,Q. Appl. Math., 69: 331–356, 2011. [59] K. Zhao, Large time behavior of a Cahn–Hilliard–Boussinesq system on a bounded domain ,Electron. J. Differ. Equ., 46: 1–21, 2011. [60] K. Zhao, Long-time dynamics of a coupled Cahn–Hilliard–Boussinesq system , Commun. Math. Sci., 10: 735–749, 2012. 43

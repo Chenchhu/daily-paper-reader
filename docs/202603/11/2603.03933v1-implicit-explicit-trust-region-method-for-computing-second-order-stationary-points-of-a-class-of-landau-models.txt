@@ -1,0 +1,1226 @@
+Title: Implicit-Explicit Trust Region Method for Computing Second-Order Stationary Points of A Class of Landau Models
+
+URL Source: https://arxiv.org/pdf/2603.03933v1
+
+Published Time: Thu, 05 Mar 2026 01:58:28 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+> MATHEMATICS OF COMPUTATION Volume 00, Number 0, Pages 000–000 S 0025-5718(XX)0000-0
+
+IMPLICIT-EXPLICIT TRUST REGION METHOD FOR COMPUTING SECOND-ORDER STATIONARY POINTS OF A CLASS OF LANDAU MODELS 
+
+CHENGLONG BAO, KAI DENG, KAI JIANG, AND JUAN ZHANG 
+
+Abstract. We propose an implicit-explicit trust region method for comput-ing second-order stationary points of a class of Landau-type free energy func-tionals, which correspond to physically (meta-)stable phases. The proposed method is demonstrated through the Landau-Brazovskii (LB) model in this work, while broader applicability to more Landau models of the similar type is straightforwardly extended. The LB energy functional is discretized via the Fourier pseudospectral method, which yields a finite-dimensional nonconvex optimization problem. By exploiting the Hessian structure—–specifically, that the interaction potential is diagonal in reciprocal space whereas the bulk energy is diagonal in physical space—–we design an adaptive implicit-explicit solver for the trust region subproblem. This solver utilizes the fast Fourier transform to perform efficient matrix-vector products, significantly reducing computa-tional complexity while ensuring provable convergence to the global minimizer of the subproblem. In contrast to existing algorithms that target first-order stationary points, our proposed method can converge to a second-order sta-tionary state, corresponding to a local minimum with theoretical convergence guarantees. Numerical experiments on the LB model demonstrate that the proposed approach efficiently escapes saddle points and significantly outper-forms existing first-order schemes. Furthermore, we successfully identify the stable region of the FDDD phase, a structure previously unreported in the LB phase diagram. 
+
+1. Introduction 
+
+Landau theory constitutes a foundational framework for describing phases and phase transitions across a wide range of physical systems [21, 22]. In this paper, we consider a class of Landau-type energy functionals that contain two components, an interaction potential and a bulk energy term, (1.1) E(ψ(x)) = G(ψ(x)) + F (ψ(x)) ,
+
+where ψ(x) is the order parameter. In this formulation, the interaction poten-tial G(ψ) typically involves differential or non-local operators that describe spatial 
+
+2020 Mathematics Subject Classification. Primary 65N22, 65K10, 90C26. The first author was supported by the National Natural Science Foundation of China (12271291) and New Cornerstone Investigator Program (100001127). The third author was sup-ported by the National Key R&D Program of China (2023YFA1008802), the National Natural Science Foundation of China (12288101), the Science and Technology Innovation Program of Hunan Province (2024RC1052). The fourth author was supported by the National Key R&D Pro-gram of China (2023YFB3001604). This work is also partially supported by the High Performance Computing Platform of Xiangtan University. 
+
+> ©XXXX American Mathematical Society
+
+1 
+
+> arXiv:2603.03933v1 [math.NA] 4 Mar 2026 2CHENGLONG BAO, KAI DENG, KAI JIANG, AND JUAN ZHANG
+
+correlations and pattern selection, while the bulk energy term F (ψ) is a nonlinear potential driving phase transitions. This unified framework encompasses a wide va-riety of physical models, such as the Ginzburg-Landau model, the Ohta-Kawasaki model, the Swift-Hohenberg model, the LB model, and multi-length-scale mod-els [17, 25, 39, 31, 35]. One of the most important problems in investigating these models is computing both stable and metastable states accurately and ef-ficiently [14, 24], which is crucial for constructing phase diagrams and guiding the design of ordered materials in modulated systems. In the field of scientific computation, a standard approach is to discretize the energy functional (1.1), thereby transforming the infinite-dimensional variational problem into an n-dimensional optimization problem. By minimizing the resulting discretized function E, we can obtain the stationary points of the system. We define first- and second-order stationary points (SP-I and SP-II) as follows. 
+
+Definition 1.1. For a twice differentiable function E : Rn → R, a point v ∈ Rn is called a first-order stationary point (SP-I) of E if it satisfies ∇E(v) = 0 . Moreover, if v is SP-I and satisfies ∇2E(v) ⪰ 0, then v is called a second-order stationary point (SP-II) of E.
+
+SP-Is encompass global minima, local minima, and saddle points (SDPs), cor-responding to stable, metastable and transition states, respectively. SP-IIs form a subset of SP-Is and represent physically stable and metastable states. The identi-fication of SP-IIs enables accurate determination of equilibrium states. We define SP-IIs using positive semi-definite Hessians, rather than strictly positive definite ones, to accommodate degenerate stationary states with zero eigenvalues in their Hessian matrices. Such degeneracy arises fundamentally from continuous symme-tries, most notably translational invariance in ordered phases including periodic crystals and quasicrystals [4, 14, 13]. The current algorithms that aim to compute stationary states for such Landau models can be broadly classified into three categories. The first category is to solve the steady nonlinear Euler–Lagrange equations of (1.1). The second cate-gory focuses on solving the nonlinear gradient flow equation. Approaches include explicit-implicit schemes [36, 11, 33], the scalar auxiliary variable [32], the invari-ant energy quadrature scheme [38], and exponential time differencing methods [16]. The third category is from the optimization viewpoint. These approaches directly find the stationary states via solving a finite-dimensional or infinite-dimensional nonconvex optimization problem, such as gradient descent [28, 34], proximal gra-dient, and the Bregman proximal gradient approaches [4, 3, 18]. However, these approaches typically only consider convergence to SP-Is and theoretically cannot guarantee convergence to SP-IIs. To address this limitation, this work develops an algorithm that can provably converge to SP-IIs with theoretical guarantees by combining recent advances in op-timization. In particular, recent theories suggest that SP-IIs in nonconvex problems can be reached either through controlled perturbations or by exploiting curvature information. Stochastic gradient descent and its adaptive forms escape from sad-dle points and converge to SP-IIs by introducing noise during the iteration [20, 23]. Trust region (TR) methods [15, 29], and the variants of Newton’s method [27, 30, 1] can also ensure convergence to SP-IIs by utilizing the Hessian information. To validate the effectiveness of the proposed algorithm, we employ the LB model as a primary benchmark. This model is a representative example that describes IMEX-TR METHOD FOR COMPUTING SP-IIS OF A CLASS OF LANDAU MODELS 3
+
+systems exhibiting spatially modulated phases at finite wavenumbers, such as block copolymers, liquid crystals, microemulsions, and magnetic materials [7, 35, 8]. It effectively captures a broad spectrum of ordered phases, including lamellar, hexag-onal, body-centered cubic spheres, face-centered cubic spheres, double gyroid, A15, and σ phase [26]. The energy functional of the LB model is (1.2) E(ψ(x)) = 1
+
+|Ω|
+
+Z
+
+> Ω
+
+12 [(∆ + 1) ψ(x)] 2
+
+| {z }
+
+> G(ψ(x))
+
++ ( τ
+
+2! ψ(x)2 − γ
+
+3! ψ(x)3 + 14! ψ(x)4)
+
+| {z } 
+
+> F(ψ(x))
+
+dx.
+
+Here, Ω is a bounded domain with volume |Ω|; τ is the dimensionless reduced temperature, and γ is the phenomenological coefficient. The order parameter ψ(x)satisfies the mass conservation constraint 1
+
+> |Ω|
+
+R 
+
+> Ω
+
+ψ(x)dx = 0. The main contributions of this paper include 
+
+• We propose an implicit-explicit trust region (IMEX-TR) method for a class of Landau-type models, which converges to SP-IIs with theoretical guaran-tee. 
+
+• By exploiting the diagonal structure of the Hessian—diagonal in reciprocal space for the interaction potential and diagonal in physical space for the bulk energy term—we develop a customized algorithm for solving the non-convex TR subproblem arising at each iteration of the IMEX-TR method. The solver computes the global minimizer of the subproblem with the-oretical guarantees. The resulting implementation uses the fast Fourier transform (FFT) and achieves O(N log N ) computational complexity per iteration. 
+
+• The numerical results show that the IMEX-TR method reliably converges to SP-IIs from a wide range of initializations and effectively avoids SDPs encountered by first-order schemes. Furthermore, we reveal a previously unreported SP-II, namely the FDDD pattern, in the LB model and deter-mine its stable region within the newly constructed phase diagram. The remainder of this article is organized as follows. Section 2 discretizes the LB energy functional via the Fourier pseudospectral method, obtaining the finite-dimensional optimization problem. Section 3 proposes the IMEX-TR method and provides a comprehensive convergence analysis to SP-IIs. This section also de-tails the construction and theoretical analysis of the efficient global solver for the nonconvex TR subproblem. Section 4 presents numerical results that validate the theoretical properties of the proposed method. Finally, Section 5 provides a sum-mary of the main findings. 
+
+Notation : In the rest of the content, let ∥u∥2 = √u⊤u denote the ℓ2 norm for vector u. The operator (spectral) norm of a matrix H is denoted by ∥H∥ := max  
+
+> ∥u∥2=1
+
+∥Hu ∥2. For a third-order tensor T (e.g., third-order derivative ∇3E), the operator norm is defined as ∥T ∥ := max  
+
+> ∥u∥2=∥v∥2=∥w∥2=1
+
+|T [u, v, w]|, which represents the maximum absolute value of the tensor evaluated over all unit vectors [10]. 2. Discretizing the LB model with Fourier pseudospectral method 
+
+Here, we consider the periodic structures of the LB model. Thus, we adopt the Fourier pseudospectral method for spatial discretization. This approach naturally 4 CHENGLONG BAO, KAI DENG, KAI JIANG, AND JUAN ZHANG 
+
+accommodates periodic boundary conditions and facilitates the enforcement of mass conservation. Consider a periodic order parameter ψ(x) defined on x ∈ Td := Rd/AZd, where 
+
+A ∈ Rd×d represents the primitive Bravais lattice. The primitive reciprocal lattice 
+
+B ∈ Rd×d satisfies the dual relationship AB ⊤ = 2 πI.The order parameter ψ(x) can be expanded as 
+
+ψ(x) = X
+
+> k∈Zd
+
+ˆψ(k)ei(Bk )⊤x, x ∈ Td,
+
+where the Fourier coefficients ˆψ(k) = 1
+
+|Td|
+
+Z
+
+> Ω
+
+ψ(x)e−i(Bk )⊤x dx.
+
+Define the discrete grid set as 
+
+TdM = (x1,i 1 , . . . , xd,i d ) = A(i1/M, . . . , i d/M )⊤, i j = 0 , . . . , M − 1, j = 1 , . . . , d ,
+
+where the number of elements in TdM is N = M d. Denote the grid periodic function space FM = {f : TdM → R, f is periodic }. For any periodic grid functions f, g ∈FM , define the discrete ℓ2-inner product as 
+
+⟨f, g ⟩N = 1
+
+N
+
+X
+
+> xi∈TdM
+
+f (xi)¯ g(xi),
+
+where ¯ g(xi) is the conjugate of g(xi). The discrete reciprocal space is 
+
+KdM = {k = ( ki)di=1 ∈ Zd : −M/ 2 ≤ ki < M/ 2}.
+
+For k, h ∈ Zd, we have the discrete orthogonality 
+
+⟨ei(Bk )⊤x, e i(Bh )⊤x⟩N =
+
+(
+
+1, k = h + M m, m ∈ Zd,
+
+0, otherwise .
+
+Then the discrete Fourier coefficients of ψ(x) in Ω M can be represented as ˆψ(k) = ⟨ψ(x), e i(Bk )⊤x⟩N = 1
+
+N
+
+X
+
+> xi∈TdM
+
+ψ(xi)e−i(Bk )⊤xi , k ∈ KdM .
+
+Let Ψ = ( ψ1, . . . , ψ N ) ∈ RN , where ψi = ψ(xi), 1 ≤ i ≤ N . Denote FN ∈ CN ×N
+
+as the discrete Fourier transformation matrix, then we have the discrete order parameter ˆΨ = FN Ψ in reciprocal space. The discretized energy function is 
+
+E( ˆΨ) = G( ˆΨ) + F ( ˆΨ),
+
+where G and F are the discretized interaction and bulk energy (2.1) 
+
+G( ˆΨ) = 12
+
+X
+
+> k1+k2=0
+
+1 − k⊤k2 ˆΨ(k1) ˆΨ(k2),F ( ˆΨ) = τ
+
+2
+
+X
+
+> k1+k2=0
+
+ˆΨ(k1) ˆΨ(k2) − γ
+
+3! 
+
+X
+
+> k1+k2+k3=0
+
+ˆΨ(k1) ˆΨ(k2) ˆΨ(k3)+ 14! 
+
+X
+
+> k1+k2+k3+k4=0
+
+ˆΨ(k1) ˆΨ(k2) ˆΨ(k3) ˆΨ(k4),IMEX-TR METHOD FOR COMPUTING SP-IIS OF A CLASS OF LANDAU MODELS 5
+
+and ki ∈ KdM . The nonlinear terms F ( ˆΨ) can be efficiently obtained by the FFT after being calculated in the d-dimensional physical space. Moreover, the mass conservation constraint is discretized as 
+
+e⊤ 
+
+> 1
+
+ˆΨ = 0 ,
+
+where e1 = (1 , 0, . . . , 0) ⊤ ∈ RN . Therefore, we obtain the finite-dimensional mini-mization problem (2.2) min 
+
+> ˆΨ∈CN
+
+E( ˆΨ) = G( ˆΨ) + F ( ˆΨ) s.t. e⊤ 
+
+> 1
+
+ˆΨ = 0 .
+
+According to (2.1), we have 
+
+∇G( ˆΨ) = Λ ˆΨ, ∇F ( ˆΨ) = FN ΓF −1 
+
+> N
+
+ˆΨ,
+
+∇2G( ˆΨ) = Λ, ∇2F ( ˆΨ) = FN Γ′F −1 
+
+> N
+
+,
+
+where Λ is a diagonal matrix with nonnegative entries 1−k⊤k2 and Γ, Γ′ ∈ RN ×N
+
+are also diagonal matrices that depend on ˆΨ.3. Implicit-Explicit Trust Region Method 
+
+This section considers solving the minimization problem (2.2). To transform the problem into an unconstrained optimization problem, we use the following property 
+
+{ ˆΨ ∈ CN : e⊤ 
+
+> 1
+
+ˆΨ = 0 } = {P ⊤v : v ∈ CN −1},
+
+where P = [ 0, IN −1]. Based on this, we introduce an equivalent objective function ¯E(v) = E(P ⊤v),
+
+we then can equivalently express problem (2.2) as the following unconstrained op-timization problem (3.1) min  
+
+> v∈CN−1
+
+¯E(v).
+
+3.1. IMEX-TR Method and Convergence Analysis. In this subsection, we present the TR method (see Algorithm 1) and prove that this algorithm converges to SP-IIs of the problem (3.1). At each iteration j, we construct a quadratic model 
+
+mj (d) of the objective function around the current iterate vj ,
+
+mj (d) = ¯E(vj ) + g⊤ 
+
+> j
+
+d + 12 d⊤Hj d,
+
+where gj = ∇ ¯E(vj ) and Hj = ∇2 ¯E(vj ). The step dj is obtained by solving the TR subproblem (3.2) min 
+
+> ∥d∥2≤rj
+
+mj (d),
+
+where rj is the trust region radius. The optimality conditions for the TR subprob-lem (3.2) are stated in the following theorem. 6 CHENGLONG BAO, KAI DENG, KAI JIANG, AND JUAN ZHANG 
+
+Theorem 3.1 ([12], Corollary 7.2.2) . A vector d∗ is a global minimizer of the subproblem (3.2) if and only if there exists a scalar λ∗ ≥ 0 such that the following conditions are satisfied. 
+
+(3.3) 
+
+
+
+gj + ( Hj + λ∗I)d∗ = 0 ,
+
+∥d∗∥2 − rj ≤ 0,λ∗(∥d∗∥2 − rj ) = 0 ,
+
+Hj + λ∗I ⪰ 0.
+
+If Hj + λ∗I is positive definite, then d∗ is the unique global minimizer of (3.2) .
+
+Algorithm 1 summarizes the IMEX-TR method for solving the problem (3.1). Algorithm 2, the CONTRACT procedure, is designed to adjust the trust region radius. Algorithm 3 in the next subsection will present the customized solver for the TR subproblem (3.2). 
+
+Algorithm 1 IMEX-TR method for solving the problem (3.1) 
+
+Require: Initial guess v0, initial radius r0, parameters θ ∈ (0 , 1), 0 < γ C < 1 < γ E ,
+
+γλ > 1, 0 < μ ≤ ¯μ, μ0 ≥ μ, 0 < r 0 ≤ ν0, tolerance ε > 0.  
+
+> 1:
+
+for j = 0 , 1, . . . do  
+
+> 2:
+
+Compute gj = ∇ ¯E(vj ) 
+
+> 3:
+
+if ∥gj ∥∞ < ε , return vj . end if  
+
+> 4:
+
+Solve the TR subproblem (3.2) (see Algorithm 3), let sj and λj satisfy the optimality conditions (3.3), and sj be the global minimizer.  
+
+> 5:
+
+if j > 0 and ϱj−1 < θ then  
+
+> 6:
+
+μj = max {μj−1, λ j /∥sj ∥2} 
+
+> 7:
+
+end if  
+
+> 8:
+
+Calculate ϱj = ( ¯E(vj ) − ¯E(vj + sj )) /∥sj ∥32 
+
+> 9:
+
+if ϱj ≥ θ and either λj ≤ μj ∥sj ∥2 or ∥sj ∥2 = νj then  
+
+> 10:
+
+vj+1 = vj + sj , νj+1 = max {νj , γ E ∥sj ∥2} 
+
+> 11:
+
+rj+1 = min {νj+1 , max {rj , γ E ∥sj ∥2}} , μj+1 = max {μj , λ j /∥sj ∥2} 
+
+> 12:
+
+else if ϱj < θ then  
+
+> 13:
+
+vj+1 = vj , νj+1 = νj , rj+1 = CONTRACT( vj , r j , μ j , sj , λ j ).  
+
+> 14:
+
+else  
+
+> 15:
+
+vj+1 = vj , νj+1 = νj , rj+1 = min {νj+1 , λ j /μ j }, μj+1 = μj 
+
+> 16:
+
+end if  
+
+> 17:
+
+end for 
+
+3.1.1. Convergence to Second-Order Stationary Points. We first present two im-portant properties of the gradient and Hessian of the energy functional ¯E(v) with 
+
+{vj } and {sj } generated by Algorithm 1. 
+
+Theorem 3.2. Let sj be the global minimizer of the TR subproblem at the j-th iteration of Algorithm 1, and let sequence {vj } be generated by Algorithm 1. Then the gradient sequence {∇ ¯E(vj )} is bounded and the function ∇ ¯E is Lipschitz con-tinuous with a scalar Lipschitz constant gLip > 0 in an open convex set containing the iterate sequence {vj } and {vj + sj }. Furthermore, the Hessian function ∇2 ¯E
+
+is Lipschitz continuous on a path defined by the sequence of {vj } and {vj + sj }.IMEX-TR METHOD FOR COMPUTING SP-IIS OF A CLASS OF LANDAU MODELS 7
+
+Algorithm 2 CONTRACT procedure  
+
+> 1:
+
+procedure CONTRACT( vj , rj , μj , sj , λj ) 
+
+> 2:
+
+if λj < μ ∥sj ∥2 then  
+
+> 3:
+
+ˆλ = λj + ( μ∥gj ∥2)1/2 
+
+> 4:
+
+˜λ = ˆλ, solve the linear system ( Hj + ˜λI)s = −gj to get s 
+
+> 5:
+
+if ˜λ/ ∥s∥2 ≤ ¯μ then  
+
+> 6:
+
+return rj+1 = ∥s∥2 
+
+> 7:
+
+else  
+
+> 8:
+
+Find ˜λ ∈ (λj , ˆλ) such that μ ≤ ˜λ/ ∥s∥2 ≤ ¯μ, where s is the solution of the linear system ( Hj + ˜λI)s = −gj 
+
+> 9:
+
+return rj+1 = ∥s∥2 
+
+> 10:
+
+end if  
+
+> 11:
+
+else  
+
+> 12:
+
+˜λ = γλλj and solve the linear system ( Hj + ˜λI)s = −gj to get s 
+
+> 13:
+
+if ∥s∥2 ≥ γC ∥sj ∥2 then  
+
+> 14:
+
+return rj+1 = ∥s∥2 
+
+> 15:
+
+else  
+
+> 16:
+
+return rj+1 = γC ∥s∥2 
+
+> 17:
+
+end if  
+
+> 18:
+
+end if  
+
+> 19:
+
+end procedure 
+
+Proof. By the continuity and coercivity of ¯E and the decrease of ¯E(vj ), the sublevel set L = {v | ¯E(v) ≤ ¯E(v0)} is compact and {vj } ⊂ L , hence the sequences {vj } and 
+
+{∇ ¯E(vj )} are bounded. As the trial step sj is bounded ∥sj ∥2 ≤ rj , thus {vj + sj }
+
+is also bounded. By the boundedness of {vj } and {vj + sj }, there exists R > 0such that ∥vj ∥2 ≤ R and ∥vj + sj ∥2 ≤ R for all j. Let B := {v | ∥ v∥2 < R + δ},where δ > 0, then B is a bounded open convex set containing {vj } and {vj + sj }.By the mean value inequality, for any u, v ∈ B ,
+
+∥∇ ¯E(u) − ∇ ¯E(v)∥ ≤ sup  
+
+> w∈¯B
+
+∥∇ 2 ¯E(w)∥∥ u − v∥2,
+
+where ¯B is the closure of B. By the continuity of ∇2 ¯E and the compactness of ¯B,we have sup w∈ ¯B ∥∇ 2 ¯E(w)∥ < ∞, with gLip := sup w∈ ¯B ∥∇ 2 ¯E(w)∥, the Lipschitz continuity of ∇ ¯E on B follows. To prove the Lipschitz continuity of ∇2 ¯E on the path defined by the sequences 
+
+{vj } and {vj + sj }, we only need to show that ∇2 ¯E is Lipschitz continuous on ¯B.According to the mean value inequality, for any u, v ∈ ¯B, we have 
+
+∥∇ 2 ¯E(u) − ∇ 2 ¯E(v)∥ ≤ sup  
+
+> w∈¯B
+
+∥∇ 3 ¯E(w)∥∥ u − v∥2.
+
+As the third-order derivative ∇3 ¯E exists and is continuous, it follows that 
+
+∥∇ 2 ¯E(u) − ∇ 2 ¯E(v)∥ ≤ hLip ∥u − v∥2,
+
+where hLip := sup w∈ ¯B ∥∇ 3 ¯E(w)∥ < ∞. This completes the proof. □
+
+With the above preparations, we can establish the convergence of the outer loop to SP-IIs. 8 CHENGLONG BAO, KAI DENG, KAI JIANG, AND JUAN ZHANG 
+
+Theorem 3.3. The sequence {vj } generated by Algorithm 1 has the following prop-erty 
+
+lim  
+
+> j→∞
+
+∥∇ ¯E(vj )∥ = 0 , lim inf  
+
+> j→∞
+
+∇2 ¯E(vj ) ⪰ 0.
+
+Proof. In combination with Theorem 3.2, the properties of the sequence {vj } follow directly from Theorem 3.14 and Theorem 3.26 of [15]. □
+
+3.2. Efficient Global Solver for the Nonconvex TR Subproblem. In this subsection, we propose an efficient IMEX algorithm to solve the nonconvex TR subproblem (3.2) and analyze the algorithm’s ability to converge to the global minimizer of the subproblem. At each iteration of the IMEX-TR, a core challenge lies in solving the noncon-vex subproblem (3.2) globally and efficiently. For ease of analysis, we remove the subscript j and the constant term, and restate the subproblem (3.2) as (3.4) min  
+
+> ∥d∥2≤r
+
+f (d) = g⊤d + 12 d⊤Hd .
+
+We exploit the structural properties of the Hessian for the LB model, which can be decomposed as 
+
+H = P ∇2G(P ⊤v)P ⊤
+
+| {z }
+
+> D
+
++ P ∇2F (P ⊤v)P ⊤
+
+| {z }
+
+> T
+
+= D + T .
+
+Here, D is a positive semi-definite diagonal matrix in reciprocal space. We develop an algorithm that embeds an adaptive implicit-explicit iteration within the TR loop. The implicit-explicit scheme for the subproblem is (3.5) (I + η(D + λk+1 I)) dk+1 = dk − η(g + T d k), k = 0 , 1, 2, . . . 
+
+where η > 0 is a step size, and λk+1 ≥ 0 is a Lagrange multiplier adjusted to ensure 
+
+∥dk+1 ∥ ≤ rj . In this scheme, the diagonal part D is treated implicitly while the dense part T is treated explicitly, enabling efficient FFT-based computation while maintaining stability. By letting Lk+1 = D + λk+1 I, ¯ gk = g + T d k, and substituting these into (3.5), then it can be rewritten as (3.6) (I + ηLk+1 )
+
+| {z }
+
+> Diagonal matrix
+
+dk+1 = dk − η ¯gk.
+
+The features of scheme (3.6) are 
+
+• The matrix I + ηLk+1 is a diagonal matrix in reciprocal space, thus the up-date process only involves element-wise operations on the matrix, resulting in low computational complexity. 
+
+• The coefficient matrix I + ηLk+1 is always positive definite, which guar-antees the existence and uniqueness of the solution to the linear system, ensuring the numerical stability of the scheme. 
+
+• By adjusting the value of λk+1 , the norm of the solution can be limited within a certain range to ensure that the solution is within the feasible domain of the subproblem. 
+
+Remark 3.4. In order to exploit the diagonal structure of T in physical space, the product T d is efficiently computed by performing point-wise multiplication in physical space followed by the FFT. This approach ensures an overall computational IMEX-TR METHOD FOR COMPUTING SP-IIS OF A CLASS OF LANDAU MODELS 9
+
+complexity of O(N log N ) per iteration, avoiding the O(N 2) cost associated with direct matrix-vector multiplication in reciprocal space. 
+
+We first show that the solution of (3.6) satisfies ∥d∥2 ≤ r by adaptively adjust-ing the value of λk+1 , which ensures the solution of the adaptive implicit-explicit iteration is a feasible solution to problem (3.4). Since I + ηLk+1 is a diagonal matrix and positive definite, we get 
+
+dk+1 = ( I + ηLk+1 )−1bk =
+
+
+
+[bk]1/(1 + η(D1,1 + λk+1 )) ...[bk]N −1/(1 + η(DN −1,N −1 + λk+1 )) 
+
+ ,
+
+where [ bk]i denotes the i-th component of bk = dk −η ¯gk and Di,i is the i-th diagonal element of the diagonal matrix D, thus 
+
+ϕk(λk+1 ) = ∥dk+1 ∥22 = 
+
+> N−1
+
+X
+
+> i=1
+
+ [bk]i
+
+(1 + η(Di,i + λk+1 )) 
+
+2
+
+,
+
+it is easy to see that ϕk(λ) is a continuously differentiable and monotonically de-creasing function with respect to λ, then there must exist 0 ≤ λmin ≤ λmax < ∞,such that for any λk+1 ∈ [λmin , λ max ], we have ϕk(λk+1 ) ≤ r2. We set the value of 
+
+λk+1 as (3.7) λk+1 =
+
+(
+
+0, if ϕk(0) ≤ r2,λ′
+
+, if ϕk(0) > r 2,
+
+where λ′
+
+satisfying ϕk(λ′
+
+) = r2 is computed via Newton’s method 
+
+λι+1 = λι − (ϕk(λι) − r2)/ϕ ′
+
+> k
+
+(λι), ι = 0 , 1, 2, . . . , 
+
+with λ0 = 0. The complete adaptive implicit-explicit iteration for solving the TR subproblem (3.4) is summarized in Algorithm 3. 
+
+Algorithm 3 Adaptive implicit-explicit iteration 
+
+Input: : Step size η > 0, trust region radius r > 0, gradient g, decompose Hessian as H = D + T , initial value d0 = −rg/∥g∥2, tolerance εsub .
+
+Output: dk+1 .
+
+for k = 0 , 1, . . . do 
+
+λk+1 = 0. 
+
+while ϕk(λk+1 ) > r 2 do 
+
+Find λk+1 satisfies ϕk(λk+1 ) = r2 by Newton’s method 
+
+λk+1 ← λk+1 − (ϕk(λk+1 ) − r2)/ϕ ′
+
+> k
+
+(λk+1 )
+
+end while 
+
+dk+1 = ( I + η(D + λk+1 I)) −1(dk − η(g + T d k)) 
+
+if ∥g + ( H + λk+1 I)dk+1 ∥2 < ε sub then return dk+1 .
+
+end if end for 
+
+By Algorithm 3 and the update rule (3.7), we have the following corollary. 10 CHENGLONG BAO, KAI DENG, KAI JIANG, AND JUAN ZHANG 
+
+Corollary 3.5. The sequence {(λk, dk)} generated by Algorithm 3 has the following properties, 
+
+λk ≥ 0, ∥dk∥2 ≤ r, λk(∥dk∥2 − r) = 0 .
+
+By the above Corollary 3.5, we need only focus on the remaining two conditions in the optimality conditions (3.3). In the following, we first focus on the condition 
+
+g + ( H + λ∗I)d∗ = 0, and then the condition H + λ∗I ⪰ 0. 3.2.1. Global Convergence of the IMEX solver for the TR subproblem. We ana-lyze the properties of the sequence {dk} generated by Algorithm 3 for solving the nonconvex subproblem. Let β2 = λ ≥ 0 and define the Lagrangian function associated with the TR subproblem (3.4) as (3.8) L(d, β ) = f (d) + β2
+
+2 (∥d∥22 − r2).
+
+We first present the following Lemma 3.6 to describe the decreasing property of function values of L, which plays a crucial role in proving the convergence for the scheme (3.6). 
+
+Lemma 3.6. For any a > 0, if step size η satisfies the inequality 
+
+η−1 ≥ ∥ T ∥ + 2 a, 
+
+then we get the descent property for the function values of f in (3.4) and L in (3.8) ,
+
+f (dk) − f (dk+1 ) ≥ a∥dk+1 − dk∥22,L(dk, β k) − L(dk+1 , β k+1 ) ≥ a∥dk+1 − dk∥22.
+
+Proof. We define an auxiliary function and show that the update rule (3.6) is equiv-alent to minimizing this auxiliary function, i.e. ,(3.9) dk+1 = arg min 
+
+> d
+
+{fk(d)},
+
+where the objective function is defined as 
+
+fk(d) = 12 d⊤Lk+1 d + ( g + 12 T d k)⊤dk + ¯ g⊤ 
+
+> k
+
+(d − dk) + 12η ∥d − dk∥22,IMEX-TR METHOD FOR COMPUTING SP-IIS OF A CLASS OF LANDAU MODELS 11 
+
+By the optimality of dk+1 in (3.9), we have 
+
+f (dk) + β2
+
+> k+1
+
+2 ∥dk∥22 = fk(dk) ≥ fk(dk+1 )= 12 (dk+1 )⊤Lk+1 (dk+1 ) + ( g + 12 T d k)⊤(dk) + (¯ gk)⊤(dk+1 − dk) + 12η ∥dk+1 − dk∥22
+
+= 12 (dk+1 )⊤(Dd k+1 ) + ( g)⊤(dk+1 ) + ( T d k+1 )⊤(dk+1 − dk) + 12η ∥dk+1 − dk∥22
+
+− (T (dk+1 − dk)) ⊤(dk+1 − dk) + 12 (T d k)⊤(dk) + β2
+
+> k+1
+
+2 ∥dk+1 ∥22
+
+=f (dk+1 ) + β2
+
+> k+1
+
+2 ∥dk+1 ∥22 + 12η ∥dk+1 − dk∥22 + 12 (T d k+1 )⊤(dk+1 )
+
+− (T (dk+1 − dk)) ⊤(dk+1 − dk) + 12 (T d k)⊤(dk) − (T d k+1 )⊤(dk)=f (dk+1 ) + β2
+
+> k+1
+
+2 ∥dk+1 ∥22 + 12η ∥dk+1 − dk∥22 − 12 (T (dk+1 − dk)) ⊤(dk+1 − dk)=f (dk+1 ) + β2
+
+> k+1
+
+2 ∥dk+1 ∥22 + 12 (dk+1 − dk)⊤( 1
+
+η I − T )( dk+1 − dk).
+
+Since ∥dk∥22 ≤ r2, it follows that 
+
+f (dk) + β2
+
+> k+1
+
+2 ∥dk∥22 ≤ f (dk) + β2
+
+> k+1
+
+2 r2.
+
+By combining the above inequality with Corollary 3.5, we have 
+
+f (dk) + β2
+
+> k+1
+
+2 r2 ≥ f (dk+1 ) + β2
+
+> k+1
+
+2 r2 + 12 ⟨dk+1 − dk, ( 1
+
+η I − T )( dk+1 − dk)⟩ .
+
+Thus, when 1 /η ≥ ∥ T ∥ + 2 a, it reads 
+
+f (dk) − f (dk+1 ) ≥ a∥dk+1 − dk∥22,
+
+and L(dk, β k) − L(dk+1 , β k+1 )=f (dk) + β2
+
+> k
+
+2 (∥dk∥22 − r2) −
+
+
+
+f (dk+1 ) + β2
+
+> k+1
+
+2 (∥dk+1 ∥22 − r2)
+
+
+
+=f (dk) − f (dk+1 )
+
+≥a∥dk+1 − dk∥22.
+
+The second equality above is derived from Corollary 3.5. □
+
+Next, we show that the norm of the gradient is bounded, which is also important to our convergence theorem. 
+
+Lemma 3.7. If the step size η satisfies 
+
+(3.10) 0 < η min ≤ η ≤ 1
+
+∥T ∥ + 2 a ,
+
+then there must exist b > 0, such that 
+
+(3.11) 
+
+∇dL(dk+1 , β k+1 )
+
+∇β L(dk+1 , β k+1 )
+
+
+
+> 2
+
+≤ b ∥dk+1 − dk∥2 .12 CHENGLONG BAO, KAI DENG, KAI JIANG, AND JUAN ZHANG 
+
+Proof. ∇dL(dk+1 , β k+1 )
+
+∇β L(dk+1 , β k+1 )
+
+
+
+> 2
+
+=
+
+∇f (dk+1 ) + β2
+
+> k+1
+
+dk+1 
+
+βk+1 (∥dk+1 ∥22 − r2)
+
+
+
+> 2
+
+=
+
+∇f (dk+1 ) + β2
+
+> k+1
+
+dk+1 
+
+0
+
+
+
+> 2
+
+=∥g + T d k + Dd k+1 + β2
+
+> k+1
+
+dk+1 + T (dk+1 − dk)∥2
+
+=∥ − (dk+1 − dk)/η + T (dk+1 − dk)∥2
+
+≤(1 /η + ∥T ∥)∥dk+1 − dk∥2
+
+≤(1 /η min + ∥T ∥)∥dk+1 − dk∥2.
+
+The second equality above follows from Corollary 3.5 and β2 
+
+> k+1
+
+= λk+1 , (3.5) has been used for the fourth equality. Let b = 1 /η min + ∥T ∥ finishes the proof. □
+
+Using the KL property and the techniques of Lemma 2.6 from [2], we prove that the sequence {dk} is a Cauchy sequence. 
+
+Definition 3.8 (KL Property[5]) . Let L : CN → (−∞ , +∞] be a proper and lower semi-continuous function. For each z∗ ∈ dom ∇L, there exist κ > 0, a neighborhood U of z∗, and a concave continuous function φ : [0 , κ ) → R+, such that 
+
+φ(0) = 0 , φ ∈ C1(0 , κ ), φ ′(s) > 0 for all s ∈ (0 , κ ), and 
+
+φ′(L(z) − L(z∗)) dist (0 , ∇L(z)) ≥ 1,
+
+for all z ∈ U ∩ { z : L(z∗) < L (z) < L (z∗) + κ}, then L(z) is said to satisfy the KL property at point z∗. If L(z) satisfies the KL property at every point z, then 
+
+L(z) is called a KL function. 
+
+Theorem 3.9. Let the sequence {zk} = {(dk, β k)} = {(dk, √λk)} be generated by the IMEX subproblem solver in Algorithm 1. If the step condition (3.10) is satisfied, then we have that ∞X
+
+> k=1
+
+∥dk − dk+1 ∥2 < ∞,
+
+which means {dk} is a Cauchy sequence and that {dk} converges to d∗ as k → ∞ .Proof. As {zk} is bounded, there must exist an accumulation point of {zk}, let it be z∗ = ( d∗, β ∗), and there exists a subsequence {zkl } of {zk} converging to z∗ as 
+
+l → ∞ . Due to the boundedness from below of L and the monotonicity of {L(zk)},the continuous property of L implies that {L(zk)} converges to L(z∗) as k → ∞ 
+
+with L(z∗) < L (zk), k ∈ N. In particular, L satisfies the KL property [5], and thus 
+
+L(z∗) < L (zk) < L (z∗) + κ for large k ∈ N and small κ > 0.
+
+Taking the latter into account, we define a sequence {bk} by 
+
+bk := ∥zk − z∗∥2 + 2  a−1(L(zk) − L(z∗))  12 + ba −1φ L(zk) − L(z∗)
+
+and deduce from the continuity of φ that the origin 0 ∈ R is an accumulation point of {bk}. Thus there exists k0 := kl0 such that the inequalities (3.12) ∥zk0 − z∗∥2 + 2  a−1(L(zk0 ) − L(z∗))  12 + ba −1φ L(zk0 ) − L(z∗) < ϵ, L(z∗) < L (zk0 ) < L (z∗) + κIMEX-TR METHOD FOR COMPUTING SP-IIS OF A CLASS OF LANDAU MODELS 13 
+
+are satisfied and yield in turn the inclusions 
+
+zk0 ∈ B(z∗, ϵ ) ∩ L(z∗) < L < L (z∗) + κ ⊂ U ∩ L(z∗) < L < L (z∗) + κ,
+
+hence dk0 ∈ B(d∗, ϵ ). Moreover, we claim that if L(zk) < L (z∗) + κ and dk ∈ B(d∗, ϵ ), then (3.13) 2 ∥dk+1 −dk∥2 ≤ ∥ dk −dk−1∥2 + ba [φ L(zk)−L(z∗)−φ L(zk+1 )−L(z∗)].
+
+By Lemma 3.6, we have the inequality (3.14) L(zk) − L(zk+1 ) ≥ a∥dk+1 − dk∥22,
+
+hence 0 ≤ L(zk0+1 ) − L(z∗) ≤ L(zk0 ) − L(z∗) < κ, 
+
+which implies therefore the inequality 
+
+φ L(zk0 ) − L(z∗) − φ L(zk0+1 ) − L(z∗) ≥ φ′ L(zk0 ) − L(z∗)  L(zk0 ) − L(zk0+1 )
+
+by the concavity of φ. Combining (3.14) and 
+
+φ′(L(zk0 ) − L(z∗)) ≥ 1
+
+∇L(dk0 , β k0 ) ≥ 1
+
+b∥dk0 − dk0−1∥2
+
+,
+
+we have 
+
+ba [φ L(zk0 ) − L(z∗) − φ L(zk0+1 ) − L(z∗)] ≥ ∥dk0+1 − dk0 ∥22
+
+∥dk0 − dk0−1∥2
+
+.
+
+By 2 √αβ ≤ α + β, we get (3.13) with k = k0, i.e. ,2∥dk0+1 − dk0 ∥2 ≤ ∥ dk0 − dk0−1∥2 + ba [φ L(zk0 ) − L(z∗) − φ L(zk0+1 ) − L(z∗)].
+
+As we have (3.15) ∥dk0+1 − dk0 ∥2 ≤
+
+r L(zk0 ) − L(zk0+1 )
+
+a ≤
+
+r L(zk0 ) − L(z∗)
+
+a
+
+by (3.14), hence 
+
+∥dk0+1 −d∗∥2 ≤ ∥ dk0 −d∗∥2 +∥dk0+1 −dk0 ∥2 ≤ ∥ dk0 −d∗∥2 +
+
+r L(zk0 ) − L(z∗)
+
+a < ϵ, 
+
+then dk0+1 ∈ B(d∗, ϵ ), we get (3.13) with k = k0 + 1, i.e. ,2∥dk0+2 −dk0+1 ∥2 ≤ ∥ dk0+1 −dk0 ∥2+ ba [φ L(zk0+1 )−L(z∗)−φ L(zk0+2 )−L(z∗)].
+
+Next, for l = 1 , 2, · · · , we prove dk0+l ∈ B(d∗, ϵ ) and (3.16) 
+
+> l
+
+X
+
+> i=1
+
+∥dk0+i+1 − dk0+i∥2 + ∥dk0+l+1 − dk0+l∥2
+
+≤∥ dk0+1 − dk0 ∥2 + ba [φ L(zk0+1 ) − L(z∗) − φ L(zk0+l+1 ) − L(z∗)]14 CHENGLONG BAO, KAI DENG, KAI JIANG, AND JUAN ZHANG 
+
+by induction on l. Suppose dk0+l ∈ B(d∗, ϵ ) and (3.16) hold for some l ≥ 1, using the triangle inequality and (3.16) we have 
+
+∥d∗ − dk0+l+1 ∥2 ≤ ∥ d∗ − dk0 ∥2 + ∥dk0 − dk0+1 ∥2 +
+
+> l
+
+X
+
+> i=1
+
+∥dk0+i+1 − dk0+i∥2
+
+≤∥ d∗ − dk0 ∥2 + 2 ∥dk0 − dk0+1 ∥2
+
++ ba [φ L(zk0+1 ) − L(z∗) − φ L(zk0+l+1 ) − L(z∗)]
+
+≤∥ d∗ − dk0 ∥2 + 2 ∥dk0 − dk0+1 ∥2 + ba [φ L(zk0 ) − L(z∗)].
+
+Using the above inequality, (3.15) and (3.12) we conclude that dk0+l+1 ∈ B(d∗, ϵ ). Hence, (3.13) holds with k = k0 + l + 1, i.e. ,2∥dk0+l+2 − dk0+l+1 ∥2 ≤∥ dk0+l+1 − dk0+l∥2+
+
+ba [φ L(zk0+l+1 ) − L(z∗) − φ L(zk0+l+2 ) − L(z∗)].
+
+Adding the above inequality with (3.16), yields (3.16) with l + 1, which completes the induction proof. Direct use of (3.16) shows that 
+
+> k0+l
+
+X
+
+> i=k0+1
+
+∥di+1 − di∥2 ≤ ∥ dk0+1 − dk0 ∥2 + ba (φ L(zk0+1 ) − L(z∗)),
+
+therefore, ∞X
+
+> i=1
+
+∥di+1 − di∥2 < +∞
+
+which implies that the sequence {dk} is a Cauchy sequence, which therefore con-verges to d∗ since it is an accumulation point of {dk}. □
+
+Thus, we can prove that any limit point {(d∗, λ ∗)} of sequence {(dk, λ k)} is a KKT point. 
+
+Theorem 3.10. When step size condition (3.10) is satisfied, every limit point 
+
+{(d∗, λ ∗)} of the sequence {(dk, λ k)} is a KKT point of problem (3.4) .Proof. As {λk} is a bounded sequence, by the Bolzano-Weierstrass theorem, there exists a subsequence {λkl } such that λkl → λ∗ as l → ∞ . By Theorem 3.9 we know that dk converges to d∗, thus lim  
+
+> k→∞
+
+∥dk+1 − dk∥2 = 0. Taking the limits along the convergent subsequence on both sides of (3.11) yields lim  
+
+> j→∞
+
+∥g + Dd kl+1 + T d kl + λkl+1 dkl+1 ∥2 = 0 = ⇒ g + Dd ∗ + T d ∗ + λ∗d∗ = 0 ,
+
+combining with Corollary 3.5, we conclude that ( d∗, λ ∗) is a KKT point of problem (3.4). □
+
+Finally, we establish the global convergence of Algorithm 3. Denote by σ1 ≤
+
+σ2 ≤ . . . ≤ σN −1 the eigenvalues of H in (3.4). If σ1 ≥ 0, then subproblem (3.4) is a convex problem, and thus the first-order convergence (Theorem 3.10) naturally guarantees the global convergence of the iteration. Below, we assume σ1 < 0 and choose ξ to be the unit-norm eigenvector of the matrix H corresponding to the IMEX-TR METHOD FOR COMPUTING SP-IIS OF A CLASS OF LANDAU MODELS 15 
+
+smallest eigenvalue σ1 (i.e. , ∥ξ∥2 = 1). We define w(1) := ξ⊤w, for any w ∈ RN −1.The proof of global convergence relies on the following proposition. 
+
+Proposition 3.11 (Proposition 2.2 [9]) . Let g(1) ̸ = 0 . The global minimizer d∗ of problem (3.4) is the unique stationary point satisfying the condition d(1)  
+
+> ∗
+
+g(1) ≤ 0.
+
+Building upon the above proposition, we further prove that the limit point d∗
+
+from Theorem 3.10 is the global minimizer of the subproblem (3.4). 
+
+Theorem 3.12. If g(1) ̸ = 0 and the initial point is chosen as d0 = −rg/∥g∥2, then there exists an ηmax > 0 such that for any step size η ∈ (ηmin , η max ], d∗ is the global minimizer of the subproblem (3.4) .Proof. Theorem 3.10 establishes that dk → d∗ and that d∗ is a KKT point of (3.4). By Proposition 3.11, we only need to prove that (3.17) d(1)  
+
+> ∗
+
+g(1) ≤ 0.
+
+We now use induction to establish that (3.18) d(1)  
+
+> k
+
+g(1) ≤ 0 for all k ≥ 0,
+
+and thus taking the limit yields (3.17). By the choice of the initial point, we have 
+
+d(1) 0 g(1) = −r(g(1) )2 ≤ 0.
+
+Next, assuming d(1)  
+
+> k
+
+g(1) ≤ 0, we show d(1) 
+
+> k+1
+
+g(1) ≤ 0. We rewrite the iteration (3.5) as (3.19) [I + η(D + λk+1 I)] dk+1 = dk − η(T d k + g) = dk − η(( H − D)dk + g)=( I + ηD)dk − η(Hd k + g) = ( I + ηD)dk − η∇f (dk)=( I + η(D + λk+1 I)) dk − η(λk+1 dk + ∇f (dk)) .
+
+Then (3.20) dk+1 = dk − η(I + η(D + λk+1 I)) −1(λk+1 dk + ∇f (dk)) .
+
+Multiplying both sides of equation (3.19) on the left by ξ yields (1 + ηλ k+1 )d(1)  
+
+> k+1
+
++ η⟨ξ, D(dk+1 − dk)⟩ = (1 − ησ 1)d(1)  
+
+> k
+
+− ηg (1) .
+
+Multiplying both sides of the equation by g(1) yields (1 + ηλ k+1 )d(1) 
+
+> k+1
+
+g(1) = (1 − ησ 1)d(1)  
+
+> k
+
+g(1) − η
+
+
+
+(g(1) )2 + ⟨ξ, D(dk+1 − dk)⟩g(1) 
+
+.
+
+Since d(1)  
+
+> k
+
+g(1) ≤ 0, sufficient conditions for d(1) 
+
+> k+1
+
+g(1) ≤ 0 are (3.21a) 1 − ησ 1 ≥ 0 ⇐⇒ η ≥ 1
+
+σ1
+
+;(3.21b) (g(1) )2 + ⟨ξ, D(dk+1 − dk)⟩g(1) ≥ 0.16 CHENGLONG BAO, KAI DENG, KAI JIANG, AND JUAN ZHANG 
+
+With Mk = D[I +η(D +λk+1 I)] −1, we analyze the conditions under which (3.21b) holds. From the iteration (3.20), we have (3.22) 
+
+∥D(dk+1 − dk)∥2 =∥ηMk(λk+1 dk + ∇f (dk)) ∥2
+
+≤η∥Mk∥∥ λk+1 dk + ∇f (dk)∥2
+
+= η∥D∥∥ λk+1 dk + ∇f (dk)∥2
+
+1 + η(∥D∥ + λk+1 )
+
+≤ η∥D∥(λmax ∥dk∥2 + ∥∇ f (dk)∥2)1 + η∥D∥ .
+
+There exists ¯ η > 0 such that, for all η ≤ ¯η, we have (3.23) η∥D∥(λmax ∥dk∥2 + ∥∇ f (dk)∥2)1 + η∥D∥ < |g(1) |
+
+2 , for all k ≥ 0.
+
+Combining (3.22), (3.23) and ∥ξ∥2 = 1, we have (g(1) )2 + ξ⊤(D(dk+1 − dk)) g(1) ≥(g(1) )2 − ∥ ξ∥2∥D(dk+1 − dk)∥2|g(1) |
+
+>(g(1) )2 − |g(1) |2
+
+2 = (g(1) )2
+
+2 > 0.
+
+Thus, combining the step size condition (3.10) and (3.21a), if the step size η satisfies the following condition max 
+
+ 1
+
+σ1
+
+, η min 
+
+
+
+= ηmin ≤ η ≤ ηmax := min 
+
+ 1
+
+∥T ∥ + 2 a , ¯η
+
+
+
+,
+
+it is guaranteed that d(1) 
+
+> k+1
+
+g(1) ≤ 0. Thus, by induction, (3.18) holds. Let k → ∞ in (3.18) and using Proposition 3.11, we conclude that d∗ must be a global minimizer of problem (3.4). □
+
+4. Numerical Experiments 
+
+This section presents a comprehensive numerical evaluation of the proposed IMEX-TR method. To systematically compare the proposed method with several representative first-order schemes, including gradient flow methods and a Bregman proximal gradient algorithm, we demonstrate that IMEX-TR consistently converges to SP-IIs, whereas conventional methods often stagnate at unstable SP-Is. Further-more, we show that IMEX-TR exhibits robustness to initialization and is capable of escaping saddle points to explore complex energy landscapes, leading to the discovery of a previously unreported stable phase cubic FDDD in the LB model. Parameters used in Algorithm 1 are set to standard values in TR literature to balance convergence speed and numerical stability, γC = 0 .5, γE = 2, γλ = 1 .5, 
+
+θ = 10 −4, μ = 1, ¯ μ = 10 5, μ0 = 1, r0 = 1, ν0 = 5 and ε = 10 −10 . In Algorithm 3, the step size η = 0 .1 is chosen empirically to ensure efficient inner-loop convergence with a tolerance εsub = 10 −13 .4.1. Convergence. In this subsection, we compare the IMEX-TR method with representative methods, including the adaptive accelerated Bregman proximal gra-dient (AA-BPG) [18], and several gradient flow methods, including the semi-implicit scheme (SIS), first-order stabilized semi-implicit scheme (SSIS1), second-order sta-bilized semi-implicit scheme (SSIS2) [33], the invariant energy quadratization (IEQ) [38], the scalar auxiliary variable (SAV) [32], and exponential time differencing (ETD) IMEX-TR METHOD FOR COMPUTING SP-IIS OF A CLASS OF LANDAU MODELS 17 
+
+methods [16]. 1 All algorithms start from the same initial condition to demonstrate that the IMEX-TR method, by effectively using Hessian information, converges to SP-IIs, while other methods may converge to SP-Is. We illustrate the performance of IMEX-TR through three different examples. Table 1 summarizes the model parameters ( τ, γ ), computational domains, and ini-tial configurations employed in the three numerical experiments. The initial or-dered configurations—specifically, three-dimensional lamellar (LAM) and hexago-nal (HEX) phases—are constructed via Fourier series expansion of the form [19] 
+
+ψ(x) = X
+
+> k∈Ξ
+
+ˆψ(k)ei(Bk )⊤x,
+
+where the reciprocal lattice point sets Ξ, Fourier coefficients ˆψ(k), and reciprocal lattices B are detailed in Table 2. 
+
+Table 1. Model parameters, computational domains, and initial configurations for three numerical examples. Example Parameters ( τ, γ ) Domain Initial Phase 1 (−0.35 , 0.7) [0 , 2√2π]3 LAM 2 (−0.001 , 0.4) [0 , 2√2π]3 LAM 3 (−0.28 , 0.32) [0 , 2√6π]3 HEX 
+
+Table 2. Initial reciprocal lattice point sets Ξ, nonzero Fourier coefficients ˆψ(k), and reciprocal lattice matrices B for the LAM and HEX phases. Phase Ξ ˆψ(k) B
+
+LAM {(1 , 0, 0) , (−1, 0, 0) } 0.3 1√2 I
+
+HEX {(0 , 1, −1) , (0 , −1, 1) , (1 , 0, −1) ,
+
+(−1, 0, 1) , (1 , −1, 0) , (−1, 1, 0) } 0.3 1√6 I
+
+Figure 1 presents the converged SPs and their corresponding energy values. In Examples 1 and 2, conventional first-order schemes fail to escape the initial en-ergy basins and stagnate at unstable stationary points. Specifically, in Example 1, first-order methods remain trapped in the LAM state, while in Example 2, they converge to a disordered state ( i.e. , ϕ(x) ≈ 0). In contrast, the IMEX-TR method successfully converges to SP-IIs, HEX and body-centered cubic (BCC) phases, both exhibiting lower free energies. In Example 3, all methods reach the SP-II state HEX; however, the IMEX-TR method escapes the HEX basin and discovers a cu-bic FDDD pattern that achieves an energy of E = −8.05 × 10 −2, which is markedly lower than the HEX phase ( E = −8.02 × 10 −2). The cubic FDDD pattern has been reported in the phase diagram of AB-type diblock copolymers [37]; however, its presence in the LB model has not been previously documented. To further verify the stability of these stationary points, we perform an eigen-value analysis of the Hessian matrix. Figure 2 illustrates the evolution of the four  
+
+> 1Since the results of SIS, SSIS1, and IEQ are similar to those of other methods except IMEX-TR, the corresponding results are not reported. 18 CHENGLONG BAO, KAI DENG, KAI JIANG, AND JUAN ZHANG
+
+smallest eigenvalues throughout the iterative process. For the first-order methods in Examples 1 and 2, the persistence of significant negative eigenvalues confirms that the states reached are SDPs. Conversely, the IMEX-TR method converges to a point where the Hessian eigenvalues are non-negative, which satisfies the SP-II condition. In summary, the numerical results demonstrating convergence to SP-IIs and the discovery of the cubic FDDD phase highlight the IMEX-TR method’s distinctive capability for identifying (meta-)stable states, while existing first-order gradient approaches may fail to capture. AA-BPG SSIS2 SAV IMEX-TR ETD             
+
+> (-0.35,0.7)
+> (-0.001,04)
+> (-0.28, 0.32) E=-1.94e-02 E=-1.94e-02 E=-1.94e-02 E=-1.94e-02 E=-1.33e-01
+> E=2.68e-20 E=4.02e-20 E=4.02e-20 E=4.02e-20 E=-1.10e-03
+> E=-8.02e-02 E=-8.02e-02 E=-8.02e-02 E=-8.02e-02 E=-8.05e-02
+
+Figure 1. Final physical phases and energy. IMEX-TR identifies the (meta-)stable HEX, BCC, and cubic FDDD phases across the three examples, consistently achieving lower energy states com-pared to standard first-order schemes. 4.2. Robustness to initial conditions. We further evaluate the robustness of IMEX-TR by activating it at distinct stages along the trajectory of first-order methods. As Figure 3 illustrates, IMEX-TR launches on three representative states: (i) the initial configuration, (ii) an intermediate state, and (iii) the converged SDP stage attained by first-order solvers. The behavior of IMEX-TR remains similar regardless of the specific first-order method used. These results show that IMEX-TR consistently converges to an SP-II, a fun-damental advantage arising from its use of Hessian information to capture the curvature of the energy landscape. This capability allows the algorithm to identify and exploit descent directions associated with negative curvature, thereby enabling it to divert the optimization trajectory away from SP-Is during the early stages or to escape them after stagnation. Consequently, the IMEX-TR reliably avoids SP-I and locates SP-II, i.e. , the physical (meta-)stable phase, regardless of whether it is deployed from the beginning or as a post-processing step for other solvers. 4.3. Construction of new phase diagram. The phase diagram of the LB model has been well documented to contain stable ordered phases such as LAM, HEX, IMEX-TR METHOD FOR COMPUTING SP-IIS OF A CLASS OF LANDAU MODELS 19 (-0.35, 0.7) 
+
+> (-0.001, 0.4)
+> (-0.28, 0.32)
+
+AA-BPG SSIS2 SAV ETD IMEX-TR 
+
+the smallest eigenvalue 
+
+the second smallest eigenvalue 
+
+the third smallest eigenvalue 
+
+the fourth smallest eigenvalue                     
+
+> 1.0 5.0 10.0 14.0 19.0
+> -0.5
+> -0.4
+> -0.3
+> -0.2
+> -0.1
+> 0
+> 0.1
+> 1.0 10.0 19.0 28.0 37.0
+> -0.04
+> -0.02
+> 0
+> 0.02
+> 0.04
+> 1.0 13.0 26.0 38.0 51.0
+> -0.2
+> -0.15
+> -0.1
+> -0.05
+> 0
+> 0.05
+> 1.0 29.0 57.0 85.0 113.0
+> -0.2
+> -0.15
+> -0.1
+> -0.05
+> 0
+> 0.05
+> 1.0 12.0 23.0 34.0 46.0
+> -0.5
+> -0.4
+> -0.3
+> -0.2
+> -0.1
+> 0
+> 0.1
+
+Figure 2. Evolution of the four smallest eigenvalues of the Hes-sian matrix. The dashed line indicates the zero threshold. IMEX-TR consistently reaches the SP-II region (non-negative eigenval-ues), whereas first-order methods often stagnate at SDPs with neg-ative curvature. Energy -8.73e-04 -1.936e-02 -1.94e-02 -1.33e-01 
+
+initial value 
+
+> IMEX-TR First-order algorithms Switch to IMEX-TR
+
+SP-II SDP 
+
+SDP 
+
+Figure 3. Trajectories of IMEX-TR activated at different stages of first-order methods. Whether started from the initial point, an intermediate state, or the converged saddle point, IMEX-TR con-sistently converges to the same (meta-)stable SP-II (HEX phase), demonstrating its efficacy in exploiting negative curvature direc-tions to escape unstable stationary points. 20 CHENGLONG BAO, KAI DENG, KAI JIANG, AND JUAN ZHANG 
+
+BCC, double gyroid (DG), face-centered cubic spheres, A15, and σ phases [6, 26]. Our simulation in Section 4.1 demonstrates that the cubic FDDD pattern is indeed an SP-II according to the IMEX-TR method. There is a stable region of the dis-covered cubic FDDD pattern in the phase diagram of AB-type diblock copolymers [37]. However, its thermodynamic stability in the LB model remains uncertain. Motivated by this finding, we conducted an extensive search across the ( τ, γ ) pa-rameter space to investigate whether a stable region for the cubic FDDD pattern exists within the LB model. As presented in Figure 4, our results confirm the ex-istence of a stable region for the cubic FDDD pattern. Moreover, the identified stable region of the cubic FDDD phase does not affect the stable regions of the face-centered cubic spheres, A15, and σ phases [26]. This finding not only provides a more complete picture of the LB phase diagram but also demonstrates the capa-bility of IMEX-TR to explore complex energy landscapes and uncover new stable structures. 5. Conclusion 
+
+In this work, we propose the IMEX-TR method for computing SP-IIs of a broad class of Landau-type energy functionals, which correspond to the (meta-)stable states of the physical system. Using the periodic phases of the LB model as a benchmark, we discretized the energy by the Fourier pseudospectral method and addressed the key algorithmic challenge, i.e. , solving the nonconvex TR subproblem with global optimality guarantees. By splitting the Hessian into two components that are diagonal in reciprocal space and in physical space, respectively, we de-veloped an efficient solver that attains the global minimizer of each subproblem, thereby enabling the overall IMEX-TR iteration to provably converge to SP-IIs. Extensive numerical experiments on the LB model validate both the theoretical properties and the practical advantages of IMEX-TR, including robust convergence from diverse initializations and effective avoidance of SP-Is encountered by first-order gradient schemes. Furthermore, we identified the stable region of the cubic FDDD phase, which, to the best of our knowledge has not been reported in exist-ing LB phase diagrams. Finally, although our analysis and experiments focused on (a) (b) LAM (c) HEX (d) BCC (e) DG (f) FDDD 
+
+Figure 4. (a) Phase diagram of the LB model. The purple shaded area corresponds to the stable region of the FDDD phase. (b)-(f) illustrate the SP-II phases: LAM, HEX, BCC, DG, and FDDD. IMEX-TR METHOD FOR COMPUTING SP-IIS OF A CLASS OF LANDAU MODELS 21 
+
+the LB model, the IMEX-TR framework and the accompanying convergence the-ory are applicable to other Landau-type models of similar type and various spatial discretization schemes. 
+
+References 
+
+1. N. Agarwal, Z. Allen-Zhu, B. Bullins, E. Hazan, and T. Ma, Finding approximate local min-ima faster than gradient descent , STOC’17—Proceedings of the 49th Annual ACM SIGACT Symposium on Theory of Computing, ACM, New York, 2017, pp. 1195–1199. MR 3678262 2. H. Attouch, J. Bolte, and B. F. Svaiter, Convergence of descent methods for semi-algebraic and tame problems: proximal algorithms, forward-backward splitting, and regularized Gauss-Seidel methods , Math. Program. 137 (2013), no. 1-2, 91–129. MR 3010421 3. C. Bao, C. Chen, and K. Jiang, An adaptive block Bregman proximal gradient method for computing stationary states of multicomponent phase-field crystal model , CSIAM Trans. Appl. Math. 3 (2022), no. 1, 133–171. MR 4399507 4. C. Bao, C. Chen, K. Jiang, and L. Qiu, Convergence analysis for Bregman iterations in minimizing a class of Landau free energy functionals , SIAM J. Numer. Anal. 62 (2024), no. 1, 476–499. MR 4704654 5. J. Bolte, S. Sabach, and M. Teboulle, Proximal alternating linearized minimization for non-convex and nonsmooth problems , Math. Program. 146 (2014), no. 1-2, 459–494. MR 3232623 6. S. A. Brazovskii, Phase transition of an isotropic system to a nonuniform state , Sov. Phys. JETP 41 (1975), 85. 7. S. A. Brazovski˘ ı, Phase transition of an isotropic system to a nonuniform state , 30 Years Of The Landau Institute—Selected Papers, World Scientific, 1996, pp. 109–113. 8. M. E. Caplan and C. J. Horowitz, Colloquium: Astromaterial science and nuclear pasta , Rev. Modern Phys. 89 (2017), 041002. 9. Y. Carmon and J. C. Duchi, First-order methods for nonconvex quadratic minimization ,SIAM Rev. 62 (2020), no. 2, 395–436, Revised reprint of “Gradient descent finds the cubic-regularized nonconvex Newton step” [4000224]. MR 4094475 10. C. Cartis, N. I. M. Gould, and P. L. Toint, Sharp worst-case evaluation complexity bounds for arbitrary-order nonconvex optimization with inexpensive constraints , SIAM J. Optim. 30 
+
+(2020), no. 1, 513–541. MR 4066572 11. L. Q. Chen and J. Shen, Applications of semi-implicit fourier-spectral method to phase field equations , Computer Physics Communications 108 (1998), no. 2-3, 147–158. 12. A. R. Conn, N. I. M. Gould, and P. L. Toint, Trust-region methods , MPS/SIAM Series on Optimization, Society for Industrial and Applied Mathematics (SIAM), Philadelphia, PA; Mathematical Programming Society (MPS), Philadelphia, PA, 2000. MR 1774899 13. G. Cui and K. Jiang, Spring pair method of finding saddle points using the minimum energy path as a compass , Phys. Rev. E 110 (2024), no. 6, Paper No. 064123, 11. MR 4859046 14. G. Cui, K. Jiang, and T. Zhou, An efficient saddle search method for ordered phase transitions involving translational invariance , Computer Physics Communications 306 (2025), 109381. 15. F. E. Curtis, D. P. Robinson, and M. Samadi, A trust region algorithm with a worst-case iteration complexity of O(ϵ−3/2) for nonconvex optimization , Math. Program. 162 (2017), no. 1-2, 1–32. MR 3612930 16. Z. Fu and J. Yang, Energy-decreasing exponential time differencing Runge-Kutta methods for phase-field models , J. Comput. Phys. 454 (2022), Paper No. 110943, 11. MR 4369169 17. V. L. Ginzburg and L. D. Landau, On the theory of superconductivity , On superconductivity and superfluidity: a scientific autobiography, Springer, 2009, pp. 113–137. 18. K. Jiang, W. Si, C. Chen, and C. Bao, Efficient numerical methods for computing the station-ary states of phase field crystal models , SIAM J. Sci. Comput. 42 (2020), no. 6, B1350–B1377. MR 4171590 19. K. Jiang, C. Wang, Y. Huang, and P. Zhang, Discovery of new metastable patterns in diblock copolymers , Commun. Comput. Phys. 14 (2013), no. 2, 443–460. 20. C. Jin, R. Ge, P. Netrapalli, S. M. Kakade, and M. I. Jordan, How to escape saddle points efficiently , International conference on machine learning, PMLR, 2017, pp. 1724–1732. 21. L. D Landau, The theory of phase transitions , Nature 138 (1936), no. 3498, 840–841. 22. L. D. Landau and E. M. Lifshitz, Statistical physics , vol. 5, Pergamon Press, 1958. MR 136378 22 CHENGLONG BAO, KAI DENG, KAI JIANG, AND JUAN ZHANG 
+
+23. J. D. Lee, M. Simchowitz, M. I. Jordan, and B. Recht, Gradient descent only converges to minimizers , Conference on learning theory, PMLR, 2016, pp. 1246–1257. 24. L. Lin, X. Cheng, W. E, A.-C. Shi, and P. Zhang, A numerical method for the study of nucleation of ordered phases , J. Comput. Phys. 229 (2010), no. 5, 1797–1809. MR 2578252 25. C. Liu and J. Shen, A phase field model for the mixture of two incompressible fluids and its ap-proximation by a Fourier-spectral method , Phys. D 179 (2003), no. 3-4, 211–228. MR 1984386 26. D. McClenagan, Landau theory of complex ordered phases , Master’s thesis, McMaster Uni-versity, 2019. 27. Y. Nesterov and B. T. Polyak, Cubic regularization of Newton method and its global perfor-mance , Math. Program. 108 (2006), no. 1, 177–205. MR 2229459 28. J. W. Neuberger, Sobolev gradients and differential equations , second ed., Lecture Notes in Mathematics, vol. 1670, Springer-Verlag, Berlin, 2010. MR 2573187 29. M. Nouiehed and M. Razaviyayn, A trust region method for finding second-order stationarity in linearly constrained nonconvex optimization , SIAM J. Optim. 30 (2020), no. 3, 2501–2529. MR 4150278 30. C. W. Royer, M. O’Neill, and S. J. Wright, A Newton-CG algorithm with complexity guar-antees for smooth unconstrained optimization , Math. Program. 180 (2020), no. 1-2, 451–488. MR 4062843 31. S. Savitz, M. Babadi, and R. Lifshitz, Multiple-scale structures: from faraday waves to soft-matter quasicrystals , IUCrJ 5 (2018), no. 3, 247–268. 32. J. Shen, J. Xu, and J. Yang, A new class of efficient and robust energy stable schemes for gradient flows , SIAM Rev. 61 (2019), no. 3, 474–506. MR 3989239 33. J. Shen and X. Yang, Numerical approximations of Allen-Cahn and Cahn-Hilliard equations ,Discrete Contin. Dyn. Syst. 28 (2010), no. 4, 1669–1691. MR 2679727 34. S. Sial, J. Neuberger, T. Lookman, and A. Saxena, Energy minimization using Sobolev gra-dients: application to phase separation and ordering , J. Comput. Phys. 189 (2003), no. 1, 88–97. MR 1988141 35. J. Swift and P. C. Hohenberg, Hydrodynamic fluctuations at the convective instability , Phys. Rev. A 15 (1977), no. 1, 319–328. 36. S. M. Wise, C. Wang, and J. S. Lowengrub, An energy-stable and convergent finite-difference scheme for the phase field crystal equation , SIAM J. Numer. Anal. 47 (2009), no. 3, 2269– 2288. MR 2519603 37. K. Yamada, M. Nonomura, and T. Ohta, Fddd structure in AB-type diblock copolymers ,Journal of Physics: Condensed Matter 18 (2006), no. 32, L421. 38. X. Yang, Linear, first and second-order, unconditionally energy stable numerical schemes for the phase field model of homopolymer blends , J. Comput. Phys. 327 (2016), 294–316. MR 3564340 39. P. Zhang and X. Zhang, An efficient numerical method of Landau-Brazovskii model , J. Com-put. Phys. 227 (2008), no. 11, 5859–5870. MR 2414934 
+
+Yau Mathematical Sciences Center, Tsinghua University, Beijing, China, 100084 
+
+Email address : clbao@mail.tsinghua.edu.cn 
+
+School of Mathematics and Computational Science, Xiangtan University, Xiangtan, Hunan, China, 411105 
+
+Email address : kdeng1533@smail.xtu.edu.cn 
+
+Hunan Key Laboratory for Computation and Simulation in Science and Engineering, School of Mathematics and Computational Science, Xiangtan University, Xiangtan, Hunan, China, 411105 
+
+Email address : kaijiang@xtu.edu.cn 
+
+Key Laboratory of Intelligent Computing and Information Processing of Ministry of Education, School of Mathematics and Computational Science, Xiangtan University, Xiangtan, Hunan, China, 411105 
+
+Email address : zhangjuan@xtu.edu.cn

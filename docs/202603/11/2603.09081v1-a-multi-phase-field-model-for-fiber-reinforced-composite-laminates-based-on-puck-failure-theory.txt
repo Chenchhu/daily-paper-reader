@@ -1,0 +1,1789 @@
+Title: A multi-phase-field model for fiber-reinforced composite laminates based on puck failure theory
+
+URL Source: https://arxiv.org/pdf/2603.09081v1
+
+Published Time: Wed, 11 Mar 2026 00:23:08 GMT
+
+Number of Pages: 39
+
+Markdown Content:
+# A Multi-Phase-Field Model for Fiber-Reinforced Composite Laminates Based on Puck Failure Theory 
+
+Pavan Kumar Asur Vijaya Kumar a, Rafael Fleischhacker a, Aamir Dean b,c, ∗, Heinz E Pettermann a
+
+> aInstitute of Lightweight Design and Structural Biomechanics, Technische Universität Wien, Getreidemarkt 9, 1060 Vienna, Austria.
+> bInstitute of Structural Analysis. Leibniz Universität Hannover, Appelstr. 9A, 30167 Hannover, Germany
+> cSchool of Civil Engineering, College of Engineering, Sudan University of Science and Technology, P.O. Box 72, Khartoum, Sudan
+
+Abstract 
+
+This article proposes a multi-phase-field model using the Puck failure theory to predict the failure in fiber-reinforced composites (FRCs) laminates. Specifically, this work proposes a two-dimensional multi-field model in conjunction with a mesh overlay method to compute in-plane damage in the FRCs laminates with various ply orientations. The formulation considers the two independent phase-field variables to trigger fiber and inter-fiber-dominated failure separately, thereby accessing the interrelation between the damage. Furthermore, the model considers two characteristic length scales and two structural tensors to describe the damage modes accurately. Each ply in the laminate is represented using a separate mesh and is com-bined using the mesh overlay method. Four benchmark examples are utilized to demonstrate the predictive capability of the proposed model. Specifically, coupon tests in tensile and compressive loading, open-hole tension, compact tension, and double-edged notched tension examples are presented along with the compar-ison with the experimental results from the literature. Furthermore, results regarding cross-ply laminates and isotropic laminates show the model’s ability to mimic the experimental results both qualitatively and quantitatively. 
+
+Keywords: A. Multi-Phase-Field, B. Laminates, C. Phase-field method, D. FRCs, E. Fracture 
+
+1. Introduction 
+
+Laminated composites (FRCs) have been the popular choice of engineering applications in the last few decades. This is due to their unique combination of mechanical, thermal, and chemical properties and, more importantly, the ability to manipulate the mechanical properties according to the designer’s need. A prime example is the Boeing 787, with 50% of its weight and 80% by volume, and the Airbus A350 wide-body aircraft, with 53% of its weight being composites. The laminated composites have made their way into every lightweight alternative sector, such as aerospace, automotive, marine, energy, and sporting, to name a few. Despite their contributions, the FRCs possess a significant challenge in predicting fracture due to their complex failure mechanism [1]. Numerical methods to predict the onset and damage propagation in the com-posites are highly desirable to supplement the experimental investigation and to enhance damage-tolerant designs. For a given loading, the propagation of cracks and the failure mode within the laminates highly depend on the layup sequence. Failure modes that can arise under in-plane loading include: 1. transverse intralaminar matrix cracking, 2. longitudinal intralaminar matrix cracking, 3. interlaminar cracking (delam-ination), 4. transverse crack propagation leading to fiber tensile or compressive failure, and 5. delamination growth [2, 3].   
+
+> ∗Corresponding author
+> Email address: a.dean@isd.uni-hannover.de (Aamir Dean )
+> arXiv:2603.09081v1 [physics.comp-ph] 10 Mar 2026
+
+The literature on composites, especially FRCs, is dominated by experimental investigations. This article highlights the most relevant research. See [4] and the references for a more extensive review. Experimental investigation regarding the open-hole tension (OHT) of the laminates are presented in [5–8]. Specifically, [9] investigates the strength of the open hole tension and the underlying failure mode. [7, 8, 10–13] considers various laminate sequences and the ply block to study the effects of stacking sequence, ply block thickness, and the effects of size in the laminates, among other factors. See [8, 9] for more details. Apart from the OHT, compact tension (CT) configurations are widely used to study laminates. The compact tension results for the carbon/epoxy are tested in [14–20], while carbon/ carbon laminates are studied in [21], carbon/PEEK in [22], boron/aluminum in [23, 24]. These studies also consider various lam-inate sequences under tension and compression. The notched tension specimens are extensively investigated to study their mechanical properties, including fracture toughness, and the effects of the notch in different structural configurations in various laminate sequences in [14, 23, 25–30], among others. Several numerical approaches are used to model composites mathematically. In the related literature, various models are used to simulate damage propagation in FRCs, such as cohesive elements [31], smeared crack models [32], extended-finite element method (XFEM) [33], peridynamics [34, 35]. Additionally, a combined FEM and peridynamics approach [36], discrete lattice models [37–39] are also used. See [3] for an elaborate discussion on computational modeling of composite material, and [2] for a review on general computational damage. The dominant approach stems from continuum damage mechanics (CDM), where unidirectional (UD) plies are treated as smeared (homogenized) materials within FEM. Various constitutive models for ply behavior are proposed, ranging from progressive degradation models [40] to advanced contin-uum damage mechanics models [41–43]. Composites are modeled as anisotropic elastic-brittle continua in [44–46] or shear-driven inelasticity [47]. Models addressing stiffness degradation and unrecoverable strain ac-cumulation are proposed in [48–51]. The micro-mechanics inspired CDM model that includes nonlinearities stemming from the accumulation of unrecoverable strains, strain hardening, strain softening, and plasticity is proposed in [5, 6, 50, 52]. Phase-field (PF) methods, in general, are seen as a competition between the strain energy in the system and the energy required to create a new surface [53–56]. Due to the smeared nature of the crack, the non-local approach, and the ease of integrating with different material models, the phase-field methods have become an appealing computational tool for fracture modeling. Consequently, phase-field methods are used to study fracture in brittle [57–67], dynamic fracture [56, 58, 67–70], thermo-mechanical fracture [71–73], and composites [74–84] among others. In the context of the composites, the phase-field methods are primarily restricted to the study of single-ply/unidirectional fiber-reinforced composites and occasionally simple laminate sequences such as cross-ply laminates, see [74, 79, 85–87]. Specifically, the laminates with various sequences are treated in and out-of-plane setting to study the effects of the laminate sequence. As a consequence, only crack propagation in the thickness plane (out of plane) is studied as in [87–94]. According to the authors, no articles within the context of phase-field methods consider more than two layers of laminate sequence to find the in-plane crack propagation in the laminates. Many PF models relying on anisotropic energies [88, 93] fail to capture compressive loading due to the energy split. Furthermore, extending these methods to study laminates with different ply sequences is not trivial. Additionally, the models often resort to balancing the length scales to match the force-displacement curve. This approach is a direct consequence of the recent paper by Oscar et al. [95, 96], which suggests that classical variational phase-field models cannot predict crack nucleation accurately. Furthermore, the study suggests that the entire failure initiation surface has to be included in the formulation for the phase-field model to describe crack nucleation. In other words, the crack nucleation has to be primarily accompanied by ad hoc criteria apart from the interpolation of the length scale ℓ (of PF). Within the context of the FRCs, the phenomenological criteria such as PUCK [40], Hashin [97], or physically based criteria such as [4, 98–103] have to be included in the model to account for the crack nucleation. See [104] and the references therein for more extensive review of FRCs using Phase-field method. This paper addresses the issues regarding the failure initiation (strength) surface by invoking the Puck failure theory. Furthermore, the in-plane damage in the laminates with various ply sequences is captured using a simple two-dimensional model employing mesh overlay techniques. As a consequence of the two-dimensional model, the study of the delamination is omitted. Further advantages and disadvantages of the 2model are detailed in the sequel. The article also compares the numerical results with the experimental methods in each example using crack propagation and qualitative assessment such as force vs. displacement and laminate mean stress, wherever available. The article is organized as follows. Section 2 presents the variation formulation using a multi-phase-field model. Section 3 briefly introduces the Puck failure theory, followed by its integration into the variational framework. Thermodynamic consistency and the details of driving forces are presented in Section 4. Section 5 presents the finite element formulation in general for the n-ply in the laminates using mesh overlay techniques. The relevant information for the computer implementation of the mesh overlay technique is also presented. Section 6 considers four distinct geometries with various laminate sequences to present the model’s predictive capacity. Specifically, the following examples, along with the comparison between the experiments and numerical methods, are presented. Section 6.1 presents the coupon test. Section 6.2 presents the results regarding open hole tension. Section 6.3 presents the results regarding compact tension, and finally Section 6.4 presents the results regarding the double edge notched tension. Finally, the conclusions are presented in Section 7. The research data, along with the codes, are provided in Section 8. 
+
+2. Variational Formulation 
+
+This section proposes a multi-phase-field model for the fracture analysis of fiber-reinforced composite laminates. The damage at the ply level is initiated using Puck failure criteria, while displacement coupling stemming from laminates is used to determine the damage at the laminate level. Restricting the analysis to a two-dimensional setting, consider an arbitrary body B in an Euclidean space with its delimiting boundaries 
+
+∂B. Then, for every position vector x ∈ B , vector valued displacement is defined as u(x, t ) : B × [0 , t ] → R2,with pseudo time τ ∈ [0 , t ]. The strain in the system is defined as a symmetric gradient of the displacement field ε(u) = ∇su, with ε : B → R2×2. Prescribed boundary displacements are given by u = ¯u on ∂Bu, while the prescribed tractions are given by ¯t = σ · n applied on ∂Bt. Here σ is the Cauchy stress tensor, and n is the unit outward normal vector at the traction boundary. The boundary conditions satisfy ∂Bu ∪ ∂Bt = ∂B
+
+and ∂Bu ∩∂Bt = ∅. Furthermore, let Γf and Γm be crack sets for fiber failure and matrix failure, respectively, such that Γf , Γm ⊂ R1, and Γf ∪ Γm = Γ as in Fig. 1. fm
+
+> t
+> fm
+> GLGLLL
+> Figure 1: Geometrical description of the body under consideration.
+
+Griffith ´s theory suggests that cracks are formed due to competition between the stored strain energy in the body and the energy required to create new surfaces. The strain energy in FRCs can be additively decomposed into energy associated with the fiber Ψf and the energy associated with the inter-fiber/matrix 
+
+Ψm. Consequently, the energy required to create a new surface (herein referred to as surface energy) can be decomposed into fiber and inter-fiber surface energy. The phase-field methods to fracture approximate the sharp, discontinuous crack sets Γ using a diffusive crack model, represented by a scalar-valued field d : B × [0 , t ] → [0 , 1] , and the characteristic length scale 3ℓ. Here, d = 0 refers to the intact material, while d = 1 refers to the fully fractured material. Due to the presence of two distinct crack sets Γf , and Γm, two independent phase-fields are introduced df and dm
+
+representing a diffusive crack in fiber and inter-fiber, respectively. The total energy of the system takes the form 
+
+Ψ( u, Γf , Γm) = 
+
+Z
+
+> B\ Γf
+
+Ψf (ε)dx +
+
+Z
+
+> B\ Γm
+
+Ψm(ε)dx +
+
+Z
+
+> Γf
+
+GC,f dS +
+
+Z
+
+> Γm
+
+GC,m dS − Ψext (u). (1) Here Ψi(ε) refers to the undamaged strain energy densities, while GC,i denotes the fracture energy densities corresponding to each (i = f, m ). Herein, (f ) represents the fiber, and (m) represents the inter-fiber. Furthermore, Ψext (u) refers to the applied loading defined as 
+
+Ψext (u) := 
+
+Z
+
+> B
+
+fv · u dx +
+
+Z
+
+> ∂Bt
+
+¯t · u dS . (2) Within the context of the phase-field approach, the surface energy can be approximated using the diffusive field as 
+
+Z
+
+> Γi
+
+GC,i dS ≈
+
+Z
+
+> B
+
+GC,i 
+
+4cw
+
+γi(di, ∇di)dx, (3) where γi(di, ∇di) for each (i = f, m ) are crack surface energy density function given as 
+
+γi(di, ∇di) = α(di)
+
+ℓi
+
++ ℓi [∇di · A i · ∇ di] . (i = f, m ) (4) Here α(di) is the geometric crack function such that α(0) = 0 , and α(1) = 1 with α : [0 , 1] → [0 , 1] . The geometric crack function α(di) is chosen in line with the AT2 model. i.e α(di) = d2 
+
+> i
+
+. Furthermore, ℓi is the characteristic length scale, and Ai is the second-order structural tensor to penalize the gradient of the phase-field. The structural tensor is written as 
+
+Af = e2 ⊗ e2, Am = e1 ⊗ e1, (5) where e1 is the principal material direction along the fiber orientation, while e2 is the transverse in-plane orientation perpendicular to e1. For the fiber orientation of θ from the global X-coordinate, the material directions take the form 
+
+e1 =
+
+cos θ
+
+sin θ
+
+
+
+, and e2 =
+
+sin θ
+
+cos θ
+
+
+
+. (6) The sequel introduces global and local ply coordinate systems to maintain consistency with the Puck failure criteria, which is based on the tri-axial stress state in local ply coordinates. Global quantities are denoted using (·)G , while the local (ply) quantities are denoted using (·)L. The transformation from the local to global coordinates is achieved using the transformation matrix R in line with [105–108] given as 
+
+R =
+
+
+
+cos θ2 sin θ2 2 cos θ sin θ
+
+sin θ2 cos θ2 −2 cos θ sin θ
+
+− cos θ sin θ cos θ sin θ cos θ2 − sin θ2
+
+ (7) 4The transformation of the strain field in the local ply setting is written as 
+
+εL =  R−1T · εG , (8) while the stress field in local ply setting takes the form 
+
+σL = R · σG . (9) The stress in the global system is then written as 
+
+σG = CG · εG . (10) Furthermore, the constitutive stiffness matrix CL in the global setting can be derived from the local setting as 
+
+CG = R−1 · CL ·  R−1T . (11) The local anisotropic constitutive stiffness matrix can be defined as a additive decomposition of the fiber and inter-fiber constituents as 
+
+CL = CL 
+
+> f
+
++ CL
+
+> m
+
+, (12) where CL 
+
+> f
+
+and CL 
+
+> m
+
+are the fiber and inter-fiber contribution whose specific description takes the form 
+
+CL 
+
+> f
+
+=
+
+
+
+C11 0 00 0 00 0 0
+
+ ; CL 
+
+> m
+
+=
+
+
+
+0 C12 0
+
+C12 C22 00 0 C33 
+
+ , (13) with C11 = E11 
+
+1 − ν12 ν21 
+
+,C12 = ν12 E11 
+
+1 − ν12 ν21 
+
+, C22 = E22 
+
+1 − ν12 ν21 
+
+, and C33 = G12 . Furthermore E11 , E22 , and 
+
+g12 are the Young’s modulus, while ν12 , and ν21 = ν12 
+
+E11 
+
+E22 
+
+are the Poisons ´s ratio. With this at hand, the strain energy density contributions corresponding to the fiber and inter-fiber phases, respectively, are given by 
+
+Ψf (u, d) = g(d) 12 εL · CL 
+
+> f
+
+· εL, (14) 
+
+Ψm(u, d) = g(d) 12 εL · CL 
+
+> m
+
+· εL. (15) Due to the damage in the fiber and inter-fiber, the strain energy density contributions are degraded based on the degradation function g(d) in line with the AT2 model. The total energy of the system considering the strain energy in Eqns. (14), (15), and surface energy in Eqn. (4) takes the form 
+
+Ψ( u, df , dm) = R 
+
+> B
+
+g(d) 12 εL · CL 
+
+> f
+
+· εLdx + R 
+
+> B
+
+g(d) 12 εL · CL 
+
+> m
+
+· εLdx − Ψext (u) (16) 
+
++ R
+
+> B
+
+h
+
+GC,f α(df ) 
+
+> ℓf
+
++ ℓf [∇df · A f · ∇ df ]
+
+i
+
+dx + R
+
+> B
+
+h
+
+GC,m α(dm) 
+
+> ℓm
+
++ ℓm [∇dm · A m · ∇ dm]
+
+i
+
+dx.(17) Furthermore, due to multiple damage mechanisms, the degraded constitutive matrix in the local co-ordinates takes the form 5˜CL = g(d)CL 
+
+> f
+
++ g(d)CL
+
+> m
+
+, (18) with 
+
+g(d) = 
+
+
+
+gf
+
+gm
+
+min {gf , g m}
+
+ . (19) Here gf = (1 − df )2, and gm = (1 − dm)2 are the fiber and inter-fiber degradation functions respectively in line with standard AT2 formulation [56]. Consequently, the degraded stress in the local co-ordinates takes the form 
+
+˜σL = g(d)T σL; ˜σG = R−1 · ˜σL. (20) The initiation of the damage relies on the Puck failure theory based on the local stress state as detailed in the next section. 
+
+3. PUCK Failure Criteria 
+
+Puck failure theory [40] distinguishes between the damage in fiber and inter-fiber independent of each other. The theory identifies two modes for fiber failure, namely: (i) fiber failure in tension, (ii) fiber failure in compression, and three modes of failure in the inter-fiber failure, namely: (iii) Mode-A (transverse tension or transverse tensile-shear failure), (iv) Mode-B (transverse compression + in-plane shear), and (v) Mode-C (Dominant transverse compression with negligible shear). Each failure mode is triggered when the energetic exposure factor corresponding to the failure mode, denoted as Fi, reaches the value 1. Puck failure criteria in a two-dimensional setting in the local ply coordinates are presented in the sequel. Here, subscript 1 represents the principle material direction (fiber direction), while subscripts 2 and 3 represent the direction normal to the fiber and direction in-plane and out-of-plate, respectively. In the local ply coordinates, E11 , E22 , are the longitudinal modulus, while the shear modulus is denoted by 
+
+E12 . Similarly, the longitudinal strengths in the fiber direction and transverse tensile strengths are denoted by RT
+
+> 11
+
+, RT
+
+> 22
+
+, and R12 respectively. Furthermore, Puck failure theory allows for a distinction between tensile and compressive failure. Consequently, the longitudinal strength counterparts in compression are represented using RC 
+
+> 11
+
+and RC
+
+> 22
+
+. The major poisson’s ratios are represented as ν12 , and ν23 , while the puck matrix inclination parameters are represented using P +21 , P −
+
+> 21
+
+, P +22 , and P − 
+
+> 22
+
+with usual notations. See [40, 91, 104] for detailed description of the Puck failure theory. 
+
+3.1. Fiber Failure 
+
+The fiber exposure factor in tension F Tf is defined as a ratio of the stress in the principle material direction ( σL
+
+> 11
+
+) to the strength of the fibers. i.e 
+
+F Tf = σL
+
+> 11
+
+RT
+
+> 11
+
+, if σL 
+
+> 11
+
+> 0. (21) Similarly, the fiber exposure factor in compression takes the form 
+
+F Cf =
+
+s σL
+
+> 11
+
+RC
+
+> 11
+
+2
+
++ α
+
+ σL
+
+> 12
+
+R12 
+
+2
+
+if σL 
+
+> 11
+
+< 0. (22) Here α ∈ [0 , 1] is the influence of the shear on the compressive fiber failure. 63.2. Matrix Failure 
+
+If stress σL 
+
+> 22
+
+> 0, the exposure factor for the inter-fiber failure in Mode-A transverse tension takes the form 
+
+F Tm =
+
+s σL
+
+> 12
+
+R12 
+
+2
+
++
+
+
+
+1 − P +21 
+
+RT
+
+> 22
+
+R12 
+
+2
+
++
+
+ σL
+
+> 22
+
+RT
+
+> 22
+
+2
+
++ P +21 σL
+
+> 22
+
+R12 
+
+. (23) The Mode-B of Puck criteria refers to inter-fiber dominated transverse compression. The exposure factor for Mode-B is triggered, if the local stress state fulfills σL 
+
+> 22
+
+< 0 as well as 
+
+ σL
+
+> 22
+
+σL
+
+> 12
+
+> 0
+
+
+
+&& 
+
+ σL
+
+> 22
+
+σL
+
+> 12
+
+< Ra
+
+> 22
+
+Rc
+
+> 12
+
+
+
+, (24) where Ra 
+
+> 22
+
+= R12 
+
+2P −
+
+> 21
+
+s
+
+1 + 2 P −
+
+> 21
+
+RC
+
+> 22
+
+R12 
+
+− 1
+
+, and Rc 
+
+> 12
+
+= R12 
+
+q
+
+1 + 2 P −
+
+> 22
+
+. The exposure factor for the compres-sion then takes the form 
+
+F Cm =
+
+s σL
+
+> 12
+
+R12 
+
+2
+
++
+
+
+
+P −
+
+> 21
+
+σL
+
+> 22
+
+R12 
+
+2
+
++ P −
+
+> 21
+
+σL
+
+> 22
+
+R12 
+
+. (25) Similarly, if the stress in local ply coordinates 
+
+ σL
+
+> 12
+
+σL
+
+> 22
+
+> 0
+
+
+
+&& 
+
+ σL
+
+> 12
+
+σL
+
+> 22
+
+< Rc
+
+> 12
+
+Ra
+
+> 22
+
+
+
+(26) is applicable, then the compression exposure factor corresponding to the matrix failure in Mode-C corre-sponding to out-of-plane transverse compression can be written as 
+
+F Cm =
+
+ σL
+
+> 12
+
+2(1 + P −
+
+> 22
+
+)R12 
+
+2
+
+−
+
+ σL
+
+> 22
+
+RC
+
+> 22
+
+2 RC
+
+> 22
+
+σL
+
+> 22
+
+. (27) The energy corresponding to the local stress state σL∗ when the Puck failure criteria are met (for one or multiple failure modes) can be computed for fiber ( Ψf, 0) and the inter-fiber ( Ψm, 0) as 
+
+Ψf, 0 =
+
+
+
+12 σL
+
+> 11
+
+εL 
+
+> 11
+
+if F Tf , F Cf ≥ 10 if F Tf , F Cf < 1
+
+. (28) 
+
+Ψm, 0 =
+
+
+
+12
+
+ σL
+
+> 22
+
+εL 
+
+> 22
+
++ 2 σL
+
+> 12
+
+εL
+
+> 12
+
+ if F Tm, F Cm ≥ 10 if F Tm, F Cm < 1
+
+. (29) 
+
+4. Thermodynamic Consistency and Driving Force 
+
+The second law of thermodynamics that ensures the consistency of the variational formulation is presented using the triplet (u, df , dm) as 
+
+D =
+
+
+
+σ − ∂Ψ
+
+∂ε
+
+
+
+· ˙ε −
+
+ ∂Ψ
+
+∂df
+
+˙df + ∂Ψ
+
+∂∇df
+
+∇ ˙df
+
+
+
+−
+
+ ∂Ψ
+
+∂dm
+
+˙dm + ∂Ψ
+
+∂∇dm
+
+∇ ˙dm
+
+
+
+≥ 0. (30) 7which is referred to as classius-Duhem inequality. Since stress can be written as σ = ∂Ψ
+
+∂ε = ˜CG : εG in the global setting, the classius-Duhem inequality takes the form 
+
+D =
+
+
+
+σ − ∂Ψ
+
+∂ε
+
+
+
+˙ε − D f ˙df + Dm ˙dm ≥ 0, (31) where Df , and Dm are crack energy associated with fiber and inter-fiber respectively, whose specific form is written as 
+
+Df = 2(1 − df )Ψ − GC,f 
+
+ df
+
+ℓf
+
+− ℓf ∇df · A f · ∇ df
+
+
+
+, (32) 
+
+Dm = g′(d)Ψ − GC,m 
+
+ dm
+
+ℓm
+
+− ℓm∇dm · A m · ∇ dm
+
+
+
+. (33) Note that g′(d)Ψ is not defined due to min (gf , g m). Consequently, first minima is taken followed by the g′(d).Here the expression GC,i 
+
+ di
+
+ℓi
+
+− ℓi∇di · A i · ∇ di
+
+
+
+for each i = f, m refers to the energetic crack resistance. Furthermore, g′(d)Ψ is the crack driving force. A direct consequence of Eqn. (31) and the boundedness of the phase-field leads to the first-order opti-mality condition, also known as the Karush-Kuhn-Tucker (KKT) condition, whose specific form reads 
+
+˙df ≥ 0, −D f ≤ 0, Df ˙df = 0 , (34) 
+
+˙dm ≥ 0, −D m ≤ 0, Dm ˙dm = 0 . (35) In order to enforce the irreversibility of the phase-field variables, the driving force based on the Puck failure theory takes the form 
+
+Hf = max   
+
+> τ∈[0 ,T ]
+
+
+
+ζf
+
+ Ψf − Ψf, 0
+
+GC,f 
+
+ 
+
+if Ψf, 0 > 0, and 0 otherwise , (36) 
+
+Hm = max   
+
+> τ∈[0 ,T ]
+
+
+
+ζm
+
+ Ψm − Ψm, 0
+
+GC,m 
+
+ 
+
+if Ψm, 0 > 0, and 0 otherwise . (37) Here ζf and ζm are the dimensionless driving parameters to characterize the propagation of the fiber and inter-fiber failure. 
+
+5. Finite Element Implementation: Compact UEL 
+
+The solution to the Eqn. 17 can be obtained by solving the total energy potential as a minimization problem with respect to triplet (u, df , dm) at every discrete time step τ ∈ [0 , t ], i.e to determine (u, df , dm)
+
+from 
+
+(u∗, d∗ 
+
+> f
+
+, d∗
+
+> m
+
+) = Arg min S Ψ( u, df , dm) (38) with S = { ˙df , ˙dm ≥ 0, for all x ∈ B} . For any admissible test function (δu, δ df , δ dm) ∈ (Au, Af , Am),the first variation of the total energy functional leads to the following multi-phase-field weak form 8Z
+
+> B
+
+˜σG : εG (δu)dx −
+
+Z
+
+> B
+
+fv · δu dx +
+
+Z
+
+> ∂Bt
+
+¯t · δu dS = 0 , (39) 
+
+Z
+
+> B
+
+GC,f 
+
+ df
+
+ℓf
+
+δdf + ℓf ∇df · A f · ∇ δdf
+
+
+
+dx −
+
+Z
+
+> B
+
+  ˜σG : εG δdf
+
+ dx = 0 , (40) 
+
+Z
+
+> B
+
+GC,m 
+
+ dm
+
+ℓm
+
+δdm + ℓm∇dm · A m · ∇ δdm
+
+
+
+dx −
+
+Z
+
+> B
+
+  ˜σG : εG δdm
+
+ dx = 0 . (41) with triplet (u, df , dm) ∈ (Bu, Bf , Bm). Recalling the standard Bubnov-Galerkin method, the functional space for the triplet (u, df , dm) is given by 
+
+u ∈ Bu := {u ∈ H1(B)|∇ u = ¯ u on ∂Bu}, (42) 
+
+df ∈ Bf := {df ∈ H1(B)|df ∈ [0 , 1] , ˙df ≥ 0, for all x ∈ B} , (43) 
+
+dm ∈ Bm := {dm ∈ H1(B)|dm ∈ [0 , 1] , ˙dm ≥ 0, for all x ∈ B} , (44) while the functional space for the variations (δu, δ df , δ dm) takes the form 
+
+δu ∈ Au := {δu ∈ H1(B)|∇ δu = 0 on ∂Bu}, (45) 
+
+δdf ∈ Af := {δdf ∈ H1(B)|∇ δdf ≥ 0, for all x ∈ B} , (46) 
+
+δdm ∈ Am := {δdm ∈ H1(B)|∇ δdm ≥ 0 for all x ∈ B} . (47) Let the functional space B is discretized into ne non-overlapping isoparametric elements such that B ≈ Sne 
+
+> e=1
+
+B(e) and the partition of unity holds. Let B(Ne) is the nodes associated with each element B(e). Then, we can create a set of i elements sharing the same node set B(Ne). i.e 
+
+B(e) 
+
+> i
+
+= B(e) for i=1,2,...,j (48) where j is the number of plies in the laminates with each ply having an fiber orientation of θi. Specifically, 
+
+B(e) is refered to as a base mesh, while the B(e) 
+
+> i
+
+for each i = 1 , 2, ..., j are referred to as dummy mesh. The dummy mesh also fulfills the following condition 
+
+B ≈ 
+
+> ne
+
+[
+
+> e=1
+
+B(e) =
+
+> ne
+
+[
+
+> e=1
+
+B(e) 
+
+> i
+
+for each i=1,2,...,j (49) where the node set B(Ne) is shared among all the element sets B(e) 
+
+> i
+
+.Fig. 2 describes this method as the mesh overlay method. The nodes are shared among all the layers, while each layer contains a unique element set with unique fiber orientation θi. Consequently, the displace-ment is coupled in all the layers, while the stresses are decoupled and depend on the fiber orientation θi for each layer. Consequently, the energy developed in each layer is a function of the fiber orientation. With this setting, the primary fields and their respective gradients can be interpolated for each layer 
+
+i = 1 , 2, ..., j as 
+
+ue =
+
+> ne
+
+X
+
+> k=1
+
+Nuk uek, def =
+
+> ne
+
+X
+
+> k=1
+
+Nd
+
+> k
+
+def,k , dem =
+
+> ne
+
+X
+
+> k=1
+
+Nd
+
+> k
+
+dem,k , (50) 
+
+∇ue =
+
+> ne
+
+X
+
+> k=1
+
+Buk uek, ∇def =
+
+> ne
+
+X
+
+> k=1
+
+Bd
+
+> k
+
+def,k , ∇dem =
+
+> ne
+
+X
+
+> k=1
+
+Bd
+
+> k
+
+dem,k , (51) 9Base Mesh Shared Nodes Dummy Mesh 1 Dummy Mesh 2 Dummy Mesh 3 Figure 2: Geometric description of the mesh overlay method. 
+
+where Nuk , and Nd 
+
+> k
+
+are the shape functions associated with the node k for the fields u, and two phase-fields 
+
+(df , dm) respectively. Furthermore Buk , and Bd 
+
+> k
+
+are the derivatives of the shape functions at the node k for displacement u and the two-phase-fields, respectively. The triplet (ue, def , dem) is computed using the shape functions derived from integration points at the nodal level leading to a coupling between displacement and the damage in the laminates. Consequently, stress and strains at individual ply can be determined, while the damage within each ply cannot be obtained through mesh overlay methods. Additionally, the exposure factor related to Puck modes at individual ply can still be computed. With the isoparametric interpolation functions, the discrete version of the elemental residual vectors for each layer i = 1 , 2, ..., j takes the form 
+
+Re 
+
+> u,i
+
+=
+
+Z
+
+> B(e)
+> i
+
+(Bu)T ˜σG dx −
+
+Z
+
+> B(e)
+> i
+
+(Nu)T fv dx −
+
+Z
+
+> ∂B(e)
+> i
+
+(Nu)T tdS , (52) 
+
+Ref,i =
+
+Z
+
+> B(e)
+> i
+
+−2(1 − df )( Nd)T Hf + GC,f 
+
+ℓf
+
+(Nd)T df + ℓ2 
+
+> f
+
+(Bd)T Af ∇df
+
+ dx, (53) 
+
+Rem,i =
+
+Z
+
+> B(e)
+> i
+
+−2(1 − dm)( Nd)T Hm + GC,m 
+
+ℓm
+
+(Nd)T dm + ℓ2
+
+> m
+
+(Bd)T Am∇dm
+
+ dx. (54) If the displacement and the tractions are applied on the nodes, the external load is shared among all the plies in the laminates. The corresponding Newton-Raphson iteration for the globally assembled non-linear system at (n + 1) the step for each layer i = 1 , 2, ..j can be expressed as 
+
+
+
+u
+
+df
+
+dm
+
+
+
+> n+1
+
+=
+
+
+
+u
+
+df
+
+dm
+
+
+
+> n
+
+−
+
+
+
+Kuu 0 00 Kf f 00 0 Kmm 
+
+
+
+> −1
+> n+1
+
+
+
+Ru
+
+Rf
+
+Rm
+
+
+
+> n
+
+, (55) where the particular form of the elemental stiffness at the element level reads 
+
+Kuu  
+
+> i
+
+:= ∂Re
+
+> u,i
+
+∂ue =
+
+Z
+
+> Bei
+
+(Bu)T ˜CG Budx, (56) 
+
+Kf f i := ∂Ref,i 
+
+∂def
+
+=
+
+Z
+
+> Bei
+
+
+
+2Hf + GC,f 
+
+ℓf
+
+
+
+(Nd)T Nd + GC,f ℓf (Bd)T Af Bddx, (57) 10 Kmm i := ∂Rem,i 
+
+∂dem
+
+=
+
+Z
+
+> Bei
+
+
+
+2Hm + GC,m 
+
+ℓm
+
+
+
+(Nd)T Nd + GC,m ℓm(Bd)T AmBddx. (58) The above system of equations has been implemented in Abaqus-UEL to take advantage of the in-built Newton-Raphson solver, mesh assembly, and the automatic time-stepping scheme. The corresponding codes are provided in the Data Availability section. To this end, the present model is developed to predict the laminate response under the consideration of anisotropic stiffness degradation. The model does not incorporate plasticity, strain hardening, or softening behavior. Consequently, the material non-linearity is not addressed. Furthermore, the two-dimensional nature of the model impose certain limitations. The interfaces between the plies are assumed to be perfect. Consequently, delamination is not accounted for in the present model. Additionally, the model is not recommended when the out-of-the-plane stresses are expected to have a pronounced influence on the laminate behavior. Furthermore, the influence of the stacking sequence cannot be captured due to the mesh overlay method, while ply thickness effects can be captured to some extent by scaling the load-displacement. 
+
+6. Numerical Examples 
+
+The formulation offers several novel aspects regarding the crack propagation in the laminates. The inter-connection between the different failure mechanisms is captured well using the present model. Furthermore, comparisons with the experiments are made both qualitatively and quantitatively to show the predictive capabilities of the proposed model. Even though the mesh overlay method simplifies the model to exclude delamination, the method offers computationally efficient alternatives to the three-dimensional models. Four structures are considered for the comparison as listed below: 1. The coupon tests with uni-axial loading in compression and tension with different layup sequences are considered in line with the test conducted by Flatscher et al. [109]. Specifically, laminates with a layup of 
+
+[( θ/ − θ)8]s with θ = 45 ◦, 60 ◦, 75 ◦ are considered. The resulting transverse compression and tension stress state are compared with the experimental observation. 2. The open hole tension subjected to uniaxial tension with layup sequence of [0 ◦
+
+> 4
+
+/90 ◦
+
+> 4
+
+]s and [45 ◦
+
+> 4
+
+/ − 45 ◦
+
+> 4
+
+]s
+
+are compared with the experimental results in line with [6]. The results compare the onset and interaction of the damage mechanism in the laminate. 3. A blocked compact tension with the layup sequence of [0 ◦
+
+> 2
+
+/90 ◦
+
+> 2
+
+]2s, and [0 ◦
+
+> 4
+
+/90 ◦
+
+> 4
+
+]2s are compared both qualitatively and quantitatively against the experimental results from [110]. 4. Finally, the double-notched tension with three different layup sequences comprising of cross-ply and isotropic laminates are compared with the experiments from [30] to show the predictive capability of the proposed model. The interaction between the fiber-dominated and inter-fiber-dominated failure is captured. 
+
+6.1. Coupon Tests 
+
+Tests Layup Sequence L (mm) W (mm) T-45 [(45 ◦/ − 45 ◦)8]s 134 32 
+
+C-45 [(45 ◦/ − 45 ◦)8]s 56 32 
+
+C-60 [(60 ◦/ − 60 ◦)8]s 32 32 
+
+T-75, C-75 [(75 ◦/ − 75 ◦)8]s 20 32 
+
+> Table 1: Length, width and layup sequences of the specimens in coupon test in line with [109].
+
+This section discusses the results of the coupon tests in uni-axial compression and tension loading. The test considers the uni-axial loading of five angled-ply laminates as reported in [109]. The tensile and compressive stress states are compared with the experiments in line with [109]. Specifically, the layup sequence of [( θ/ − θ)8]s with θ = 45 ◦, 60 ◦, 75 ◦ are considered. In this section, the compressive tests are 11 E11 (MPa) E22 (MPa) ν12 ν21 G12 (MPa) 146000 9000 0.02096 0.34 4270 
+
+> Table 2: Elastic properties of the composites.
+
+RT 
+
+> 11
+
+(MPa) RT 
+
+> 22
+
+(MPa) RC 
+
+> 11
+
+(MPa) RC 
+
+> 22
+
+(MPa) R12 (MPa) 2100 82 1407 249 110 
+
+> Table 3: Strength properties of the composites.
+
+denoted with C, while the tension tests are denoted as T . For example, C − 45 presents the results of the uni-axial compression of the laminate with layup sequence [(45 ◦/ − 45 ◦)8]s. The laminates are made of unidirectional Cycom ®977-2-35/40-12KHTS-134-300 plies, a carbon-fiber epoxy laminate. The material properties for the simulations are taken from [109] and are presented in Tab. 2 and 3. Additionally, different fracture toughness was used in the experiment for tension and compression [109], consequently adopted as shown in Tab. 4. Furthermore, the fiber and inter-fiber phase-field characteristic length scales are chosen as ℓf = 2 mm and ℓm = 1 mm respectively. Figure 3a) presents the geometrical description of the bi-axial coupon tests under tension while the loads are reversed for the compression. Specifically, Table. 1 presents the layup sequence specific geometrical dimension with length L, and width W in line with Fig. 3a). Each ply is considered 0.125 mm thick, leading to the total thickness of laminates as 4mm. displacement  
+
+> displacement
+> Figure 3: a) Geometric description of the Coupon test along with the dimensions and boundary conditions (in tension), b) force vs. displacement curves corresponding to the compressive cases, and c) force vs. displacement curves corresponding to the tensile tests.
+
+In order to simulate the crack initiation and propagation, the laminate coupons are weakened in a small area near the centre of the coupons (of 4 elements) by reducing the fracture toughness of both fiber and inter-fiber by 10% in line with [111–113]. Consequently, cracks are initiated in this region. Figure 4a), b) and c) presents the damage propagation in C − 75 , C − 60 , and C − 45 respectively, while Fig. 4d), and e) presents the damage propagation in T − 75 and T − 45 respectively. Each case shows inter-12 GTC,f 
+
+ Nmm 
+
+
+
+GTC,m 
+
+ Nmm 
+
+
+
+GCC,f 
+
+ Nmm 
+
+
+
+GCC,m 
+
+ Nmm 
+
+
+
+ζf ζm
+
+89.8 0.2 78.3 0.8 1 1
+
+> Table 4: Multi-phase-field properties.
+> Figure 4: Matrix crack pattern of the coupons for the compressive cases a) C-75, b) C-60, and c) C-45 as well as well as for the tensile tests d) T-75 and e) T-45.
+
+fiber-dominated failure along the principle material orientation with no fiber damage. Furthermore, in all the cases, Puck matrix initiation is immediately followed by a symmetric unstable crack propagation. The resulting damage pattern for the T −45 and C −45 are much broader than the other coupons , which could be attributed to the effect of the structural tensor as detailed in [104]. The force vs. displacement curve for the compression and tension cases are presented in Fig. 3 b) and c), respectively. All the force vs. displacement curves show a linear elastic behavior until the maximum load limit due to the absence of plasticity, followed by an unstable crack propagation indicated by a sudden drop in the reactions. Furthermore, the maximum load limit and the nominal cross section with width w, and thickness t are used to compute the laminates stresses ¯σxx as in [109]: 
+
+¯σxx = F
+
+wt . (59) Case Current Implementation (MPa) Flatscher [109] (MPa) C-45 −228 .2 −203 .1
+
+C-60 −255 .7 −198 .4
+
+C-75 −251 .6 −229 .3  
+
+> Table 5: Comparison of the nominal stress ¯σxx determined by the current implementation and the implementation in [109].
+
+Table 5 compares the laminate stresses in the present model and the experimental investigation reported in [109]. The comparison in Tab 5 shows that the present implementation consistently overestimates the prediction in [109] but generally proves to be in good agreement, especially in the absence of plasticity in 13 the present model. Since the Puck failure initiation is immediately followed by the crack propagation in all the coupon tests, the maximum load response is independent of the length scales ℓf , and ℓm.
+
+6.2. Open Hole Tension 
+
+The open hole tension has been addressed numerically using the phase-field method in [12, 74, 88, 89, 94, 114] in a single ply setting. The open hole tension has been addressed numerically in the context of CDM as in[5, 6]. This section adopts the open hole tension results reported by Flatscher et al. [6, 109]. The geometrical description of the open hole tension is presented in Fig. 5. Specifically, the two laminate sequences of [0 ◦
+
+> 4
+
+/90 ◦
+
+> 4
+
+]s and [45 ◦
+
+> 4
+
+/ − 45 ◦
+
+> 4
+
+]s are investigated. The material property is the same as in the section 6.1 except the phase-field characteristic length scales, whose specific details will be presented in the sequel.     
+
+> Figure 5: Geometric description of open hole tension test along with the Boundary conditions, fiber orientation. The indicated symmetry plane (dash-dotted line) is used only for the [0 ◦
+> 4/90 ◦
+> 4]slayup.
+
+6.2.1. Open Hole Tension- [0 ◦
+
+> 4
+
+/90 ◦
+
+> 4
+
+]s
+
+> Figure 6: Stress distribution at each layer of the cross-ply laminates.
+
+Experimental work and the previous numerical methods [5, 6, 115] regarding the open hole tension of 
+
+[0 ◦
+
+> 4
+
+/90 ◦
+
+> 4
+
+]s suggest stiff load response since the fibers are oriented in the loading direction. Furthermore, the literature suggests that symmetric inter-fiber damage is propagated in the loading direction, followed by fiber damage in the direction perpendicular to the load. Consequently, only half of the specimen is modeled with symmetric boundary conditions. The domain is discretized by 12907 quadrilateral 4-node plane stress elements per ply block. Figure 5 shows the symmetry plane used in this case. The vertical symmetry is not exploited due to the potential vertical crack. The fiber and inter-fiber’s phase-field characteristic length scales are considered as ℓf = 2 mm and ℓm = 1 mm respectively. The dimensionless driving parameter for damage propagation are set to ζf = 30 for fiber damage and ζm = 0 .01 for matrix damage. Figure 7 compares the inter-fiber dominated failure in the present model and the experimental investi-gation. Furthermore, Figure 6 presents the stress distribution in the individual layer. Initially, the stress 14 Figure 7: Resulting inter-fiber damage pattern in a) the current implementation, and b) representative experimental results as in [109].    
+
+> Figure 8: Inter-fiber (left) and fiber (right) phase-field for a displacement of the right boundary of a) 0.7056 mm , b) 0.7670 mm ,and c) 1 mm .
+
+concentrates near the hole, leading to inter-fiber-dominated damage around the vicinity of the hole. How-ever, the inter-fiber-dominated damage starts to localize near the hole and then propagates parallel to the loading direction. The location of the inter-fiber dominated crack in Fig. 7a) shows an excellent correlation with the experiments as in Fig. 7b). This predictive damage pattern can be interpreted as Longitudinal splitting in line with the experimental testing, see [6, 116] ·
+
+Figure 9 presents the force vs displacement plot, Puck fiber, matrix initiation, and damage. In general, the force-displacement behavior is linear at first. A slight drop in the reaction force is observed due to strain location, which leads to an inter-fiber-dominated failure. The cracks propagate in the loading direction as shown in Fig. 8a)left. At this stage, the Puck fiber damage is initiated, with no damage localization as shown in Fig. 8a) right. The resulting damage pattern is compared to the numerical results reported in [5, 109]. Once the fiber damage is localized, the fiber damage propagates in the direction perpendicular to the loading direction as shown in Fig. 8b)right. Consequently, the inter-fiber dominated failure grows around the broken fibers as shown in Fig. 8b) left. Furthermore, the full fiber damage leads to a complete structural failure as shown in 8c). The resulting stable fiber damage can also be seen in Fig. 9 by a steady drop in the force reactions. The maximum load-carrying capacity of the present implementation is compared against the experimental 15 Figure 9: Force displacement curve for an open-hole tension test with a layup sequence of a) [0 ◦       
+
+> 4/90 ◦
+> 4]s, and b) [45 ◦
+> 4/−45 ◦
+> 4]s
+> along with the Puck damage initiation.
+
+and numerical investigation presented in [6] and [115]. Table 6 presents the quantitative comparison of the peak load in the [0 ◦
+
+> 4
+
+/90 ◦
+
+> 4
+
+]s laminates. The load at failure in the experiment is estimated as 25 .2 kN . The numerical results overestimate this peak load, while the current implementation matches the experiments very well, as shown in Tab 6. It is observed that change in the characteristic length of the phase-field ℓf and 
+
+ℓm does not influence the peak load, while the dimensionless driving parameters have a significant effect. Models Peak load (kN) Experimental result [6] 25 .2
+
+Flatscher [6] 38 .4
+
+Broger [115] 39 .2
+
+Current implementation 24 .3 
+
+> Table 6: Comparison of the peak loads determined by the current implementation, the implementations in [6, 115] and the experimental result [6].
+
+6.2.2. Open Hole Tension- [45 ◦
+
+> 4
+
+/ − 45 ◦
+
+> 4
+
+]s
+
+The open hole tension in the laminate [45 ◦
+
+> 4
+
+/ − 45 ◦
+
+> 4
+
+]s exhibit crack shielding [5], leading to an asymmetric crack propagation. Consequently, the entire specimen is modeled using 56068 quadrilateral 4-node plane stress elements per ply with refinement around the open hole. The problem’s geometrical description and boundary conditions are shown in Fig. 5. It has also been noticed that the damage localization occurs in a very small region. Consequently, a smaller characteristic length scale for the phase-field with ℓf = 0 .2 mm 
+
+and ℓm = 0 .1 mm are chosen to resolve the gradient of the phase-field. Furthermore, the dimensionless driving parameter is considered to be ζf = 1 and ζm = 0 .005 . It is also important to note that the dimensionless parameters corresponding to the fiber damage are irrelevant since no fiber damage is observed as in [5, 6, 115]. Figure 10 shows the different stages of damage accumulation demonstrated by the proposed implemen-tation with comparisons to the results of [5, 109]. Meanwhile, Fig. 11 presents the stress in each layer. Initially, the damage starts around the hole due to stress concentration. The damage then starts to accu-mulate, leading to localization as shown in Fig. 10a). One of the branches starts to progress while the other does not due to crack shielding as shown in Fig. 10b) which is also evident in the literature, see [5] for more details. The present model shows an excellent correlation with the experimental work regarding predicting the qualitative results of crack propagation. The force vs. displacement for the open hole tension with the laminate sequence of [45 ◦
+
+> 4
+
+/ − 45 ◦
+
+> 4
+
+]s is presented in Fig. 9b) along with the Puck inter-fiber failure initiation. The crack propagation mostly happens parallel to the fiber direction with no subsequence damage to the fiber. Consequently, the reactions are linear until the maximum failure load is reached, followed by an unstable 16 Figure 10: Comparison of a) initial damage to the result in [109] and b) the complete damage pattern to the result in [5]. 874 -274 874 -274 -45-Layer 45-Layer S12 S11 11 22 -22 -11 S22 54 -18 54 -18 
+
+Figure 11: Stress distribution at each layer for the laminate of layup sequence [45 ◦ 
+
+> 4
+
+/ − 45 ◦ 
+
+> 4
+
+]s.
+
+crack propagation (crack shielding) leading to a drop in the forced displacement. Previous experiments and numerical results talk about pronounced non-linearity due to plasticity. As plasticity is not taken into account in this model, these non-linearities are not reflected in Fig. 9b). Table 7 compares the predicted peak load of the present model with the experimental and numerical observation from the literature. It is seen that the present model predicts the peak load very well. Models Peak load (kN) Experimental result [6] 14 .1
+
+Flatscher [6] 10 .7
+
+Broger [115] 9.0
+
+Current implementation 11 .8
+
+Table 7: Comparison of the peak loads determined by the current implementation, the implementations in [6, 115] and the experimental result [6]. 
+
+6.3. Compact Tension 
+
+This section corresponds to the compact tension results of the extended compact tension proposed in Li et al. [110]. Li et al. [110] investigate the influence of layup sequence on the fracture behavior of the laminated composites using blocked ply and dispersed ply sequences. The material consists of an IM7/8552 carbon-epoxy pre-preg system with a nominal ply thickness of 0.125 mm. While both types of layup se-quences consist of the same number of plies in each laminate, for the dispersed plies, each ply had a different 17 Figure 12: Geometrical description of contact tension tests along with the boundary conditions. The symmetry plane (dash-dotted line) is used for this simulation. The green lines indicate a rigid connection of the surface to the central node which experiences the displacement. All lengths are considered to be in mm. 
+
+fiber orientation to the next ply. In contrast, the blocked ply layup sequences introduced thicker sheets of one fiber orientation by stacking more plies with the same fiber orientation above each other, leading to a stark contrast in their fracture behavior. See [110] for more details. The dispersed ply specimens showed clear fiber failure and only moderate inter-fiber-dominated damage, with fiber failure occurring in multiple unstable events. However, the blocked ply specimens were more prone to delamination and matrix damage, leading to a pronounced non-linear response in their force-displacement behavior. Furthermore, the quasi-isotropic specimens exhibit more complex fracture behavior than the cross-ply samples. The difference in the layup sequence cannot be captured with the mesh overlay method. Therefore, only blocked cross-ply results are compared to the proposed model. Figure 12 a) presents the geometrical description of the body under consideration and the boundary conditions. In order to mimic the experiments as closely as possible, the displacement is applied so that the hole can rotate around a central node without deforming. The domain is discretized by 10620 quadrilateral 4-node plane stress elements per ply. Quantitatively, the force versus pin opening displacement (POD) curve is compared to the measured results from [110] in Fig.13a) for the [0 ◦
+
+> 2
+
+/90 ◦
+
+> 2
+
+]2s and Fig.13b) for the [0 ◦
+
+> 4
+
+/90 ◦
+
+> 4
+
+]2s layups. The comparisons are based on a single numerical example of [0 ◦/90 ◦]. For the [0 ◦
+
+> 4
+
+/90 ◦
+
+> 4
+
+]2s case, the reaction forces were scaled accordingly to incorporate the increased thickness. Additionally, Fig. 13 show the points in the load-displacement curves, where the pictures in Fig. 15 were taken to facilitate a better qualitative comparison. The numerical result is always marked with purple Roman numerals, while the experimental results are marked with red and black Roman numerals. Figures 13 a) and b) generally display a good agreement of the force-displacement behavior of the ex-periment, especially at low loading stages, since both the experiment and the numerical result show a linear relation between force and displacement with very similar slopes in both cases. Furthermore, the numerical result consistently overpredicts the reaction forces and shows a much longer loading period, where the curve remains linear. This discrepancy can be due to the heavy delamination between the plies that 18 Figure 13: a) Force vs. Pin Opening Displacement (POD) curves corresponding to the [0 ◦ 
+
+> 2
+
+/90 ◦ 
+
+> 2
+
+]2s, and b) force pin opening displacement curves corresponding to the [0 ◦ 
+
+> 2
+
+/90 ◦ 
+
+> 2
+
+]2s . The markings with numerals indicate the positions at which the images in Fig. 15 were taken. 
+
+19 u uFigure 14: Stress distribution at each layer of [0 ◦ 
+
+> 2
+
+/90 ◦ 
+
+> 2
+
+]2s corresponding to the displacement at position I ( d = 0 .59 ) and II (d = 1 .55 ) respectively. 
+
+20 Figure 15: Comparison of the crack propagation of the numerical results (purple roman numerals) to the experimental results (red arabic and small black roman numerals). Experimental results are reproduced from [110] with permission from Elsevier. 
+
+occur in the experiments. In spite of that, the present model generally matches the experimental results well. The indications in Fig. 13 highlight the loading stages at which the damage presented in Fig. 15 is taken. The initial images 1, i, and I were taken at roughly the same displacement stage, while the second set of pictures differs. This is due to a seemingly unstable crack propagation event that happens in the experiment of the [0 ◦
+
+> 2
+
+/90 ◦
+
+> 2
+
+]2s case between pictures 1 and 2, leading to a larger crack compared to the numerical result at the same displacement. Therefore, picture II was taken closer to point ii at a latter loading stage. The last picture of the numerical result already shows complete failure, while the experiments do not reach complete failure as is the case for the [0 ◦
+
+> 2
+
+/90 ◦
+
+> 2
+
+]2s specimens or failure happens later as for the [0 ◦
+
+> 4
+
+/90 ◦
+
+> 4
+
+]2s samples. The latter fails by the pullout of the 0◦-blocks instead of matrix cracking. This also explains the discrepancy in the final damage pattern predicted in Fig. 15. Here, the energy required for the inter-fiber dominated crack to grow is dissipated by delamination and 0◦-block pullout, leading to shorter matrix cracks than the numerical result. The stress at each layer corresponding to the damage I and II are presented in Fig. 14. In conclusion, the proposed model provides an excellent agreement with the experiments in terms of both qualitative and quantitative predictions. 
+
+6.4. Double Notched Tension 
+
+This section corresponds to the double-edge notched tension results of various laminate sequences. The article [30] presents the experimental results of the progressive damage and the effects of the layup sequence in the double-edge tension tests. The article uses specimens of various sizes to present the failure mode, strength, and subcritical damage development in the E-glass/913 glass-epoxy laminate. In this section, three laminate sequences with constant width w = 20 mm are considered to evaluate the model’s predictive capability in terms of fiber, inter-fiber failure interaction, sub-critical damage, and crack propagation. The geometrical description of the body under consideration, along with the boundary conditions, is presented in Fig. 16 a). The Figure 16 a) also presents the nomenclature of the fiber orientation θ. The direction of loading is considered as θ = 90 ◦, while the direction perpendicular to the loading direction is 21 E11 (MPa) E22 (MPa) E12 (MPa) ν12 ν21 G12 (MPa) 45600 16200 6000 0.099 0.4 6000 
+
+> Table 8: Elastic Properties of the glass-epoxy
+
+RT 
+
+> 11
+
+(MPa) RT 
+
+> 22
+
+(MPa) RC 
+
+> 11
+
+(MPa) RC 
+
+> 22
+
+(MPa) R12 (MPa) GTC,f 
+
+ Nmm 
+
+
+
+GTC,m 
+
+ Nmm 
+
+
+
+1280 73.3 800 145 73 64 1.8 
+
+> Table 9: Strength properties of glass-epoxy
+
+considered as θ = 0 ◦. Three laminate sequences are considered in line with [30], including a) [0 /90] s, b) 
+
+[45 /90 / − 45] s (in this article, the sequence translates to [45 /0/ − 45] s), and c) [45 /90 / − 45 /0] s . 
+
+> Figure 16: a) Geometric description of the double-notched tension specimen along with the boundary conditions an fiber orientations, b) force vs. displacement curves for different laminate sequences.
+
+The material consists of glass-epoxy pre-preg plates whose approximate material properties are presented in the Table. 8-9. The model is meshed with 23716 elements for each ply, with refinement near the notches in line with [117]. Each layup sequence is accompanied by a comparison with the experimental results [30] at several instances in line with the experiments. Furthermore, a force-displacement curve for each layup sequence is presented, indicating the damage patterns at intervals as in [30] is shown to highlight the model’s ability to simulate sub-critical cracks, crack propagation in both fiber and inter-fiber separately. In all the laminated sequences presented in this section, the authors [30] report extensive delamination, which is neglected in the numerical modeling. 
+
+6.4.1. Cross-Ply Laminate [0 /90] s
+
+Figure 17 compares numerical results and the experimental results of the cross-ply laminate in terms of crack propagation. Figure 16b) presents the force vs displacement curve for the cross-ply laminate. The percentage of the maximum reaction force is shown for each damage comparison, and the corresponding crack pattern is compared with the experimental results [30]. The comparison of crack propagation at a) 26% , b) 67%, c) 98%, d) 100% of maximum load is presented in Figure 17a),b),c),d) respectively. The Final failure is presented in e). Initially, the split near the notch appears in the cross-ply laminate as shown in Fig. 17a). At this point, there is a partial inter-fiber failure, as shown in the numerical results. Furthermore, as the load increases, 22 26% 67% 98% Final Failure 0 0.05 0 1 0 1 0 1 0 1
+
+100% 01fmF-max a) b) c) d) e) Figure 17: Comparison of the crack propagation between the experiment and numerical results for the laminates sequence of  
+
+> [0 /90] sas a function of maximum load. Experimental results are reproduced from [30]
+
+ply splitting occurs in the loading direction, while the single transverse cracks appear in the directions perpendicular to the loading direction. This can also be seen numerically in Fig. 17b). The split cracks propagate, while the region perpendicular to the loading starts to damage dm ≈ 0.5. Due to the inter-fiber dominated crack in the cross-ply, a slight drop in the force vs. displacement can be seen in Fig. 16b). As the load further increases, the splitting crack grows, leading to fiber damage near the notch tip as shown in Fig. 16 c) and d). Experimental investigation [30] suggests that as the fiber failure increases, it follows an irregular path across the specimen width and is accompanied by splitting and delamination. Omitting the delamination, Fig. 16 d), e) presents the growth of a splitting crack followed by a fiber failure. As the fiber failure increases, the matrix around the fiber also damages, as shown in Fig. 16 e). The fracture prediction based on individual ply can be made based on the stress concentrations in the individual ply. Fig. A.21 presents the stress distribution for the cross-ply laminate in each layer. 
+
+6.4.2. Laminate [45 /0/ − 45] s
+
+Figure 18 compares the experimental and numerical investigation concerning crack propagation based on the percentage of maximum load. Fig. 16b) presents the corresponding force vs. displacement. As the applied load increases, the inter-fiber dominant cracks at the 45 ◦interface and −45 ◦ layers start to appear. The cracks are oriented in the fiber direction in the local setting, while the cracks appear to grow 
+
+±45 ◦ in the global setting as shown in Fig. 18a). At this stage, the numerical results show damage in the laminates dominated by the ±45 ◦ inter-fiber. As the applied load increases, subcritical cracks start to nucleate to form a more pronounced crack pattern in an inter-fiber dominated failure mode as in Fig. 18b). The Numerical results also show that the combination of fiber and inter-fiber failure modes drives the damage after this stage. When the maximum reaction load is reached, the failure mode is entirely dominated by the fiber failure at the notch tip, as shown in Fig. 18c). Due to the stark rise in the fiber damage, the force vs. displacement shows a significant drop, leading to a complete failure as shown in Fig. 16b). The crack propagation and the final failure pattern are compared in Fig. 18d) and e), respectively. In conclusion, the results presented show an excellent correlation with the experimental results for the qualitative comparison. Specifically, the models predict an inter-fiber-dominated failure followed by a fiber-23 f
+
+43% 94% 100% 0 0.3 01f01mF-max a) b) c) d) e) Figure 18: Comparison between experimental and numerical results for the laminates sequence of [45 /0/ − 45] s as a function of maximum load. The second row presents the damage in inter-fiber, while the third row presents the corresponding fiber-failure (if any). Experimental results are reproduced from [30] 
+
+dominated failure. The model also captures the competition between the fiber and matrix-dominated failure mechanisms as shown in Fig. 18 in line with the experiments [30]. 
+
+6.4.3. Quasi-Isotropic Laminate [45 /90 / − 45 /0] s
+
+This subsection compares the quasi-isotropic laminates with the layup sequence of [45 /90 / − 45 /0] s with the experimental results. The results are similar to the laminate sequence of [45 /0/ − 45] s. The interlaminar dominant cracks run along the fiber direction of ±45 ◦ plies at first as shown in Fig. 19a). This subcritical crack further grows, and the competition between the inter-fiber and fiber-dominated failure can be seen in Fig. 19b). Furthermore, as the fiber-dominated failure increases, the crack evolution strongly depends on the fiber failure, with inter-fiber-dominated failure around the damaged fibers as shown in Fig. 19c) and Fig. 19d). Furthermore, the force vs. displacement curve for the quasi-isotropic layup is shown in Fig. 16b). The stress distribution in each layer at position a) is presented in Fig. 20. 24 0 0.22 0 0.85 0 0.3 0 1 0 10 1 0 1a) b) c) d) mf64% F-max Figure 19: Comparison between experimental and numerical results for the laminates sequence of [45 /90 / − 45 /0] s as a function of maximum load. The second row presents the damage in inter-fiber, while the third row presents the corresponding fiber-failure (if any). Experimental results are reproduced from [30] 
+
+25 735 -250 74 -5 45-Layer 90-Layer S12 S11 1036 -7 101 -116 S22 658 -304 5-74 -45-Layer 167 -38 106 -12 172 -30 316 -78 116 -101 232 -2 0-Layer Figure 20: Stress distribution in each layer of the laminate [45 /90 / − 45 /0] s corresponding to maximum load of Fmax = 64% 
+
+corresponding to crack propagation in Fig. 19a). All the stresses are in MPa. 
+
+26 7. Conclusion 
+
+A multi-phase-field ply model capable of handling various laminate sequences is presented in this article. The model incorporates the Puck failure theory and uses two separate damage variables to separately model failure in fiber and inter-fiber. The laminate with different layup sequences is built using the mesh overlay technique. Comparison with the experiments showcases the model’s ability to replicate qualitative and quantitative experimental results. Furthermore, the interplay between the fiber and inter-fiber damage is shown using the cross-ply and isotropic laminates. Additionally, the compressive failure of the laminates is addressed in the article. The present model can currently be used for the qualitative assessment of fractures in laminates. In contrast, the quantitative assessment can be made by calibrating the proposed dimensionless number coined as dimensionless driving parameters. Finally, this work brings together many benchmark examples of com-putational analysis of laminates. Additionally, the codes and the corresponding data are provided to bring transparency and allow independent researchers to build on the present model. 
+
+8. Data Availability 
+
+This section provides the link to the codes and data, which includes the code and input file for all the examples in the article after the acceptance of the article. 
+
+References 
+
+[1] T. Q. B. et al., A review of phase-field models, fundamentals and their applications to composite laminates, Engineering Fracture Mechanics 248 (2021) 107705. doi:https://doi.org/10.1016/j. engfracmech.2021.107705 .[2] R. Piska, K. Sivadas, K. Boyina, A. Vuppuluri, A. Chaurasia, C. Parimi, T. Rabczuk, Recent trends in computational damage models: An overview, Theoretical and Applied Fracture Mechanics 132 (2024) 104494. doi:https://doi.org/10.1016/j.tafmec.2024.104494 .URL https://www.sciencedirect.com/science/article/pii/S016784422400243X 
+
+[3] Z.-Q. Cheng, H. Liu, W. Tan, Advanced computational modelling of composite materials, Engineer-ing Fracture Mechanics 305 (2024) 110120. doi:https://doi.org/10.1016/j.engfracmech.2024. 110120 .URL https://www.sciencedirect.com/science/article/pii/S0013794424002832 
+
+[4] M. J. Laffan, S. T. Pinho, P. Robinson, A. J. McMillan, Translaminar fracture toughness testing of composites: A review, Polymer Testing 31 (3) (2012) 481–489. doi:https://doi.org/10.1016/j. polymertesting.2012.01.002 .[5] J. Kaul, H. Pettermann, A constitutive model for fiber reinforced polymer plies – implicit anisotropic evolution of damage and plasticity based on effective strengths, Composites Part C: Open Access 4 (2021) 100097. doi:https://doi.org/10.1016/j.jcomc.2020.100097 .URL https://www.sciencedirect.com/science/article/pii/S2666682020300979 
+
+[6] T. Flatscher, M. Wolfahrt, G. Pinter, H. Pettermann, Simulations and experiments of open hole tension tests – assessment of intra-ply plasticity, damage, and localization, Composites Science and Technology 72 (10) (2012) 1090–1095, recent Advancements in Deformation & Fracture of Composites: Experiment & Analysis. doi:https://doi.org/10.1016/j.compscitech.2011.07.021 .URL https://www.sciencedirect.com/science/article/pii/S0266353811002740 
+
+[7] B. Green, M. Wisnom, S. Hallett, An experimental investigation into the tensile strength scaling of notched composites, Composites Part A: Applied Science and Manufacturing 38 (3) (2007) 867–878. 
+
+doi:https://doi.org/10.1016/j.compositesa.2006.07.008 .URL https://www.sciencedirect.com/science/article/pii/S1359835X06002326 
+
+27 [8] S. R. Hallett, B. G. Green, W.-G. Jiang, K. H. Cheung, M. R. Wisnom, The open hole tensile test: a challenge for virtual testing of composites, International Journal of Fracture 158 (2) (2009) 169–181. 
+
+doi:10.1007/s10704-009-9333-8 .URL https://doi.org/10.1007/s10704-009-9333-8 
+
+[9] T. Chuaqui, M. Nielsen, J. Colton, R. Butler, A. Rhead, Effects of ply angle and blocking on open-hole tensile strength of composite laminates: A design and certification perspective, Composites Part B: Engineering 207 (2021) 108582. doi:https://doi.org/10.1016/j.compositesb.2020.108582 .URL https://www.sciencedirect.com/science/article/pii/S1359836820336283 
+
+[10] P. Camanho, P. Maimí, C. Dávila, Prediction of size effects in notched laminates using continuum damage mechanics, Composites Science and Technology 67 (13) (2007) 2715–2727. doi:https:// doi.org/10.1016/j.compscitech.2007.02.005 .URL https://www.sciencedirect.com/science/article/pii/S0266353807000796 
+
+[11] M. R. Wisnom, S. R. Hallett, The role of delamination in strength, failure mechanism and hole size effect in open hole tensile tests on quasi-isotropic laminates, Composites Part A: Applied Science and Manufacturing 40 (4) (2009) 335–342. doi:https://doi.org/10.1016/j.compositesa.2008. 12.013 .URL https://www.sciencedirect.com/science/article/pii/S1359835X08003266 
+
+[12] S. Hallett, B. Green, W. Jiang, M. Wisnom, An experimental and numerical investigation into the damage mechanisms in notched composites, Composites Part A: Applied Science and Manufacturing 40 (5) (2009) 613–624. doi:https://doi.org/10.1016/j.compositesa.2009.02.021 .URL https://www.sciencedirect.com/science/article/pii/S1359835X09000499 
+
+[13] M. Wisnom, S. Hallett, C. Soutis, Scaling effects in notched composites, Journal of Composite Mate-rials 44 (2) (2010) 195–210. doi:10.1177/0021998309339865 .URL https://doi.org/10.1177/0021998309339865 
+
+[14] C. Harris, D. Morris, A comparison of the fracture behavior of thick laminated composites utilizing compact tension, three-point bend, and center-cracked tension specimens, in: Fracture Mechanics: Sev-enteenth Volume, ASTM International, 1986. arXiv:https://asmedigitalcollection.asme.org/ astm-ebooks/book/chapter-pdf/7396209/10\_1520\_stp17392s.pdf , doi:10.1520/STP17392S .URL https://doi.org/10.1520/STP17392S 
+
+[15] J. H. Underwood, M. Kortschot, Notch-tip damage and translaminar fracture toughness measurements from carbon/epoxy laminates, in: Proceedings contribution, 1994. URL https://api.semanticscholar.org/CorpusID:135863567 
+
+[16] J. H. Underwood, M. T. Kortschot, W. R. Lloyd, H. L. Eidinoff, D. A. Wilson, N. Ashbaugh, Translam-inar fracture toughness test methods and results from interlaboratory tests of carbon/epoxy laminates, ASTM special technical publication 1256 (1995) 486–508. [17] S. Pinho, P. Robinson, L. Iannucci, Fracture toughness of the tensile and compressive fibre failure modes in laminated composites, Composites Science and Technology 66 (13) (2006) 2069–2079. doi: https://doi.org/10.1016/j.compscitech.2005.12.023 .URL https://www.sciencedirect.com/science/article/pii/S026635380600011X 
+
+[18] M. Laffan, S. Pinho, P. Robinson, L. Iannucci, Measurement of the in situ ply fracture toughness associated with mode i fibre tensile failure in frp. part i: Data reduction, Composites Science and Technology 70 (4) (2010) 606–613. doi:https://doi.org/10.1016/j.compscitech.2009.12.016 .URL https://www.sciencedirect.com/science/article/pii/S0266353809004515 
+
+28 [19] M. Laffan, S. Pinho, P. Robinson, L. Iannucci, Measurement of the in situ ply fracture toughness associated with mode i fibre tensile failure in frp. part ii: Size and lay-up effects, Composites Science and Technology 70 (4) (2010) 614–621. doi:https://doi.org/10.1016/j.compscitech.2009.12. 011 .URL https://www.sciencedirect.com/science/article/pii/S0266353809004369 
+
+[20] M. Laffan, S. Pinho, P. Robinson, A. McMillan, Translaminar fracture toughness: The critical notch tip radius of 0 ° plies in cfrp, Composites Science and Technology 72 (1) (2011) 97–102. doi:https: //doi.org/10.1016/j.compscitech.2011.10.006 .URL https://www.sciencedirect.com/science/article/pii/S0266353811003630 
+
+[21] K. G. Dassios, V. Kostopoulos, M. Steen, Intrinsic parameters in the fracture of carbon/carbon com-posites, Composites Science and Technology 65 (6) (2005) 883–897. doi:https://doi.org/10.1016/ j.compscitech.2004.10.021 .URL https://www.sciencedirect.com/science/article/pii/S0266353804002945 
+
+[22] R. Reber, J. de Haan, J. Mayer, M. Petitmermet, E. Wintermatnel, Intralaminar fracture of weft-knitted carbon fiber reinforced peek, in: J. Williams, A. Pavan (Eds.), Fracture of Polymers, Com-posites and Adhesives, Vol. 27 of European Structural Integrity Society, Elsevier, 2000, pp. 123–133. 
+
+doi:https://doi.org/10.1016/S1566-1369(00)80013-8 .URL https://www.sciencedirect.com/science/article/pii/S1566136900800138 
+
+[23] K. M. Prewo, The effect of ply lay-up sequence on the fracture toughness of boron aluminum, Journal of Composite Materials 12 (1) (1978) 40–52. doi:10.1177/002199837801200103 .URL https://doi.org/10.1177/002199837801200103 
+
+[24] C. Sun, K. Prewo, The fracture toughness of boron aluminum composites, Journal of Composite Materials 11 (2) (1977) 164–175. doi:10.1177/002199837701100204 .URL https://doi.org/10.1177/002199837701100204 
+
+[25] D. Morris, H. Hahn, Fracture resistance characterization of graphite/epoxy composites, ASTM Inter-national, 1977. [26] Y. Yeow, D. Morris, H. Brinson, A correlative study between analysis and experiment on the fracture behavior of graphite/epoxy composites, Journal of Testing and Evaluation 7 (2) (1979) 117–125. 
+
+doi:10.1520/JTE11211J .URL https://doi.org/10.1520/JTE11211J 
+
+[27] J. Underwood, I. Burch, S. Bandyopadhyay, Effects of notch geometry and moisture on fracture strength of carbon/epoxy and carbon/bismaleimide laminates, in: Composite Materials: Fatigue and Fracture (Third Volume), ASTM International, 1991. [28] C. Poe Jr, J. Sova, Fracture toughness of boron/aluminum laminates with various proportions of 0 and plus/minus 45 deg plies, National Aeronautics and Space Administration, (1980) 36. [29] M. E. Toygar, M. Toparli, B. Uyulgan, An investigation of fracture toughness of carbon/epoxy com-posites, Journal of Reinforced Plastics and Composites 25 (18) (2006) 1887–1895. doi:10.1177/ 0731684406069916 .URL https://doi.org/10.1177/0731684406069916 
+
+[30] S. R. Hallett, M. R. Wisnom, Experimental investigation of progressive damage and the effect of layup in notched tensile tests, Journal of Composite Materials 40 (2) (2006) 119–141. doi:10.1177/ 0021998305053504 .URL https://doi.org/10.1177/0021998305053504 
+
+29 [31] S. Pinho, L. Iannucci, P. Robinson, Formulation and implementation of decohesion elements in an explicit finite element code, Composites Part A: Applied Science and Manufacturing 37 (5) (2006) 778–789. doi:https://doi.org/10.1016/j.compositesa.2005.06.007 .URL https://www.sciencedirect.com/science/article/pii/S1359835X05002691 
+
+[32] S. Pinho, L. Iannucci, P. Robinson, Physically based failure models and criteria for laminated fibre-reinforced composites with emphasis on fibre kinking. part ii: Fe implementation, Composites Part A: Applied Science and Manufacturing 37 (5) (2006) 766–777. doi:https://doi.org/10.1016/j. compositesa.2005.06.008 .URL https://www.sciencedirect.com/science/article/pii/S1359835X05002708 
+
+[33] N. Moës, T. Belytschko, Extended finite element method for cohesive crack growth, Engineering Frac-ture Mechanics 69 (7) (2002) 813–833. doi:https://doi.org/10.1016/S0013-7944(01)00128-X .URL https://www.sciencedirect.com/science/article/pii/S001379440100128X 
+
+[34] F. Bobaru, S. A. Silling, Peridynamic 3d models of nanofiber networks and carbon nanotube-reinforced composites, AIP Conference Proceedings 712 (1) (2004) 1565–1570. doi:10.1063/1.1766752 .URL https://doi.org/10.1063/1.1766752 
+
+[35] J. Xu, A. Askari, O. Weckner, S. Silling, Peridynamic analysis of impact damage in composite laminates, Journal of Aerospace Engineering 21 (3) (2008) 187–194. doi: 10.1061/(ASCE)0893-1321(2008)21:3(187) .URL https://ascelibrary.org/doi/abs/10.1061/%28ASCE%290893-1321%282008%2921%3A3% 28187%29 
+
+[36] E. Oterkus, E. Madenci, O. Weckner, S. Silling, P. Bogert, A. Tessler, Combined finite element and peridynamic analyses for predicting failure in a stiffened composite curved panel with a central slot, Composite Structures 94 (3) (2012) 839–850. doi:https://doi.org/10.1016/j.compstruct.2011. 07.019 .URL https://www.sciencedirect.com/science/article/pii/S0263822311002741 
+
+[37] D. Boyina, T. Kirubakaran, A. Banerjee, R. Velmurugan, Mixed-mode translaminar fracture of woven composites using a heterogeneous spring network, Mechanics of Materials 91 (2015) 64–75. doi:https: //doi.org/10.1016/j.mechmat.2015.07.013 .URL https://www.sciencedirect.com/science/article/pii/S0167663615001672 
+
+[38] A. Mayya, A. Banerjee, R. Rajesh, Role of porosity and matrix behavior on compressive fracture of haversian bone using random spring network model, Journal of the Mechanical Behavior of Biomedical Materials 83 (2018) 108–119. doi:https://doi.org/10.1016/j.jmbbm.2018.04.013 .URL https://www.sciencedirect.com/science/article/pii/S175161611830496X 
+
+[39] M. Braun, I. Iváñez, M. Ariza, A numerical study of progressive damage in unidirectional composite materials using a 2d lattice model, Engineering Fracture Mechanics 249 (2021) 107767. doi:https: //doi.org/10.1016/j.engfracmech.2021.107767 .URL https://www.sciencedirect.com/science/article/pii/S0013794421002125 
+
+[40] A. Puck, H. Schürmann, Failure analysis of frp laminates by means of physically based phenomeno-logical models, Composites Science and Technology 62 (12) (2002) 1633 – 1662. doi:https: //doi.org/10.1016/S0266-3538(01)00208-1 .URL http://www.sciencedirect.com/science/article/pii/S0266353801002081 
+
+[41] O. Allix, L. Daudeville, P. Ladevèze, Delamination and damage mechanics, Mechanics and mechanisms of damage in composites and multi-materials (1989) 143–157. [42] P. Ladeveze, On a damage mechanics approach, Mechanics and mechanisms of damage in composites and multi-materials (1989) 119–141. 30 [43] P. LADEVÈZE, A damage mesomodel of laminate composites, in: Handbook of materials behavior models, Elsevier, 2001, pp. 1004–1014. [44] A. Matzenmiller, J. Lubliner, R. Taylor, A constitutive model for anisotropic damage in fiber-composites, Mechanics of Materials 20 (2) (1995) 125–152. doi:https://doi.org/10.1016/ 0167-6636(94)00053-0 .URL https://www.sciencedirect.com/science/article/pii/0167663694000530 
+
+[45] I. Lapczyk, J. A. Hurtado, Progressive damage modeling in fiber-reinforced materials, Composites Part A: Applied Science and Manufacturing 38 (11) (2007) 2333–2341, compTest 2006. doi:https: //doi.org/10.1016/j.compositesa.2007.01.017 .URL https://www.sciencedirect.com/science/article/pii/S1359835X07000218 
+
+[46] P. Maimí, P. Camanho, J. Mayugo, C. Dávila, A continuum damage model for composite laminates: Part i – constitutive model, Mechanics of Materials 39 (10) (2007) 897–908. doi:https://doi.org/ 10.1016/j.mechmat.2007.03.005 .URL https://www.sciencedirect.com/science/article/pii/S0167663607000543 
+
+[47] W. Van Paepegem, I. De Baere, J. Degrieck, Modelling the nonlinear shear stress–strain response of glass fibre-reinforced composites. part ii: Model development and finite element simulations, Composites Science and Technology 66 (10) (2006) 1465–1478. doi:https://doi.org/10.1016/j. compscitech.2005.04.018 .URL https://www.sciencedirect.com/science/article/pii/S026635380500117X 
+
+[48] E. J. Barbero, P. Lonetti, An inelastic damage model for fiber reinforced laminates, Journal of Com-posite Materials 36 (8) (2002) 941–962. [49] C. Schuecker, H. Pettermann, A continuum damage model for fiber reinforced laminates based on ply failure mechanisms, Composite Structures 76 (1) (2006) 162–173, fifteenth International Conference on Composite Materials. doi:https://doi.org/10.1016/j.compstruct.2006.06.023 .URL https://www.sciencedirect.com/science/article/pii/S0263822306002625 
+
+[50] C. Schuecker, H. Pettermann, Constitutive ply damage modeling, fem implementation, and analyses of laminated structures, Computers & Structures 86 (9) (2008) 908–918, composites. doi:https: //doi.org/10.1016/j.compstruc.2007.04.021 .URL https://www.sciencedirect.com/science/article/pii/S0045794907001666 
+
+[51] C. Schuecker, H. E. Pettermann, Fiber Reinforced Laminates: Progressive Damage Modeling Based on Failure Mechanisms, Archives of Computational Methods in Engineering 15 (2) (2008) 163–184. 
+
+doi:10.1007/s11831-008-9016-z .URL https://doi.org/10.1007/s11831-008-9016-z 
+
+[52] H. T Flatscher, C. Schuecker, A constitutive ply model for stiffness degradation and plastic strain accumulation: Its application to the third world wide failure exercise (part a), Journal of Composite Materials 47 (20-21) (2013) 2575–2593. doi:10.1177/0021998313484075 .[53] A. A. Griffith, The phenomena of rupture and flow in solids, Philosophical Transactions of the Royal Society of London. 221 (1921) 163–198. [54] G. F. et al., Revisiting brittle fracture as an energy minimization problem, Journal of the Mechanics and Physics of Solids 46 (8) (1998) 1319 – 1342. doi:https://doi.org/10.1016/S0022-5096(98) 00034-9 .[55] B. Bourdin, G. Francfort, J.-J. Marigo, Numerical experiments in revisited brittle fracture, Journal of the Mechanics and Physics of Solids 48 (4) (2000) 797 – 826. doi:https://doi.org/10.1016/ S0022-5096(99)00028-9 .31 [56] B. Bourdin, C. J. Larsen, C. L. Richardson, A time-discrete model for dynamic fracture based on crack regularization, International Journal of Fracture 168 (2) (2011) 133–143. doi:10.1007/ s10704-010-9562-x .[57] C. Miehe, F. Welschinger, M. Hofacker, Thermodynamically consistent phase-field models of fracture: Variational principles and multi-field fe implementations, International Journal for Numerical Methods in Engineering 83 (10) (2010) 1273–1311. arXiv:https://onlinelibrary.wiley.com/doi/pdf/10. 1002/nme.2861 , doi:https://doi.org/10.1002/nme.2861 .URL https://onlinelibrary.wiley.com/doi/abs/10.1002/nme.2861 
+
+[58] A. Schlüter, A. Willenbücher, C. Kuhn, R. Müller, Phase field approximation of dynamic brittle fracture, Computational Mechanics 54 (5) (2014) 1141–1161. doi:10.1007/s00466-014-1045-x .URL https://doi.org/10.1007/s00466-014-1045-x 
+
+[59] M. A. Msekh, J. M. Sargado, M. Jamshidian, P. M. Areias, T. Rabczuk, Abaqus implementation of phase-field model for brittle fracture, Computational Materials Science 96 (2015) 472–484, special Issue Polymeric Composites. doi:https://doi.org/10.1016/j.commatsci.2014.05.071 .URL https://www.sciencedirect.com/science/article/pii/S0927025614004133 
+
+[60] C. Miehe, M. Hofacker, F. Welschinger, A phase field model for rate-independent crack propagation: Robust algorithmic implementation based on operator splits, Computer Methods in Applied Mechanics and Engineering 199 (45) (2010) 2765–2778. doi:https://doi.org/10.1016/j.cma.2010.04.011 .URL https://www.sciencedirect.com/science/article/pii/S0045782510001283 
+
+[61] A. Mesgarnejad, B. Bourdin, M. Khonsari, Validation simulations for the variational approach to fracture, Computer Methods in Applied Mechanics and Engineering 290 (2015) 420–437. doi:https: //doi.org/10.1016/j.cma.2014.10.052 .URL https://www.sciencedirect.com/science/article/pii/S004578251400423X 
+
+[62] F. Freddi, F. Iurlano, Numerical insight of a variational smeared approach to cohesive fracture, Journal of the Mechanics and Physics of Solids 98 (2017) 156–171. doi:https://doi.org/10.1016/j.jmps. 2016.09.003 .URL https://www.sciencedirect.com/science/article/pii/S0022509616304860 
+
+[63] M. Paggi, J. Reinoso, Revisiting the problem of a crack impinging on an interface:a modeling framework for the interaction between the phase field approach for brittle fracture and the interface cohesive zone model, Computer Methods in Applied Mechanics and Engineering 321 (2017) 145–172. doi:https: //doi.org/10.1016/j.cma.2017.04.004 .URL https://www.sciencedirect.com/science/article/pii/S0045782516317066 
+
+[64] J.-Y. Wu, A unified phase-field theory for the mechanics of damage and quasi-brittle failure, Journal of the Mechanics and Physics of Solids 103 (2017) 72–99. doi:https://doi.org/10.1016/j.jmps. 2017.03.015 .URL https://www.sciencedirect.com/science/article/pii/S0022509616308341 
+
+[65] T. Nguyen, J. Yvonnet, Q.-Z. Zhu, M. Bornert, C. Chateau, A phase-field method for computational modeling of interfacial damage interacting with crack propagation in realistic microstructures obtained by microtomography, Computer Methods in Applied Mechanics and Engineering 312 (2016) 567–595, phase Field Approaches to Fracture. doi:https://doi.org/10.1016/j.cma.2015.10.007 .URL https://www.sciencedirect.com/science/article/pii/S0045782515003266 
+
+[66] S. Conti, M. Focardi, F. Iurlano, Phase field approximation of cohesive fracture models, Annales de l’Institut Henri Poincaré C, Analyse non linéaire 33 (4) (2016) 1033–1067. doi:https://doi.org/ 10.1016/j.anihpc.2015.02.001 .URL https://www.sciencedirect.com/science/article/pii/S0294144915000360 
+
+32 [67] M. J. Borden, C. V. Verhoosel, M. A. Scott, T. J. Hughes, C. M. Landis, A phase-field description of dynamic brittle fracture, Computer Methods in Applied Mechanics and Engineering 217-220 (2012) 77–95. doi:https://doi.org/10.1016/j.cma.2012.01.008 .URL https://www.sciencedirect.com/science/article/pii/S0045782512000199 
+
+[68] D. H. Doan, T. Q. Bui, T. Van Do, N. D. Duc, A rate-dependent hybrid phase field model for dynamic crack propagation, Journal of Applied Physics 122 (11) (2017) 115102. arXiv:https://pubs.aip. org/aip/jap/article-pdf/doi/10.1063/1.4990073/13334518/115102\_1\_online.pdf , doi:10. 1063/1.4990073 .URL https://doi.org/10.1063/1.4990073 
+
+[69] S. Zhou, X. Zhuang, T. Rabczuk, Phase-field modeling of fluid-driven dynamic cracking in porous media, Computer Methods in Applied Mechanics and Engineering 350 (2019) 169–198. doi:https: //doi.org/10.1016/j.cma.2019.03.001 .URL https://www.sciencedirect.com/science/article/pii/S0045782519301276 
+
+[70] V. P. Nguyen, J.-Y. Wu, Modeling dynamic fracture of solids with a phase-field regularized cohesive zone model, Computer Methods in Applied Mechanics and Engineering 340 (2018) 1000–1022. doi: https://doi.org/10.1016/j.cma.2018.06.015 .URL https://www.sciencedirect.com/science/article/pii/S004578251830313X 
+
+[71] C. M. et al., Phase field modeling of fracture in multi-physics problems. part ii. coupled brittle-to-ductile failure criteria and crack propagation in thermo-elastic–plastic solids, Computer Methods in Applied Mechanics and Engineering 294 (2015) 486–522. doi:https://doi.org/10.1016/j.cma. 2014.11.017 .[72] P. K. A. V. Kumar, A. Dean, S. Sahraee, J. Reinoso, M. Paggi, Non-linear thermoelastic analysis of thin-walled structures with cohesive-like interfaces relying on the solid shell concept, Finite Elements in Analysis and Design 202 (2022) 103696. doi:https://doi.org/10.1016/j.finel.2021.103696 .URL https://www.sciencedirect.com/science/article/pii/S0168874X21001700 
+
+[73] P. K. Asur Vijaya Kumar, A. Dean, J. Reinoso, M. Paggi, Nonlinear thermo-elastic phase-field fracture of thin-walled structures relying on solid shell concepts, Computer Methods in Applied Mechanics and Engineering 396 (2022) 115096. doi:https://doi.org/10.1016/j.cma.2022.115096 .URL https://www.sciencedirect.com/science/article/pii/S0045782522002936 
+
+[74] J. Bleyer, R. Alessi, Phase-field modeling of anisotropic brittle fracture including several damage mechanisms, Computer Methods in Applied Mechanics and Engineering 336 (2018) 213–236. doi: https://doi.org/10.1016/j.cma.2018.03.012 .URL https://www.sciencedirect.com/science/article/pii/S0045782518301373 
+
+[75] A. Dean, J. Reinoso, N. Jha, E. Mahdi, R. Rolfes, A phase field approach for ductile fracture of short fibre reinforced composites, Theoretical and Applied Fracture Mechanics 106 (2020) 102495. 
+
+doi:https://doi.org/10.1016/j.tafmec.2020.102495 .URL https://www.sciencedirect.com/science/article/pii/S0167844219306536 
+
+[76] Q. Wang, Y. Feng, W. Zhou, Y. Cheng, G. Ma, A phase-field model for mixed-mode fracture based on a unified tensile fracture criterion, Computer Methods in Applied Mechanics and Engineering 370 (2020) 113270. doi:https://doi.org/10.1016/j.cma.2020.113270 .URL https://www.sciencedirect.com/science/article/pii/S0045782520304552 
+
+[77] P. Asur Vijaya Kumar, A. Dean, J. Reinoso, P. Lenarda, M. Paggi, Phase field modeling of fracture in functionally graded materials: Γ-convergence and mechanical insight on the effect of grading, Thin-Walled Structures 159 (2021) 107234. doi:https://doi.org/10.1016/j.tws.2020.107234 .URL https://www.sciencedirect.com/science/article/pii/S0263823120311046 
+
+33 [78] R. Alessi, F. Freddi, Phase-field modelling of failure in hybrid laminates, Composite Structures 181 (2017) 9–25. doi:https://doi.org/10.1016/j.compstruct.2017.08.073 .URL https://www.sciencedirect.com/science/article/pii/S0263822317313107 
+
+[79] J. Reinoso, A. Arteiro, M. Paggi, P. Camanho, Strength prediction of notched thin ply laminates using finite fracture mechanics and the phase field approach, Composites Science and Technology 150 (2017) 205–216. doi:https://doi.org/10.1016/j.compscitech.2017.07.020 .URL https://www.sciencedirect.com/science/article/pii/S0266353817310552 
+
+[80] Hirshikesh, S. Natarajan, R. K. Annabattula, Modeling crack propagation in variable stiffness com-posite laminates using the phase field method, Composite Structures 209 (2019) 424–433. doi:https: //doi.org/10.1016/j.compstruct.2018.10.083 .URL https://www.sciencedirect.com/science/article/pii/S0263822318325935 
+
+[81] A. Singh, S. Pal, Multi-phase field modeling for various fracture mechanisms in composites, Engineer-ing Fracture Mechanics 241 (2021) 107348. doi:https://doi.org/10.1016/j.engfracmech.2020. 107348 .URL https://www.sciencedirect.com/science/article/pii/S0013794420309292 
+
+[82] P. Zhang, W. Yao, X. Hu, T. Q. Bui, An explicit phase field model for progressive tensile failure of composites, Engineering Fracture Mechanics 241 (2021) 107371. doi:https://doi.org/10.1016/j. engfracmech.2020.107371 .URL https://www.sciencedirect.com/science/article/pii/S0013794420309516 
+
+[83] Q. Yue, Q. Wang, W. Tian, T. Rabczuk, W. Zhou, G. Ma, X. Zhuang, X. Chang, A phase-field lattice model (pflm) for fracture problem: Theory and application in composite materials, Composite Structures 323 (2023) 117432. doi:https://doi.org/10.1016/j.compstruct.2023.117432 .URL https://www.sciencedirect.com/science/article/pii/S026382232300778X 
+
+[84] A. Dean, M. Hematipour, P. K. Asur Vijaya Kumar, R. Rolfes, Experimental–numerical phase-field modelling of ductile and fatigue fracture in short fibre-reinforced polymeric adhesives, Composites Science and Technology 279 (2026) 111588. doi:https://doi.org/10.1016/j.compscitech.2026. 111588 .URL https://www.sciencedirect.com/science/article/pii/S0266353826000734 
+
+[85] O. Gültekin, H. Dal, G. A. Holzapfel, Numerical aspects of anisotropic failure in soft biological tissues favor energy-based criteria: A rate-dependent anisotropic crack phase-field model, Computer Methods in Applied Mechanics and Engineering 331 (2018) 23 – 52. doi:10.1016/j.cma.2017.11.008 .[86] O. Gültekin, H. Dal, G. Holzapfel, A phase-field approach to model fracture of arterial walls: Theory and finite element analysis, Computer Methods in Applied Mechanics and Engineering 312 (2016) 542 – 566. doi:10.1016/j.cma.2016.04.007 .[87] A. Quintanas-Corominas, J. Reinoso, E. Casoni, A. Turon, J. Mayugo, A phase field approach to sim-ulate intralaminar and translaminar fracture in long fiber composite materials, Composite Structures 220 (2019) 899–911. doi:https://doi.org/10.1016/j.compstruct.2019.02.007 .URL https://www.sciencedirect.com/science/article/pii/S0263822318339928 
+
+[88] P. Zhang, X. Hu, T. Q. Bui, W. Yao, Phase field modeling of fracture in fiber reinforced composite laminate, International Journal of Mechanical Sciences 161-162 (2019) 105008. doi:https://doi. org/10.1016/j.ijmecsci.2019.07.007 .URL https://www.sciencedirect.com/science/article/pii/S0020740318341729 
+
+[89] S. Mrunmayee, A. Rajagopal, K. Rakesh, K. Basant, J. Reddy, Phase field approach to predict mixed-mode delamination and delamination migration in composites, Composite Structures 337 (2024) 118074. doi:https://doi.org/10.1016/j.compstruct.2024.118074 .URL https://www.sciencedirect.com/science/article/pii/S0263822324002022 
+
+34 [90] D. Pranavi, A. Rajagopal, J. Reddy, Interaction of anisotropic crack phase field with interface cohesive zone model for fiber reinforced composites, Composite Structures 270 (2021) 114038. doi:https: //doi.org/10.1016/j.compstruct.2021.114038 .URL https://www.sciencedirect.com/science/article/pii/S0263822321004980 
+
+[91] A. D. et al., A multi phase-field fracture model for long fiber reinforced composites based on the puck theory of failure, Composite Structures 251 (2020) 112446. doi:https://doi.org/10.1016/j. compstruct.2020.112446 .[92] P. K. A. et al., A multi phase-field-cohesive zone model for laminated composites: Application to delamination migration, Composite Structures 276 (2021) 114471. doi:https://doi.org/10.1016/ j.compstruct.2021.114471 .[93] I. Jain, A. Muixí, C. Annavarapu, S. S. Mulay, A. Rodríguez-Ferran, Adaptive phase-field modeling of fracture in orthotropic composites, Engineering Fracture Mechanics 292 (2023) 109673. doi:https: //doi.org/10.1016/j.engfracmech.2023.109673 .URL https://www.sciencedirect.com/science/article/pii/S0013794423006318 
+
+[94] A. Kumar, T. Sain, Phase field-based cohesive zone approach to model delamination in fiber-reinforced polymer composites, Composite Structures 329 (2024) 117751. doi:https://doi.org/10.1016/j. compstruct.2023.117751 .URL https://www.sciencedirect.com/science/article/pii/S0263822323010978 
+
+[95] O. Lopez-Pamies, J. E. Dolbow, G. A. Francfort, C. J. Larsen, Classical variational phase-field models cannot predict fracture nucleation, Computer Methods in Applied Mechanics and Engineering 433 (2025) 117520. doi:https://doi.org/10.1016/j.cma.2024.117520 .URL https://www.sciencedirect.com/science/article/pii/S0045782524007746 
+
+[96] F. Kamarei, J. Dolbow, O. Lopez-Pamies, Nucleation of fracture: The first-octant evidence against classical variational phase-field models, Journal of Applied Mechanics (2024) 1– 5arXiv:https://asmedigitalcollection.asme.org/appliedmechanics/article-pdf/doi/ 10.1115/1.4067146/7404104/jam-24-1344.pdf , doi:10.1115/1.4067146 .URL https://doi.org/10.1115/1.4067146 
+
+[97] Z. Hashin, Fatigue Failure Criteria for Unidirectional Fiber Composites, Journal of Applied Mechanics 48 (4) (1981) 846–852. doi:10.1115/1.3157744 .URL https://doi.org/10.1115/1.3157744 
+
+[98] S. T. Pinho, et al., Failure Models and Criteria for FRP Under In-Plane or Three-Dimensional Stress States Including Shear Non-Linearity, Department of Aeronautics, Imperial College London, 2013. [99] S. T. Pinho, L. Iannucci, P. Robinson, Physically-based failure models and criteria for laminated fibre-reinforced composites with emphasis on fibre kinking: Part i: Development, Composites Part A: Applied Science and Manufacturing 37 (1) (2006) 63–73. doi:https://doi.org/10.1016/j. compositesa.2005.04.016 .[100] S. T. Pinho, R. Darvizeh, P. Robinson, C. Schuecker, P. P. Camanho, Material and structural response of polymer-matrix fibre-reinforced composites, Journal of Composite Materials 46 (19-20) (2012) 2313– 2341. doi:10.1177/0021998312454478 .[101] G. Bullegas, J. M. Lamela, S. Pimenta, S. Pinho, On the role of dynamic stress concentrations and frac-ture mechanics in the longitudinal tensile failure of fibre-reinforced composites, Engineering Fracture Mechanics 228 (2020) 106920. doi:https://doi.org/10.1016/j.engfracmech.2020.106920 .35 [102] M. J. Laffan, S. T. Pinho, P. Robinson, L. Iannucci, A. J. McMillan, Measurement of the fracture toughness associated with the longitudinal fibre compressive failure mode of laminated composites, Composites Part A: Applied Science and Manufacturing 43 (11) (2012) 1930–1938. doi:https:// doi.org/10.1016/j.compositesa.2012.04.009 .[103] M. J. Laffan, S. T. Pinho, P. Robinson, L. Iannucci, Measurement of the in situ ply fracture toughness associated with mode i fibre tensile failure in frp. part ii: Size and lay-up effects, Composites Science and Technology 70 (4) (2010) 614–621. doi:https://doi.org/10.1016/j.compscitech.2009.12. 011 .[104] P. K. Asur Vijaya Kumar, R. Fleischhacker, A. Dean, R. Rolfes, H. E. Pettermann, Revisiting multi-phase field model for frcs using puck theory, Composite Structures 372 (2025) 119549. doi:https: //doi.org/10.1016/j.compstruct.2025.119549 .URL https://www.sciencedirect.com/science/article/pii/S0263822325007147 
+
+[105] P. Li, J. Yvonnet, Y. Wu, Improved fracture resistance of 3d-printed elastoplastic structures with respect to their topology and orientation of deposited layers, International Journal of Mechanical Sciences 220 (2022) 107147. doi:https://doi.org/10.1016/j.ijmecsci.2022.107147 .URL https://www.sciencedirect.com/science/article/pii/S0020740322000777 
+
+[106] Z. Pan, K. Liew, Predicting vibration characteristics of rotating composite blades containing cnt-reinforced composite laminae and damaged fiber-reinforced composite laminae, Composite Structures 250 (2020) 112580. doi:https://doi.org/10.1016/j.compstruct.2020.112580 .URL https://www.sciencedirect.com/science/article/pii/S0263822320320419 
+
+[107] Z. Pan, L.-W. Zhang, K. Liew, Adaptive surrogate-based harmony search algorithm for design op-timization of variable stiffness composite materials, Computer Methods in Applied Mechanics and Engineering 379 (2021) 113754. doi:https://doi.org/10.1016/j.cma.2021.113754 .URL https://www.sciencedirect.com/science/article/pii/S0045782521000906 
+
+[108] Z. Pan, L. Zhang, K. Liew, A phase-field framework for failure modeling of variable stiffness composite laminae, Computer Methods in Applied Mechanics and Engineering 388 (2022) 114192. doi:https: //doi.org/10.1016/j.cma.2021.114192 .URL https://www.sciencedirect.com/science/article/pii/S0045782521005235 
+
+[109] T. Flatscher, A constitutive model for the elasto-plasto-damage ply behavior in laminated frp com-posites: its development, implementation and application in fem simulations, Dissertation, Technis-che Universität Wien, available at reposiTUm https://resolver.obvsg.at/urn:nbn:at:at-ubtuw: 1-31444 (2010). [110] X. Li, S. R. Hallett, M. R. Wisnom, N. Zobeiry, R. Vaziri, A. Poursartip, Experimental study of damage propagation in over-height compact tension tests, Composites Part A: Applied Science and Manufac-turing 40 (12) (2009) 1891–1899, special Issue: CompTest 2008. doi:10.1016/j.compositesa.2009. 08.017 .[111] S. Hörrmann, A. Adumitroaie, M. Schagerl, Through-thickness fatigue behavior of non-crimp fabrics featuring manufacturing defects, Procedia Structural Integrity 2 (2016) 158–165, 21st European Con-ference on Fracture, ECF21, 20-24 June 2016, Catania, Italy. doi:https://doi.org/10.1016/j. prostr.2016.06.021 .URL https://www.sciencedirect.com/science/article/pii/S245232161630021X 
+
+[112] S. Hörrmann, A. Adumitroaie, M. Schagerl, The effect of ply folds as manufacturing defect on the fatigue life of cfrp materials, Fracture and Structural Integrity 10 (38) (2016) Pages 76–81. doi: 10.3221/IGF-ESIS.38.10 .URL https://www.fracturae.com/index.php/fis/article/view/1772 
+
+36 [113] S. Hörrmann, A. Adumitroaie, C. Viechtbauer, M. Schagerl, The effect of fiber waviness on the fatigue life of cfrp materials, International Journal of Fatigue 90 (2016) 139–147. doi:https://doi.org/10. 1016/j.ijfatigue.2016.04.029 .URL https://www.sciencedirect.com/science/article/pii/S0142112316300834 
+
+[114] J. Felger, N. Stein, W. Becker, Mixed-mode fracture in open-hole composite plates of finite-width: An asymptotic coupled stress and energy approach, International Journal of Solids and Structures 122-123 (2017) 14–24. doi:https://doi.org/10.1016/j.ijsolstr.2017.05.039 .URL https://www.sciencedirect.com/science/article/pii/S0020768317302524 
+
+[115] J. Broger, Adaptation of an elasto-plasto-damage model from abaqus/standard to abaqus/explicit and its application to laminated frp composites, Diploma thesis, Technische Universität Wien, available at reposiTUm https://doi.org/10.34726/hss.2014.3960 (2014). [116] Q. Yang, B. Cox, Cohesive models for damage evolution in laminated composites, International Journal of Fracture 133 (2) (2005) 107–137. doi:10.1007/s10704-005-4729-6 .URL https://doi.org/10.1007/s10704-005-4729-6 
+
+[117] S. R. Hallett, M. R. Wisnom, Numerical investigation of progressive damage and the effect of layup in notched tensile tests, Journal of Composite Materials 40 (14) (2006) 1229–1245. doi:10.1177/ 0021998305057432 .URL https://doi.org/10.1177/0021998305057432 
+
+37 Appendix A. :Stress Distribution in Double Notched tension Specimens 1029 -133 168 -29 90-Layer 0-Layer S12 S11 50 -66 66 -50 S22 32 -1 74 -4 
+
+Figure A.21: Stress distribution in each layer of laminate [0 /90] s. All the stress are in MPa. 
+
+38 2249 -456 290 -71 45-Layer 0-Layer S12 S11 45 -7 31 -31 S22 70 
+
+-13 83 -16 -45-Layer  2077 -559 -7 -45 70 -13 Figure A.22: Stress distribution in each layer of the laminate [45 /90 / − 45] s. All the stresses are in MPa. 
+
+39
