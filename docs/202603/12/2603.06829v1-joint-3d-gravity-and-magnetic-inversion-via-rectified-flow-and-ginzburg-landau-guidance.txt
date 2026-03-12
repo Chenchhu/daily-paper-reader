@@ -1,0 +1,873 @@
+Title: Joint 3D Gravity and Magnetic Inversion via Rectified Flow and Ginzburg-Landau Guidance
+
+URL Source: https://arxiv.org/pdf/2603.06829v1
+
+Published Time: Tue, 10 Mar 2026 00:13:05 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+# JOINT 3D G RAVITY AND MAGNETIC INVERSION VIA 
+
+# RECTIFIED FLOW AND GINZBURG -L ANDAU GUID -
+
+# ANCE 
+
+Dhruman Gupta 
+
+Department of Computer Science Ashoka University Haryana, India (HR – 131029) 
+
+dhurman.gupta ug2023@ashoka.edu.in 
+
+Yashas Shende 
+
+Department of Physics Ashoka University Haryana, India (HR – 131029) 
+
+yashas.shende ug25@ashoka.edu.in 
+
+Aritra Das 
+
+Department of Computer Science Ashoka University Haryana, India (HR – 131029) 
+
+aritra.das@ashoka.edu.in 
+
+Chanda Grover Kamra 
+
+Department of Computer Science Ashoka University Haryana, India (HR – 131029) 
+
+chanda.grover phd19@ashoka.edu.in 
+
+Debayan Gupta 
+
+Department of Computer Science Ashoka University Haryana, India (HR – 131029) 
+
+debayan.gupta@ashoka.edu.in 
+
+# ABSTRACT 
+
+Subsurface ore detection is of paramount importance given the gradual depletion of shallow mineral resources in recent years. It is crucial to explore approaches that go beyond the limitations of traditional geological exploration methods. One such promising new method is joint magnetic and gravitational inversion. Given magnetic and gravitational data on a surface, jointly reconstructing the underlying densities that generate them remains an ill-posed inverse problem. Although joint inversion of multiple properties mitigates the non-uniqueness problem in magnetic and gravitational data, deterministic algorithms converge to a single regularized solution and thus do not capture the distribution of possible solutions. Similarly, most machine learning based techniques predict a single solution without mod-elling the entire distribution. In this paper, we introduce a novel framework that reframes 3D gravity and magnetic joint inversion as a rectified flow on the Nod-dyverse dataset, the largest physics-based dataset for inversion. We introduce a Ginzburg-Landau (GL) regularizer, a generalized version of the Ising model that aids in ore identification, enabling physics-aware training. We also propose a guidance methodology based on GL theory that can be used as a plug-and-play module with existing unconditional denoisers. Lastly, we also train and release a VAE for the 3D densities, which facilitates downstream work in the field. 
+
+Keywords: Geophysical Inversion· High-dimensional modeling · Physics-aware Diffusion Guidance 1
+
+> arXiv:2603.06829v1 [cs.LG] 6 Mar 2026
+
+# 1 INTRODUCTION 
+
+Gravitational and magnetic surveys are among the most widely deployed geophysical measurements for regional mapping and mineral explorationBlakely (1995); Hinze et al. (2013). However, turning these surface measurements into 3D subsurface property models is fundamentally challenging Li & Oldenburg (1996b). Inversion of gravitational and magnetic potential fields is ill-posed and non-unique, with many distinct subsurface distributions producing indistinguishable gravitational and magnetic fields Tarantola (2005); Tikhonov & Arsenin (1977). Classical 3D inversion methods recover a single regularized estimate by balancing data misfit with hand-crafted priors Li & Oldenburg (1996b; 1998b); Portniaguine & Zhdanov (1999a). This does not account for the probabilistic nature of the solution, which is critical for proper inversion. An alternative is to adopt probabilistic methods, where we infer a posterior distribution rather than a single point estimate Mosegaard & Tarantola (1995). While Monte Carlo sampling has long been recognized as a principled approach for probabilistic sampling in inverse problems, it is computa-tionally prohibitive at the scale of modern 3D models Tarantola (2005). Furthermore, incorporating priors that simultaneously encode geological realism and sharp host-ore boundaries is challenging for both standard probabilistic methods and classical methods. ML approaches allow the encoding of realistic geology Negahdari et al. (2025). However, most ML models for magnetic and gravity inversion are trained on simplistic data that do not reflect real-world physics Huang et al. (2021); Zhou et al. (2024). This disconnect between training data and real-world geology limits the reliability of such approaches in practice. Noddyverse provides a dataset of large-scale physics simulations that model real-world geological settings Jessell et al. (2022). This makes it a relevant dataset for training ML models on geophysically realistic data, enabling models to learn geological structures and physical relationships that better reflect the true subsurface. Recent advances in deep generative modeling allow us to sample from expressive priors. In par-ticular, diffusion models Ho et al. (2020) learn complex data distributions via denoising dynamics, and can be adapted to inverse problems by combining a learned score with a likelihood Chung et al. (2022). Additionally, latent diffusion compresses high-dimensional data into a lower-dimensional latent space where diffusion becomes substantially more efficient Rombach et al. (2022). This leads to the following question: Can we systematically turn joint gravity and magnetic inversion into scalable posterior sampling over geologically plausible 3D property models, while still enforcing the sharp, phase-like structures expected of ore systems? 
+
+We approach this by combining (i) a learned latent generative prior trained on Noddyverse with (ii) a novel physics-inspired Ginzburg–Landau (GL) prior that promotes phase separation and in-terface regularity, providing a continuous version of Ising-style ore and host structure. Our main contributions are: • Joint potential-field inversion as latent posterior sampling. We reframe 3D joint grav-ity and magnetic inversion as posterior sampling with a latent generative prior, enabling stochastic reconstruction in a scalable space. • GL physics for ore-aware structure. We introduce a Ginzburg–Landau regularizer that encodes phase-separation structure and integrate it into flow-based inversion as a physics-aware prior. • Plug-and-play GL guidance. We propose a GL guidance step that can be combined with existing unconditional denoisers in a modular fashion, connecting potential-field inversion to plug-and-play optimization. • Benchmark assets for the community. We train and release a 3D VAE for density/susceptibility volumes and provide an efficient pre-processing pipeline for Noddyverse-style data to facilitate downstream work. • First flow-based study for joint magnetic and gravitational inversion. To the best of our knowledge, we are the first to develop a generative model for inversion over magnetic and gravitational fields. All code is publicly available at https://anonymous.4open.science/r/ maggrav-joint-diffusion-DB71 .22 RELATED WORK 
+
+Potential-field inversion: Gravity and magnetic inversion are classic examples of ill-posed potential-field problems, where many subsurface density and susceptibility distributions can fit the same observations. Voxel-based 3D inversion with Tikhonov-style regularization and depth weight-ing remains a traditional approach for both magnetics and gravity Li & Oldenburg (1996a; 1998a). To recover geologically plausible, compact bodies, regularizers such as edge-preserving or focusing stabilizers and minimum-gradient-support have been used. Last & Kubik (1983); Portniaguine & Zhdanov (1999b). 
+
+Joint gravity–magnetic inversion: Combining gravity and magnetic data can reduce non-uniqueness by exploiting their complementary sensitivities. Early approaches used lower-dimensional or layered parameterizations Gallardo-Delgado et al. (2003); Pilkington (2006). Gen-eral 3D joint inversion introduces coupling terms that encode either structural similarity or shared geometry between recovered density and susceptibility models Fregoso & Gallardo (2009); Zh-danov et al. (2012); Lin et al. (2018); Utsugi et al. (2025). Recent formulations extend these ideas to multiple potential-field data types while keeping memory and runtime manageable Vatankhah et al. (2023). 
+
+Stochastic and uncertainty-aware methods: While regularized least-squares formulations return a single MAP-like model, probabilistic joint inversion has been pursued to characterize uncertainty, including Monte-Carlo-based gravity and magnetic inversion strategies that target posterior statis-tics Bosch et al. (2006). 
+
+Machine Learning-based potential-field inversion: Supervised neural networks have been trained to directly map potential-field measurements to subsurface models, enabling rapid inversion once trained. Recent work applies deep networks to gravity inversion Huang et al. (2021), joint gravity and magnetic inversion Min et al. (2024), and to Noddy-based magnetic inversion examples Guo et al. (2021). However, most neural networks produce point estimates and do not explicitly represent posterior stochasticity. 
+
+Generative models for inverse problems: Diffusion and score-based generative models have emerged as generative priors that support conditional generation and approximate posterior sam-pling. Foundational work includes denoising diffusion models Ho et al. (2020) and the SDE score-based formalism Song et al. (2021), latent diffusion improves efficiency by operating in an autoen-coder latent space Rombach et al. (2022). EDM preconditioning Karras et al. (2022) and rectified flow Liu et al. (2022) enable faster sampling. Further, General inverse-problem solvers such as diffusion posterior sampling (DPS) and DDRM incorporate measurement consistency via iterative guidance Chung et al. (2022). 
+
+# 3 THEORETICAL BACKGROUND 
+
+3.1 GRAVITATIONAL FORWARD PROBLEM 
+
+The gravitational potential U (x) at a point x due to a density distribution ρ(x′) in a volume V is given by Newton’s integral ( G is the gravitational constant): 
+
+U (x) = G
+
+Z
+
+> V
+
+ρ(x′)
+
+|x − x′| d3x′ (1) 
+
+Definition 1 (Gravity Anomaly) . The vertical component of the gravitational acceleration anomaly is: 
+
+gz (x) = − ∂U ∂z = G
+
+Z
+
+> V
+
+ρ(x′) z − z′
+
+|x − x′|3 d3x′ (2) 
+
+z is positive upward and we report gz as the downward component −g(up ) 
+
+> z
+
+.3For computational implementation, we discretize the subsurface into N cells with constant density 
+
+ρj within each cell. The forward operator becomes ggrav = Gρρ where Gρ ∈ RMg ×N is the gravity sensitivity kernel with elements: 
+
+[Gρ]ij = G
+
+Z
+
+> Vj
+
+zi − z′
+
+|xi − x′|3 d3x′ (3) 
+
+Proposition 1 (Analytical Kernel for Rectangular Prisms) . For a rectangular prism with corners at 
+
+(x1, y 1, z 1) and (x2, y 2, z 2), the gravity kernel element evaluated at observation point (x0, y 0, z 0)
+
+is: 
+
+[Gρ]ij = G
+
+> 2
+
+X
+
+> k=1 2
+
+X
+
+> l=1 2
+
+X
+
+> m=1
+
+(−1) k+l+m
+
+"
+
+xkm ln( ylm + rklm )+ ylm ln( xkm + rklm ) − zmm arctan 
+
+ xkm ylm 
+
+zmm rklm 
+
+ #
+
+(4) where x′ 
+
+> k
+
+= xk − x0, y′ 
+
+> l
+
+= yl − y0, z′ 
+
+> m
+
+= zm − z0, and rklm = px′2 
+
+> k
+
++ y′2 
+
+> l
+
++ z′2
+
+> m
+
+.
+
+Proof. The derivation proceeds by direct integration of equation 2. We have: 
+
+[Gρ]ij = G
+
+Z z2
+
+> z1
+
+Z y2
+
+> y1
+
+Z x2
+
+> x1
+
+z0 − z′
+
+[( x0 − x′)2 + ( y0 − y′)2 + ( z0 − z′)2]3/2 dx ′dy ′dz ′ (5) Substituting u = x′ − x0, v = y′ − y0, w = z′ − z0:
+
+[Gρ]ij = −G
+
+Z w2
+
+> w1
+
+Z v2
+
+> v1
+
+Z u2
+
+> u1
+
+w
+
+(u2 + v2 + w2)3/2 du dv dw  (6) The inner integral with respect to u yields: 
+
+Z w
+
+(u2 + v2 + w2)3/2 du = wu 
+
+(v2 + w2)√u2 + v2 + w2 (7) Continuing with the v and w integrations and applying the fundamental theorem of calculus at each boundary yields the closed-form expression in equation 4. [Nagy (1966) 3.2 MAGNETIC FORWARD PROBLEM 
+
+The magnetic field anomaly arises from induced and remanent magnetization. For induced mag-netization in a region with susceptibility χ(x′): M (x′) = χ(x′)H0 where H0 is the ambient geomagnetic field. 
+
+Definition 2 (Total Magnetic Intensity Anomaly) . Total magnetic intensity (TMI) anomaly pro-jected onto the direction of the ambient field ˆH0 is: 
+
+∆T (x) = − μ0 ˆH0
+
+4π · ∇ 
+
+Z
+
+> V
+
+M (x′) · ∇ ′ 1
+
+|x − x′| d3x′ (8) In discretized form, gmag = Gχχ. The magnetic sensitivity kernel Gχ ∈ RMm×N depends on both the geometry and the ambient field direction characterized by inclination I and declination D, with 
+
+α and β being angles relating the observation-source geometry to the field direction. 
+
+[Gχ]ij = μ0H0
+
+4π
+
+Z
+
+> Vj
+
+"
+
+(3 cos 2 α − 1) 1
+
+r3 + 3 cos α cos β 3
+
+r3 + . . . 
+
+#
+
+d3x′ (9) 43.3 JOINT FORWARD MODEL 
+
+Combining gravity and magnetic observations into a unified framework: 
+
+ggrav 
+
+gmag 
+
+| {z }
+
+> y
+
+=
+
+Gρ 00 Gχ
+
+| {z }
+
+> G
+
+ρχ
+
+| {z } 
+
+> m
+
++
+
+ ϵg
+
+ϵm
+
+| {z } 
+
+> ϵ
+
+(10) We denote m = [ ρ⊤, χ⊤]⊤ ∈ R2N as the combined model parameter vector. 
+
+Assumption 1 (Noise Model) . Measurement noise ϵ is assumed to be Gaussian: 
+
+ϵ ∼ N (0, Σϵ) (11) where Σϵ = diag (σ2
+
+> g, 1
+
+, . . . , σ 2 
+
+> g,M g
+
+, σ 2
+
+> m, 1
+
+, . . . , σ 2 
+
+> m,M m
+
+) for independent noise, or may include off-diagonal terms for correlated noise. Under Assumption 1, the likelihood function is: 
+
+p(y|m) = 1(2 π)M/ 2|Σϵ|1/2 exp 
+
+
+
+− 12 (y − Gm )⊤Σ−1 
+
+> ϵ
+
+(y − Gm )
+
+
+
+(12) 3.4 GINZBURG -L ANDAU ENERGY FOR CONTINUOUS ISING -S TYLE DYNAMICS 
+
+In ore deposit modeling, we often expect sharp boundaries between ore and host rock, suggesting an underlying discrete structure . The Ising model naturally captures such binary behavior with spatial correlation: 
+
+HIsing = −J X
+
+> ⟨i,j ⟩
+
+sisj − h X
+
+> i
+
+si, si ∈ {− 1, +1 } (13) However, discrete models pose challenges: 1. Non-differentiability prevents gradient-based optimization 2. Incompatibility with continuous diffusion processes 3. Difficulty in probabilistic modeling The Ginzburg-Landau (GL) functional provides a continuous relaxation that preserves the essential physics. 
+
+Definition 3 (Ginzburg-Landau Free Energy) . For a continuous order parameter field ϕ(x) : Ω → R
+
+representing susceptibility (normalized): 
+
+EGL [ϕ] = 
+
+Z
+
+> Ω
+
+h κ
+
+2 |∇ ϕ|2 + W (ϕ)
+
+i
+
+dx (14) where: • κ > 0 is the gradient penalty coefficient (interface energy) • W (ϕ) is a double-well potential favoring discrete states 
+
+Definition 4 (Double-Well Potential) . The standard choice is: 
+
+W (ϕ) = 14 (ϕ2 − 1) 2 (15) with minima at ϕ = ±1, representing the two ”phases” (ore/host). 5Let Ω ⊂ Rd be a bounded Lipschitz domain. Consider the Ginzburg–Landau functional 
+
+Eε(ϕ) = 
+
+Z
+
+> Ω
+
+ ε
+
+2 |∇ ϕ|2 + 1
+
+ε W (ϕ)
+
+
+
+dx,  (16) where W ∈ C2(R) satisfies: 1. W ≥ 0,2. W (±1) = 0 ,3. W (s) > 0 for s̸ = ±1,4. W ′′ (±1) > 0.Define c0 = R 1
+
+> −1
+
+p2W (s) ds and the limiting functional 
+
+E0(u) = 
+
+c0 Per( E; Ω) , u = χE − χΩ\E , E ⊂ Ω of finite perimeter ,
+
++∞, otherwise . (17) 
+
+Theorem 1 (Ising-GL Correspondence (Modica–Mortola)) . As ε → 0, Eε Γ-converges to E0 in 
+
+L1(Ω) .
+
+Proof. We prove compactness, liminf inequality, and recovery sequence construction. Assume sup ε Eε(ϕε) < ∞. Then  Z
+
+> Ω
+
+1
+
+ε W (ϕε)dx ≤ C. 
+
+Since W (s) ≳ (|s| − 1) 2 near its wells, it follows that ϕε → u in L1(Ω) with u(x) ∈ {± 1} almost everywhere. Define 
+
+Φ( s) = 
+
+Z s
+
+> 0
+
+p2W (r)dr. 
+
+Using the Modica inequality, 
+
+ε
+
+2 |∇ ϕ|2 + 1
+
+ε W (ϕ) ≥ |∇ Φ( ϕ)| =⇒
+
+Z
+
+> Ω
+
+|∇ Φ( ϕε)|dx ≤ C. 
+
+Hence Φ( ϕε) is bounded in BV (Ω) and converges (up to subsequence) to Φ( u) in L1. Therefore 
+
+u ∈ BV (Ω; {± 1}).By the Modica inequality, 
+
+Eε(ϕε) ≥
+
+Z
+
+> Ω
+
+|∇ Φ( ϕε)|dx. 
+
+By lower semicontinuity of the BV norm, 
+
+lim inf  
+
+> ε→0
+
+Eε(ϕε) ≥
+
+Z
+
+> Ω
+
+|∇ Φ( u)|dx. 
+
+Since u takes only ±1 values, 
+
+|∇ Φ( u)| = c0|∇ χE |,
+
+which equals c0Per( E; Ω) .6Let u = χE − χΩ\E .Define 
+
+ϕε(x) = q
+
+ d(x, ∂E )
+
+ε
+
+
+
+,
+
+where q solves the heteroclinic ODE 
+
+q′ = p2W (q), q(−∞ ) = −1, q(+ ∞) = 1 .
+
+Using the coarea formula and one-dimensional energy computation, 
+
+lim  
+
+> ε→0
+
+Eε(ϕε) = c0Per( E; Ω) .
+
+Thus, the limsup inequality holds. The Γ-convergence follows. For numerical implementation, we discretize on a grid with N cells: 
+
+EGL [ϕ] = 
+
+> N
+
+X
+
+> i=1
+
+∆V
+
+ κ
+
+4
+
+X 
+
+> j∈N (i)
+
+(ϕi − ϕj )2
+
+h2 + 14ϵ2 (ϕ2 
+
+> i
+
+− 1) 2
+
+ (18) where N (i) denotes the neighbors of cell i, h is the grid spacing, and ∆V = h3 is the cell volume. In matrix form: 
+
+EGL [ϕ] = κ
+
+2h2 ϕ⊤Lϕ + 14ϵ2
+
+> N
+
+X
+
+> i=1
+
+(ϕ2 
+
+> i
+
+− 1) 2 (19) where L is the graph Laplacian matrix with elements: 
+
+Lij =
+
+
+
+|N (i)| if i = j
+
+−1 if j ∈ N (i)0 otherwise 
+
+(20) 
+
+Proposition 2 (GL Energy Gradient) . The gradient of the GL energy with respect to ϕ is: 
+
+∇ϕEGL = κh2 Lϕ + 1
+
+ϵ2 ϕ ⊙ (ϕ ⊙ ϕ − 1) (21) where ⊙ denotes element-wise multiplication (proof in appendix). 
+
+Proof. For the gradient term: 
+
+∂∂ϕ k
+
+h κ
+
+2h2 ϕ⊤Lϕ 
+
+i
+
+= κh2 [Lϕ ]k (22) since L is symmetric. For the double-well term: 
+
+∂∂ϕ k
+
+ 14ϵ2 (ϕ2 
+
+> k
+
+− 1) 2
+
+
+
+= 1
+
+ϵ2 ϕk(ϕ2 
+
+> k
+
+− 1)  (23) 7Proposition 3 (GL Energy Hessian) . The Hessian of the GL energy is: 
+
+HGL = κh2 L + 1
+
+ϵ2 diag (3 ϕ ⊙ ϕ − 1) (24) 
+
+Remark 1 (Convexity Analysis) . The GL energy is non-convex due to the double-well potential. More specifically, the local curvature of the double-well term is negative when |ϕi| < 1/√3, hence the energy is non-convex. This non-convexity is essential for capturing the phase-separation behav-ior. For magnetic susceptibility χ ∈ [χmin , χ max ], we define the mapping: 
+
+ϕ = 2χ − (χmax + χmin )
+
+χmax − χmin 
+
+(25) The inverse mapping is: 
+
+χ = χmax − χmin 
+
+2 ϕ + χmax + χmin 
+
+2 (26) Thus: • ϕ = −1 corresponds to χ = χmin (host rock, low susceptibility) • ϕ = +1 corresponds to χ = χmax (ore body, high susceptibility) The total energy functional for the inverse problem becomes: 
+
+Etotal [m] = Edata [m] + λGL EGL [ϕ(m)] + Eother [m] (27) where: 
+
+Edata [m] = 12σ2
+
+> y
+
+∥y − Gm ∥2 (28) 
+
+EGL [ϕ(m)] = κ
+
+2h2 ϕ⊤Lϕ + 14ϵ2 ∥ϕ ⊙ ϕ − 1∥2 (29) 
+
+Definition 5 (GL-Regularized Prior) . The GL energy defines an implicit prior: 
+
+pGL (m) ∝ exp( −λGL EGL [ϕ(m)])  (30) The corresponding score is: 
+
+∇m log pGL (m) = −λGL ∇mEGL  (31) The GL functional naturally leads to the Allen-Cahn equation, which describes phase separation dynamics. 
+
+Definition 6 (Allen-Cahn Equation) .
+
+∂ϕ ∂t = − δEGL 
+
+δϕ = κ∇2ϕ − W ′(ϕ) = κ∇2ϕ − 1
+
+ϵ2 ϕ(ϕ2 − 1)  (32) 
+
+Lemma 1 (Energy Dissipation) . The Allen-Cahn equation is a gradient flow that monotonically decreases the GL energy: 
+
+dEGL 
+
+dt = −
+
+Z
+
+> Ω
+
+∂ϕ ∂t 
+
+> 2
+
+dx ≤ 0 (33) 8Proof. 
+
+dEGL 
+
+dt =
+
+Z
+
+> Ω
+
+δEGL 
+
+δϕ ∂ϕ ∂t dx (34) 
+
+=
+
+Z
+
+> Ω
+
+δEGL 
+
+δϕ 
+
+
+
+− δEGL 
+
+δϕ 
+
+
+
+dx (35) 
+
+= −
+
+Z
+
+> Ω
+
+δEGL 
+
+δϕ 
+
+> 2
+
+dx ≤ 0 (36) Let Ω ⊂ Rd be bounded with Neumann boundary conditions. Consider the stochastic Allen–Cahn equation Allen & Cahn (1979) 
+
+dϕ t = ( κ∆ϕt − W ′(ϕt)) dt + √2T dW t, (37) where Wt is a cylindrical Wiener process in L2(Ω) .Define the GL energy EGL [ϕ] = R
+
+> Ω
+
+  κ 
+
+> 2
+
+|∇ ϕ|2 + W (ϕ) dx 
+
+Theorem 2 (Invariant Gibbs Measure) . Assume suitable coercivity of W and well-posedness of equation 37. Then the measure 
+
+μ(dϕ ) = Z−1 exp 
+
+
+
+− EGL [ϕ]
+
+T
+
+
+
+dϕ  (38) is an invariant measure for the stochastic Allen–Cahn equation. 
+
+Proof. The drift is the negative variational derivative 
+
+δEGL 
+
+δϕ = −κ∆ϕ + W ′(ϕ).
+
+Thus, the SPDE can be written as 
+
+dϕ t = − δEGL 
+
+δϕ dt + √2T dW t.
+
+The formal generator is 
+
+LF (ϕ) = ⟨− δEGL /δϕ, DF (ϕ)⟩ + T Tr( D2F (ϕ)) .
+
+By integration by parts in infinite dimensions, the adjoint operator satisfies 
+
+L∗μ = 0 .
+
+Thus, μ is invariant. 
+
+Remark 2 (Relation between GL weight and temperature) . The Gibbs measure peq [ϕ] ∝
+
+exp 
+
+
+
+− EGL [ϕ]
+
+> T
+
+
+
+coincides with a GL-regularized prior of the form pGL (ϕ) ∝ exp( −λGL EGL [ϕ]) 
+
+when the identification λGL = 1 
+
+> T
+
+is made. The regularization weight can be interpreted as the inverse temperature of the corresponding stochastic Allen–Cahn dynamics. We now integrate the GL regularization with the diffusion model framework. 
+
+Definition 7 (GL-Augmented Score) . The combined prior score incorporating both the learned dif-fusion prior and GL physics is: 
+
+scombined (m, t ) = sθ (m, t ) + λGL (t) · (−∇ mEGL [ϕ(m)])  (39) where λGL (t) is a time-dependent weighting. 9Remark 3 (Continuation schedule versus thermodynamic temperature) . The time-dependent weight 
+
+λGL (t) employed during reverse diffusion is a continuation strategy that gradually increases struc-tural enforcement as uncertainty decreases. It does not correspond to a physical temperature evolu-tion in the stochastic Allen–Cahn sense. The identification λGL = 1 /T applies only to the stationary Gibbs measure of the SPDE and not to the (inference) diffusion-time homotopy. 
+
+# 4 DATASET AND PRE -PROCESSING 
+
+We use Noddyverse, a physics-based synthetic benchmark for geophysical inversion. Each sample contains a 3D subsurface block of size 200 × 200 × 200 voxels, where each voxel stores gravita-tional density ( ρ) and magnetic susceptibility ( χ). The corresponding observations are two forward-simulated 2D surface fields on a 200 × 200 grid: gravity anomaly ( ggrav ) and total magnetic intensity (gmag ). The learning task is to reconstruct 3D property volumes from 2D measurements. Direct training on the raw files is difficult for three reasons. First, the target dimensionality is very large ( 200 3 voxels per property), making inversion highly underdetermined and memory-intensive. Second, magnetic susceptibility is strongly heavy-tailed, which can destabilize optimization. Third, the dataset is distributed as compressed text files, which limits data-loader throughput during train-ing. To make the dataset practical for ML workflows, we implement and release a three-stage pre-processing pipeline: 1. Extraction and parsing. We decompress .gz archives and parse raw text into structured 
+
+NumPy /PyTorch tensors for both subsurface properties and surface measurements. 2. Storage and compression. We store parsed tensors in Zarr with sample-wise chunk-ing, enabling random access to individual models and substantially faster I/O with high compression for 200 3 volumes. 3. Normalization and PyTorch integration. We provide custom Dataset classes with log-transform normalization for susceptibility, producing numerically stable inputs for training generative models. 
+
+# 5 MODEL ARCHITECTURES AND TRAINING 
+
+5.1 VAE We use a custom 3D VAE with residual convolutions and bottleneck attention to model joint density– susceptibility volumes. The input is x ∈ R2×200 ×200 ×200 . The encoder comprises residual Conv3D blocks with progressive downsampling, followed by non-local self-attention at the bottleneck. La-tent parameters are produced by  1 × 1 × 1 projection heads for  μ and  log σ2, and latent sam-ples are drawn via z = μ + ϵ ⊙ exp   12 log σ2 , ϵ ∼ N (0 , I ). The decoder mirrors the encoder with progressive upsampling and residual refinement, ending in a final convolution that reconstructs 
+
+ˆx ∈ R2×200 ×200 ×200 . The bottleneck is formed at  25 3; we project to a  24 3 latent grid so each spa-tial dimension is divisible by powers of two, improving compatibility with downstream multiscale components. We performed hyperparameter sweeps over latent size, model capacity (parameter count), and KL weight  β. The final setting balances reconstruction quality, latent regularization, and com-pute/memory constraints: latent grid  24 3, β = 10 −3, and  385 ,736  parameters. A larger latent grid (40 3) yields substantially lower reconstruction loss, but we retain  24 3 for practical compute. 5.2 DIFFUSION AND FLOW MODEL 
+
+Two 3D latent-space backbones are used: a timestep-conditioned 3D UNet C ¸ ic ¸ek et al. (2016) and BiFlowNet. Wang et al. (2025) The 3D UNet is built from residual convolutional blocks with FiLM-based time conditioning, symmetric downsampling/upsampling paths with skip connections, and self-attention at lower spatial resolutions. BiFlowNet adopts a hybrid multiscale design that couples a UNet-like 3D hierarchy with patch-level transformer-style (DiT-like) processing and cross-scale feature fusion. Empirically, BiFlowNet demonstrates better parameter efficiency and faster opti-mization dynamics than the 3D UNet baseline. Training is conducted under two continuous-time 10 Figure 1: Overview of our VAE architecture (generated with AI). formulations: EDM diffusion parameterization Karras et al. (2022) and rectified flow Liu et al. (2022). Preliminary comparisons show faster convergence in terms of epochs for rectified flow, so the final model is trained with the flow parameterization. 
+
+# 6 DPS FOR INVERSION 
+
+For posterior sampling, we use FlowDPSKim et al. (2025) for Rectified flow and adopt its latent-space variant (Eq. 36 Kim et al. (2025)), since inversion is performed with a VAE latent prior. The Noddyverse forward operator is re-implemented in PyTorch so the full map z D
+
+−→ x A
+
+−→ ˆy
+
+is differentiable ( D: VAE decoder,  A: forward operator). Let  vθ (zt, t ) denote the flow velocity. Following latent FlowDPS, we form linear-flow endpoint estimates: 
+
+ˆz0 = zt − t v θ (zt, t ), ˆz1 = zt + (1 − t) vθ (zt, t ),
+
+and apply data-consistency refinement: 
+
+zref 0 = ˆ z0 − αt∇ˆz0 Ldata (ˆ z0), Ldata (z) = 12 AD (z) − y 2Σ−1
+
+,
+
+with  Σ = diag( σ2mag , σ 2grav ). The refined endpoint is blended and propagated via FlowDPS controls: 
+
+˜z0 = (1 − γt)ˆ z0 + γtzref 0 , ˜z1 = p1 − ηt ˆz1 + √ηt ϵ, 
+
+followed by the update to  tnext . Inference quality is sensitive to guidance hyperparameters; we use: 
+
+Nsteps = 64 , Kref = 8 , αref = 0 .1, σmag = 15 , σgrav = 0 .1.
+
+Since magnetic response depends on exponentiated susceptibility, trajectories are highly perturbation-sensitive ( χ = 10 χlog 10 − ϵ); we therefore clamp the norm of the posterior guidance score for stability. 6.1 BASELINE FLOW 
+
+We train a baseline rectified-flow model on VAE-encoded latents without any additional regular-ization terms. Timesteps are sampled from  t ∼ U (0 , 1) , and the model is optimized to predict the linear-flow velocity field on latent volumes. 11 6.2 FLOW WITH GL R EGULARIZER 
+
+We next train a GL-regularized rectified-flow model in latent space by reweighting per-sample flow losses using the GL energy computed directly on latent grids. Concretely, training minimizes 
+
+LGL-flow =
+
+P 
+
+> i
+
+wi ℓi
+
+P 
+
+> i
+
+wi
+
+, wi ∝ exp 
+
+
+
+−λ ˜EGL (zi)
+
+
+
+,
+
+where  ℓi is the per-sample rectified-flow loss and  ˜EGL  is standardized GL energy (with bounded/clamped weights for stability). We apply GL in latent space because incorporating decoder-space weighing during training would require decoder evaluations at every optimization step, which was prohibitively expensive computationally due to the raw data dimensionality. 6.3 FLOW WITH GL G UIDANCE 
+
+At inference time, we use a denoiser-aware GL guidance formulation, where the score predicted by the flow denoiser is augmented through the decoder  D:
+
+sGL (zt, t ) = sθ (zt, t ) + 
+
+ ∂Dχ(zt)
+
+∂z t
+
+⊤  − λt∇Dχ(zt)EGL 
+
+,
+
+with  Dχ denoting the susceptibility channel of the decoded volume. To map susceptibility to the phase field robustly, dataset bounds were precomputed over  1,000 ,020  samples:  χmin = 0 .0, raw 
+
+χmax = 1106 .89 , and  χ0.999 = 1 .09 .We use  χ0.999  (rather than the raw maximum) as the upper bound to reduce outlier sensitivity in heavy-tailed data (raw max is  ∼ 10 3 larger). The GL guidance weight is time-dependent and follows 
+
+λt = λ0(1 − t)γ (implemented with clamped  1 − t ∈ [0 , 1] ); this keeps guidance weak at high-noise stages to preserve exploration, then increases guidance in later denoising steps to steer samples toward physically plausible solutions. 
+
+# 7 RESULTS 
+
+Our DPS inversion produces plausible 3D posterior samples while matching magnetic and gravity observations. We compare three variants: (i) a baseline flow model, (ii) a flow trained with GL regularization (training-time loss reweighting), and (iii) a flow using GL guidance (inference-time score augmentation). 
+
+Figure 2: Example generated 3D volume visualized across multiple  z-slices. Figure 2 shows representative slices from a generated 3D posterior sample. The model produces ge-ologically plausible structures while remaining consistent with the observed fields. To complement this volumetric view, we visualize observation-conditioned forward responses in Figure 3. For each selected observation and each method, we plot observed and predicted fields. The GL-guidance vari-ant is visually more consistent with observations across both modalities, while the GL-regularized model shows larger deviations. 12 For quantitative evaluation, we compute per-sample RMSE for both magnetic and gravity fields relative to the observations. For each observation and metric, methods are ranked as follows: best if the RMSE is minimal among methods, worst if it is maximal, and mixed otherwise. 
+
+> (a) Magnetic field comparison (Observed, Normal, GL-reg, GL-guidance).
+> (b) Gravity field comparison (Observed, Normal, GL-reg, GL-guidance).
+
+Figure 3: Per-observation qualitative comparison of observed and predicted fields.    
+
+> (a) Magnetic ∆RMSE (b) Gravity ∆RMSE
+
+Figure 4: Quantitative comparison relative to the baseline flow model. Positive  ∆RMSE indicates lower error than the baseline.  
+
+> (c) ECDF (magnetic) (d) ECDF (gravity)
+
+Figure 4: Figure 4 (continued). 
+
+These statistics are aggregated over 128 generated samples to estimate method-level performance. Figures 4(a,b) report the improvement metric ∆RMSE = RMSE baseline − RMSE method , where pos-itive values indicate lower error than the baseline. Across both magnetic and gravity channels, GL 13 guidance shifts the distribution toward positive  ∆RMSE , indicating more reliable reductions in er-ror, while GL-regularized training yields less consistent gains and heavier tails.  
+
+> (e) Win-rate (grav) (f) Win-rate (mag)
+
+Figure 4: Figure 4 (continued). 
+
+Figures 4(c,d) show empirical CDFs of  ∆RMSE , confirming the same ordering at the distribution level: GL guidance places more mass on  ∆RMSE > 0 for both modalities, whereas GL regular-ization exhibits a weaker and more variable improvement profile. Figures 4(e,f) summarize ranking frequencies. In both modalities, GL guidance attains the highest best-rate and lowest worst-rate among the three methods, indicating stronger and more consistent performance across observations. Our results indicate that GL guidance performs better than GL regularization for magnetic recon-struction. We posit that this is due to the GL regularization being done in the latent space - which may not resemble magnetic dynamics observed physically. This was not pursued due to computa-tional limitations. 
+
+# 8 CONCLUSION AND FURTHER WORK 
+
+We develop physics-aware flow-based methodology to jointly invert magnetic and gravitational fields to generate subsurface susceptibility and density. We also contribute a first-of-its-kind VAE and a rectified flow generative model for the Noddyverse dataset. Further work in the field can be: • Scaling the latent dimension and parameter count of the VAE. A larger VAE allows for modeling sharper volumes. This significantly improves the approximation error in the DPS guidance, which assumes a near-perfect decoder, thus enabling higher quality generation. • Training the GL Regularizer with Decoded Susceptibility. Training a model with the GL regularization term applied on decoded susceptibility may lead to better results than the regularization term, by allowing the model to learn dynamics from the dataset. All code is publicly available here: https://anonymous.4open.science/r/ maggrav-joint-diffusion-DB71 .14 REFERENCES 
+
+Samuel M. Allen and John W. Cahn. A microscopic theory for antiphase boundary motion and its application to antiphase domain coarsening. Acta Metallurgica , 27(6):1085–1095, 1979. doi: 10.1016/0001-6160(79)90196-2. Richard J. Blakely. Potential Theory in Gravity and Magnetic Applications . Cambridge University Press, 1995. doi: 10.1017/CBO9780511549816. Mario Bosch et al. Joint gravity and magnetic inversion in 3d using monte carlo methods. Geo-physics , 2006. Hyungjin Chung, Jeongsol Kim, Michael T. McCann, Marc L. Klasky, and Jong Chul Ye. Diffusion posterior sampling for general noisy inverse problems. arXiv preprint , 2022. doi: 10.48550/arXiv. 2209.14687. ¨Ozg¨ un C ¸ ic ¸ek, Ahmed Abdulkadir, Soeren S. Lienkamp, Thomas Brox, and Olaf Ronneberger. 3d u-net: Learning dense volumetric segmentation from sparse annotation, 2016. URL https: //arxiv.org/abs/1606.06650 .Esteban Fregoso and Luis A. Gallardo. Cross-gradients joint 3d inversion of gravity and magnetic data. Geophysics , 2009. Luis A. Gallardo-Delgado, Miguel A. P´ erez-Flores, and Enrique G´ omez-Trevi˜ no. A versatile algo-rithm for joint 3d inversion of gravity and magnetic data. Geophysics , 68(3):949–959, 2003. J. Guo et al. Deep learning inversion of magnetic data based on a geological model: example using noddy data. Computers & Geosciences , 2021. William J. Hinze, Ralph R. B. von Frese, and Afif H. Saad. Gravity and Magnetic Explo-ration: Principles, Practices, and Applications . Cambridge University Press, 2013. doi: 10.1017/CBO9780511843129. Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models. In Advances in Neural Information Processing Systems (NeurIPS) , 2020. Rui Huang, Shuang Liu, Rui Qi, and Yujie Zhang. Deep learning 3D sparse inversion of gravity data. Journal of Geophysical Research: Solid Earth , 126(11):e2021JB022476, November 2021. doi: 10.1029/2021JB022476. URL https://doi.org/10.1029/2021JB022476 .Mark Jessell, Jiateng Guo, Yunqiang Li, Mark Lindsay, Richard Scalzo, J´ er´ emie Giraud, Guillaume Pirot, Ed Cripps, and Vitaliy Ogarko. Into the noddyverse: a massive data store of 3d geological models for machine learning and inversion applications. Earth System Science Data , 14(1):381– 392, 2022. doi: 10.5194/essd-14-381-2022. Tero Karras, Miika Aittala, Timo Aila, and Samuli Laine. Elucidating the design space of diffusion-based generative models. In Advances in Neural Information Processing Systems (NeurIPS) ,2022. doi: 10.48550/arXiv.2206.00364. Jeongsol Kim, Bryan Sangwoo Kim, and Jong Chul Ye. Flowdps: Flow-driven posterior sampling for inverse problems, 2025. URL https://arxiv.org/abs/2503.08136 .B. J. Last and K. Kubik. Compact gravity inversion. Geophysics , 48(6):713–721, 1983. Yaoguo Li and Douglas W. Oldenburg. 3-d inversion of magnetic data. Geophysics , 61(2):394–408, 1996a. Yaoguo Li and Douglas W. Oldenburg. 3-d inversion of magnetic data. Geophysics , 61(2):394–408, 1996b. doi: 10.1190/1.1443968. Yaoguo Li and Douglas W. Oldenburg. 3-d inversion of gravity data. Geophysics , 63(1):109–119, 1998a. Yaoguo Li and Douglas W. Oldenburg. 3-d inversion of gravity data. Geophysics , 63(1):109–119, 1998b. doi: 10.1190/1.1444302. 15 Weichao Lin et al. Joint multinary inversion of gravity and magnetic data. Geophysical Journal International , 2018. Xingchao Liu, Chengyue Gong, and Qiang Liu. Flow straight and fast: Learning to generate and transfer data with rectified flow. arXiv preprint , 2022. doi: 10.48550/arXiv.2209.03003. Q. Min et al. Gmnet: A deep learning framework for joint inversion of gravity and magnetic data. 
+
+Remote Sensing , 2024. Klaus Mosegaard and Albert Tarantola. Monte carlo sampling of solutions to inverse prob-lems. Journal of Geophysical Research: Solid Earth , 100(B7):12431–12447, 1995. doi: 10.1029/94JB03097. Dezso Nagy. The gravitational attraction of a right rectangular prism. Geophysics , 31(2):362–371, 1966. doi: 10.1190/1.1439779. Vahid Negahdari, Shirin Samadi Bahrami, Seyed Reza Moghadasi, and Mohammad Reza Razvan. Performance of machine learning methods for gravity inversion: Successes and challenges, 2025. URL https://arxiv.org/abs/2510.09632 .Mark Pilkington. Joint inversion of gravity and magnetic data for two-layer model. Geophysics ,2006. O. Portniaguine and M. S. Zhdanov. Focusing geophysical inversion images. Geophysics , 64(3): 874–887, 1999a. doi: 10.1190/1.1444596. Oleg Portniaguine and Michael S. Zhdanov. Focusing geophysical inversion images. Geophysics ,64(3):874–887, 1999b. doi: 10.1190/1.1444596. Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Bj¨ orn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF Con-ference on Computer Vision and Pattern Recognition (CVPR) , 2022. Yang Song, Jascha Sohl-Dickstein, Diederik P. Kingma, Abhishek Kumar, Stefano Ermon, and Ben Poole. Score-based generative modeling through stochastic differential equations. arXiv preprint ,2021. doi: 10.48550/arXiv.2011.13456. Albert Tarantola. Inverse Problem Theory and Methods for Model Parameter Estimation . Society for Industrial and Applied Mathematics (SIAM), 2005. doi: 10.1137/1.9780898717921. Andrey N. Tikhonov and Vasiliy Y. Arsenin. Solutions of Ill-Posed Problems . V. H. Winston & Sons, 1977. Mitsuru Utsugi et al. Joint inversion of magnetic and gravity data using group lasso regu-larization for extracting common sparse structures. Earth, Planets and Space , 2025. doi: 10.1186/s40623-025-02270-1. Saeid Vatankhah et al. Generalized joint inversion of gravity, gravity gradient tensor and magnetic data using gramian constraints. Geophysical Journal International , 2023. Haoshen Wang, Zhentao Liu, Kaicong Sun, Xiaodong Wang, Dinggang Shen, and Zhiming Cui. 3d meddiffusion: A 3d medical latent diffusion model for controllable and high-quality medical image generation, 2025. URL https://arxiv.org/abs/2412.13059 .Michael S. Zhdanov, Alexey Gribenko, and Gerald Wilson. Generalized joint inversion of multi-modal geophysical data using gramian constraints. Geophysical Research Letters , 2012. Shuai Zhou, Yue Wei, Pengyu Lu, Guangrui Yu, Shuqi Wang, Jian Jiao, Ping Yu, and Jianwei Zhao. A deep learning gravity inversion method based on a self-constrained network and its application. Remote Sensing , 16(6), 2024. ISSN 2072-4292. doi: 10.3390/rs16060995. URL 
+
+https://www.mdpi.com/2072-4292/16/6/995 .16

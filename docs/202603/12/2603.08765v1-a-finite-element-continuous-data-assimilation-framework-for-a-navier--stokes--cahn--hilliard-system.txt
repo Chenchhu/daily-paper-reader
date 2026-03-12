@@ -1,0 +1,2737 @@
+Title: A finite element continuous data assimilation framework for a Navier--Stokes--Cahn--Hilliard system
+
+URL Source: https://arxiv.org/pdf/2603.08765v1
+
+Published Time: Wed, 11 Mar 2026 00:02:56 GMT
+
+Number of Pages: 25
+
+Markdown Content:
+March 11, 2026 
+
+A FINITE ELEMENT CONTINUOUS DATA ASSIMILATION FRAMEWORK FOR A NAVIER–STOKES–CAHN–HILLIARD SYSTEM 
+
+TIANYU SUN 
+
+Abstract. This paper studies a coupled two-dimensional Navier–Stokes–Cahn–Hilliard phase-field model augmented by a transported auxiliary field, and develops a continuous data assimilation (CDA) framework for recovering its trajectories from coarse-in-space observations. We formulate a nudging-based CDA system for the coupled NSCH–auxiliary-field model, in which coarse measurements are incorporated through a general linear observation operator. The observation mechanism is described abstractly by an interpolant satisfying an H2-type approximation property, which is compatible with coarse spatial observations obtained from mesh coarsening and reconstruction. At the continuous level, we record two structural properties of the model: a formal energy law for the reference system and an evolution law for the phase mean in the assimilated dynamics. At the discrete level, we introduce a capped fully discrete finite element splitting scheme using continuous quadratic elements for the phase, chemical potential, velocity, and auxiliary field, together with continuous linear elements for the pressure. For this scheme, we prove one-step well-posedness and establish a stepwise a priori estimate for the capped method. Numerical experiments illustrate the practical behavior of the proposed CDA approach. They demon-strate recovery from strongly mismatched initial conditions and show how synchronization depends on the observation resolution, boundary forcing, and feedback strength. A coarse-indistinguishability experiment further shows that identical coarse initial information may correspond to distinct fine-scale evolutions, while the assimilated dynamics select the trajectory determined by the supplied time-dependent observations. 
+
+Keywords. Navier–Stokes–Cahn–Hilliard · Continuous data assimilation · Nudging · Finite element method · Phase-field models 
+
+MSC 2010. 35Q35, 35K55, 35K57, 65M60, 93C20. 
+
+Contents 
+
+1. Introduction 12. A phase-field model of NSCH type and continuous data assimilation 33. Finite element discretization and one-step well-posedness 74. Numerical experiments for the NSCH system with continuous data assimilation 13 Conclusions and Commentary 21 References 22 1. Introduction 
+
+Phase-field models provide a flexible framework for describing multiphase hydrodynamics in which inter-faces are represented by thin transition layers rather than sharp boundaries. The underlying diffuse-interface viewpoint goes back to the classical work of Cahn and Hilliard on interfacial free energy, and has since become a standard modeling tool for interfacial fluid phenomena; see, for example, [8, 5]. Within this paradigm, the Navier–Stokes–Cahn–Hilliard (NSCH) system, often referred to as Model H and its variants, provides a diffuse-interface description of incompressible two-phase flow that couples hydrodynamics with interfacial mixing and capillarity. Because the interface is represented through an order parameter rather than tracked explicitly, phase-field formulations are especially effective in situations involving topological changes, such as droplet merger and breakup, without the need for front tracking. Representative examples include microflu-idic droplet formation and breakup [7]. In biomechanics and hemodynamics, phase-field methods have also been used to describe thrombus formation and remodeling in flowing blood, incorporating spatially varying material properties and permeability within a unified energetic framework [50, 46, 47]. Related develop-ments connect phase-field hydrodynamics to complex-fluid effects such as viscoelasticity and transported microstructure; see, for example, [35, 27].  
+
+> 1
+> arXiv:2603.08765v1 [math.NA] 9 Mar 2026 2TIANYU SUN
+
+From the analytical viewpoint, the NSCH system and related diffuse-interface models have been studied extensively. For two-phase flows with matched densities, diffuse-interface models coupled to incompressible Navier–Stokes equations were analyzed by Abels [1], while for the variable-density setting strong and weak solvability results were established by Abels and collaborators [2, 3]. Degenerate-mobility variants have also been investigated, with the physically important feature that the order parameter remains in the admissible interval under suitable assumptions [4]. For the NSCH system itself, uniqueness and regularity theory with physically relevant potentials has been developed in several settings, including strong well-posedness in two dimensions and local strong theory in three dimensions [26]. Long-time dynamics for CHNS-type systems have likewise been studied through attractors and asymptotic behavior [22, 25]. Broader background on the Cahn–Hilliard equation and its variants may be found in the surveys and monographs [37, 38]. Other works incorporate additional physical couplings and nonlinear effects, such as thermo-induced Marangoni forcing [45] and chemotaxis-driven or singular-potential regimes in two dimensions [31]. Motivated in part by thrombus modeling, rigorous PDE analyses have also been obtained for phase-field blood–thrombus systems, including local strong well-posedness results in three dimensions [33] and in two dimensions [29]. These studies provide a useful foundation for investigating algorithmic questions in situations where only partial information about the evolving state is available. On the numerical side, the CHNS system has generated a substantial literature devoted to efficient and stable discretizations. Among widely used approaches are convex-splitting and pressure-projection methods, decoupled energy-stable schemes, adaptive energy-stable methods, and second-order linear schemes that preserve discrete energy dissipation; see, for instance, [30, 39, 13, 10, 49]. Such works show that preserving as much as possible of the energetic structure of the continuous model is central to robust computation. They also highlight the practical role of splitting, decoupling, and linearization in making phase-field fluid solvers computationally feasible. These considerations are particularly relevant in the present setting, where the coupled NSCH dynamics are further enriched by a transported auxiliary field and by assimilation terms driven by coarse observations. A central practical difficulty is that accurate initial conditions and complete state observations are rarely accessible in applications. Data assimilation addresses this issue by incorporating observations into the model dynamics in order to recover, or track, the underlying trajectory. Among continuous-in-time approaches, the nudging framework of Azouani–Olson–Titi (AOT) has attracted considerable attention because of its relative simplicity at the PDE level and its connection with the idea that dissipative systems possess finitely many determining parameters [32, 6]. A growing literature studies continuous and discrete data assimilation for fluid models, including computational validation for the two-dimensional Navier–Stokes equations [24], discrete-in-time assimilation for the same system [21], analytical results for convection models under partial observations [18], and abridged or approximate assimilation procedures using reduced sets of measurements or regularized models [17, 34]. For phase-field dynamics, CDA-type ideas have also been explored for the Cahn–Hilliard equation itself [15]. More directly relevant to the present work, CDA has been developed for the two-dimensional Cahn–Hilliard–Navier–Stokes system, where convergence to the reference trajectory can be established under suitable resolution and nudging conditions [48]. On the numerical side, data-assimilation modifications of NSCH have also been coupled with energy-stable time discretizations driven by coarse observed data [41]. At the same time, recent work has emphasized that nudging-type recovery may fail in non-dissipative regimes where determining parameters do not exist, underscoring the importance of dissipativity and observability in the underlying model [44]. The purpose of the present paper is to formulate and study a continuous data assimilation framework for a coupled NSCH-type phase-field model augmented by a transported auxiliary field. The additional field is intended to represent transported microstructural information and contributes an extra stress term in the momentum balance, making the system a natural extension of NSCH models arising in complex-fluid and thrombus-inspired settings [35, 50, 33, 29, 27]. We restrict attention to two spatial dimensions and focus on the formulation of the CDA model, its basic structural properties, a practical capped fully discrete finite element realization, and the resulting computational behavior. More precisely, we first introduce the coupled NSCH– ψ system and the associated nudging-based CDA dynamics driven by coarse-in-space observations through a general linear observation operator. We then record two basic structural properties of the continuous system: a formal energy law for the reference dynamics and an evolution law for the phase mean in the assimilated system. The observation mechanism FINITE ELEMENT CDA FOR AN NSCH SYSTEM 3
+
+is described abstractly through an interpolant IH satisfying an H2-type approximation property, which is compatible with coarse spatial observations obtained from mesh coarsening and reconstruction. Next, we present a fully discrete finite element splitting scheme for the CDA system. The discretization uses continuous quadratic elements for the phase, chemical potential, velocity, and auxiliary field, together with continuous linear elements for the pressure. In order to match the numerical implementation and to ensure admissible coefficient evaluation, we introduce a capped phase in the fully discrete scheme. By combining skew-symmetric transport forms with this capped coefficient structure, we prove one-step well-posedness of the fully discrete problem and derive a stepwise a priori estimate for the capped scheme. We emphasize that this estimate is not a closed discrete free-energy law and does not by itself yield a full convergence theory; rather, it provides a basic stability bound consistent with the split discretization used in computation. Finally, we perform a series of numerical experiments illustrating the behavior of the coupled CDA dynam-ics. These tests examine synchronization from strongly mismatched initial data, the influence of boundary forcing, the effect of the nudging coefficients, and the role of observation resolution. We also include a coarse-indistinguishability experiment showing that identical coarse initial information may correspond to distinct fine-scale evolutions, while the CDA dynamics select and track the trajectory determined by the supplied time-dependent observations. 2. A phase-field model of NSCH type and continuous data assimilation 
+
+In this section, we introduce the coupled Navier–Stokes–Cahn–Hilliard (NSCH) system considered in this work, together with an additional transported auxiliary phase field and the corresponding continuous data assimilation (CDA) algorithm. Throughout, ω ⊂ R2 denotes a bounded simply connected domain with C2
+
+boundary, and T > 0 is a fixed final time. For t ∈ (0 , T ), the unknowns are the velocity ⃗u = ( u 1, u 2), the pressure p, the phase-field order parameter ϕ ∈ [0 , 1], the chemical potential μ, and an auxiliary phase field ⃗ψ = ( ψ1, ψ 2). We regard the density ρ > 0 and the Reynolds number Re > 0 as fixed. The phase-dependent viscosity 
+
+η(ϕ), the mobility ν(ϕ), and the permeability κ(ϕ) are assumed to satisfy (1) 0 < η min ≤ η(ϕ) ≤ ηmax , 0 ≤ νmin ≤ ν(ϕ) ≤ νmax , 0 < κ min ≤ κ(ϕ) ≤ κmax ,
+
+for all admissible values of ϕ. Moreover, we assume η, ν, κ ∈ C1(R) and that their derivatives are bounded on bounded sets. In particular, for any M > 0 there exists CM > 0 such that (2) |η′(s)| + |ν′(s)| + |κ′(s)| ≤ CM for all |s| ≤ M. 
+
+We denote by λ > 0 the gradient-energy coefficient and by γ > 0 the bulk potential coefficient. The time-scale parameters τ > 0 (Cahn–Hilliard mobility) and ϵ > 0 (diffusivity scale for ⃗ ψ) are also fixed. Let F : R → R be a double-well potential and denote by f := F ′ its derivative. We assume F ∈ C2(R)and that there exist q ≥ 3 and constants C, c F > 0, CF ≥ 0 such that (3) |f (s)| ≤ C(1 + |s|q−1) ∀ s ∈ R,
+
+and (4) F (s) ≥ cF |s|q − CF ∀ s ∈ R.
+
+We consider the following coupled system on ω × (0 , T ): (5) 
+
+
+
+ρ Re 
+
+
+
+∂t⃗u + ( ⃗u · ∇)⃗u
+
+
+
++ ∇p − ∇ · η(ϕ)∇⃗u 
+
+= −λ ∇ · (∇ϕ ⊗ ∇ ϕ) + ∇ · ν(ϕ) ( ∇⃗ ψ)T ∇⃗ ψ − η(ϕ) 
+
+> κ(ϕ)
+
+(1 − ϕ)⃗u, 
+
+∇ ·⃗u = 0 ,∂t⃗ ψ + ( ⃗u · ∇)⃗ ψ = ϵ ∇ · ν(ϕ)∇⃗ψ,∂tϕ +⃗u · ∇ϕ = τ ∆μ, μ = −λ ∆ϕ + λγ f (ϕ) + 12 ν′(ϕ) |∇ ⃗ψ|2,
+
+The term −λ∇ · (∇ϕ⊗∇ ϕ) is the stress contribution generated by the gradient energy of ϕ, while ∇ · ν(ϕ)( ∇⃗ψ)T ∇⃗ ψ
+
+is the analogous stress contribution generated by the auxiliary field ⃗ ψ. The resistance term η(ϕ) 
+
+> κ(ϕ)
+
+(1 − ϕ)⃗u
+
+penalises the flow in regions where ϕ is small. 4 TIANYU SUN 
+
+We prescribe the boundary conditions (6) ⃗ u =⃗ 0 on ∂ω × (0 , T ), ∂⃗ν ϕ = ∂⃗ν μ = 0 on ∂ω × (0 , T ), ν(ϕ) ∂⃗ν⃗ ψ = 0 on ∂ω × (0 , T ),
+
+and the initial data (7) ⃗ u( · , 0) = ⃗u 0, ϕ( · , 0) = ϕ0,⃗ ψ( · , 0) = ⃗ ψ0, in ω. 
+
+We introduce the space of smooth solenoidal test fields 
+
+V := {⃗w ∈⃗ C∞ 
+
+> 0
+
+(ω) : ∇·⃗w = 0 }.
+
+We denote by H the closure of V in ⃗ L2(ω), and by V the closure of V in H10 (ω). It is standard that these spaces admit the characterizations 
+
+H = {⃗w ∈⃗ L2(ω) : ∇·⃗w = 0 ,⃗w ·⃗ν = 0 on ∂ω }, V = {⃗w ∈ H 10 (ω) : ∇·⃗w = 0 }.
+
+Let P :⃗ L2(ω) → H be the Helmholtz–Leray orthogonal projection and define the Stokes operator A := −P ∆with domain 
+
+D(A) := H2(ω) ∩ V.
+
+For any sufficiently smooth ϕ, the stress admits the identity (8) −λ ∇ · (∇ϕ ⊗ ∇ ϕ) = λ(−∆ϕ) ∇ϕ − ∇ 
+
+ λ
+
+2 |∇ ϕ|2
+
+.
+
+Using the definition of the chemical potential in (5), 
+
+μ = −λ ∆ϕ + λγ f (ϕ) + 12 ν′(ϕ) |∇ ⃗ψ|2,
+
+and the relation f = F ′, we may rewrite (8) as (9) −λ ∇ · (∇ϕ ⊗ ∇ ϕ) = μ ∇ϕ − 12 ν′(ϕ) |∇ ⃗ψ|2 ∇ϕ − ∇ 
+
+
+
+λγ F (ϕ) + λ
+
+2 |∇ ϕ|2
+
+.
+
+Consequently, introducing the modified pressure (10) ˜p := p + λγ F (ϕ) + λ
+
+2 |∇ ϕ|2,
+
+the system (5) is equivalently written in the form (11) 
+
+
+
+ρ Re 
+
+
+
+∂t⃗u + ( ⃗u · ∇)⃗u
+
+
+
++ ∇˜p − ∇ · η(ϕ)∇⃗u 
+
+= μ ∇ϕ − 12 ν′(ϕ) |∇ ⃗ψ|2 ∇ϕ + ∇ · ν(ϕ) ( ∇⃗ ψ)T ∇⃗ ψ − η(ϕ) 
+
+> κ(ϕ)
+
+(1 − ϕ)⃗u, 
+
+∇ ·⃗u = 0 ,∂t⃗ ψ + ( ⃗u · ∇)⃗ ψ = ϵ ∇ · ν(ϕ)∇⃗ψ,∂tϕ +⃗u · ∇ϕ = τ ∆μ, μ = −λ ∆ϕ + λγ f (ϕ) + 12 ν′(ϕ) |∇ ⃗ψ|2.
+
+The formulations (5) and (11) are algebraically equivalent and therefore share the same existence and uniqueness theory for strong solutions under (1) and mild regularity assumptions on f (see, e.g., [33]). We now introduce the continuous data assimilation (CDA) algorithm associated with (11), following the nudging framework of Azouani–Olson–Titi [6]. The objective is to recover the unknown reference trajectory from coarse-in-space observations by evolving an assimilated state and adding linear feedback terms that relax the observed large scales toward the available measurements. Let h > 0 denote the observational resolution and let IH be a linear interpolant mapping sufficiently regular fields on ω into an observation space. We assume that there exist constants c0, c I > 0, independent of h, such that (12) ∥w − IH w∥2 
+
+> L2(ω)
+
+≤ 14 c20 h4 ∥w∥2 
+
+> H2(ω)
+
+∀ w ∈ H2(ω),
+
+In our computations, IH is realized by transferring fine-grid finite element fields onto a uniformly coarsened mesh. FINITE ELEMENT CDA FOR AN NSCH SYSTEM 5
+
+Problem P. Let (⃗u, ˜p, ϕ, μ,⃗ ψ) denote the reference solution of (5) –(7) . The assimilated unknowns (⃗v, ˜π, φ, ξ,⃗ ζ)
+
+are defined as the solution of the nudged NSCH system 
+
+(13) 
+
+
+
+ρ Re 
+
+
+
+∂t⃗v + ( ⃗v · ∇)⃗v
+
+
+
++ ∇˜π − ∇ · η(φ)∇⃗v 
+
+= ξ ∇φ − 12 ν′(φ) |∇ ⃗ζ|2 ∇φ + ∇ · ν(φ) ( ∇⃗ ζ)T ∇⃗ ζ − η(φ) 
+
+> κ(φ)
+
+(1 − φ)⃗v + α u IH (⃗u −⃗v),
+
+∇ ·⃗v = 0 ,∂t⃗ ζ + ( ⃗v · ∇)⃗ ζ = ϵ ∇ · ν(φ)∇⃗ζ + αψ IH (⃗ψ −⃗ ζ),∂tφ +⃗v · ∇φ = τ ∆ξ + α ϕ IH (ϕ − φ),ξ = −λ ∆φ + λγ f (φ) + 12 ν′(φ) |∇ ⃗ζ|2,
+
+supplemented with the same boundary conditions as (6) with (⃗u, ϕ, μ,⃗ ψ) replaced by (⃗v, φ, ξ,⃗ ζ) and initial data 
+
+(14) ⃗ v( · , 0) = ⃗v 0, φ( · , 0) = φ0,⃗ ζ( · , 0) = ⃗ ζ0,
+
+which may be chosen independently of the reference initial data. Here αu, α ϕ, α ψ ≥ 0 are the nudging parameters. The feedback acts only through the coarse observation operator IH .
+
+Based on the formal energetic structure of (13), we define the energy by (15) E(t) := 
+
+Z
+
+> ω
+
+ ρRe 2 |⃗v| 2 + λ
+
+2 |∇ φ|2 + λγF (φ) + 12 ν(φ)|∇ ⃗ζ|2
+
+dx. 
+
+We begin by recording the formal energy law and the behavior of the spatial mean. These identities explain the dissipative structure of the reference system and the role of the nudging terms in the assimilated dynamics. 
+
+Theorem 2.1. Let (⃗u, ˜p, ϕ, μ,⃗ ψ) be a sufficiently smooth solution of (11) –(7) satisfying the boundary con-ditions (6) . Then the energy 
+
+Eref (t) := 
+
+Z
+
+> ω
+
+ ρRe 2 |⃗u| 2 + λ
+
+2 |∇ ϕ|2 + λγF (ϕ) + 12 ν(ϕ)|∇ ⃗ψ|2
+
+dx 
+
+satisfies 
+
+(16) ddt Eref (t) + 
+
+Z
+
+> ω
+
+η(ϕ)|∇ ⃗u| 2 dx +
+
+Z
+
+> ω
+
+η(ϕ)
+
+κ(ϕ) (1 − ϕ)|⃗u| 2 dx + τ ∥∇ μ∥2 
+
+> L2(ω)
+
++ ϵ∥∇ · (ν(ϕ)∇⃗ ψ)∥2 
+
+> L2(ω)
+
+= 0 .
+
+Proof. We test the momentum equation by ⃗u and integrate over ω. Using ∇ ·⃗u = 0, ⃗u| ∂ω = 0, and the boundary conditions, we obtain 
+
+ρRe 2
+
+ddt ∥⃗u∥ 2 
+
+> L2
+
++
+
+Z
+
+> ω
+
+η(ϕ)|∇ ⃗u| 2 dx +
+
+Z
+
+> ω
+
+η(ϕ)
+
+κ(ϕ) (1 − ϕ)|⃗u| 2 dx = ( μ∇ϕ,⃗ u) − 12
+
+ ν′(ϕ)|∇ ⃗ψ|2∇ϕ,⃗ u 
+
+−  ν(ϕ)( ∇⃗ψ)T ∇⃗ ψ, ∇⃗u .(17) Here we used (( ⃗u · ∇)⃗u,⃗ u) = 0 , (∇˜p,⃗ u) = 0 .
+
+Next, testing the phase equation by μ gives (18) (∂tϕ, μ ) + ( ⃗u · ∇ϕ, μ ) + τ ∥∇ μ∥ 2 
+
+> L2
+
+= 0 .
+
+Using the constitutive relation for μ, we compute (∂tϕ, μ ) = λ(∇ϕ, ∇∂tϕ) + λγ (f (ϕ), ∂ tϕ) + 12
+
+ ν′(ϕ)|∇ ⃗ ψ|2, ∂ tϕ
+
+= ddt 
+
+Z
+
+> ω
+
+ λ
+
+2 |∇ ϕ|2 + λγF (ϕ)
+
+
+
+dx + 12
+
+Z
+
+> ω
+
+ν′(ϕ)|∇ ⃗ψ|2 ∂tϕ dx. (19) For the auxiliary field, we test the ⃗ ψ-equation by −∇ · (ν(ϕ)∇⃗ψ) and integrate by parts. This yields 12
+
+ddt 
+
+Z
+
+> ω
+
+ν(ϕ)|∇ ⃗ψ|2 dx − 12
+
+Z
+
+> ω
+
+ν′(ϕ)|∇ ⃗ ψ|2 ∂tϕ dx + ϵ∥∇ · (ν(ϕ)∇⃗ ψ)∥2 
+
+> L26TIANYU SUN
+
++ (⃗u · ∇)⃗ ψ, −∇ · (ν(ϕ)∇⃗ ψ) = 0 .(20) A direct integration by parts shows that (21)  (⃗u · ∇)⃗ ψ, −∇ · (ν(ϕ)∇⃗ ψ) =  ν(ϕ)( ∇⃗ψ)T ∇⃗ ψ, ∇⃗u  − 12
+
+ ν′(ϕ)|∇ ⃗ψ|2∇ϕ,⃗ u .
+
+Finally, summing (17), (18)–(19), and (20)–(21), all mixed coupling terms cancel: (μ∇ϕ,⃗ u) − (⃗u · ∇ϕ, μ ) = 0 ,
+
+and the ν′(ϕ)|∇ ⃗ ψ|2-terms also cancel exactly. Therefore we obtain (16). □
+
+Theorem 2.2. Assume (⃗u, ˜p, ϕ, μ,⃗ ψ) is a sufficiently smooth solution of (11) and (⃗v, ˜π, φ, ξ,⃗ ζ) is a suffi-ciently smooth solution of (13) . Assume also that the observation operator IH satisfies (12) . Then: 
+
+(1) The reference phase mass is conserved: 
+
+Z
+
+> ω
+
+ϕ(t) dx =
+
+Z
+
+> ω
+
+ϕ0 dx for all t ∈ [0 , T ].
+
+(2) The assimilated phase mass satisfies 
+
+ddt 
+
+Z
+
+> ω
+
+φ(t) dx = αϕ
+
+Z
+
+> ω
+
+IH (ϕ − φ) dx. 
+
+(3) Let eϕ := ϕ − φ. Then the mean error satisfies 
+
+ddt 
+
+Z
+
+> ω
+
+eϕ dx + αϕ
+
+Z
+
+> ω
+
+eϕ dx = αϕ
+
+Z
+
+> ω
+
+(eϕ − IH eϕ) dx. 
+
+Consequently, 
+
+ddt 
+
+ ϕ − φ + αϕ(ϕ − φ) ≤ c0
+
+2 αϕ |ω|−1/2h2∥eϕ∥H2(ω),
+
+where 
+
+ϕ := |ω|−1
+
+Z
+
+> ω
+
+ϕ dx, φ := |ω|−1
+
+Z
+
+> ω
+
+φ dx. 
+
+Proof. Integrating the reference phase equation over ω and using ∂ν μ = 0 on ∂ω , together with ⃗u ·⃗ν = 0 on 
+
+∂ω and ∇ ·⃗u = 0, we obtain 
+
+ddt 
+
+Z
+
+> ω
+
+ϕ dx = τ
+
+Z
+
+> ω
+
+∆μ dx −
+
+Z
+
+> ω
+
+⃗u · ∇ϕ dx = 0 .
+
+This proves the conservation of the reference phase mass. Similarly, integrating the assimilated phase equation gives 
+
+ddt 
+
+Z
+
+> ω
+
+φ dx = τ
+
+Z
+
+> ω
+
+∆ξ dx −
+
+Z
+
+> ω
+
+⃗v · ∇φ dx + α ϕ
+
+Z
+
+> ω
+
+IH (ϕ − φ) dx = αϕ
+
+Z
+
+> ω
+
+IH (ϕ − φ) dx. 
+
+Thus, with eϕ = ϕ − φ,
+
+ddt 
+
+Z
+
+> ω
+
+eϕ dx = −αϕ
+
+Z
+
+> ω
+
+IH eϕ dx, 
+
+and therefore ddt 
+
+Z
+
+> ω
+
+eϕ dx + αϕ
+
+Z
+
+> ω
+
+eϕ dx = αϕ
+
+Z
+
+> ω
+
+(eϕ − IH eϕ) dx. 
+
+Finally, by Cauchy–Schwarz and (12), 
+
+Z
+
+> ω
+
+(eϕ − IH eϕ) dx ≤ | ω|1/2∥eϕ − IH eϕ∥L2(ω) ≤ c0
+
+2 |ω|1/2h2∥eϕ∥H2(ω).
+
+Dividing by |ω| yields 
+
+ddt 
+
+ ϕ − φ + αϕ(ϕ − φ) ≤ c0
+
+2 αϕ |ω|−1/2h2∥eϕ∥H2(ω).
+
+This completes the proof. □FINITE ELEMENT CDA FOR AN NSCH SYSTEM 7
+
+Remark 2.1. The previous theorem shows that, unlike the reference phase mass, the assimilated phase mean is generally not conserved unless the observation operator has an additional mean-preserving property. Thus the coarse-observation mechanism can influence the large-scale phase balance even when the reference dynamics conserve mass. 
+
+3. Finite element discretization and one-step well-posedness 
+
+We now introduce a fully discrete finite element splitting scheme used in the numerical experiments. Our goal here is not to develop a full numerical convergence theory, but rather to record the discretization and establish one-step solvability. Let Th be a conforming triangulation of ω. For each triangle K ∈ T h, let Pr (K)denote the space of scalar polynomials on K of total degree at most r. In particular, P1(K) and P2(K) are the standard linear and quadratic Lagrange finite elements on K. We introduce the finite element spaces 
+
+Vh := { ϑh ∈ C0(ω) : ϑh|K ∈ P2(K) ∀K ∈ T h },Qh := { qh ∈ C0(ω) : qh|K ∈ P1(K) ∀K ∈ T h },Q0 
+
+> h
+
+:= 
+
+n
+
+qh ∈ Qh :
+
+Z
+
+> ω
+
+qh dx = 0 
+
+o
+
+,⃗ Vh := {⃗w h ∈ [Vh]2 :⃗ w h =⃗ 0 on ∂ω },⃗ Wh := [ Vh]2.
+
+Problem Ph. Let tn := n∆t for n = 0 , . . . , N . Assume that coarse observations of the reference fields 
+
+(⃗u n, ϕ n,⃗ ψ n) are available through IH (⃗u n), IH (ϕn), and IH (⃗ψn).The CDA finite element unknowns are 
+
+(⃗v nh , ˜π nh , φ nh , ξ nh ,⃗ ζ nh ) ∈⃗ Vh × Q0 
+
+> h
+
+× Vh × Vh ×⃗ Wh.
+
+Given initial data (⃗v 0 
+
+> h
+
+, φ 0 
+
+> h
+
+,⃗ ζ 0 
+
+> h
+
+) and an initial pressure guess ˜π 0 
+
+> h
+
+∈ Q0
+
+> h
+
+, compute (⃗v n+1  
+
+> h
+
+, ˜π n+1  
+
+> h
+
+, φ n+1  
+
+> h
+
+, ξ n+1  
+
+> h
+
+,⃗ ζ n+1  
+
+> h
+
+)
+
+for n = 0 , . . . , N − 1 by the following splitting procedure. The no-slip condition for ⃗v h is imposed strongly, while Neumann conditions for φh, ξh, and ⃗ ζh are enforced naturally in the weak forms. For ⃗a ∈⃗ Vh, r, s ∈ Vh,⃗z,⃗ θ ∈⃗ Wh, and ⃗ b,⃗ w ∈⃗ Vh, define 
+
+bϕ(⃗a; r, s ) := −  r⃗ a, ∇s  − 12
+
+ (∇·⃗a) r, s ,bψ (⃗a;⃗z,⃗ θ) :=  (⃗a · ∇)⃗z,⃗ θ + 12
+
+ (∇·⃗a)⃗z,⃗ θ,
+
+and 
+
+c(⃗a;⃗ b,⃗ w) :=  (⃗a · ∇)⃗ b,⃗ w  + 12
+
+ (∇·⃗a)⃗ b,⃗ w .
+
+Here 
+
+ (∇·⃗a)⃗z,⃗ θ := 
+
+> 2
+
+X
+
+> j=1
+
+ (∇·⃗a) z j , θ j
+
+.
+
+Define the truncation operator 
+
+T (s) := min {1, max {0, s }} , s ∈ R.
+
+For each time level n, we set 
+
+bφ nh := T (φ nh ).
+
+Thus φ nh ∈ Vh remains the finite element unknown, while bφ nh ∈ [0 , 1] is the capped phase used in the evaluation of the phase-dependent coefficients. This reflects the numerical implementation in which the phase is clipped to [0 , 1] at each time step before forming the coefficients. (i) Cahn–Hilliard step. Given (⃗v nh , φ nh ,⃗ ζ nh ), find (φ n+1  
+
+> h
+
+, ξ n+1  
+
+> h
+
+) ∈ Vh ×Vh such that, for all (ϑh, χ h) ∈ Vh ×Vh,
+
+(22) 
+
+ φ n+1  
+
+> h
+
+− φ nh
+
+∆t , ϑ h
+
+
+
++ bϕ(⃗v nh ; φ n+1  
+
+> h
+
+, ϑ h) + τ (∇ξ n+1  
+
+> h
+
+, ∇ϑh) =  αϕ IH (ϕn − φ nh ), ϑ h
+
+,
+
+(ξ n+1  
+
+> h
+
+, χ h) − λ(∇φ n+1  
+
+> h
+
+, ∇χh) = λγ  f ( bφ nh ), χ h
+
+ + 12
+
+ ν′( bφ nh )|∇ ⃗ ζ nh |2, χ h
+
+.8 TIANYU SUN 
+
+(ii) Auxiliary-field step. Given (⃗v nh , φ n+1  
+
+> h
+
+,⃗ ζ nh ), find ⃗ ζ n+1  
+
+> h
+
+∈⃗ Wh such that, for all ⃗ θh ∈⃗ Wh,
+
+(23) 
+
+⃗ ζ n+1  
+
+> h
+
+−⃗ ζ nh
+
+∆t ,⃗ θ h
+
+
+
++ bψ (⃗v nh ;⃗ ζ n+1  
+
+> h
+
+,⃗ θ h) + ϵ ν( bφ n+1  
+
+> h
+
+)∇⃗ ζ n+1  
+
+> h
+
+, ∇⃗θh
+
+ =  αψ IH (⃗ψ n −⃗ ζ nh ),⃗ θ h
+
+.
+
+(iii) Navier–Stokes step and pressure correction. Given (⃗v nh , ˜π nh , ˜π n−1 
+
+> h
+
+, φ n+1  
+
+> h
+
+, ξ n+1  
+
+> h
+
+,⃗ ζ n+1  
+
+> h
+
+), find ⃗v n+1  
+
+> h
+
+∈⃗ Vh
+
+such that, for all ⃗w h ∈⃗ Vh,
+
+(24) 
+
+ ρ Re ∆t⃗ v n+1  
+
+> h
+
+,⃗ w h
+
+
+
++ ρ Re c(⃗v nh ;⃗v n+1  
+
+> h
+
+,⃗ w h) +  η( bφ n+1  
+
+> h
+
+)∇(⃗v n+1  
+
+> h
+
+), ∇(⃗w h) +
+
+ η( bφ n+1  
+
+> h
+
+)
+
+κ( bφ n+1  
+
+> h
+
+) (1 − bφ n+1  
+
+> h
+
+)⃗v n+1  
+
+> h
+
+,⃗ w h
+
+
+
+=
+
+ ρ Re ∆t⃗ v nh ,⃗ w h
+
+
+
++  2˜ π nh − ˜π n−1 
+
+> h
+
+, ∇ ·⃗w h
+
+ +  ξ n+1  
+
+> h
+
+∇φ n+1  
+
+> h
+
+,⃗ w h
+
+ − 12
+
+ ν′( bφ n+1  
+
+> h
+
+)|∇ ⃗ ζ n+1  
+
+> h
+
+|2∇φ n+1  
+
+> h
+
+,⃗ w h
+
+
+
+−  ν( bφ n+1  
+
+> h
+
+)( ∇⃗ ζ n+1  
+
+> h
+
+)T ∇⃗ ζ n+1  
+
+> h
+
+, ∇⃗w h
+
+ +  αu IH (⃗u n −⃗v nh ),⃗ w h
+
+.
+
+Finally, compute ˜π n+1  
+
+> h
+
+∈ Q0 
+
+> h
+
+from the Poisson correction: find ˜π n+1  
+
+> h
+
+∈ Q0 
+
+> h
+
+such that, for all qh ∈ Q0
+
+> h
+
+,
+
+(25) (∇˜π n+1  
+
+> h
+
+, ∇qh) = 
+
+ ρ Re ∆t ∇ ·⃗v n+1  
+
+> h
+
+, q h
+
+
+
+− (∇˜π nh , ∇qh).
+
+■
+
+Before stating the one-step solvability result, we note that schemes of this general type have been widely used in the numerical treatment of diffuse-interface fluid models. For the Cahn–Hilliard–Navier–Stokes sys-tem and related phase-field flow equations, unique solvability, linearized solvability, and discrete stability have been proved for convex-splitting, projection-based, and auxiliary-variable discretizations; see, for example, [23, 30, 10, 41]. Classical pressure-correction and fractional-step ideas underlying the velocity update also go back to the projection methods of Chorin and Temam [14, 42]; see also [28, 43] for general background. In the present setting, once the quantities at time level n are fixed, each subproblem in Problem Ph is linear in the new unknowns, the transport forms are skew-symmetric, and the capped phase bφ nh keeps the coef-ficient evaluations within the admissible interval [0 , 1]. This leads to the following one-step well-posedness statement. 
+
+Theorem 3.1. Assume that η, ν, κ satisfy (1) . Let 
+
+(⃗v nh , ˜π nh , ˜π n−1 
+
+> h
+
+, φ nh ,⃗ ζ nh ) ∈⃗ Vh × Q0 
+
+> h
+
+× Q0 
+
+> h
+
+× Vh ×⃗ Wh
+
+be given, and define 
+
+bφ nh := T (φ nh ).
+
+Then the subproblems in Problem Ph admit unique solutions 
+
+(φ n+1  
+
+> h
+
+, ξ n+1  
+
+> h
+
+) ∈ Vh × Vh,⃗ ζ n+1  
+
+> h
+
+∈⃗ Wh,⃗ v n+1  
+
+> h
+
+∈⃗ Vh, ˜π n+1  
+
+> h
+
+∈ Q0
+
+> h
+
+.
+
+Proof. Since all finite element spaces are finite dimensional and each subproblem is linear in the new un-knowns, it is enough to prove uniqueness for the associated homogeneous problems. Assume that (φ n+1  
+
+> h, 1
+
+, ξ n+1  
+
+> h, 1
+
+), (φ n+1  
+
+> h, 2
+
+, ξ n+1  
+
+> h, 2
+
+)are two solutions of (22). Define Φh := φ n+1  
+
+> h, 1
+
+− φ n+1  
+
+> h, 2
+
+, Ξh := ξ n+1  
+
+> h, 1
+
+− ξ n+1  
+
+> h, 2
+
+.
+
+Then (Φ h, Ξh) ∈ Vh × Vh satisfies (26) 
+
+ Φh
+
+∆t , ϑ h
+
+
+
++ bϕ(⃗v nh ; Φ h, ϑ h) + τ (∇Ξh, ∇ϑh) = 0 ,
+
+(Ξ h, χ h) − λ(∇Φh, ∇χh) = 0 ,
+
+for all ( ϑh, χ h) ∈ Vh × Vh. Choosing ϑh = Φ h and χh = τλ Ξh, and using 
+
+bϕ(⃗v nh ; Φ h, Φh) = 0 ,
+
+we obtain 1∆t ∥Φh∥2 
+
+> L2(ω)
+
++ τ (∇Ξh, ∇Φh) = 0 ,FINITE ELEMENT CDA FOR AN NSCH SYSTEM 9
+
+and τλ ∥Ξh∥2 
+
+> L2(ω)
+
+− τ (∇Φh, ∇Ξh) = 0 .
+
+Adding these identities yields 1∆t ∥Φh∥2 
+
+> L2(ω)
+
++ τλ ∥Ξh∥2 
+
+> L2(ω)
+
+= 0 .
+
+Hence Φ h = 0 and Ξ h = 0. Therefore the Cahn–Hilliard subproblem is uniquely solvable. Now assume that ⃗ ζ n+1  
+
+> h, 1
+
+and ⃗ ζ n+1  
+
+> h, 2
+
+are two solutions of (23), and define ⃗Zh := ⃗ ζ n+1  
+
+> h, 1
+
+−⃗ ζ n+1  
+
+> h, 2
+
+∈⃗ Wh.
+
+Since both solutions are computed with the same φ n+1  
+
+> h
+
+, the same capped phase 
+
+bφ n+1  
+
+> h
+
+:= T (φ n+1  
+
+> h
+
+)appears in the coefficient. Thus ⃗ Zh satisfies 
+
+⃗ Zh
+
+∆t ,⃗ θ h
+
+
+
++ bψ (⃗v nh ;⃗ Zh,⃗ θ h) + ϵ ν( bφ n+1  
+
+> h
+
+)∇⃗ Zh, ∇⃗θh
+
+ = 0 ∀⃗ θh ∈⃗ Wh.
+
+Taking ⃗ θh =⃗ Zh and using 
+
+bψ (⃗v nh ;⃗ Zh,⃗ Z h) = 0 ,
+
+we obtain 1∆t ∥⃗Zh∥2 
+
+> L2(ω)
+
++ ϵ
+
+Z
+
+> ω
+
+ν( bφ n+1  
+
+> h
+
+)|∇ ⃗ Zh|2 dx = 0 .
+
+Because 0 ≤ bφ n+1  
+
+> h
+
+≤ 1 and (1) holds on admissible values, 
+
+ν( bφ n+1  
+
+> h
+
+) ≥ νmin ≥ 0.
+
+Hence 1∆t ∥⃗ Zh∥2 
+
+> L2(ω)
+
++ ϵν min ∥∇ ⃗ Zh∥2 
+
+> L2(ω)
+
+= 0 ,
+
+and therefore ⃗ Zh = 0. Thus the auxiliary-field subproblem is uniquely solvable. Next assume that ⃗v n+1  
+
+> h, 1
+
+and ⃗v n+1  
+
+> h, 2
+
+are two solutions of (24), and define ⃗Uh := ⃗v n+1  
+
+> h, 1
+
+−⃗v n+1  
+
+> h, 2
+
+∈⃗ Vh.
+
+Since both solutions are computed with the same φ n+1  
+
+> h
+
+, ξ n+1  
+
+> h
+
+, and ⃗ ζ n+1  
+
+> h
+
+, and therefore with the same capped phase 
+
+bφ n+1  
+
+> h
+
+:= T (φ n+1  
+
+> h
+
+),
+
+the difference ⃗ Uh satisfies 
+
+ ρ Re ∆t⃗ Uh,⃗ w h
+
+
+
++ ρ Re c(⃗v nh ;⃗ Uh,⃗ w h) +  η( bφ n+1  
+
+> h
+
+)∇(⃗ Uh), ∇(⃗w h)
+
++
+
+ η( bφ n+1  
+
+> h
+
+)
+
+κ( bφ n+1  
+
+> h
+
+) (1 − bφ n+1  
+
+> h
+
+)⃗ Uh,⃗ w h
+
+
+
+= 0 ∀⃗w h ∈⃗ Vh.
+
+Choosing ⃗w h =⃗ Uh and using 
+
+c(⃗v nh ;⃗ Uh,⃗ U h) = 0 ,
+
+we get 
+
+ρ Re ∆t ∥⃗Uh∥2 
+
+> L2(ω)
+
++
+
+Z
+
+> ω
+
+η( bφ n+1  
+
+> h
+
+)|∇ ⃗ Uh|2 dx +
+
+Z
+
+> ω
+
+η( bφ n+1  
+
+> h
+
+)
+
+κ( bφ n+1  
+
+> h
+
+) (1 − bφ n+1  
+
+> h
+
+)|⃗Uh|2 dx = 0 .
+
+Since 
+
+η( bφ n+1  
+
+> h
+
+) ≥ ηmin > 0, κ( bφ n+1  
+
+> h
+
+) ≥ κmin > 0, 0 ≤ 1 − bφ n+1  
+
+> h
+
+≤ 1,
+
+all three terms are nonnegative. Hence ⃗ Uh = 0, and the velocity subproblem is uniquely solvable. Finally, suppose ˜ π n+1  
+
+> h, 1
+
+and ˜ π n+1  
+
+> h, 2
+
+are two solutions of (25) in Q0
+
+> h
+
+, and define Πh := ˜ π n+1  
+
+> h, 1
+
+− ˜π n+1  
+
+> h, 2
+
+∈ Q0
+
+> h
+
+.
+
+Then (∇Πh, ∇qh) = 0 ∀ qh ∈ Q0
+
+> h
+
+.10 TIANYU SUN 
+
+Taking qh = Π h, we obtain 
+
+∥∇ Πh∥2 
+
+> L2(ω)
+
+= 0 .
+
+Thus Π h is constant on ω. Since Π h ∈ Q0
+
+> h
+
+, it follows that Π h = 0. Therefore the pressure correction is uniquely solvable. □
+
+Before stating the stepwise estimate, we briefly place the argument in the context of existing stability analyses for related phase-field fluid schemes. For the Cahn–Hilliard–Navier–Stokes system, several distinct mechanisms have been used to derive discrete stability. Han and Wang combined a convex-splitting treatment of the Cahn–Hilliard part with a pressure-projection step for the Navier–Stokes part and obtained a modified discrete energy law [30]. Shen and Yang constructed decoupled energy-stable schemes based on stabilization and convex splitting [39], while Chen and Shen developed a decoupled fully discrete adaptive scheme that is unconditionally energy stable [13]. Chen and Zhao proposed a second-order linear method that preserves an energy dissipation law and whose linear systems are uniquely solvable [10]. More recently, Zhao and Han reformulated the Cahn–Hilliard–Navier–Stokes system into a constraint gradient-flow form, which leads to second-order decoupled energy-stable schemes in the original variables [49]. In a broader gradient-flow setting, Shen, Xu, and Yang introduced the scalar auxiliary variable approach, which has become a standard device for constructing efficient energy-stable time discretizations [40]. Motivated by these developments, we do not seek here a closed discrete free-energy law for the split capped scheme in Problem Ph. Instead, by testing the Cahn–Hilliard substep with the discrete chemical potential, the auxiliary-field substep with the updated auxiliary variable, and the velocity substep with the updated velocity, and then exploiting the skew-symmetry of the transport forms together with Young’s inequality, we obtain the following stepwise a priori estimate. 
+
+Theorem 3.2. Assume that η, ν, κ satisfy (1) , and let 
+
+(⃗v nh , ˜π nh , φ nh , ξ nh ,⃗ ζ nh ) ∈⃗ Vh × Q0 
+
+> h
+
+× Vh × Vh ×⃗ Wh, n = 0 , 1, . . . , N, 
+
+be generated by Problem Ph. For each n, define 
+
+bφ nh := T (φ nh ) = min {1, max {0, φ nh }} .
+
+Set 
+
+Enh := ρ Re 2 ∥⃗v nh ∥2 
+
+> L2(ω)
+
++ 12 ∥φ nh ∥2 
+
+> L2(ω)
+
++ 12 ∥⃗ζ nh ∥2
+
+> L2(ω)
+
+,
+
+Dn+1  
+
+> h
+
+:= τ
+
+4λ ∥ξ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
++ 12
+
+ η( bφ n+1  
+
+> h
+
+)∇⃗v n+1  
+
+> h
+
+, ∇⃗v n+1 
+
+> h
+
+
+
++ 12
+
+ η( bφ n+1  
+
+> h
+
+)
+
+κ( bφ n+1  
+
+> h
+
+) (1 − bφ n+1  
+
+> h
+
+)⃗v n+1  
+
+> h
+
+,⃗ v n+1 
+
+> h
+
+
+
++ ϵ ν( bφ n+1  
+
+> h
+
+)∇⃗ζ n+1  
+
+> h
+
+, ∇⃗ζ n+1 
+
+> h
+
+,
+
+and 
+
+Snh := α2
+
+> ϕ
+
+∥IH (ϕn − φ nh )∥2 
+
+> L2(ω)
+
++ α2 
+
+> ψ
+
+∥IH (⃗ ψ n −⃗ ζ nh )∥2 
+
+> L2(ω)
+
++ α2
+
+> u
+
+∥IH (⃗u n −⃗v nh )∥2
+
+> L2(ω)
+
++ ∥f ( bφ nh )∥2 
+
+> L2(ω)
+
++ ∥ν′( bφ nh ) |∇ ⃗ζ nh |2∥2 
+
+> L2(ω)
+
++ ∥2˜ π nh − ˜π n−1 
+
+> h
+
+∥2
+
+> L2(ω)
+
++ ∥ξ n+1  
+
+> h
+
+∇φ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
++ ∥ν′( bφ n+1  
+
+> h
+
+)|∇ ⃗ ζ n+1  
+
+> h
+
+|2∇φ n+1  
+
+> h
+
+∥2
+
+> L2(ω)
+
++ ∥ν( bφ n+1  
+
+> h
+
+)( ∇⃗ ζ n+1  
+
+> h
+
+)T ∇⃗ ζ n+1  
+
+> h
+
+∥2
+
+> L2(ω)
+
+.
+
+Then there exist constants C > 0 and ∆t0 > 0, depending only on ω, ρ, Re , τ , λ, ϵ, ηmin , ηmax , νmax ,and κmin , such that for every 0 < ∆t ≤ ∆t0 and every n = 0 , . . . , N − 1,
+
+(27) En+1  
+
+> h
+
++ ∆ t Dn+1  
+
+> h
+
+≤ (1 + C∆t)Enh + C∆t Snh .
+
+Consequently, if T = N ∆t, then for every m ≤ N ,
+
+(28) Emh + ∆ t
+
+> m−1
+
+X
+
+> n=0
+
+Dn+1  
+
+> h
+
+≤ eCT E0 
+
+> h
+
++ C∆t
+
+> m−1
+
+X
+
+> n=0
+
+Snh
+
+!
+
+.FINITE ELEMENT CDA FOR AN NSCH SYSTEM 11 
+
+Proof. Throughout the proof, C > 0 denotes a generic constant independent of h and ∆ t.We first estimate the Cahn–Hilliard step. Taking ϑh = φ n+1  
+
+> h
+
+in (22), using 
+
+bϕ(⃗v nh ; φ n+1  
+
+> h
+
+, φ n+1  
+
+> h
+
+) = 0 ,
+
+and the identity 2( a − b, a ) = ∥a∥2 − ∥ b∥2 + ∥a − b∥2,
+
+we obtain 12∆ t
+
+
+
+∥φ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
+− ∥ φ nh ∥2 
+
+> L2(ω)
+
++ ∥φ n+1  
+
+> h
+
+− φ nh ∥2
+
+> L2(ω)
+
+
+
++ τ (∇ξ n+1  
+
+> h
+
+, ∇φ n+1  
+
+> h
+
+)= αϕ
+
+ IH (ϕn − φ nh ), φ n+1 
+
+> h
+
+.(29) Next, choosing χh = τλ ξ n+1  
+
+> h
+
+in the constitutive relation gives 
+
+τλ ∥ξ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
+− τ (∇φ n+1  
+
+> h
+
+, ∇ξ n+1  
+
+> h
+
+) = τ γ  f ( bφ nh ), ξ n+1 
+
+> h
+
+
+
++ τ
+
+2λ
+
+ ν′( bφ nh )|∇ ⃗ ζ nh |2, ξ n+1 
+
+> h
+
+.(30) Adding (29) and (30) yields 12∆ t
+
+
+
+∥φ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
+− ∥ φ nh ∥2 
+
+> L2(ω)
+
++ ∥φ n+1  
+
+> h
+
+− φ nh ∥2
+
+> L2(ω)
+
+
+
++ τλ ∥ξ n+1  
+
+> h
+
+∥2
+
+> L2(ω)
+
+= αϕ
+
+ IH (ϕn − φ nh ), φ n+1 
+
+> h
+
+ + τ γ  f ( bφ nh ), ξ n+1 
+
+> h
+
+ + τ
+
+2λ
+
+ ν′( bφ nh )|∇ ⃗ ζ nh |2, ξ n+1 
+
+> h
+
+.(31) By Young’s inequality, 
+
+αϕ
+
+ IH (ϕn − φ nh ), φ n+1 
+
+> h
+
+ ≤ 12 ∥φ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
++ Cα 2
+
+> ϕ
+
+∥IH (ϕn − φ nh )∥2
+
+> L2(ω)
+
+,(32) 
+
+τ γ  f ( bφ nh ), ξ n+1 
+
+> h
+
+ ≤ τ
+
+4λ ∥ξ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
++ C∥f ( bφ nh )∥2
+
+> L2(ω)
+
+,(33) 
+
+τ
+
+2λ
+
+ ν′( bφ nh )|∇ ⃗ ζ nh |2, ξ n+1 
+
+> h
+
+ ≤ τ
+
+4λ ∥ξ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
++ C∥ν′( bφ nh )|∇ ⃗ ζ nh |2∥2
+
+> L2(ω)
+
+.(34) Substituting (32)–(34) into (31), we obtain 12∆ t
+
+
+
+∥φ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
+− ∥ φ nh ∥2 
+
+> L2(ω)
+
++ ∥φ n+1  
+
+> h
+
+− φ nh ∥2
+
+> L2(ω)
+
+
+
++ τ
+
+2λ ∥ξ n+1  
+
+> h
+
+∥2
+
+> L2(ω)
+
+≤ 12 ∥φ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
++ C
+
+
+
+α2
+
+> ϕ
+
+∥IH (ϕn − φ nh )∥2 
+
+> L2(ω)
+
++ ∥f ( bφ nh )∥2 
+
+> L2(ω)
+
++ ∥ν′( bφ nh )|∇ ⃗ ζ nh |2∥2
+
+> L2(ω)
+
+
+
+.(35) We now estimate the auxiliary-field step. Taking ⃗ θh =⃗ ζ n+1  
+
+> h
+
+in (23) and using 
+
+bψ (⃗v nh ;⃗ ζ n+1  
+
+> h
+
+,⃗ ζ n+1  
+
+> h
+
+) = 0 ,
+
+we obtain 12∆ t
+
+
+
+∥⃗ ζ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
+− ∥ ⃗ ζ nh ∥2 
+
+> L2(ω)
+
++ ∥⃗ ζ n+1  
+
+> h
+
+−⃗ ζ nh ∥2
+
+> L2(ω)
+
+
+
++ ϵ ν( bφ n+1  
+
+> h
+
+)∇⃗ζ n+1  
+
+> h
+
+, ∇⃗ζ n+1 
+
+> h
+
+
+
+= αψ
+
+ IH (⃗ ψ n −⃗ ζ nh ),⃗ ζ n+1 
+
+> h
+
+.(36) By Young’s inequality, (37) αψ
+
+ IH (⃗ ψ n −⃗ ζ nh ),⃗ ζ n+1 
+
+> h
+
+ ≤ 12 ∥⃗ζ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
++ Cα 2 
+
+> ψ
+
+∥IH (⃗ ψ n −⃗ ζ nh )∥2
+
+> L2(ω)
+
+.
+
+Hence 12∆ t
+
+
+
+∥⃗ ζ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
+− ∥ ⃗ ζ nh ∥2 
+
+> L2(ω)
+
++ ∥⃗ ζ n+1  
+
+> h
+
+−⃗ ζ nh ∥2
+
+> L2(ω)
+
+
+
++ ϵ ν( bφ n+1  
+
+> h
+
+)∇⃗ζ n+1  
+
+> h
+
+, ∇⃗ζ n+1 
+
+> h
+
+
+
+≤ 12 ∥⃗ζ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
++ Cα 2 
+
+> ψ
+
+∥IH (⃗ψ n −⃗ ζ nh )∥2
+
+> L2(ω)
+
+.(38) Next we estimate the velocity step. Taking ⃗w h =⃗v n+1  
+
+> h
+
+in (24), using 
+
+c(⃗v nh ;⃗v n+1  
+
+> h
+
+,⃗ v n+1  
+
+> h
+
+) = 0 ,12 TIANYU SUN 
+
+and again the identity 2( a − b, a ) = ∥a∥2 − ∥ b∥2 + ∥a − b∥2, we obtain 
+
+ρ Re 2∆ t
+
+
+
+∥⃗v n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
+− ∥ ⃗v nh ∥2 
+
+> L2(ω)
+
++ ∥⃗v n+1  
+
+> h
+
+−⃗v nh ∥2
+
+> L2(ω)
+
+
+
++ η( bφ n+1  
+
+> h
+
+)∇⃗v n+1  
+
+> h
+
+, ∇⃗v n+1 
+
+> h
+
+ +
+
+ η( bφ n+1  
+
+> h
+
+)
+
+κ( bφ n+1  
+
+> h
+
+) (1 − bφ n+1  
+
+> h
+
+)⃗v n+1  
+
+> h
+
+,⃗ v n+1 
+
+> h
+
+
+
+=  2˜ π nh − ˜π n−1 
+
+> h
+
+, ∇·⃗v n+1 
+
+> h
+
+ +  ξ n+1  
+
+> h
+
+∇φ n+1  
+
+> h
+
+,⃗ v n+1 
+
+> h
+
+
+
+− 12
+
+ ν′( bφ n+1  
+
+> h
+
+)|∇ ⃗ ζ n+1  
+
+> h
+
+|2∇φ n+1  
+
+> h
+
+,⃗ v n+1 
+
+> h
+
+
+
+− ν( bφ n+1  
+
+> h
+
+)( ∇⃗ ζ n+1  
+
+> h
+
+)T ∇⃗ ζ n+1  
+
+> h
+
+, ∇⃗v n+1 
+
+> h
+
+ + αu
+
+ IH (⃗u n −⃗v nh ),⃗ v n+1 
+
+> h
+
+.(39) Since ⃗v n+1  
+
+> h
+
+∈⃗ Vh ⊂ H10 (ω)2, the Poincar´ e inequality gives 
+
+∥⃗v n+1  
+
+> h
+
+∥L2(ω) ≤ CP ∥∇ ⃗v n+1  
+
+> h
+
+∥L2(ω).
+
+Also, 
+
+η( bφ n+1  
+
+> h
+
+) ≥ ηmin > 0, 0 ≤ 1 − bφ n+1  
+
+> h
+
+≤ 1.
+
+Therefore, by Cauchy–Schwarz, Poincar´ e, and Young’s inequality, 
+
+ 2˜ π nh − ˜π n−1 
+
+> h
+
+, ∇·⃗v n+1 
+
+> h
+
+ ≤ 14
+
+ η( bφ n+1  
+
+> h
+
+)∇⃗v n+1  
+
+> h
+
+, ∇⃗v n+1 
+
+> h
+
+ + C∥2˜ π nh − ˜π n−1 
+
+> h
+
+∥2
+
+> L2(ω)
+
+,(40) 
+
+ ξ n+1  
+
+> h
+
+∇φ n+1  
+
+> h
+
+,⃗ v n+1 
+
+> h
+
+ ≤ 14
+
+ η( bφ n+1  
+
+> h
+
+)∇⃗v n+1  
+
+> h
+
+, ∇⃗v n+1 
+
+> h
+
+ + C∥ξ n+1  
+
+> h
+
+∇φ n+1  
+
+> h
+
+∥2
+
+> L2(ω)
+
+,(41) 12
+
+ ν′( bφ n+1  
+
+> h
+
+)|∇ ⃗ ζ n+1  
+
+> h
+
+|2∇φ n+1  
+
+> h
+
+,⃗ v n+1 
+
+> h
+
+ ≤ 14
+
+ η( bφ n+1  
+
+> h
+
+)∇⃗v n+1  
+
+> h
+
+, ∇⃗v n+1 
+
+> h
+
+
+
++ C∥ν′( bφ n+1  
+
+> h
+
+)|∇ ⃗ ζ n+1  
+
+> h
+
+|2∇φ n+1  
+
+> h
+
+∥2
+
+> L2(ω)
+
+,(42) 
+
+ ν( bφ n+1  
+
+> h
+
+)( ∇⃗ ζ n+1  
+
+> h
+
+)T ∇⃗ ζ n+1  
+
+> h
+
+, ∇⃗v n+1 
+
+> h
+
+ ≤ 14
+
+ η( bφ n+1  
+
+> h
+
+)∇⃗v n+1  
+
+> h
+
+, ∇⃗v n+1 
+
+> h
+
+
+
++ C∥ν( bφ n+1  
+
+> h
+
+)( ∇⃗ ζ n+1  
+
+> h
+
+)T ∇⃗ ζ n+1  
+
+> h
+
+∥2
+
+> L2(ω)
+
+,(43) 
+
+αu
+
+ IH (⃗u n −⃗v nh ),⃗ v n+1 
+
+> h
+
+ ≤ 14
+
+ η( bφ n+1  
+
+> h
+
+)∇⃗v n+1  
+
+> h
+
+, ∇⃗v n+1 
+
+> h
+
+ + Cα 2
+
+> u
+
+∥IH (⃗u n −⃗v nh )∥2
+
+> L2(ω)
+
+.(44) Substituting (40)–(44) into (39), we obtain 
+
+ρ Re 2∆ t
+
+
+
+∥⃗v n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
+− ∥ ⃗v nh ∥2 
+
+> L2(ω)
+
++ ∥⃗v n+1  
+
+> h
+
+−⃗v nh ∥2
+
+> L2(ω)
+
+
+
++ 12
+
+ η( bφ n+1  
+
+> h
+
+)∇⃗v n+1  
+
+> h
+
+, ∇⃗v n+1 
+
+> h
+
+ +
+
+ η( bφ n+1  
+
+> h
+
+)
+
+κ( bφ n+1  
+
+> h
+
+) (1 − bφ n+1  
+
+> h
+
+)⃗v n+1  
+
+> h
+
+,⃗ v n+1 
+
+> h
+
+
+
+≤ C
+
+
+
+∥2˜ π nh − ˜π n−1 
+
+> h
+
+∥2 
+
+> L2(ω)
+
++ ∥ξ n+1  
+
+> h
+
+∇φ n+1  
+
+> h
+
+∥2
+
+> L2(ω)
+
++∥ν′( bφ n+1  
+
+> h
+
+)|∇ ⃗ ζ n+1  
+
+> h
+
+|2∇φ n+1  
+
+> h
+
+∥2
+
+> L2(ω)
+
++∥ν( bφ n+1  
+
+> h
+
+)( ∇⃗ ζ n+1  
+
+> h
+
+)T ∇⃗ ζ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
++ α2
+
+> u
+
+∥IH (⃗u n −⃗v nh )∥2
+
+> L2(ω)
+
+
+
+.(45) We now add (35), (38), and (45), and multiply by ∆ t. Recalling the definitions of Enh , Dn+1  
+
+> h
+
+, and Snh , we infer (46) En+1  
+
+> h
+
+− E nh + ∆ t Dn+1  
+
+> h
+
+≤ C∆t En+1  
+
+> h
+
++ C∆t Snh .
+
+Indeed, the terms ∆t
+
+2 ∥φ n+1  
+
+> h
+
+∥2 
+
+> L2(ω)
+
+and ∆t
+
+2 ∥⃗ ζ n+1  
+
+> h
+
+∥2
+
+> L2(ω)
+
+arising from (35) and (38) are bounded by C∆t En+1  
+
+> h
+
+.Choose ∆ t0 > 0 so that C∆t0 ≤ 12 . Then for every 0 < ∆t ≤ ∆t0, the term C∆t En+1  
+
+> h
+
+can be absorbed into the left-hand side of (46), yielding 
+
+En+1  
+
+> h
+
++ ∆ t Dn+1  
+
+> h
+
+≤ (1 + C∆t)Enh + C∆t Snh ,
+
+which is exactly (27). Iterating this estimate and applying the discrete Gr¨ onwall lemma proves (28). □FINITE ELEMENT CDA FOR AN NSCH SYSTEM 13 
+
+Remark 3.1. Theorem 3.2 provides a stepwise stability bound for the capped fully discrete scheme. In particular, it gives a useful a priori control on the propagation of the discrete solution and supports the numerical implementation employed in the experiments below. 
+
+Remark 3.2. Related convergence and error estimates for diffuse-interface and Cahn–Hilliard fluid schemes can be found in [19, 20, 16, 36, 11, 9, 12]. These works place Theorem 3.2 in the broader context of fully discrete phase-field approximations. For the capped scheme considered here, the truncation bφ nh = T (φ nh ) adds an extra layer to the analysis. 
+
+4. Numerical experiments for the NSCH system with continuous data assimilation 
+
+We present a set of two-dimensional numerical experiments illustrating the behavior of the coupled NSCH– 
+
+ψ system and the effectiveness of the continuous data assimilation (CDA) nudging terms. All simulations are performed with FreeFEM++ using the splitting scheme described in Problem Ph.We take ω = (0 , 1) × (0 , 1). Let TH denote the fine triangulation used for the forward solves, and let Th
+
+be a uniformly coarsened mesh used to represent the observational resolution. In the implementation, the observation operator IH is realized by nodal interpolation onto Th and then evaluating the coarse-grid field on TH .We use continuous P2 elements on TH for ( ϕ, μ ) and for each component of ⃗ ψ and ⃗u, and continuous P 1
+
+elements for the pressure variable. Let us choose ν(ϕ) = λe(1 − ϕ). We report the following components: 
+
+Ekin (t) = ρ
+
+2
+
+Z
+
+> ω
+
+|⃗u| 2 dx, Emix (t) = 
+
+Z
+
+> ω
+
+ λ
+
+2 |∇ ϕ|2 + 4 λγ ϕ 2(1 − ϕ)2
+
+dx, 
+
+and an elastic contribution for ⃗ ψ weighted by 1 − ϕ,
+
+Eel (t) = λe
+
+2
+
+Z
+
+> ω
+
+(1 − ϕ) |∇ ⃗ ψ|2 dx, Etot = Ekin + Emix + Eel 
+
+.We track the L2-errors between the reference state and the CDA state: 
+
+eu(t) = ∥⃗u(t) −⃗v(t)∥ L2(ω), eϕ(t) = ∥ϕ(t) − φ(t)∥L2(ω), eψ (t) = ∥⃗ ψ(t) −⃗ ζ(t)∥L2(ω).
+
+For visualization, we plot the errors on a logarithmic scale versus time. We also plot an L2-difference for the pressure iterate, but we emphasize that pressure is only defined up to an additive constant and is obtained here via a pressure-correction update. Thus, its error can exhibit persistent oscillations even when the primary variables synchronize. Test 1: performance demonstration. We consider the square domain ω = (0 , 1) 2 on a 64 × 64 on the fine mesh TH and 32 × 32 on the coarse mesh Th. We solve the coupled system with the no-slip condition ⃗u =⃗ 0 on ∂ω , homogeneous Neumann conditions for ϕ, μ, and ⃗ ψ, and no external forcing. For this test, set ∆t = 10 −2, T = 100, Re = 3000, τ = 10 −4, ϵ = 5 × 10 −3, ρ = 1, λ = 1, γ = 1, λe = 0 .5, kper = 1, and 
+
+η(ϕ) = ηpϕ + ηf (1 − ϕ) with ( ηf , η p) = (10 −2, 10 −1). The observation operator IH is implemented by nodal interpolation of fine-grid fields to a uniformly coarsened mesh TH .The reference initial conditions are 
+
+ϕ0(x, y ) = 12 + 12 tanh 
+
+ R0 − p(x − x0)2 + ( y − y0)2
+
+√2γ
+
+
+
+, (x0, y 0) = (0 .5, 0.5) , R0 = 0 .18 ,
+
+together with ⃗ψ0(x, y ) = ( −y, x ),⃗ u 0(x, y ) ≡ (0 , 0) , p0(x, y ) ≡ 0.
+
+For the assimilated run, we intentionally start from mismatched initial data: 
+
+φ0(x, y ) = 12 + 12 tanh 
+
+ Rda 0 − p(x − xda 0 )2 + ( y − yda 0 )2
+
+√2γ
+
+
+
+, (xda 0 , y da 0 ) = (0 .65 , 0.35) , Rda 0 = 0 .22 ,⃗ ζ0(x, y ) =  −(cos θ y + sin θ x ), cos θ x − sin θ y , θ = 0 .6,⃗ v 0(x, y ) =  0.20 sin( πy ), 0, π0(x, y ) ≡ 0.
+
+We first report the energy evolution of the reference solution. In this parameter regime, the total energy decreases, and the solution relaxes toward a steady configuration. 14 TIANYU SUN  
+
+> Figure 1. Reference solution: total energy and its components.
+
+We next show the synchronization errors for the CDA run. The L2-errors eu(t) = ∥⃗u −⃗v∥ L2(ω), eϕ(t) = 
+
+∥ϕ − φ∥L2(ω), and eψ (t) = ∥⃗ψ −⃗ ζ∥L2(ω) decay rapidly and then plateau at a small discretization-limited level.           
+
+> Figure 2. CDA run (Test 1, αu=αϕ=αψ= 1): logarithmic L2-errors in ⃗u,ϕ, and ⃗ψ.
+
+Then, we set the nudging parameter to zero to turn off the data assimilation. The mismatch persists, and the errors do not decay to zero.            
+
+> Figure 3. No-nudging run (Test 1, αu=αϕ=αψ= 0): logarithmic L2-errors in ⃗u,ϕ, and ⃗ψ.FINITE ELEMENT CDA FOR AN NSCH SYSTEM 15
+
+We finally compare the φ snapshots. With CDA nudging the assimilated state φ recovers the correct interface geometry and location. The solution relaxes to a different steady state determined by its own initial condition without nudging.                           
+
+> Reference CDA No nudging
+> t= 0 t= 2 t= 4 t= 6 t= 8 t= 10
+> Figure 4. Order parameter snapshots. Top row: reference ϕ(t). Middle row: assimilated φ(t) with αu=αϕ=
+> αψ= 1. Bottom row: solution without nudging ( αu=αϕ=αψ= 0).
+
+Test 2: effects of initial conditions. We use the same setup as in Test 1 (domain, boundary conditions, discretization, parameters, and observation operator IH ), and we fix αu = αϕ = αψ = 1. The only difference is the assimilated initial data: we initialize the CDA state from an opposite configuration, 
+
+φ0 = 1 − ϕ0,⃗ ζ0 = −⃗ψ0 = ( y, −x),⃗ v 0(x, y ) =  0.20 sin( πy ), 0, π0(x, y ) ≡ 0.
+
+This provides a stringent test in which the initial droplet phase is inverted and the auxiliary field is sign-reversed. Figure 5 reports the synchronization errors at log scale. Despite the severe mismatch at t = 0, all errors decay rapidly and then plateau at a discretization-limited level.     
+
+> Figure 5. Opposite-initialization test: logarithmic L2-errors in ⃗u,ϕ, and ⃗ψ.
+
+Figure 6 compares order-parameter snapshots for the reference and assimilated runs at early times. The assimilated state, initialized from φ0 = 1 − ϕ0, rapidly aligns with the reference interface. 16 TIANYU SUN                      
+
+> Reference CDA
+> t= 0 t= 2 t= 4 t= 6 t= 8 t= 10
+> Figure 6. Order parameter snapshots. Top row: reference ϕ(t). Bottom row: assimilated φ(t) initialized by
+> φ0= 1 −ϕ0.
+
+Test 3: effects of boundary conditions. We consider the same setup as in Test 1 (domain, discretization, observation operator IH , and initial data), but now impose a shear flow by prescribing a moving-lid boundary condition on the top boundary: ⃗u = ( U 0, 0) on {y = 1 },⃗ u =⃗ 0 on {y = 0 } ∪ { x = 0 } ∪ { x = 1 }, U0 = 2 .
+
+The nudging parameters are fixed as αu = αϕ = αψ = 1, and we set Re = 100 for this test. Figure 7 reports the evolution of the total energy and its components. In contrast to Test 1, the moving lid injects kinetic energy into the system, and therefore, the total energy is not monotone. The kinetic energy increases as the shear develops, while the mixing energy rapidly relaxes to an approximately steady value, and the elastic contribution decays quickly.  
+
+> Figure 7. Shear-driven test: total energy and its components.
+
+We next show the synchronization errors on a logarithmic scale. As shown in Figure 8, the errors decay rapidly and then plateau at a discretization-limited level. FINITE ELEMENT CDA FOR AN NSCH SYSTEM 17     
+
+> Figure 8. Shear-driven test: logarithmic L2-errors in ⃗u,ϕ, and ⃗ψ.
+
+We finally compare order-parameter snapshots for the reference and assimilated runs at early times. Despite the initial mismatch in droplet location and radius, the assimilated interface rapidly aligns with the reference interface under the imposed shear.                            
+
+> Reference CDA No Nudging
+> t= 0 t= 2 t= 4 t= 6 t= 8 t= 10
+> Figure 9. Order parameter snapshots. Top row: reference ϕ(t). Middle row: assimilated φ(t) with αu=αϕ=
+> αψ= 1. Bottom row: φ(t) without nudging ( αu=αϕ=αψ= 0).
+
+Test 4: validation of data assimilation. In this test, we check whether coarse-resolution initial information alone is sufficient to determine the future evolution. We build two fine-grid initial conditions that are indistinguishable after applying the interpolation operator IH , but that differ on the fine scales. We then evolve both reference systems forward with the same parameters and boundary conditions as in Test 3. Let ϕnaive denote the base initial condition defined on the fine mesh TH . We apply the observation operator 
+
+IH to ϕnaive and denote the reconstructed field by ϕcoarse := IH ϕnaive . The difference δϕ := ϕcoarse − ϕnaive 
+
+contains only fine-scale components that are lost when passing through IH . We then define two fine-grid initial conditions 
+
+ϕ(1) 0 := ϕnaive + ε δϕ, ϕ(2) 0 := ϕnaive − ε δϕ, 
+
+with ε > 0 chosen so that the fine-grid separation ∥ϕ(1) 0 − ϕ(2) 0 ∥L2(ω) is visible. Therefore, IH ϕ(1) 0 = IH ϕ(2) 0 up to machine precision, while ϕ(1) 0̸ = ϕ(2) 0 on the fine mesh. In this test, we choose ε = 10 .0. We use a relatively coarse observation mesh Th of size 8 × 8 such that most information on the fine mesh are not resolved by the observation operator IH , thus producing two separated initial conditions ϕ(1) 0 , ϕ (2) 0 . For the other variables, we use the same procedure as in the baseline setup, and evolve both reference systems independently. We report four log-scale L2-differences: (i) Ref 1–DA 1 and (ii) Ref 2–DA 2, which measure synchronization of CDA to the driven reference trajectory; and (iii) Ref 1–Ref 2 and (iv) DA 1–DA 2, which measure the separation 18 TIANYU SUN 
+
+between the two reference solutions and the separation between the two assimilated solutions. Here, DA 1
+
+denotes the CDA run driven by coarse observations from Ref 1, and DA 2 is driven by coarse observations from Ref 2 (both started from the same assimilated initial guess). The tables and plots Figures 10–13 show that Ref 1–DA 1 and Ref 2–DA 2 decay to near machine precision for ϕ,⃗ ψ,⃗u, and the combined error, while Ref 1–Ref 2 remains nonzero over the time window and DA 1–DA 2
+
+overlaps with Ref 1–Ref 2. Thus, even though the two reference runs have the same coarse-grid initial data, their fine-grid evolutions separate, and CDA tracks whichever reference solution supplies the observations. 
+
+t Ref1-DA1 Ref2-DA2 Ref1-Ref2 DA1-DA2 99.95 1.61E-05 1.75E-05 1.61E-02 1.61E-02 99.96 1.61E-05 1.75E-05 1.61E-02 1.61E-02 99.97 1.61E-05 1.75E-05 1.61E-02 1.61E-02 99.98 1.61E-05 1.75E-05 1.61E-02 1.61E-02 99.99 1.61E-05 1.75E-05 1.61E-02 1.61E-02 100.00 1.61E-05 1.75E-05 1.61E-02 1.61E-02     
+
+> (a) Last six values (total). (b) Total error: Ref1–DA1 and Ref2–DA2 decay to near machine precision, while Ref1–Ref2 and DA1–DA2 overlap and plateau.
+> Figure 10. Total error comparison showing CDA tracks the driven reference solution.
+
+t Ref1-DA1 Ref2-DA2 Ref1-Ref2 DA1-DA2 99.95 4.89E-10 9.37E-10 2.33E-04 2.33E-04 99.96 4.89E-10 9.25E-10 2.33E-04 2.33E-04 99.97 4.89E-10 9.14E-10 2.33E-04 2.33E-04 99.98 4.89E-10 9.04E-10 2.33E-04 2.33E-04 99.99 4.89E-10 8.95E-10 2.33E-04 2.33E-04 100.00 4.89E-10 8.88E-10 2.33E-04 2.33E-04      
+
+> (a) Last six values ( φ). (b) φerror: Ref1–DA1 and Ref2–DA2 decay, while Ref1– Ref2 and DA1–DA2 remain matched and plateau.
+> Figure 11. ϕerror comparison.
+
+t Ref1-DA1 Ref2-DA2 Ref1-Ref2 DA1-DA2 99.95 1.17E-12 2.79E-12 7.04E-03 7.04E-03 99.96 1.17E-12 2.79E-12 7.04E-03 7.04E-03 99.97 1.16E-12 2.78E-12 7.04E-03 7.04E-03 99.98 1.16E-12 2.78E-12 7.04E-03 7.04E-03 99.99 1.16E-12 2.77E-12 7.04E-03 7.04E-03 100.00 1.16E-12 2.77E-12 7.04E-03 7.04E-03        
+
+> (a) Last six values ( ⃗ψ). (b) ⃗ψerror: Ref1–DA1 and Ref2–DA2 decay, while Ref1– Ref2 and DA1–DA2 overlap and plateau.
+> Figure 12. ⃗ψerror comparison. FINITE ELEMENT CDA FOR AN NSCH SYSTEM 19
+
+t Ref1-DA1 Ref2-DA2 Ref1-Ref2 DA1-DA2 99.95 1.61E-05 1.75E-05 8.81E-03 8.80E-03 99.96 1.61E-05 1.75E-05 8.80E-03 8.80E-03 99.97 1.61E-05 1.75E-05 8.80E-03 8.80E-03 99.98 1.61E-05 1.75E-05 8.80E-03 8.80E-03 99.99 1.61E-05 1.75E-05 8.80E-03 8.80E-03 100.00 1.61E-05 1.75E-05 8.80E-03 8.80E-03                            
+
+> (a) Last six values ( ⃗u). (b) ⃗uerror: Ref1–DA1 and Ref2–DA2 decay, while Ref1– Ref2 and DA1–DA2 remain matched and plateau.
+> Figure 13. Velocity ⃗uerror comparison.
+> Ref1-Ref2 DA1-DA2
+> t= 0 t= 2 t= 4 t= 6 t= 8 t= 10
+> Figure 14. Order parameter difference snapshots. Top: reference solution ϕ(1) −ϕ(2) (Ref1–Ref2). Bottom: nudging solution φ(1) −φ(2) (DA1–DA2), where DA1 and DA2 start from the same assimilated initial guess but are driven by coarse observations from Ref1 and Ref2, respectively.
+
+Test 5: effects of nudging coefficient. In this test, we investigate how the synchronization rate depends on the strength of the feedback. We repeat the setup of Test 3 (same domain, discretization, observation operator 
+
+IH , parameters, and mismatched initial data), but vary the nudging parameters. For simplicity, we use a single coefficient 
+
+αu = αϕ = αψ =: α, α ∈ { 1, 10 −1, 10 −2}.
+
+We plot the errors on a logarithmic scale versus time. Figure 15 shows a clear dependence on α. For α = 1, all primary variables synchronize rapidly: the curves display a steep initial drop and then enter a slower decay regime, consistent with reaching an observation/discretization-limited accuracy. For α = 0 .1, the decay is still robust but noticeably slower; over most of the time interval, the trajectories are close to straight lines on the log scale, indicating approx-imately exponential decay with a smaller rate. For α = 0 .01, the feedback is too weak on the time horizon [0 , 100]: the errors decrease only mildly and full synchronization is not observed within the final time. We also report the pressure iterate difference in Figure 15 (top right). Since pressure is only defined up to an additive constant and is obtained here via a pressure-correction update, its curve can remain highly oscillatory even when the primary variables synchronize. Accordingly, the most reliable synchronization indicators are the velocity and phase-field errors. 20 TIANYU SUN               
+
+> Figure 15. Log-scale errors for αu=αϕ=αψ=α∈ { 1,0.1,0.01 }.. Top left: combined error.Top right: velocity error. Bottom row: componentwise errors in ϕand ⃗ψ.
+
+Test 6: effects of interpolation mesh size. In this test, we examine the dependence of synchronization on the resolution of the observation/interpolation operator IH . We keep the physical parameters, time step, and nudging strengths fixed with 
+
+αu = αϕ = αψ = 1 ,
+
+and vary only the observation mesh size H. We consider three observation resolutions (labeled 32 × 32, 16 × 16, and 8 × 8), while maintaining the same overall simulation setup and mismatched initial data as in the preceding tests. Figure 16 shows a clear monotone trend: finer observations lead to faster and stronger synchronization. The most pronounced sensitivity to H occurs in the velocity component. The velocity error exhibits a steep initial decay and reaches a very small plateau by approximately t ≈ 20 on the finest observation mesh (32 ×32). For 16 ×16 observations, the same qualitative behavior persists but with a noticeably reduced decay rate. For the coarsest 8 × 8 observations, the velocity error decreases much more slowly and remains several orders of magnitude larger over the entire interval. This behavior is consistent with the fact that coarser observations cannot constrain finer-scale features of the flow, thereby limiting the achievable synchronization accuracy. In contrast, the phase-field errors in ϕ and ⃗ ψ are less sensitive to H on the time horizon considered, and the combined error is largely governed by the late-time behavior of the auxiliary field ⃗ ψ. The energy diag-nostics further support this picture: the elastic, mixing, and total energies remain nearly indistinguishable across all observation resolutions, while the kinetic energy exhibits the clearest H-dependence, with coarser observations associated with a larger residual kinetic component. FINITE ELEMENT CDA FOR AN NSCH SYSTEM 21             
+
+> Figure 16. Log-scale errors for three interpolation mesh sizes H(labeled 32 ×32, 16 ×16, and 8 ×8). Top left: combined error. Top right: velocity error. Bottom row: componentwise errors in ϕand ⃗ψ.
+
+Conclusions and Commentary 
+
+In this paper we formulated a continuous data assimilation framework for a two-dimensional NSCH-type phase-field model coupled with a transported auxiliary field. The additional transported field contributes an extra stress term in the momentum balance and provides a natural extension of more classical NSCH dynamics arising in complex-fluid and thrombus-inspired phase-field modeling. Our goal was to develop a coarse-observation CDA formulation for this coupled system, identify its basic structural properties, and study its practical behavior through a fully discrete finite element realization. On the continuous level, we introduced the nudged NSCH– ψ system and recorded two structural properties relevant to the assimilation dynamics. First, we derived a formal energy law for the reference system, showing that the coupled model retains a dissipative structure compatible with the underlying phase-field formulation. Second, we analyzed the behavior of the phase mean and showed that, although the reference phase mass is conserved, the assimilated phase mean is generally influenced by the observation operator and the nudging term. These identities clarify the roles played by the coupled stresses and by the coarse-observation feedback mechanism. On the discrete level, we proposed a capped fully discrete finite element splitting scheme for the CDA system. The method uses continuous quadratic elements for the phase, chemical potential, velocity, and auxiliary field, together with continuous linear elements for the pressure. The capped phase is used in the evaluation of the phase-dependent coefficients in order to reflect the numerical implementation and preserve admissible coefficient values. Within this framework, we proved one-step well-posedness of the fully discrete problem and established a stepwise a priori estimate for the capped scheme. Although this estimate does not constitute a closed discrete free-energy law and does not provide a full convergence theory, it gives a basic stability bound for the numerical method employed in the experiments. The numerical experiments illustrate several features of the proposed CDA approach. In particular, they show recovery from strongly mismatched initial data, sensitivity of the synchronization behavior to 22 TIANYU SUN 
+
+the nudging strength and the observation resolution, and robustness under boundary forcing. The coarse-indistinguishability experiment further demonstrates that coarse initial information alone may fail to de-termine the fine-scale evolution uniquely, while the assimilated trajectory is selected by the supplied time-dependent observations. Taken together, these computations indicate that the proposed nudging strategy is effective in practice for this coupled NSCH-type system. Several directions remain open. One natural next step is to establish a rigorous well-posedness and synchronization theory for the continuous assimilated dynamics under assumptions compatible with the present model. Another is to strengthen the discrete analysis by developing a closed stability theory or a convergence analysis for the capped fully discrete scheme. It would also be of interest to investigate partial-observation scenarios by nudging only the velocity or only the phase field and to characterize the minimal observation content needed for synchronization in this coupled setting. Finally, extending the analysis to three dimensions, or to additional physical couplings motivated by thrombus biomechanics and complex-fluid structure, remains an important and challenging topic. 
+
+Declarations. Data Availability Statement. Data sharing is not applicable to this article as no datasets were generated or analysed during the current study. 
+
+Funding Statement. This work was partly supported by the Research Fund of Indiana University. 
+
+Conflict of Interest Disclosure. All authors certify that they have no affiliations with or involvement in any organization or entity with any competing interests in the subject matter or materials discussed in this manuscript. 
+
+Ethics Approval Statement. Not applicable. 
+
+Patient Consent Statement. Not applicable. 
+
+Permission to Reproduce Material from other Sources. None of the presented material was drawn from other sources. 
+
+Clinical Trial Registration. Not applicable. 
+
+Authors’ Contribution. The author contributed to all parts of this manuscript. 
+
+Acknowledgements. T.S. is greatly thankful to Professor Michael Jolly for the insightful discussions and advice. 
+
+References 
+
+[1] H. Abels. On a diffuse interface model for two-phase flows of viscous, incompressible fluids with matched densities. Arch. Rational Mech. Anal. , 194(2):463–506, 2009. doi: 10.1007/s00205-008-0160-2. [2] H. Abels, H. Garcke, and G. Gr¨ un. Thermodynamically consistent, frame indifferent diffuse interface models for incompressible two-phase flows with different densities. Math. Models Methods Appl. Sci. ,22(3):1150013, 2012. doi: 10.1142/S0218202511500138. [3] H. Abels, D. Depner, and H. Garcke. Existence of weak solutions for a diffuse interface model for two-phase flows of incompressible fluids with different densities. J. Math. Fluid Mech. , 15:453–480, 2013. doi: 10.1007/s00021-012-0118-x. [4] H. Abels, D. Depner, and H. Garcke. On an incompressible Navier–Stokes/Cahn–Hilliard system with degenerate mobility. Ann. Inst. H. Poincar´ e Anal. Non Lin´ eaire , 30(6):1175–1190, 2013. doi: 10.1016/ j.anihpc.2013.01.002. [5] D. M. Anderson, G. B. McFadden, and A. A. Wheeler. Diffuse-interface methods in fluid mechanics. 
+
+Annual Review of Fluid Mechanics , 30(1):139–165, 1998. doi: 10.1146/annurev.fluid.30.1.139. [6] A. Azouani, E. Olson, and E. S. Titi. Continuous data assimilation using general interpolant observables. 
+
+Journal of Nonlinear Science , 24(2):277–304, 2014. doi: 10.1007/s00332-013-9189-0. [7] F. Bai, X. He, X. Yang, R. Zhou, and C. Wang. Three dimensional phase-field investigation of droplet formation in microfluidic flow focusing devices with experimental validation. International Journal of Multiphase Flow , 93:130–141, 2017. doi: 10.1016/j.ijmultiphaseflow.2017.04.008. FINITE ELEMENT CDA FOR AN NSCH SYSTEM 23 
+
+[8] J. W. Cahn and J. E. Hilliard. Free energy of a nonuniform system. I. interfacial free energy. The Journal of Chemical Physics , 28(2):258–267, 1958. doi: 10.1063/1.1744102. [9] H. Chen, J. Mao, and J. Shen. Optimal error estimates for the scalar auxiliary variable finite-element schemes for gradient flows. Numerische Mathematik , 145:167–196, 2020. doi: 10.1007/ s00211-020-01112-4. [10] L. Chen and J. Zhao. A novel second-order linear scheme for the Cahn–Hilliard–Navier–Stokes equations. 
+
+Journal of Computational Physics , 423:109782, 2020. [11] W. Chen, S. Wang, Y. Zhang, D. Han, C. Wang, and X. Wang. Error estimate of a decoupled numerical scheme for the Cahn–Hilliard–Stokes–Darcy system. IMA Journal of Numerical Analysis , 42(3):2621– 2655, 2022. doi: 10.1093/imanum/drab046. [12] W. Chen, J. Jing, Q. Liu, C. Wang, and X. Wang. Convergence analysis of a second order numerical scheme for the Flory–Huggins–Cahn–Hilliard–Navier–Stokes system. Journal of Computational and Applied Mathematics , 450:115981, 2024. doi: 10.1016/j.cam.2024.115981. [13] Y. Chen and J. Shen. Efficient, adaptive energy stable schemes for the incompressible Cahn–Hilliard– Navier–Stokes phase-field models. Journal of Computational Physics , 308:40–56, 2016. [14] A. J. Chorin. Numerical solution of the navier–stokes equations. Mathematics of Computation , 22(104): 745–762, 1968. [15] A. E. Diegel and L. G. Rebholz. Continuous data assimilation and long-time accuracy in a C0 interior penalty method for the Cahn–Hilliard equation. Appl. Math. Comput. , 424:127042, 2022. doi: 10.1016/ j.amc.2022.127042. [16] A. E. Diegel, C. Wang, X. Wang, and S. M. Wise. Convergence analysis and error estimates for a second order accurate finite element method for the Cahn–Hilliard–Navier–Stokes system. Numerische Mathematik , 137:495–534, 2017. doi: 10.1007/s00211-017-0887-5. [17] A. Farhat, E. Lunasin, and E. S. Titi. Abridged continuous data assimilation for the 2D Navier–Stokes equations utilizing measurements of only one component of the velocity field. J. Math. Fluid Mech. , 18: 1–23, 2016. doi: 10.1007/s00021-015-0225-6. [18] A. Farhat, E. Lunasin, and E. S. Titi. Continuous data assimilation for a 2D B´ enard convection system through horizontal velocity measurements alone. Journal of Nonlinear Science , 27:1065–1087, 2017. doi: 10.1007/s00332-017-9360-y. [19] X. H. Feng. Fully discrete finite element approximations of the Navier–Stokes–Cahn–Hilliard diffuse interface model for two-phase fluid flows. SIAM Journal on Numerical Analysis , 44(3):1049–1072, 2006. doi: 10.1137/050638333. [20] X. H. Feng, Y. He, and C. Liu. Analysis of finite element approximations of a phase field model for two-phase fluids. Mathematics of Computation , 76(258):539–571, 2007. doi: 10.1090/S0025-5718-06-01915-6. [21] C. Foias, C. F. Mondaini, and E. S. Titi. A discrete data assimilation scheme for the solutions of the two-dimensional Navier–Stokes equations and their statistics. SIAM J. Appl. Dyn. Syst. , 15(4): 2109–2142, 2016. doi: 10.1137/16M1076526. [22] C. G. Gal and M. Grasselli. Asymptotic behavior of a Cahn–Hilliard–Navier–Stokes system in 2D. Ann. Inst. H. Poincar´ e Anal. Non Lin´ eaire , 27(1):401–436, 2010. doi: 10.1016/j.anihpc.2009.11.013. [23] M. Gao and X.-P. Wang. An efficient scheme for a phase field model for the moving contact line problem with variable density and viscosity. Journal of Computational Physics , 272:704–718, 2014. [24] M. Gesho, E. Olson, and E. S. Titi. A computational study of a data assimilation algorithm for the two-dimensional Navier–Stokes equations. Communications in Computational Physics , 19(4):1094–1110, 2016. doi: 10.4208/cicp.060515.161115a. [25] A. Giorgini and R. Temam. Attractors for the Navier–Stokes–Cahn–Hilliard system. Discrete and Continuous Dynamical Systems – Series S , 15(8):2249–2274, 2022. doi: 10.3934/dcdss.2022118. [26] A. Giorgini, A. Miranville, and R. Temam. Uniqueness and regularity for the Navier–Stokes–Cahn– Hilliard system. SIAM Journal on Mathematical Analysis , 51(3):2535–2574, 2019. doi: 10.1137/ 18M1223459. [27] A. Giorgini, A. Ndongmo Ngana, T. Tachim Medjo, and R. Temam. Existence and regularity of strong solutions to a nonhomogeneous Kelvin–Voigt–Cahn–Hilliard system. Journal of Differential Equations ,372:612–656, 2023. doi: 10.1016/j.jde.2023.07.024. [28] V. Girault and P.-A. Raviart. Finite Element Methods for Navier–Stokes Equations: Theory and Algo-rithms . Springer, 1986. 24 TIANYU SUN 
+
+[29] M. Grasselli and A. Poiatti. A phase-field system arising from multiscale modeling of thrombus biome-chanics in blood vessels: Local well-posedness in dimension two. Discrete and Continuous Dynamical Systems – Series S , 16(9):2364–2425, 2023. doi: 10.3934/dcdss.2023105. [30] D. Han and X. Wang. A second order in time, uniquely solvable, unconditionally stable numerical scheme for Cahn–Hilliard–Navier–Stokes equation. Journal of Computational Physics , 290:139–156, 2015. [31] J. He and H. Wu. Global well-posedness of a Navier–Stokes–Cahn–Hilliard system with chemotaxis and singular potential in 2D. Journal of Differential Equations , 297:47–80, 2021. doi: 10.1016/j.jde.2021. 06.022. [32] D. A. Jones and E. S. Titi. Upper bounds on the number of determining modes, nodes, and volume elements for the Navier–Stokes equations. Indiana University Mathematics Journal , 42(3):875–887, 1993. doi: 10.1512/iumj.1993.42.42039. [33] W. Kim, K. Tawri, and R. Temam. Local well-posedness of a three-dimensional phase-field model for thrombus and blood flow, Apr. 2022. arXiv:2204.07527v1. [34] A. Larios and Y. Pei. Approximate continuous data assimilation of the 2D Navier–Stokes equations via the Voigt-regularization with observable data. Evol. Equ. Control Theory , 9(3):733–751, 2020. doi: 10.3934/eect.2020031. [35] F.-H. Lin, C. Liu, and P. Zhang. On hydrodynamics of viscoelastic fluids. Communications on Pure and Applied Mathematics , 58(11):1437–1471, 2005. doi: 10.1002/cpa.20074. [36] Y. Liu, W. Chen, C. Wang, and S. M. Wise. Error analysis of a mixed finite element method for a Cahn–Hilliard–Hele–Shaw system. Numerische Mathematik , 135:679–709, 2017. doi: 10.1007/ s00211-016-0813-2. [37] A. Miranville. The Cahn–Hilliard equation and some of its variants. AIMS Mathematics , 2(3):479–544, 2017. doi: 10.3934/Math.2017.3.479. [38] A. Miranville. The Cahn-Hilliard equation , volume 95 of CBMS-NSF Regional Conference Series in Applied Mathematics . Society for Industrial and Applied Mathematics (SIAM), Philadelphia, PA, 2019. Recent advances and applications. [39] J. Shen and X. Yang. Decoupled, energy stable schemes for phase-field models of two-phase incompress-ible flows. SIAM Journal on Numerical Analysis , 53(1):279–296, 2015. [40] J. Shen, J. Xu, and J. Yang. The scalar auxiliary variable (SAV) approach for gradient flows. Journal of Computational Physics , 353:407–416, 2018. [41] X. Song, Q. Xia, J. Kim, and Y. Li. An unconditional energy stable data assimilation scheme for Navier– Stokes–Cahn–Hilliard equations with local discretized observed data. Computers & Mathematics with Applications , 164:21–33, 2024. doi: 10.1016/j.camwa.2024.03.018. [42] R. Temam. Sur l’approximation de la solution des ´ equations de Navier–Stokes par la m´ ethode des pas fractionnaires (i). Archive for Rational Mechanics and Analysis , 32:135–153, 1969. [43] R. Temam. Navier–Stokes Equations: Theory and Numerical Analysis . North-Holland, 1977. [44] E. S. Titi and C. Victor. On the inadequacy of nudging data assimilation algorithms for non-dissipative systems. Discrete and Continuous Dynamical Systems – Series S , 2025. doi: 10.3934/dcdss.2025151. Published online Oct. 22, 2025. [45] H. Wu. Well-posedness of a diffuse-interface model for two-phase incompressible flows with thermo-induced Marangoni effect. European Journal of Applied Mathematics , 28(3):380–434, 2017. doi: 10. 1017/S0956792516000322. [46] S. Xu, Z. Xu, O. V. Kim, R. I. Litvinov, J. W. Weisel, and M. Alber. Model predictions of deformation, embolization and permeability of partially obstructive blood clots under variable shear flow. Journal of The Royal Society Interface , 14(136):20170441, 2017. doi: 10.1098/rsif.2017.0441. [47] S. Xu, M. Alber, and Z. Xu. Three-phase model of visco-elastic incompressible fluid flow and its computational implementation. Communications in Computational Physics , 25(2):586–624, 2019. doi: 10.4208/cicp.oa-2017-0167. [48] B. You and Q. Xia. Continuous data assimilation algorithm for the two dimensional Cahn– Hilliard–Navier–Stokes system. Applied Mathematics & Optimization , 85:5, 2022. doi: 10.1007/ s00245-022-09863-2. [49] J. Zhao and D. Han. Second-order decoupled energy-stable schemes for Cahn–Hilliard–Navier–Stokes equations. Journal of Computational Physics , 443:110536, 2021. FINITE ELEMENT CDA FOR AN NSCH SYSTEM 25 
+
+[50] X. Zheng, A. Yazdani, H. Li, J. D. Humphrey, and G. E. Karniadakis. A three-dimensional phase-field model for multiscale modeling of thrombus biomechanics in blood vessels. PLOS Computational Biology ,16(4):e1007709, 2020. doi: 10.1371/journal.pcbi.1007709. 
+
+T.S. Department of Mathematics and Institute for Scientific Computing and Applied Mathematics, Indiana University Bloomington, 729 East Third Street, Bloomington, Indiana, USA 
+
+Email address : ts19@iu.edu

@@ -1,0 +1,1370 @@
+Title: One-Way Thermo-Mechanical Coupled System Identification Using Displacement and Temperature Measurements
+
+URL Source: https://arxiv.org/pdf/2603.09526v1
+
+Published Time: Wed, 11 Mar 2026 01:06:13 GMT
+
+Number of Pages: 40
+
+Markdown Content:
+# One-Way Thermo-Mechanical Coupled System Identification Using Displacement and Temperature Measurements 
+
+# Talhah Ansari 1,3 , Suneth Warnakulasuriya 1, Ihar Antonau 1,4 , Harbir Antil 2, Rainald L ¨ ohner 2,3 , and Roland W ¨ uchner 1
+
+> 1
+
+Chair of Structural Analysis, Technical University of Munich, Germany 
+
+> 2
+
+College of Science, George Mason University, Fairfax, Virginia, United States 
+
+> 3
+
+Institute for Advanced Study, Technical University of Munich, Germany 
+
+> 4
+
+Cluster of Excellence SE2A – Sustainable and Energy-Efficient Aviation, Technical University of Braunschweig 
+
+# ABSTRACT 
+
+Structural system identification in the presence of thermal loads is challenging, as unmeasured or poorly modeled thermal effects can mask or mimic damage, leading to unreliable conclusions. This work presents an optimization-driven, adjoint-based high-fidelity system identification framework for localizing structural weakness and recovering the temperature field in one-way thermo-mechanical coupled structures. The methodology builds upon a standard optimization formulation that minimizes weighted discrepancies between simulated responses and measured data from a sparse displacement and temperature sensor network. To account for thermal effects, two strategies are proposed: a monolithic approach, which simultaneously identifies Young’s modulus and temperature distributions, and a partitioned approach, which iteratively couples two inexact sub -problems through a Gauss-Seidel type fixed-point scheme. The proposed approaches are evaluated using two numerical examples—a Plate With a Hole and a Footbridge model – under linearly varying and localized thermal fields, and for different sensor layouts. Both approaches successfully recover the Young’s modulus and temperature distributions, even when sensor placement does not fully capture the underlying thermal trends. Compared with a constant - temperature assumption and interpolation of the temperature field from sensor data, the proposed approach achieves the most accurate damage localization and temperature reconstruction. The largest gains occur when localized thermal features are poorly sampled by sensors, where interpolation and constant–temperature assumptions underperform. Furthermore, results show that the location of the temperature sensors is as influential as the number of sensors: well– placed sensors substantially improve identification, while additional sensors that miss critical thermal features provide limited benefit. 
+
+Keywords: System identification, high-fidelity, damage detection, thermal field reconstruction, adjoint-method, Structural Health Monitoring 
+
+# NOMENCLATURE 
+
+J = Cost function 
+
+L = Lagrangian function 
+
+ϕ = system identification parameters 
+
+E = Young’s modulus distribution 
+
+∆T = temperature difference compared to the ambient 
+
+ψ = computed model response vector 
+
+ψmeas = measured data at the sensor location 
+
+ψcomp = model computed data at the sensor location 
+
+umeas = measured displacement at the sensor location 
+
+ucomp = model computed displacement at the sensor location 
+
+∆Tmeas = measured temperature difference at the sensor location 
+
+∆Tcomp = model computed temperature difference at the sensor location 
+
+u, ˜ u = displacement and corresponding adjoint variables 
+
+R = FE residual 
+
+K = stiffness matrix 
+
+fint = internal force vector 
+
+fext = external mechanical force vector 
+
+> arXiv:2603.09526v1 [math.OC] 10 Mar 2026
+
+f∆T = thermal load vector 
+
+x = scalar value x 
+
+x = vector x 
+
+x = matrix x 
+
+# 1 INTRODUCTION 
+
+Throughout their service life, civil and mechanical structures undergo gradual changes in material and system properties due to aging mechanisms such as damage, corrosion, and fatigue. Capturing these changes in a timely and reliable manner is central to Structural Health Monitoring (SHM) and to the construction of high - fidelity digital twins that evolve alongside the physical asset (Antil, 2024). The continued proliferation of sensors, improvements in sensing technology, and advances in numerical simulation enable increasingly accurate digital representations of structural behavior. In many practical settings, however, responses are driven by the interaction of multiple physical fields (e.g., thermo - mechanical coupling), necessitating digital twins that consistently account for these interacting domains. A key step in such pipelines is System Identification (SI)—the estimation of the current state of the structure, including localization of weakness/damage (Airaudo et al., 2023) and the update of environmental fields that influence the response. Thermal loads are among the dominant environmental drivers under normal operation. Bridges, for instance, experience markedly non - uniform temperatures through the depth of the deck and soffit due to differential solar exposure (Kulprapha and Warnitchai, 2012); long -span systems can also develop longitudinal temperature gradients (Ma et al., 2023). For long -term monitoring, temperature - induced response changes can be comparable to—or even exceed—the effects of live loads or moderate damage, complicating the interpretation of measured displacements and strains (Glashier et al., 2024; Kromanis and Kripakaran, 2014; Zhou and Yi, 2014; Bayraktar et al., 2022). Consequently, SI methods that ignore or oversimplify thermal loads risk attributing temperature -driven changes to damage, leading to false positives, biased parameter estimates, or failure to localize genuine damage. In the context of digital twins, separating temperature - induced variability from true material degradation is therefore crucial for actionable diagnostics and decision making. While prior work has addressed temperature field identification as a standalone problem (Ansari et al., 2025b), real - world applications often demand simultaneous reconstruction of environmental fields and structural properties, because these quantities are entangled in the measured response. The combined inverse problem is intrinsically ill -conditioned: sparse sensors limit observability; temperature and stiffness fields can compensate for one another in the mechanical response; and distinct parameter combinations may yield similar error levels, admitting misleading local minima. As a result, algorithms require stabilization strategies and careful coupling to avoid misidentification and divergence. This work develops an optimization -driven, adjoint -based high-fidelity SI framework for one -way thermo -mechanical coupled systems that jointly localizes damage (via Young’s modulus reduction) and reconstructs the temperature field using displacement and temperature measurements from sparse sensors. We propose two complementary strategies within a standard error-minimization formulation: (i) a monolithic approach that updates Young’s modulus and temperature distributions simultaneously in a single optimization, and (ii) a partitioned approach that staggered - updates the two fields via a Gauss–Seidel type fixed -point coupling with intentionally loose sub-problem convergence to promote stable, incremental progress. This paper is organized as follows. Section 2 provides a focused, yet non - exhaustive, overview of thermal field estimation and the treatment of thermal effects in SHM. Section 3 introduces the proposed SI framework, including sensor normalization, the optimization formulation, regularization, and the basis for result compari-son. Section 4 demonstrates the methodology through two numerical examples—a Plate With a Hole and a Footbridge Finite Element (FE) model—examined under different thermal fields and sensor configurations. Section 5 summarizes the main findings and outlines directions for future research. 
+
+# 2 LITERATURE REVIEW 
+
+Because temperature profoundly influences structural response, extensive efforts have been devoted to modeling and reconstructing thermal fields in structures. In general, thermal fields in civil structures can be reconstructed through three main routes (Lin et al., 2021). The most direct is measurement -based sensing, including point thermometers, infrared thermography, and distributed temperature sensing using optical fibers, which provides dense measurements along fiber paths. A second route is analytical heat -conduction solutions, suitable mainly for simple geometries (Santillán et al., 2015). The third route is to numerically simulate the temperature profile, commonly using FE modeling (Bui et al., 2019; Chen and Liu, 2019; Yang et al., 2012). A widely used strategy is to spatially interpolate sparse temperature measurements using inverse distance weighting, kriging, natural neighbor interpolation, or spline methods. Kriging has been widely applied to dams and massive concrete structures, where 2D/3D thermal fields are reconstructed from limited sensor 
+
+> 2/40
+
+measurements or optical fibers (Zheng et al., 2019; Zhou et al., 2019). Interpolation quality depends heavily on sensor layout, motivating sensor positioning studies such as Peng et al. (2020). More recently, learning -based methods have been used to integrate climatic variables, e.g., convolutional neural network -based reconstruction of dam surface temperatures under solar radiation and weather conditions (Pan et al., 2022). Field observations show that structures exposed to uneven solar radiation develop non -linear cross -sectional temperature profiles, both vertically and longitudinally (Kulprapha and Warnitchai, 2012; Fan et al., 2022). These spatially complex patterns highlight the limitations of simplified thermal assumptions. During construction of large concrete structures, temperature control is equally important: hydration heat, boundary conditions, and cooling strategies influence temperature evolution and can induce cracking (Lin et al., 2021; Liu et al., 2015). Thermal regimes also vary significantly across different boundary zones, such as exposed versus submerged dam faces (Bui et al., 2019). Vibration - based SHM has been extensively investigated for temperature effects on damage detection (Bhuyan et al., 2019; Tefera et al., 2023). Natural frequencies are known to be highly temperature - sensitive, while higher - order mode shapes, though harder to extract, carry more damage information (Kosti´ c and Gül, 2017). Jin et al. (2015) observed a negative correlation between the first seven eigenfrequencies and temperature, with more sensitivity observed for temperatures below the freezing point. The main challenge is that real thermal fields are non - uniform and time -varying, and environmental changes (e.g., freezing, humidity, wind) can modify boundary conditions and material properties, often producing response variations greater than those caused by moderate damage (Glashier et al., 2024; Kromanis and Kripakaran, 2014). Dimensionality-reduction approaches, such as Principal Component Analysis (PCA) and its variants, treat environmental effects as latent variables during damage detection (Nguyen et al., 2014; Reynders et al., 2014). Hybrid PCA–Gaussian Mixture Model strategies further improve robustness under varying temperature states (Wang et al., 2020). Regression -based and machine - learning methods are widely used when historical monitoring data are available. Linear regression, artificial neural network (ANN), support vector regression, and autoregressive and exogenous input (ARX) time -series models have been studied to determine the effect of temperature on the system properties (Peeters et al., 2001; Jin et al., 2016, 2015). Studies such as Ni et al. (2009) and Kromanis and Kripakaran (2014) established that data - driven models can reliably reproduce thermal response trends, while more advanced frameworks, such as extended Kalman filter-based ANNs (Jin et al., 2016) and time-series/autoregressive-based ANN hybrids (Kosti´ c and Gül, 2017; Huang et al., 2020), further enhance compensation capability. Several studies handle temperature via baseline -oriented strategies, where damage is inferred as deviations from these baselines. Yarnold and Moon (2015) advocated a temperature -based SHM paradigm that builds response–temperature baselines and flags damage as deviations, allowing for possible nonlinearity in the response–temperature relation. Soo Lon Wah and Chen (2020) proposed a single baseline temperature profile to separate global thermal trends from local stiffness changes, estimating total elemental stiffness change and subtracting the global thermal component so that peaks in the residual indicate damage. Beyond baselines, some works incorporate temperature within the identification variables. Meruane and Heylen (2012) formulate an inverse problem that jointly estimates stiffness and simplified temperature parame-ters (bridge end temperatures in a linearly varying field) using correlated mode shapes and eigenfrequencies, highlighting the coupling between thermal and material parameters. Huang et al. (2019) embed temperature directly into material properties (stiffness-temperature relation) and use a hybrid particle swarm–cuckoo search to jointly identify damage and temperature effects based on a composite natural frequency, mode shape, and modal strain energy cost function, noting that uniform temperature assumptions reduce accuracy and recom-mending gradient - type profiles (e.g., American Association of State Highway and Transportation Officials (AASHTO)-style) as closer to real working states. Despite substantial progress, many treatments of thermal effects still rely on simplified representations (uniform or code - prescribed gradients), interpolation from sparse sensors, or statistical compensation in feature space, which may be insufficient when spatial heterogeneity and limited sensor coverage obscure critical thermal features. To address this more generally, we propose an optimization -driven adjoint framework for one - way thermo - mechanical coupling that jointly identifies the Young’s modulus and temperature distributions from sparse displacement and temperature measurements. The system identification is posed as minimizing a weighted error functional that aggregates discrepancies between measured and simulated responses. We consider two formulations: a monolithic approach that updates both fields simultaneously in one global optimization, and a partitioned approach that splits the problem into two inexact sub - optimizations (one for Young’s modulus, one for temperature) coupled via a Gauss–Seidel -type fixed -point iteration with loose sub - problem convergence—i.e., early termination to allow small, incremental corrections that stabilize the coupled updates. To mitigate ill - conditioning (few measurements vs. many design variables and the tendency of temperature and stiffness to compensate each other), we employ Vertex Morphing (VM) filtering to smooth variables and gradients, suppressing spurious oscillations while retaining large - scale structure. The underlying 
+
+> 3/40
+
+SI formulation is consistent with the generic SI used for damage detection under static and transient loads, as well as model calibration, such as constitutive parameters, boundary conditions, and load identification (Ansari et al., 2025a,c, 2026a,b), thereby providing a unified and extensible approach. 
+
+# 3 METHODOLOGY 
+
+This section describes the proposed SI methodology for identifying the Young’s modulus and thermal field distributions of a structure from displacement and temperature measurements at limited discrete locations for one-way thermo-mechanical coupled systems. Firstly, the canonical system identification formulation is described. Section 3.1 then expands on the proposed methodology of obtaining both Young’s modulus and temperature distributions by specializing the canonical SI form. Sections 3.2, 3.3, and 3.4 describe the cost function non-dimensionalization, VM regularization, and the optimization procedure, respectively. Lastly, section 3.5 discusses how the results evaluation criteria and comparison metrics. Let ϕ(x) be the spatial distribution of the design variable (also referred to here as the control variable) throughout the structure. For a discretized system, determining the ϕ(x) field from measurements may be posed as an optimization problem: Given n test (load) cases and l sensor types with each recording measurements at m
+
+measuring locations xj, j = 1, . . . , m of their respective responses (such as displacement, strains, temperature, etc) 
+
+ψmeas  
+
+> kij
+
+, k = 1, l, i = 1, n, j = 1, m; determine the spatial distribution of ϕ(x) that minimizes the errors between the sensor measurements and the model response. For a discretized system, the canonical form of the cost function for system identification can be written as: min  
+
+> ϕ
+
+J(ψ(ϕ)) = 12
+
+> l
+
+# ∑
+
+> k=1
+
+Ωkn
+
+# ∑
+
+> i=1
+
+ζki m
+
+# ∑
+
+> j=1
+
+ωkij ψcomp  
+
+> kij
+
+(ϕ) − ψmeas  
+
+> kij
+> 22
+
+, (1) where, k = 1, . . . , l refers to the type of sensor, such as displacement, strain, temperature sensors; i = 1, . . . , n refers to the n given load cases; j = 1, . . . , m refers to the m measuring locations; ψmeas  
+
+> kij
+
+and ψcomp  
+
+> kij
+
+are the measured and model computed quantities of interest at the sensor locations; Ωk are individual sensor type cost function weights; ζki are the individual load case weights; and ωkij are the individual sensor weights. 
+
+3.1 One-Way Thermo-Mechanical Coupled System Identification 
+
+This section proposes a combined multiple-field (Young’s modulus and temperature) system identification method for one-way thermo-mechanical coupled structural systems using deformation and temperature measurements at limited discrete locations. The main motivation for this multi-field SI is that structures may be exposed to thermal effects which may not be exactly known throughout the structure. Therefore, some temperature measurements from the structure may be recorded and incorporated into the SI formulation to improve estimates of the Young’s modulus distribution (i.e., damage localization) and the temperature distribution (i.e., thermal load). Let E(x) and ∆T(x) be the spatial distribution of the Young’s modulus and temperature throughout the structure. In this work, the temperature difference compared to the ambient is used instead of absolute temperatures, hence the ∆ symbol in the variable ∆T . For the discretized system considered, E is the vector containing the elemental Young’s modulus and ∆T is the vector containing the nodal temperature differences compared to the ambient. For brevity, this vector ∆T may be interchangeably referred to as the temperature field throughout this work. Under thermal effects consideration, the finite element residual ( R) can be written as: 
+
+R(u(E, ∆T), E, ∆T) = fint − fext − f∆T = 0 , (2) where fint = K · u for linear elastic with small deformation cases considered herein. The Lagrangian, considering the residual, can be expressed as: 
+
+L(u(E, ∆T), E, ∆T, ˜u) = J(u(E, ∆T), ∆T) + ˜u⊤ · R(u(E, ∆T), E, ∆T) , (3) where ˜u are the Lagrange multipliers (adjoint variables). The following sub-sections discuss two different approaches to achieve this two-field (Young’s modulus and temperature distributions) SI. The first is the ‘monolithic approach’, where Young’s modulus distribution (also referred to here as ‘weakness’ or ‘damage’) and the temperature distributions are identified simultaneously in a monolithic SI. The second is a partitioned scheme in which the Young’s modulus and temperature distributions are identified via a Gauss-Seidel iterative method. For both approaches, a simplified formulation considering one load case, i.e., n = 1 and ζ = 1, shall be presented to improve readability of the equations and focus on demonstrating the key aspects of the methodology. However, there are two groups/types of sensors: displacement sensors and temperature sensors. In general case, the method’s formulation can be extended to multiple loads/sensor types. 
+
+> 4/40 3.1.1 Monolithic Approach
+
+This section describes the monolithic approach for weakness detection and thermal field identification using displacement and temperature sensors. The control variables are the Young’s modulus distribution ( E) and the temperature distribution ( ∆T). Given displacement sensor measurements umeas  
+
+> j
+
+at m measuring locations xj,
+
+j = 1, . . . , m and temperature sensor measurements ∆Tmeas  
+
+> p
+
+at o measuring locations xp, p = 1, . . . , o, determine the spatial distribution of E and ∆T that minimizes the errors between the sensor measurements and the model response. The canonical form in Eq. (1) can be modified to obtain the composite cost function formulated as: min  
+
+> E,∆T
+
+J(u(E, ∆T), ∆T) = 12 Ω1
+
+> m
+
+# ∑
+
+> j=1
+
+ωj ucomp  
+
+> j
+
+(E, ∆T) − umeas 
+
+> j
+> 22
+
+| {z }
+
+> JD
+
++ 12 Ω2
+
+> o
+
+# ∑
+
+> p=1
+
+ωp ∆Tcomp  
+
+> p
+
+− ∆Tmeas 
+
+> p
+> 22
+
+| {z }
+
+> JT
+
+. (4) where, j = 1, . . . , m refers to the m measuring locations of umeas  
+
+> j
+
+; p = 1, . . . , o refers to the p measuring locations; 
+
+∆Tmeas  
+
+> p
+
+and ∆Tcomp  
+
+> p
+
+are the measured and model computed temperature differences at the sensor locations; 
+
+ωj, ωp are the individual displacement and temperature sensor weights; and Ω1, Ω2 are the displacement and temperature response weights. The variation of the Lagrangian (Eq. (2) ) yields: the ‘forward’ or ‘primal’ problem ( ∂L  
+
+> ∂˜u
+
+= R = 0) and the ‘adjoint’ problem ( ∂L 
+
+> ∂u
+
+= 0). The adjoint system solving for the adjoint variables ( ˜ u) is expressed as: 
+
+ ∂R
+
+∂u
+
+⊤
+
+· ˜u = − ∂J
+
+∂u =⇒ K⊤ · ˜u = − ∂J
+
+∂u . (5) For most structural systems K⊤ = K, and thus can be reused from the primal solve. It is noted here that the temperature differences ( ∆T ) considered in this work are considered to be small, such that the Young’s modulus of the material is independent of temperature. This presumption would not naturally hold for large temperature changes, where Young’s modulus depends on temperature and the Young’s modulus-temperature relation must be accounted for. Considering this simplified assumption, using the residual and Lagrangian formulations from Eqs. (2) , (3) ,the gradient with respect to the Young’s modulus distribution can be written as: 
+
+dL
+
+dE = ∂L
+
+∂E + ∂L
+
+∂u · du
+
+dE + ∂L
+
+∂∆T · d∆T
+
+dE
+
+= ∂J
+
+∂E + ˜u⊤ · ∂R
+
+∂E +
+
+ ∂J
+
+∂u + ˜u⊤ · ∂R
+
+∂u
+
+| {z }
+
+> Adjoint system
+
+· du
+
+dE
+
++
+
+ ∂J
+
+∂∆T + ˜u⊤ · ∂R
+
+∂∆T
+
+
+
+· d∆T
+
+dE
+
+= ∂J
+
+∂E + ˜u⊤ · ∂R
+
+∂E . (6) Along similar lines, the gradient with respect to the temperature field can be written as: 
+
+dL
+
+d∆T = ∂L
+
+∂∆T + ∂L
+
+∂u · du
+
+d∆T + ∂L
+
+∂E · dE
+
+d∆T
+
+= ∂J
+
+∂∆T + ˜u⊤ · ∂R
+
+∂∆T +
+
+ ∂J
+
+∂u + ˜u⊤ · ∂R
+
+∂u
+
+| {z }
+
+> Adjoint system
+
+· du
+
+d∆T
+
++
+
+ ∂J
+
+∂E + ˜u⊤ · ∂R
+
+∂E
+
+
+
+· dE
+
+d∆T
+
+= ∂J
+
+∂∆T + ˜u⊤ · ∂R
+
+∂∆T . (7) In Eq. (6) : dL 
+
+> dE
+
+= dJ dE , and in Eq. (7) : dL 
+
+> d∆T
+
+= dJ d∆T , because at equilibrium the residual R = 0 and so does its change (Ref. Antil and Leykekhman (2018)). As explained earlier, the cases considered in this study work under the 
+
+> 5/40
+
+assumption that the Young’s modulus and temperature are independent fields, thus the terms d∆T 
+
+> dE
+
+and dE 
+
+> d∆T
+
+are dropped from Eqs. (6), (7). The adjoint variables computed in Eq. (5) are inserted in Eqs. (6) , (7) to compute the gradients. The partial sensitivity term ∂J 
+
+> ∂E
+
+= 0 because the cost function (Eq. (4) ) does not have a direct dependence on E. However, in the gradient w.r.t. ∆T, the partial sensitivity term ∂J
+
+> ∂∆T
+
+̸ = 0 because the cost function (Eq. (4) ) has a direct dependence on ∆T. In terms of computational resources, the adjoint method computes gradients with O(1)
+
+effort, compared to O(ndesign variables ) with direct sensitivity. 
+
+> 3.1.2 Partitioned Approach
+
+This section describes the partitioned approach for weakness detection and thermal field identification using displacement and temperature sensors. The main idea is to optimize E and ∆T in two separate optimizations. A simple two - step sequential scheme alternates once between the two fields: first identify ∆T with E held fixed, then identify E with ∆T held fixed. In ill -conditioned settings, this highly path - dependent convergence may hinge on the initial guess and the update order, and can yield non -physical or spurious solutions. For example, when E is fixed, the optimizer can compensate displacement errors in damaged regions by introducing localized heating/cooling in ∆T (unless temperature sensors directly constrain those zones). The subsequent E update then inherits this bias, making accurate weakness identification difficult. To robustly couple the two fields, we propose a Gauss–Seidel-type fixed-point iteration outer loop en-compassing the two sub - optimizations. Each sub - problem is solved inexactly with loose convergence (early termination), so that updates remain incremental while the other field is still imperfect. This prevents either sub -problem from over - fitting inconsistencies in the counterpart field and promotes stable, simultaneous correc-tion. Small successive refinements across coupling iterations guide the combined system toward a consistent solution, whereas driving each sub -problem to full convergence in isolation tends to over -compensate and can diverge. Figure 1 summarizes the workflow: sub -problem ‘A’ updates ∆T with E fixed; sub - problem ‘B’ updates E
+
+with ∆T fixed. Eqs. (8) –(10) define optimization ‘A’ (objective J = JD + JT since ∆T affects both displacement via thermal expansion and temperature sensor errors), and Eqs. (13) –(15) define optimization ‘B’ (objective J = JD
+
+under the assumption that E does not affect JT ). After each sub - optimization is solved, an optional relaxation with parameter β is applied (Eqs. (11) – (12) ), and the outer loop is checked against the overall convergence criterion in Eq. (16). Since the underlying PDE -constrained problem is unchanged, the gradients coincide with the monolithic case (Eqs. (6) , (7) ). While both monolithic and partitioned schemes have O(1) cost per optimization iteration for gradi-ent computation, the partitioned approach incurs higher computational cost due to multiple sub - optimization solves per coupling iteration. 
+
+> 6/40
+
+Subproblem A: Optimization w.r.t. field ∆T (fixed E (r))
+
+c∆T(r+1) ≈ arg min  
+
+> ∆T
+
+J(E(r), ∆T) (8) 
+
+J(E(r), ∆T) = 12 Ω1
+
+> m
+
+# ∑
+
+> j=1
+
+ωj ucomp  
+
+> j
+
+(E(r), ∆T) − umeas 
+
+> j
+> 22
+
+| {z }
+
+> JD
+
++ 12 Ω2
+
+> o
+
+# ∑
+
+> p=1
+
+ωp ∆Tcomp  
+
+> p
+
+− ∆Tmeas 
+
+> p
+> 22
+
+| {z }
+
+> JT
+
+, (9) 
+
+dL
+
+d∆T = dJ d∆T = ∂J
+
+∂∆T + ˜u⊤ ∂R
+
+∂∆T . (10) 
+
+Inner solve terminated early using a loose convergence criterion. 
+
+⇓ Gauss–Seidel relaxation ⇑
+
+E(r+1) = β bE(r+1) + ( 1 − β) E(r), 0 < β < 2 (11) 
+
+∆T(r+1) = β c∆T(r+1) + ( 1 − β) ∆T(r), 0 < β < 2 (12) 
+
+Subproblem B: Optimization w.r.t. field E (fixed ∆T(r+1))
+
+bE(r+1) ≈ arg min  
+
+> E
+
+JD (E, ∆T(r+1)) (13) 
+
+JD (E, ∆T(r+1)) = 12 Ω1
+
+> m
+
+# ∑
+
+> j=1
+
+ωj ucomp  
+
+> j
+
+(E, ∆T(r+1)) − umeas  
+
+> j
+> 22
+
+, (14) 
+
+dL
+
+dE = dJ dE = ∂JD
+
+∂E + ˜u⊤ ∂R
+
+∂E . (15) 
+
+Inner solve terminated early using a loose convergence criterion. 
+
+Outer loop convergence J = JD + JT ≤ Jtarget or r ≥ rmax (16) 
+
+Figure 1. Gauss–Seidel–type partitioned fixed point optimization with inexact subproblem solves, where r
+
+refers to the coupling iteration and β refers to the relaxation parameter. 
+
+3.2 Sensor Normalization 
+
+From the cost functions in Eqs. (1) , (4) , it can be noted that different types of sensors have different dimensions (m, ◦C, dimensionless, etc) and orders of magnitude of sensor measured values and sensor errors. For example, displacements might be in the order of 10 −6 − 10 −1 m, while temperatures might be in the order of 10 0 − 10 2
+
+> ◦
+
+C. To avoid the composite cost function from favoring one set of sensors and thereby one design variable, it is preferred to normalize and non-dimensionalize the cost function. Airaudo et al. (2023) presented several methods for sensor normalization, including local, average, maximum, and local/maximum weighting. As this work is not focused on sensor normalization, the ‘maximum measured value’ normalization is selected and consistently used throughout to ensure consistent comparisons among the results. It is written as: umeas max = max ( uj ∞ , j = 1, . . . , m) ; ωj = 1
+
+(umeas max )2 , (17) 
+
+∆Tmeas max = max ( ∆Tp ∞ , p = 1, . . . , o) ; ωp = 1
+
+(∆Tmeas max )2 , (18) where j = 1, . . . , m refers to the m displacement sensors, and p = 1, . . . , o refers to the o temperature sensors. In general, the sensor normalizing factor may be carried for each summation in the canonical form of the cost function (Eq. (1) ), i.e., per sensor type, per load case, and per sensor. In this work, since only one mechanical load case ( n = 1) is considered, and maximum weighting is used, the above equations are obtained. 
+
+> 7/40
+
+3.3 Vertex Morphing 
+
+This section presents a brief description of the vertex morphing (VM) smoothing method, which is commonly used in node-based shape optimization for smooth shape updates (Hojjat et al., 2014). The central idea is to identify the physical design field that is controlled by a non-physical control field via a mapping function. However, before VM is applied, the Sigmoid function is used to project the control variables (here, the elemental Young’s modulus and nodal temperature differences) to a [0, 1 ] range, referred to as physical phi field 
+
+(Φ). VM is then applied to this field. Eq. (19) defines the operation known as forward filtering , in discretized form. 
+
+Φ = A · ˜Φ or Φp = Apq · ˜Φq , (19) where Φ is the vector of physical phi field, ˜Φ is the vector of corresponding control field, and A is the kernel function matrix mapping the control field ˜Φ to the physical field Φ. Apq represents the filtering interaction between node/element p and node/element q based on their positions and Euclidean distance. Although VM supports different discretizations for the physical and control fields, here, the same discretization is used in both spaces. Eq. (20) defines the operation known as backward filtering , in discretized form, which maps the physical field gradients ( dJ /dΦ) to the control field gradients ( dJ /d ˜Φ). 
+
+dJ d ˜Φp
+
+= dJ dΦq
+
+· dΦq
+
+d ˜Φp
+
+, (20a) 
+
+=⇒ dJ d ˜Φp
+
+= Aqp · dJ dΦq
+
+= Aqp · bq or dJ d ˜Φ = A⊤ · b = A⊤ · dJ dΦ , (20b) where b q = dJ dΦq is the gradient of cost function J for the q-th physical field design variable. Since these high-fidelity SI problems are highly ill-conditioned, i.e., a unique solution is generally not possible because different combinations of design variables can produce the same response, some form of regularization is often required. Thus, VM acts as a smoothing function and can be understood as a convolution operator within a specified radius, thereby yielding smoother variable updates and smoother fields. The readers are referred to Antonau et al. (2025, 2022); Ghantasala et al. (2021); Hojjat et al. (2014) for a detailed explanation of VM. Simple point averaging, Laplacian smoothing, Pseudo-Laplacian smoothing, etc, are other gradient smoothing methods available in literature (Airaudo et al., 2023; Lohner et al., 2024). 
+
+3.4 Optimization 
+
+Algorithm 1: Adjoint-based optimization in a single-loop (monolithic) system identification 
+
+Start: Initial control variables (ϕ(0), θ(0)), iteration r ← 0 
+
+> 1
+
+while not converged (r ≤ rmax and J > Jtarget ) do  
+
+> 2
+
+Forward analysis of all n load cases: u(r) = [ u(r) 
+
+> 1
+
+, . . . , u(r) 
+
+> n
+
+]; 
+
+> 3
+
+Cost function calculation: J(r); 
+
+> 4
+
+Adjoint analysis of all n load cases: ˜ u(r) = [ ˜u(r) 
+
+> 1
+
+, . . . , ˜ u(r) 
+
+> n
+
+]; 
+
+> 5
+
+Gradient computation for each load case: dJ dϕ 
+
+> (r)
+
+= [ dJ dϕ1
+
+> (r)
+
+, . . . , dJ dϕn
+
+> (r)
+
+] , dJ dθ 
+
+> (r)
+
+= [ dJ dθ1
+
+> (r)
+
+, . . . , dJ dθn
+
+> (r)
+
+] ; 
+
+> 6
+
+Aggregate and smoothen (if required): 
+
+ dJ dϕ
+
+(r) 
+
+> smooth
+
+,
+
+ dJ dθ
+
+(r) 
+
+> smooth
+
+; 
+
+> 7
+
+Update the control variables: ϕ(r+1) = ϕ(r) − γ
+
+ dJ dϕ
+
+(r) 
+
+> smooth
+
+, θ(r+1) = θ(r) − γ
+
+ dJ dθ
+
+(r) 
+
+> smooth
+
+; 
+
+> 8
+
+r ← r + 1 ; 
+
+> 8/40
+
+Algorithm 2: Adjoint-based optimization in a Gauss-Seidel-based partitioned system identification 
+
+Start: Initial control variables (ϕ(0), θ(0)), iteration r = rA + rB ← 0 
+
+> 1
+
+while GS loop not converged (r ≤ rmax and J = JA + JB > Jtarget ) do Start: sub-optimization ‘A’: Initial control variables ϕ(rA), fixed θ(r), iteration counter rA ← 0 
+
+> 2
+
+while not converged (r A ≤ rA,max and J A > JA,target ) do  
+
+> 3
+
+Forward analysis of all n load cases: u(rA) = [ u(rA) 
+
+> 1
+
+, . . . , u(rA) 
+
+> n
+
+] ; 
+
+> 4
+
+Cost function calculation: J(rA) 
+
+> A
+
+; 
+
+> 5
+
+Adjoint analysis of all n load cases: ˜ u(rA) =
+
+h
+
+˜u(rA) 
+
+> 1
+
+, . . . , ˜ u(rA)
+
+> n
+
+i
+
+; 
+
+> 6
+
+Gradient computation for each load case: dJ dϕ 
+
+> (rA)
+
+= [ dJ dϕ1
+
+> (rA)
+
+, . . . , dJ dϕn
+
+> (rA)
+
+] ; 
+
+> 7
+
+Aggregate and smoothen (if required): 
+
+ dJ dϕ
+
+(rA) 
+
+> smooth
+
+; 
+
+> 8
+
+Control variable update: ϕ(rA+1) = ϕ(rA) − γ
+
+ dJ dϕ
+
+(rA) 
+
+> smooth
+
+; 
+
+> 9
+
+rA ← rA + 1, r ← r + 1 , bϕ(r) ← ϕ(rA) ;
+
+Relaxation: ϕ(r) ← β · bϕ(r) + ( 1 − β) · ϕ(r−1)
+
+Start: sub-optimization ‘B’: Initial control variables θ(r), fixed ϕ(r), iteration rB ← 0 
+
+> 10
+
+while not converged (r B ≤ rB,max and J B > JB,target ) do  
+
+> 11
+
+Forward analysis of all n load cases: u(rB) = [ u(rB) 
+
+> 1
+
+, . . . , u(rB) 
+
+> n
+
+] ; 
+
+> 12
+
+Cost function calculation: J(rB) 
+
+> B
+
+; 
+
+> 13
+
+Adjoint analysis of all n load cases: ˜ u(rB) =
+
+h
+
+˜u(rB) 
+
+> 1
+
+, . . . , ˜ u(rB)
+
+> n
+
+i
+
+; 
+
+> 14
+
+Gradient computation for each load case: dJ dθ 
+
+> (rB)
+
+= [ dJ dθ1
+
+> (rB)
+
+, . . . , dJ dθn
+
+> (rB)
+
+] ; 
+
+> 15
+
+Aggregate and smoothen (if required): 
+
+ dJ dθ
+
+(rB) 
+
+> smooth
+
+; 
+
+> 16
+
+Control variable update: θ(rB+1) = θ(rB) − γ
+
+ dJ dθ
+
+(rB) 
+
+> smooth
+
+; 
+
+> 17
+
+rB ← rB + 1 , r ← r + 1, bθ(r) ← θ(rB) ;
+
+Relaxation: θ(r) ← β · bθ(r) + ( 1 − β) · θ(r−1)
+
+This section describes the optimization procedure used for system identification. The cost function and the adjoint-based gradients are computed as discussed in Section 3.1. Algorithm 1 presents the optimization steps for the monolithic SI approach, i.e., all control variables are updated within a single optimization loop. Here, 
+
+ϕ, θ are the two sets of control variables, r is the iteration counter, J is the cost function, and γ is the step size. For all the cases, the search direction is scaled by the L2 norm (Antonau et al., 2025). Algorithm 2 presents the general optimization steps for the Gauss-Seidel-based partitioned SI approach, i.e., each sub-optimization controls only one type of variable. Here, ϕ, θ are the two sets of control variables controlled by sub-optimizations ‘A’ and ‘B’, respectively. r is the overall optimization iteration counter and keeps track of the sub-optimization iterations rA and rB. JA and JB are the cost functions associated with sub-problems ‘A’ and ‘B’, respectively. J is the cost function tracking overall convergence. β is the relaxation parameter in the Gauss-Seidel loop. While the algorithm is presented in general form, the case-specific equations were given in Fig. 1. The step size γ can be a constant or computed using methods such as line search to achieve optimal convergence. In this work, the steepest descent and Nesterov accelerated gradient (Nesterov, 1983) optimization algorithms are used, along with the Barzilai-Borwein (BB) and Quasi-Newton Barzilai-Borwein (QN-BB) methods to compute the step size. The readers are referred to Antonau et al. (2025); Antonau (2023) for explanation of the algorithms and step size methods, which have not been included here to avoid repetition. 
+
+3.5 Comparison 
+
+This section describes the basis for the qualitative and quantitative comparison of the results. 
+
+> 3.5.1 Comparison with other scenarios
+
+For each example, four scenarios with varying thermal-effect considerations are analyzed. In Scenario 1, the actual structure is subjected to thermal loading, but the system identification does not account for it. This scenario depicts the failure in detecting weaknesses when thermal effects are ignored during SI. Scenario 2 accounts for thermal effects by assuming a constant temperature distribution across the structure. This is a simplistic way to account for thermal effects in the absence of temperature measurements. In Scenario 3, a 
+
+> 9/40
+
+sparse network of temperature sensors is used to approximate the structure’s thermal field via interpolation. In this work, a standard implementation of k-Nearest Neighbors (kNN) from the Python Scikit-learn library (Pedregosa et al., 2011) is used. Scenario 4 concerns the proposed monolithic and partitioned SI approaches, which incorporate the temperature sensor measurements directly into the SI cost function. These scenarios are described in Table 2. As one moves down the table, the sophistication with which thermal effects are accounted for increases, and the SI becomes more complex. For Scenario 4, the ill-conditioning of the SI also increases because two distributions ( E, ∆T) are being identified instead of one distribution ( E) in Scenarios 1–3. 
+
+> 3.5.2 Identification Error Comparison
+
+To evaluate the effectiveness of the proposed methodology, a qualitative visual examination of the Young’s modulus and temperature distributions is first performed. Secondly, since this is an academic study, and the ‘target’ distributions in the structures are prescribed, the relative discrete Lebesgue 2-norm ( L2) norm between the target and the reconstructed quantity can be computed. In this discrete setting, it is calculated as Relative discrete L2 norm = ϵL2 =
+
+q
+
+∑Ni=1(Qi − Qtarget  
+
+> i
+
+)2
+
+q
+
+∑Ni=1(Qtarget  
+
+> i
+
+)2
+
+, (21) where i = 1, . . . , N is the loop through the nodes/elements with the total number of nodes/elements N; Qi
+
+and Qtarget  
+
+> i
+
+are the reconstructed (interpolated, identified, etc) and the target quantities of interest for the i-th node/element respectively. In this work, Q corresponds either to the elemental Young’s modulus distribution or to the nodal temperature field, depending on the quantity being examined. The percentage change in ϵL2 with respect to the start of the optimization is also computed to gauge the improvement (or deterioration) during SI. 
+
+δϵ L2 = ϵL2 − ϵ0
+
+> L2
+
+ϵ0
+
+> L2
+
+· 100 , (22) where ϵL2 refers to the relative discrete L2 error for the case being examined and ϵ0 
+
+> L2
+
+refers to the reference error, here, the relative discrete L2 error at the start of the optimization. It is pointed out that the ϵL2 and δϵ L2 error metrics are different from the cost function sensor errors (Eqs. (1) ). In ϵL2 and δϵ L2 , the entire distribution i.e., each node/element, is compared to the ‘target’ distribution, whereas, in the cost function, the quantities are only known and compared at a few discrete sensor locations. In practice, since the actual ‘target’ is unknown, only the cost function is available, and hence, the reason for system identification. 
+
+# 4 NUMERICAL EXAMPLES 
+
+This section presents two numerical examples to demonstrate the applicability of the proposed combined Young’s modulus and thermal field identification methodology. The first example is a Plate With a Hole modeled with shell elements and analyzed for different numbers of temperature sensors and configurations. The second example of a Footbridge modeled with beam and shell elements illustrates the applicability of the approach for models with mixed finite element types. Both the examples are tested on a linearly varying and a localized (Gaussian-type) thermal load cases. 
+
+Table 2. Different scenarios without and with accounting for thermal effects during SI. 
+
+System Identification Scenario Thermal effects accounted for? If yes, how? Identified quantity 1) SI without considering temperature No - E2) SI considering constant temperature field Yes ∆T constant E3) SI considering temperature 
+
+interpolation 
+
+Yes ∆T interpolated E4) SI considering temperature 
+
+identification 
+
+Yes ∆T identified E, ∆T 
+
+> 10/40 (a) (b)
+
+Figure 2. Plate with Hole. (a) Mesh and (b) location of the 14 displacement sensors. The SI and FE analyses are performed using KratosMultiphysics (Dadvand et al., 2010; Ferrándiz et al., 2025), an open source multi-physics software supporting multiple element types and formulations, constitutive models, as well as optimization capabilities. The numerical examples are setup as follows: To simulate the damaged structure subjected to thermal loads, a ‘target’ Young’s modulus distribution and a ‘target’ temperature field is prescribed and the structure is simulated with the corresponding external mechanical load fext . The displacements and temperatures are recorded at the corresponding sensor locations (displacement at xj, j = 1, . . . , m and temperatures at xp,
+
+p = 1, . . . , o). In this work, a single thermal field distribution ( ∆T(x)) shall be identified, implying that all mechanical load test cases shall be subjected to the same thermal field. This yields the measurement pairs 
+
+fext, i, i = 1, . . . , n, umeas  
+
+> ij
+
+, j = 1, . . . , m, ∆Tmeas  
+
+> p
+
+, p = 1, . . . , o which is used as the ‘target measured data’ during SI to identify the damage i.e., Young’s modulus distribution ( E) and the temperature distribution ( ∆T) in the structure. The ‘target measured data’ is supposed to be recorded on the real structure whose state is being identified and hence also referred to as ‘actual structure’. For each example, the four scenarios described in Section 3.5.1 are analyzed, ranging from when thermal effects are not accounted for to when they are accounted for using different approaches. 
+
+4.1 Plate With Hole 
+
+The plate with a hole structure is shown in Fig. 2. The plate has dimensions: 0 ≤ x ≤ 60, 0 ≤ y ≤ 30, and 0 ≤ z ≤ 0.1. All quantities are in SI units, unless explicitly mentioned. A diameter d = 10 hole is located in the plate with center at x = 30, y = 15. The material properties of the plate are: density ρ = 7800, Young’s modulus (in pristine state) E = 2 · 10 11 , Poisson’s ratio ν = 0.3, and coefficient of thermal expansion α = 1.0 · 10 −5 /◦C. The plate is discretized using 646 linear, triangular, plane stress shell elements as illustrated in Fig. 2a. The plate is fixed on the left edge ( u(x = 0) = 0), and a static horizontal mechanical line load of q = 1 · 10 7 N/m is applied on the right edge ( x = 60). In the damaged state, the Young’s modulus was prescribed to be reduced to E = 2 · 10 10 in the four locally 
+
+Figure 3. Plate with Hole. Target Young’s modulus distribution, i.e., localized damages. 
+
+> 11/40
+
+(a) (b) 
+
+Figure 4. Plate with Hole. Target temperature distributions: ( a) Linearly varying thermal field, and ( b)Localized thermal field. damaged regions: upper left (15 ≤ x ≤ 20, 25 ≤ y ≤ 30), upper right (40 ≤ x ≤ 45, 25 ≤ y ≤ 30), lower left (15 ≤ x ≤ 20, 0 ≤ y ≤ 5), and lower right (40 ≤ x ≤ 45, 0 ≤ y ≤ 5). This ‘target’ Young’s modulus distribution is shown in Fig. 3. The actual structure is also subjected to a thermal load. Here, two different types of thermal fields were investigated. The first was a linearly varying thermal field with ∆T(x = 0) = 30 ◦C at the left edge and ∆T(x = 60 ) = 10 ◦C at the right edge. The second was a localized Gaussian type thermal field 10 -3 10 -2 10 -1 10 00 500 1000 1500 2000 Cost Function J Cost function Iterations 
+
+(a) 10 -3 10 -2 10 -1 10 00 500 1000 1500 2000 Cost Function J Cost function Iterations 
+
+(b) 
+
+Figure 5. Plate with Hole. Identified Young’s modulus distributions when thermal load is not considered during SI, but the actual structure is subjected to a: ( a) Linearly varying thermal field, ( b) Localized thermal field. 
+
+12/40 defined as ∆T(x) = ∆Tmin + ( ∆Tmax − ∆Tmin )e −(x−30 )275 , ∆Tmin = 10 ◦C, ∆Tmax = 30 ◦C. These ‘target’ temperature distributions are illustrated in Fig. 4. The color bar is shown in the range [6.8, 34.2 ] ◦C for consistent visualization and better comparison with later results. To measure the deformations, fourteen displacement sensors were distributed over the plate, as depicted in Fig. 2b. At the start of SI, the plate was assumed to be in near-pristine condition with E(x) = 1.998 · 10 11 .The ‘maximum measured value’ sensor weighting (Eq. (17) ) was used for normalization. The steepest descent algorithm with BB method and a maximum step size of 1 · 10 −1 was used for the optimization. The convergence criteria were set to a 6-magnitude reduction of the cost function, i.e., J ≤ (1 · 10 −6 ∗ J0) or a maximum of 2000 iterations. The Young’s modulus control variables were bounded in the range of [2 · 10 9, 2 · 10 11 ]. To help with the ill-conditioned SI, VM with a linear kernel and radius r = 5 was employed to regularize gradients and updates. Based on the rule of thumb, the radius contained approximately 2 − 3 element side lengths. To compare results, the damage locations and intensities, as well as the optimization and VM settings, were kept the same across all cases in this example, except in Scenario 4, where the overall maximum number of iterations differed (discussed later). Scenario 1, as described in Table 2, is the case where the actual structure is subjected to thermal loads but thermal effects were not considered during SI. The identified Young’s modulus distribution for this scenario for the two thermal fields and their convergence plots are shown in Fig. 5. It can be observed that, in both thermal field cases, damage detection and localization are severely deficient. A lot of false damage is identified, which can be directly attributed to the lack of consideration of the structure’s thermal expansion. The convergence plots show that the cost functions decrease by several magnitudes (by compensating for thermal expansion with damage) and are of order O(10 −3).The spiking behavior of the convergence curve is an inherent behavior observed with the BB method (Fletcher, 2005; Ansari et al., 2025b; Antonau, 2023) and is inconsequential for this study, which does not focus 10 -5 10 -4 10 -3 10 -2 10 -1 10 00 500 1000 1500 2000 Cost Function J Cost function Iterations     
+
+> (a) 10 -5 10 -4 10 -3 10 -2 10 -1 10 00500 1000 1500 2000 Cost Function J Cost function Iterations
+> (b)
+
+Figure 6. Plate with Hole. Identified Young’s modulus distributions when a constant temperature distribution of 20 ◦C is considered during SI, but the actual structure is subjected to a: ( a) Linearly varying thermal field, ( b)Localized thermal field.  
+
+> 13/40 (a) (b)
+
+Figure 7. Plate with Hole. Location of the temperature sensors: ( a) 6 sensors configuration, ( b) 16 sensors configuration. on the optimization algorithm and step size method. Scenario 2, as described in Table 2, improves on Scenario 1, and accounts for thermal effects via a constant 20 ◦C thermal field applied to the structure in the primal simulation during SI. The identified Young’s modulus distribution for this scenario for the two thermal fields and their convergence plots are shown in Fig. 6. A slight improvement in damage localization is evident in the results. However, overall, the results are still quite poor, with many false damage detections. Here also, the convergence plots show reductions in the cost function of a few orders of magnitude, but higher reductions than in Scenario 1, and are of order O(10 −4 − 10 −5).Analyzing the results from these two scenarios, it is evident that a more accurate estimate of the structure’s thermal field is essential for meaningful damage localization. Thus, temperature sensors were placed on the structure. In this example, two sensor configurations consisting of 6 and 16 temperature sensors distributed over the plate were analyzed. These configurations are illustrated in Fig. 7. Scenario 3, as described in Table 2, is where the structure’s temperature distribution is approximated by interpolating the temperature sensor measurements. In this example, interpolation was performed using kNN with 3 nearest neighbors and inverse distance weighting. This interpolated temperature distribution was applied as a fixed thermal load on the structure in the primal simulation during SI. The quantity being identified was still the Young’s modulus distribution, as the SI problem remained unchanged; only the manner in which thermal effects are accounted for had changed. Scenario 4, as described in Table 2, is where the temperature distribution of the structure is inferred during SI alongside the Young’s modulus distribution. The proposed methodology presents two approaches to achieve this: the monolithic and the partitioned approaches as described in Section 3. For this example, the monolithic case was set up as follows: the composite cost function is the sum of the accumulated displacement sensor error and the accumulated temperature sensor error, i.e., J = JD + JT . The SI problem is reformulated to identify two fields: the Young’s modulus distribution ( E) and the temperature distribution ( ∆T). At the start of SI, the plate had a uniform temperature of ∆T(x) = 20 ◦C. The bound for the nodal temperature control variable was set to the range [−10, 40 ] ◦C. The ‘maximum measured value’ sensor normalization was applied separately to each sensor type according to Eqs. (17) , (18) . Similar to Young’s modulus distribution, VM with a linear kernel and radius r = 20 was used for the temperature field regularization. The convergence criteria were set to a 6-magnitude reduction in the composite cost function, i.e., 
+
+J = ( JD + JT ) ≤ (1 · 10 −6 ∗ J0) or 2000 iterations. All other settings were kept the same. On the other hand, the partitioned case was set up as follows: the main SI problem is reformulated into a Gauss-Seidel-type fixed-point iteration loop consisting of two sub-optimization problems. The cost function of the sub-optimization ‘A’ is similar to the composite function in the monolithic case (since the thermal distribution affects both JD and JT ) and controls the nodal temperatures. The cost function of the sub-optimization ‘B’ is associated with the accumulated displacement sensors error and controls the elemental Young’s modulus. The ‘maximum measured value’ sensor normalization was applied separately to each sub-optimization. The relaxation factor was set to β = 1, i.e., no relaxation was applied. Per coupling iteration, the two sub-optimizations were solved inexactly by defining loose convergence criteria of 20% reduction in the cost function or a maximum of 10 iterations. One solve of each sub-optimization constituted one coupling iteration. The convergence criteria for the outer coupling loop were set to a 6-magnitude reduction in the composite cost function, i.e., J = ( JD + JT ) ≤ (1 · 10 −6 ∗ J0) or approximately 4000 optimization iterations when summing the iterations of the two sub-optimizations. In the monolithic approach, each optimization iteration 
+
+> 14/40
+
+updated both design variable fields ( E and ∆T). In contrast, in the partitioned approach, each sub-optimization iteration updates only one design variable field, either E or ∆T. To enable a fair comparison between the two approaches, the maximum number of optimization iterations for the partitioned approach was therefore set to approximately twice that of the monolithic case, so that each design variable field undergoes a comparable number of updates. The term approximately is used because coupling iterations were not interrupted once started. As a result, the total number of optimization iterations may differ slightly from the nominal value, with             
+
+> (a) Identified Young’s moduli (left) and the temperature distribution (right) when the thermal field is interpolated .
+> (b) Identified Young’s moduli (left) and identified temperature distribution (right) when the thermal field is reconstructed during SI: Monolithic approach.
+> (c) Identified Young’s moduli (left) and identified temperature distribution (right) when the thermal field is reconstructed during SI: Partitioned approach.
+
+Figure 8. Plate With Hole. 14 displacement and 6 temperature sensors configuration. Linearly varying thermal field. Identified Young’s moduli and temperature distributions when the thermal load is considered using different approaches during SI. Peak temperatures are noted in the figures.     
+
+> 15/40 10 -6 10 -5 10 -4 10 -3 10 -2 10 -1 0500 1000 1500 2000 Cost Function J Cost function Iterations
+
+(a) When the temperature field is interpolated .10 -9 10 -8 10 -7 10 -6 10 -5 10 -4 10 -3 10 -2 10 -1 10 00 500 1000 1500 2000 Total Cost J = J ₁ + J ₂ 
+
+> Displacement Cost J ₁
+> Temperature Cost J ₂
+> Cost function Iterations
+
+(b) When the temperature field is identified : Monolithic 
+
+approach. 10 -9 10 -8 10 -7 10 -6 10 -5 10 -4 10 -3 10 -2 10 -1 10 00 50 100 150 200 250 Total Cost J = J ₁ + J ₂
+
+> Displacement Cost J ₁
+> Temperature Cost J ₂
+> Cost function Iterations
+
+(c) When the temperature field is identified : Partitioned 
+
+approach. Coupling iteration: 218, Overall iteration: 3990. 
+
+Figure 9. Plate With Hole. 14 displacement and 6 temperature sensors configuration. Linearly varying thermal field. Convergence plots when the thermal load is considered using different approaches during SI. a tolerance of ±10 iterations. All other aspects of the optimization algorithm, including step size and update strategy, were kept identical across all cases. The results for Scenario 3 (temperature interpolation) and Scenario 4 (temperature identification) are presented together for easy comparison. They are grouped by the number of temperature sensors and the target temperature distribution, and depicted in the following order: i) 6 temperature sensors, Linearly varying thermal field; ii) 6 temperature sensors, Localized thermal field; iii) 16 temperature sensors, Linearly varying thermal field; iv) 16 temperature sensors, Localized thermal field. 
+
+Case 1: 6 temperature sensors, linearly varying thermal field 
+
+Figure 8a shows the identified Young’s modulus and temperature fields for Scenario 3 (kNN - interpolated temperature) with 6 temperature sensors and a linearly varying thermal field. Relative to Scenario 2 (constant temperature field; Fig. 6a), Young’s modulus identification improves markedly: most false positives are removed, and damage localization is clear. Because no temperature sensors are placed on the left/right edges, the interpolated temperature range is [13.6, 26.5 ]◦C. The convergence history (Fig. 9a) shows a larger reduction than in Scenario 2 (Fig. 6a), with the cost reaching O(10 −5).Figures 8b and 8c present the identified fields for Scenario 4 (temperature identified) for the monolithic and partitioned approaches, respectively. Both approaches further improve damage localization compared with the interpolation case, eliminating all false-positive damage detections. The identified temperature ranges are 
+
+[11.5, 29.6 ] ◦C (monolithic) and [10.0, 30.1 ] ◦C (partitioned). The corresponding convergence plots (Figs. 9b, 9c) differ because the partitioned case is plotted over outer coupling iterations while the monolithic case is plotted over optimization iterations. Despite visually similar fields, the cost function components show a contrast: the displacement cost term dominates in the monolithic case, whereas the temperature cost term dominates in the partitioned case. In both, the composite cost is O(10 −5). Note that JD and JT differ by several orders of magnitude, so the total cost J may be overlapped by the dominant sub - cost function, making it difficult to see in these plots. 
+
+16/40 Case 2: 6 temperature sensors, localized thermal field 
+
+Figure 10a shows the identified Young’s modulus and temperature fields for Scenario 3 (kNN interpolation) with 6 temperature sensors and a localized thermal field. As in Case 1, Young’s modulus improves over Scenario 2 (constant temperature field; Fig. 6b); the main damage regions are detected, though several false positives remain. With two sensors near the plate center, the peak temperature is close to the target 30 ◦C, and the interpolated range is [10.5, 29.2 ] ◦C. The convergence plot (Fig. 11a) shows a larger reduction than Scenario 2             
+
+> (a) Identified Young’s moduli (left) and the temperature distribution (right) when the thermal field is interpolated .
+> (b) Identified Young’s moduli (left) and identified temperature distribution (right) when the thermal field is reconstructed during SI: Monolithic approach.
+> (c) Identified Young’s moduli (left) and identified temperature distribution (right) when the thermal field is reconstructed during SI: Partitioned approach.
+
+Figure 10. Plate With Hole. 14 displacement and 6 temperature sensors configuration. Localized thermal field. Identified Young’s moduli and temperature distributions when the thermal load is considered using different approaches during SI. Peak temperatures are noted in the figures.     
+
+> 17/40 10 -5 10 -4 10 -3 10 -2 10 -1 0500 1000 1500 2000 Cost Function J Cost function Iterations
+
+(a) When the temperature field is interpolated .10 -8 10 -7 10 -6 10 -5 10 -4 10 -3 10 -2 10 -1 10 00 500 1000 1500 2000 Total Cost J = J ₁ + J ₂ 
+
+> Displacement Cost J ₁
+> Temperature Cost J ₂
+> Cost function Iterations
+
+(b) When the temperature field is identified : Monolithic 
+
+approach. 10 -8 10 -7 10 -6 10 -5 10 -4 10 -3 10 -2 10 -1 10 00 50 100 150 200 250 Total Cost J = J ₁ + J ₂
+
+> Displacement Cost J ₁
+> Temperature Cost J ₂
+> Cost function Iterations
+
+(c) When the temperature field is identified : Partitioned 
+
+approach. Coupling iteration: 209, Overall iteration: 4009. 
+
+Figure 11. Plate With Hole. 14 displacement and 6 temperature sensors configuration. Localized thermal field. Convergence plots when the thermal load is considered using different approaches during SI. (Fig. 6b), with the cost of order O(10 −4).Figures 10b and 10c show the identified fields for Scenario 4 (temperature identified) for the monolithic and partitioned approaches, respectively. Both approaches notably enhance the Young’s modulus field and strongly attenuate false damage identification observed in Scenario 3. The identified temperatures span [6.8, 33.6 ] ◦C(monolithic) and [7.4, 34.2 ] ◦C (partitioned), which are wider than those in Scenario 3. Convergence plots (Figs. 11b, 11c) again show contrasting dominance: displacement error in the monolithic approach and temperature error in the partitioned approach, with composite costs in the order O(10 −4–10 −5).
+
+Case 3: 16 temperature sensors, linearly varying thermal field 
+
+Figure 12a presents Scenario 3 (kNN interpolation) with 16 temperature sensors and a linearly varying thermal field. The identified Young’s modulus and temperature fields are very close to the targets, with only minor artificial damage near the hole. The improvement is attributed to better spatial sampling - especially sensors on the left and right edges that capture the bounds of the linear field. The interpolated temperature range is [10.0, 30.0 ] ◦C. The convergence history (Fig. 13a) shows several orders - of - magnitude reduction in the cost, approaching 10 −6. Compared with the corresponding thermal field in the 6 -sensor case (Figs. 8a, 9a), the distributions are improved, and the final cost is slightly lower. Figures 12b and 12c show the identified fields for Scenario 4 (temperature identified) for the monolithic and partitioned approaches, respectively. Both approaches further reduce the spurious damage near the hole observed in Scenario 3. The identified temperature ranges match the target bounds: [10.0, 30.0 ] ◦C. Convergence plots (Figs. 13b, 13c) again show displacement- dominant cost in monolithic case and temperature -dominant cost in partitioned case, with composite costs in the order O(10 −4–10 −5). Compared to the same thermal field with 6 -sensor counterpart case (Figs. 8b, 8c, 9b, 9c), Young’s modulus is similarly accurate, while the temperature field shows a noticeable improvement. 
+
+Case 4: 16 temperature sensors, localized thermal field 
+
+Figure 14a shows Scenario 3 (kNN interpolation) with 16 temperature sensors and a localized thermal 
+
+18/40 field. Both fields appear deficient at first glance: false damage identification is widespread, and the maximum temperature is only 15.3 ◦C (target 30 ◦C). Nevertheless, the Young’s modulus field is still better than Scenario 2 (constant temperature field; Fig. 6b). The interpolated temperatures lie in [10.0, 15.3 ] ◦C. The convergence plot (Fig. 15a) indicates a cost of the order of O(10 −4).Figures 14b and 14c display the identified fields for Scenario 4 (temperature identified) for the monolithic and partitioned approaches, respectively. Although not perfect, both approaches improve upon Scenario 3             
+
+> (a) Identified Young’s moduli (left) and the temperature distribution (right) when the thermal field is interpolated .
+> (b) Identified Young’s moduli (left) and identified temperature distribution (right) when the thermal field is reconstructed during SI: Monolithic approach.
+> (c) Identified Young’s moduli (left) and identified temperature distribution (right) when the thermal field is reconstructed during SI: Partitioned approach.
+
+Figure 12. Plate With Hole. 14 displacement and 16 temperature sensors configuration. Linearly varying thermal field. Identified Young’s moduli and temperature distributions when the thermal load is considered using different approaches during SI. Peak temperatures are noted in the figures.     
+
+> 19/40 10 -6 10 -5 10 -4 10 -3 10 -2 10 -1 0500 1000 1500 2000 Cost Function J Cost function Iterations
+
+(a) When the temperature field is interpolated .10 -7 10 -6 10 -5 10 -4 10 -3 10 -2 10 -1 10 00 500 1000 1500 2000 Total Cost J = J ₁ + J ₂ 
+
+> Displacement Cost J ₁
+> Temperature Cost J ₂
+> Cost function Iterations
+
+(b) When the temperature field is identified : Monolithic 
+
+approach. 10 -8 10 -7 10 -6 10 -5 10 -4 10 -3 10 -2 10 -1 10 00 50 100 150 200 250 Total Cost J = J ₁ + J ₂
+
+> Displacement Cost J ₁
+> Temperature Cost J ₂
+> Cost function Iterations
+
+(c) When the temperature field is identified : Partitioned 
+
+approach. Coupling iteration: 215, Overall iteration: 3997. 
+
+Figure 13. Plate With Hole. 14 displacement and 16 temperature sensors configuration. Linearly varying thermal field. Convergence plots when the thermal load is considered using different approaches during SI. with reduced false damage identification; the monolithic approach yields a slightly better Young’s modulus distribution. The identified temperature ranges increase to [9.3, 20.9 ] ◦C (monolithic) and [9.2, 20.8 ] ◦C (parti-tioned). Convergence plots (Figs. 15b, 15c) again show displacement -dominant cost for the monolithic case and temperature-dominant for the partitioned case, with composite costs of the order of O(10 −4).Comparing these results with the corresponding 6-sensor case results (Figs. 10, 11), the identified distri-butions are substandard. This is directly related to the positions of the 16 temperature sensors. From Fig. 7, it can be seen that for the 6-sensor configuration, the positioning of the sensors is such that they capture the main features (peaks) of the localized thermal field. On the other hand, even with 16 sensors, they are unable to capture the localized behavior of the thermal field, resulting in subpar performance compared to the 6-sensor configuration. This observation is contrary to the natural intuition that adding more sensors improves SI. However, both the number and location of the sensors are important factors influencing the accuracy of the system identification. 
+
+Quantitative Comparison 
+
+Beyond visual inspection, a quantitative comparison based on the relative discrete L2 error ( ϵL2 ) and its percentage change ( δϵ L2 ) has also been conducted. At the start of the system identification, the relative discrete 
+
+L2 error in Young’s modulus distribution was 2.052 · 10 −1, in the temperature field for the linearly varying thermal field was 2.859 · 10 −1, while for the localized thermal field was 4.973 · 10 −1. These errors are considered as the reference errors to evaluate the performance of different approaches and also serve as the baseline to compute percentage change in the relative discrete L2 errors ( δϵ L2 ) for each case. Table 3 tabulates the ϵL2 and δϵ L2 for the Young’s modulus distributions for Scenarios 1 and 2, where thermal effects were unaccounted and where they were accounted for using a constant 20 ◦C temperature field. The superscripts ‘ E’ and ‘ T’ in ϵL2 and δϵ L2 refer to errors in the Young’s modulus and temperature fields. From Scenario 1 errors, it can be observed that failing to account for thermal effects during SI leads to catastrophic results, and the errors are actually higher than at the start of the optimization ( δϵ EL2 are positive and 
+
+20/40 high). This is in line with the visual findings in Fig. 5. In Scenario 2, where a simplistic (constant thermal field) approach to account for thermal effects was applied, the errors still increased compared to the initial values; however, they were better than those in Scenario 1 ( δϵ EL2
+
+are still positive but lower magnitude), indicating that the constant 20 ◦C field provided some improvement, which was also confirmed visually in Fig. 6. Table 4 tabulates the ϵL2 and δϵ L2 for the Young’s modulus and temperature distributions, where the             
+
+> (a) Identified Young’s moduli (left) and the temperature distribution (right) when the thermal field is interpolated .
+> (b) Identified Young’s moduli (left) and identified temperature distribution (right) when the thermal field is reconstructed during SI: Monolithic approach.
+> (c) Identified Young’s moduli (left) and identified temperature distribution (right) when the thermal field is reconstructed during SI: Partitioned approach.
+
+Figure 14. Plate With Hole. 14 displacement and 16 temperature sensors configuration. Localized thermal field. Identified Young’s moduli and temperature distributions when the thermal load is considered using different approaches during SI. Peak temperatures are noted in the figures.     
+
+> 21/40 10 -5 10 -4 10 -3 10 -2 10 -1 10 00500 1000 1500 2000 Cost Function J Cost function Iterations
+
+(a) When the temperature field is interpolated .10 -7 10 -6 10 -5 10 -4 10 -3 10 -2 10 -1 10 010 10 500 1000 1500 2000 Total Cost J = J ₁ + J ₂ 
+
+> Displacement Cost J ₁
+> Temperature Cost J ₂
+> Cost function Iterations
+
+(b) When the temperature field is identified : Monolithic 
+
+approach. 10 -7 10 -6 10 -5 10 -4 10 -3 10 -2 10 -1 10 010 10 50 100 150 200 250 Total Cost J = J ₁ + J ₂
+
+> Displacement Cost J ₁
+> Temperature Cost J ₂
+> Cost function Iterations
+
+(c) When the temperature field is identified : Partitioned 
+
+approach. Coupling iteration: 217, Overall iteration: 3992. 
+
+Figure 15. Plate With Hole. 14 displacement and 16 temperature sensors configuration. Localized thermal field. Convergence plots when the thermal load is considered using different approaches during SI. temperature sensor information was incorporated to account for thermal effects, i.e., Scenario 3 (via temperature interpolation) and Scenario 4 (via temperature identification). The table is grouped based on the number of temperature sensors and the type of thermal field. For case 1 (6-sensors and linearly varying thermal field), the interpolation case improved the Young’s modulus identification ( δϵ EL2 = −48.531%), which can be attributed to the better approximation of the thermal field ( δϵ TL2 = −67.66%). The monolithic and partitioned approaches in the identification case demonstrated marginally better accuracy than the interpolation case. These values are consistent with the visual examination 
+
+Table 3. Plate With Hole. Identification errors in Young’s modulus distributions for scenarios (1 and 2) where thermal effects are ignored or accounted for using a constant temperature field. Percentage changes are computed relative to the errors at optimization start. 
+
+Approach for system identification Type of thermal field ϵL2 [-] δϵ L2 [%] Scenario 1: Thermal load not accounted for during SI 
+
+SI without considering temperature Linearly varying 4.009 · 10 −1 95.384 Localized 3.290 · 10 −1 60.363 
+
+Scenario 2: Thermal load accounted as a constant temperature field during SI 
+
+SI considering constant 20 ◦C temperature field Linearly varying 2.164 · 10 −1 5.482 Localized 3.041 · 10 −1 48.194 
+
+22/40 Table 4. Plate With Hole. Identification Errors in Young’s modulus ( E) and temperature ( ∆T) fields for Scenarios ( 3 and 4 ) incorporating temperature sensor information to account for thermal effects. Percentage changes are computed relative to the errors at optimization start. 
+
+Approach accounting for thermal effects 
+
+ϵL2 [-] δϵ L2 [%] E ∆T E ∆TCase 1: 6 temperature sensors, Linearly varying thermal field 
+
+temperature interpolation 1.056 · 10 −1 9.248 · 10 −2 −48.531 −67.660 temperature identification Monolithic approach 1.028 · 10 −1 3.939 · 10 −2 −49.902 −86.223 Partitioned approach 1.027 · 10 −1 3.287 · 10 −2 −49.941 −88.504 
+
+Case 2: 6 temperature sensors, Localized thermal field 
+
+temperature interpolation 2.064 · 10 −1 2.055 · 10 −1 0.599 −58.667 temperature identification Monolithic approach 1.041 · 10 −1 1.811 · 10 −1 −49.280 −63.575 Partitioned approach 9.635 · 10 −2 1.879 · 10 −1 −53.043 −62.222 
+
+Case 3: 16 temperature sensors, Linearly varying thermal field 
+
+temperature interpolation 9.631 · 10 −2 3.766 · 10 −2 −53.064 −86.830 temperature identification Monolithic approach 1.071 · 10 −1 7.614 · 10 −3 −47.811 −97.337 Partitioned approach 9.956 · 10 −2 8.843 · 10 −3 −51.478 −96.907 
+
+Case 4: 16 temperature sensors, Localized thermal field 
+
+temperature interpolation 1.802 · 10 −1 3.500 · 10 −1 −12.200 −29.620 temperature identification Monolithic approach 1.484 · 10 −1 2.054 · 10 −1 −27.669 −58.692 Partitioned approach 1.569 · 10 −1 2.077 · 10 −1 −23.532 −58.241 in Fig. 8. For case 2 (6-sensors and localized thermal field), the interpolation case yielded subpar results, with an increase in Young’s modulus error but a significant reduction in temperature error. On the other hand, both the monolithic and partitioned approaches in the identification case outperformed the interpolation case with substantially better identification of Young’s modulus distribution and slightly better identification of the thermal field. These values corroborate the observations in Fig. 10. For case 3 (16-sensors and linearly varying thermal field), the interpolation and the identification cases yielded accurate reconstructions (as confirmed earlier by the visual examination in Fig. 12), with the interpola-tion case performing marginally better for Young’s modulus distribution and the identification case performing marginally better for the temperature distribution. For case 4 (16-sensors and localized thermal field), both the interpolation and identification cases yielded better results than the constant thermal field case (Scenario 2), but were suboptimal compared to the corre-sponding 6-sensors configuration (case 2 above). As mentioned earlier, this was due to the positioning of the sensors, which did not capture the localized trend in the thermal field effectively. Interestingly, the identification approach outperformed the interpolation approach. This trend aligns with the observation in Fig. 14, where better maximum temperatures were seen in the thermal fields, and a reduction in the false damage identification was observed. The reductions in δϵ EL2 , δϵ TL2 for the identification approach were almost double that of the interpolation approach. 
+
+4.2 Footbridge 
+
+In this section, a more realistic example of a footbridge structure shown in Fig. 16 is presented. In this work, a simplified model of the bridge is used. The bridge has dimensions: 0 ≤ x ≤ 48.3, 0 ≤ y ≤ 4.2, and 0 ≤ z ≤ 3.5. All quantities are in SI units, unless explicitly mentioned. The footbridge is discretized using a fine mesh of 7680 linear, triangular, plane stress shell elements for the deck with a thickness of 0.01, and 2632 two-noded linear beam elements for the rest of the structure with cross-area of 1.1424 · 10 −2, second moments of area 
+
+I22 = 7.6 · 10 −5, I33 = 1.5 · 10 −4, and torsional inertia of 1.0 · 10 −4. The structure is illustrated in Fig. 17. The material properties of the beams and shells were: density ρ = 7800, Young’s modulus (in pristine state) E = 2 · 10 11 , Poisson’s ratio ν = 0.3, and coefficient of thermal expansion α = 1.0 · 10 −5 /◦C. The bridge is fixed 
+
+> 23/40
+
+Figure 16. Footbridge. General view of the footbridge located above the western bypass of Vilnius, near V. Maciuleviˇ cius Street (Vilnius, Lithuania). Reproduced from (Kilikeviˇ cius et al., 2020) under the Creative Commons CC BY 4.0 license. 
+
+Figure 17. Footbridge. Mesh. on the left bottom and right bottom edges ( u(x = 0, z = 0) = u(x = 48.3, z = 0) = 0), and a static downward uniform pressure of P = 1 · 10 4 N/m 2 is applied on the bridge deck shell elements. In the damaged state, the Young’s modulus was prescribed to be reduced to E = 2 · 10 10 for the beam and shell elements in the locally damaged region of 4.025 ≤ x ≤ 12.075, z = 0. This ‘target’ Young’s modulus distribution is shown in Fig. 18. The actual structure was subjected to a thermal load. Similar to the plate with hole example, two different types of thermal fields were investigated. The first was a linearly varying thermal field with ∆T(x = 0) = 10 ◦C at the left edge and ∆T(x = 48.3 ) = 30 ◦C at the right edge. The second was a 
+
+Figure 18. Footbridge. Target Young’s modulus distribution, i.e., localized damages. 
+
+> 24/40 (a)
+> (b)
+
+Figure 19. Footbridge. Target temperature distributions: ( a) Linearly varying thermal field, and ( b) Localized thermal field. localized Gaussian type thermal field defined as ∆T(x) = ∆Tmin + ( ∆Tmax − ∆Tmin )e −(x−24.15 )230 , ∆Tmin = 10 ◦C, 
+
+∆Tmax = 30 ◦C. These ‘target’ temperature distributions are illustrated in Fig. 19. The color bar is shown in the range [3.0, 30.0 ] ◦C for consistent visualization and better comparison with later results. To measure the deformations, sixteen displacement sensors were distributed over the footbridge as depicted 
+
+Figure 20. Footbridge. Location of the 16 displacement sensors. 
+
+> 25/40
+
+in Fig. 20. At the start of system identification, the footbridge was assumed to be in near-pristine condition with E(x) = 1.98 · 10 11 . The ‘maximum measured value’ sensor weighting (Eq. (17) ) was used for normalization. The Nesterov accelerated gradient descent algorithm with QN-BB method and a maximum step size of 5 · 10 −1
+
+was used for the optimization. The convergence criteria were set to a target cost function value of J ≤ 1 · 10 −7
+
+or a maximum of 500 iterations. The Young’s modulus control variables were bounded in the range of 
+
+[2 · 10 9, 2 · 10 11 ]. To help with the ill-conditioned SI, VM with a linear kernel and radius r = 5 was employed to regularize gradients and updates. To compare results, the damage location and intensity, as well as the optimization and VM settings, were 
+
+(a) 
+
+(b) 10 010 10 100 200 300 400 500 Cost Function J Cost function Iterations 10 -1 10 010 10 100 200 300 400 500 Cost Function J Cost function Iterations 
+
+(c) Convergence plots for the linearly varying (left) and the localized (right) thermal field cases. 
+
+Figure 21. Footbridge. Identified Young’s modulus distributions when thermal load is not considered during SI, but the actual structure is subjected to a: ( a) Linearly varying thermal field, ( b) Localized thermal field. 
+
+26/40 kept the same across all cases, except in Scenario 4, where the overall maximum number of iterations was 1000 for the partitioned case, to have approximately the same number of design variable updates as the monolithic approach. Scenario 1, as described in Table 2, is the case where the actual structure is subjected to thermal loads, but thermal effects are not considered during SI. The identified Young’s modulus distribution for this scenario for the two thermal fields and their convergence plots are shown in Fig. 21. It can be observed that for both the thermal field cases, no damage whatsoever has been identified. This is the most dangerous scenario because 
+
+(a) 
+
+(b) 10 -3 10 -2 10 -1 10 00 100 200 300 400 500 Cost Function J Cost function Iterations 10 -3 10 -2 10 -1 10 00 100 200 300 400 500 Cost Function J Cost function Iterations 
+
+(c) Convergence plots for the linearly varying (left) and the localized (right) thermal field cases. 
+
+Figure 22. Footbridge. Identified Young’s modulus distributions when a constant temperature distribution of 20 ◦C is considered during SI, but the actual structure is subjected to a: ( a) Linearly varying thermal field, ( b)Localized thermal field. 
+
+27/40 Figure 23. Footbridge. Location of the 8 temperature sensors. failing to account for thermal effects leads to complete failure in damage detection and localization. From the cost functions, it can be seen that the optimizer is unable to reduce the cost. Scenario 2, as described in Table 2, improves on Scenario 1 and accounts for thermal effects via a constant thermal field applied to the structure in the primal simulation during SI. The identified Young’s modulus distribution for this scenario for the two thermal fields and their convergence plots are shown in Fig. 22. An improvement in the results is observed, with some damage localization, but many false damage detections are also being identified. Overall, the identification is quite deficient. The cost functions are in the order O(10 −2).Similar to the plate with hole example, adequate identification is not obtained in Scenarios 1 and 2, thus requiring a better estimation of the thermal field of the structure for meaningful damage localization. Hence, eight temperature sensors are placed on the structure. The temperature sensor locations are illustrated in Fig. 23. Scenario 3, as described in Table 2, is one in which the temperature distribution of the structure is ap-proximated using interpolation of the temperature sensor measurements. In this example, interpolation was performed using kNN with 3 nearest neighbors and inverse distance weighting. This interpolated temperature distribution is applied as a fixed thermal load on the structure in the primal simulation during SI. The quantity being identified remains the Young’s modulus distribution, as the SI problem remains unchanged; only the manner in which thermal effects are accounted for has changed. Scenario 4, as described in Table 2, is the proposed methodology in which the temperature distribution of the structure is inferred during SI, alongside the Young’s modulus distribution, using the monolithic and partitioned approaches. The monolithic and partitioned SI cases were set up similarly to the plate with hole example. At the start of the optimization, the bridge had a uniform temperature of ∆T(x) = 20 ◦C. The bound for the nodal temperature control variable was set to the range [−10, 40 ] ◦C. The ‘maximum measured value’ sensor normalization was applied separately to each sensor type according to Eqs. (17), (18). VM with a linear kernel and radius r = 20 was employed for the temperature field to help regularize the problem. All other settings related to the optimization algorithm, convergence criteria, etc, were kept the same. For the partitioned approach, the ‘maximum measured value’ sensor normalization was applied separately to each sub-optimization. The relaxation factor was set to β = 1, i.e., no relaxation was applied. Per coupling iteration, the two sub-optimizations were solved inexactly by defining loose convergence criteria of 30% reduction in the cost function or a maximum of 5 iterations. One solve of each sub-optimization constituted one coupling iteration. The convergence criteria for the outer coupling loop were set to a target composite cost function value J = ( JD + JT ) ≤ (1 · 10 −7) or approximately 1000 optimization iterations (summing iterations from the two sub-optimizations). The optimization algorithm and step were kept the same as all the previous scenarios. The results for Scenario 3 (temperature interpolation) and Scenario 4 (temperature identification) are presented together for easy comparison. They are grouped by the target temperature distribution. 
+
+Case 1: Linearly varying thermal field. 
+
+Figures 24a and 25a show the identified Young’s modulus distribution and temperature distribution for Scenario 3 (kNN interpolated temperature), for the linearly varying thermal field case. It can be observed that a notable improvement in the Young’s moduli identification is observed over Scenario 2 (constant temperature field; Fig. 22a). Some of the false damage identifications have been cleared, leading to marginally better damage 
+
+> 28/40
+
+localization. In the temperature field, interpolation reconstructs a fairly adequate approximation of the thermal distribution in the range [12.5, 27.5 ] ◦C. The corresponding convergence plot is depicted in Fig. 26a, where it can be observed that the cost function has a higher reduction than Scenario 2 (Fig. 22c) and is in the order of 
+
+O(10 −3).        
+
+> (a) Identified Young’s moduli when the thermal field is interpolated .
+> (b) Identified Young’s moduli when the thermal field is reconstructed during SI: Monolithic approach.
+> (c) Identified Young’s moduli when the thermal field is reconstructed during SI: Partitioned approach.
+
+Figure 24. Footbridge. Linearly varying thermal field. Identified Young’s moduli distributions when the thermal load is considered using different approaches during SI. 
+
+> 29/40
+
+Figures 24b and 24c show the identified Young’s modulus distribution for Scenario 4 (temperature field identified), for the linearly varying thermal field case. Results are shown for the monolithic and partitioned approaches, respectively. Compared to Scenario 3, the Young’s modulus distribution is even better localized for both the monolithic and partitioned approaches. However, some minimal false damage is observed in the          
+
+> (a) Interpolated temperature distribution when thermal field is interpolated during SI.
+> (b) Identified temperature distribution when the thermal field is reconstructed during SI: Monolithic approach.
+> (c) Identified temperature distribution when the thermal field is reconstructed during SI: Partitioned approach.
+
+Figure 25. Footbridge. Linearly varying thermal field. Temperature field distributions when the thermal load is considered using different approaches during SI. Peak temperatures are noted in the figures.      
+
+> 30/40 10 -4 10 -3 10 -2 10 -1 10 00100 200 300 400 500 Cost Function J Cost function Iterations
+
+(a) When the temperature field is interpolated .10 -5 10 -4 10 -3 10 -2 10 -1 10 00 100 200 300 400 500 Total Cost J = J ₁ + J ₂ 
+
+> Displacement Cost J ₁
+> Temperature Cost J ₂
+> Cost function Iterations
+
+(b) When the temperature field is identified : Monolithic 
+
+approach. 10 -5 10 -4 10 -3 10 -2 10 -1 10 00 20 40 60 80 100 120 Total Cost J = J ₁ + J ₂
+
+> Displacement Cost J ₁
+> Temperature Cost J ₂
+> Cost function Iterations
+
+(c) When the temperature field is identified : Partitioned 
+
+approach. Coupling iteration: 103, Overall iteration: 996. 
+
+Figure 26. Footbridge. Linearly varying thermal field. Convergence plots when the thermal load is considered using different approaches during SI. partitioned approach identification. The corresponding temperature distributions are illustrated in Figs. 25b and 25c The identified temperature ranges are [7.9, 29.2 ] ◦C and [7.2, 29.1 ] ◦C for the monolithic and partitioned approaches, respectively. It can be noted that the temperature ranges are larger compared to the interpolation case. The corresponding convergence plots for the monolithic and partitioned approaches are depicted in Figs. 26b and 26c, respectively. Similar to the plate with a hole example, the partitioned approach plot is plotted over the outer coupling iterations, while the monolithic approach plot is plotted over the optimization iterations. Also, a contrasting dominance of the cost function contributions is noticeable: the displacement error dominates in the monolithic approach, and the temperature error dominates in the partitioned approach, despite visually similar fields. The composite cost functions in both approaches are in the order of O(10 −3).
+
+Case 2: Localized thermal field. 
+
+Figures 27a and 28a show the identified Young’s modulus distribution and temperature distribution for Scenario 3 (kNN interpolated temperature), for the localized thermal field case. Compared to the Scenario 2 (constant temperature field; Fig. 22a) result, the interpolation results yield incredible enhancement in the damage localization quality. Apart from some false damage on a few side and top beam members, the damage localization is very accurate. Although not perfect, the interpolation does loosely detect the localized pattern in the thermal field with interpolated temperatures in the range [10.0, 15.9 ] ◦C. The corresponding convergence plot is depicted in Fig. 29a, where it can be observed that even with just one order of magnitude reduction in the cost function, a very good approximation of the Young’s modulus distribution is obtained. Figures 27b and 27c show the identified Young’s modulus for Scenario 4 (temperature field identified), for the localized thermal field case. Results are shown for the monolithic and partitioned approaches, respectively. Compared to Scenario 3, the damage localization shows more smearing, but the false damage is eliminated in the monolithic case. In the partitioned case, most of the identified damage is concentrated at the correct location; however, some false damages are also observed. The corresponding temperature distributions are illustrated in Figs. 28b and 28c. The identified temperature ranges are [3.0, 17.6 ] ◦C and [3.5, 18.0 ] ◦C for the monolithic 
+
+31/40 and partitioned approaches, respectively. Compared to the interpolation case, the distributions have higher maximum peak temperatures and lower minimum peak temperatures. The corresponding convergence plots for the monolithic and partitioned approaches are depicted in Figs. 29b and 29c, respectively. In this case as well, the displacement error dominates the composite cost function in the monolithic case, and the temperature         
+
+> (a) Identified Young’s moduli when the thermal field is interpolated .
+> (b) Identified Young’s moduli when the thermal field is reconstructed during SI: Monolithic approach.
+> (c) Identified Young’s moduli when the thermal field is reconstructed during SI: Partitioned approach.
+
+Figure 27. Footbridge. Localized thermal field. Identified Young’s moduli distributions when the thermal load is considered using different approaches during SI. 
+
+> 32/40
+
+error dominates in the partitioned case. The composite cost functions in both approaches are in the order of 
+
+O(10 −2).
+
+(a) Interpolated temperature distribution when thermal field is interpolated during SI. 
+
+(b) Identified temperature distribution when the thermal field is reconstructed during SI: Monolithic approach. 
+
+(c) Identified temperature distribution when the thermal field is reconstructed during SI: Partitioned approach. 
+
+Figure 28. Footbridge. Localized thermal field. Temperature field distributions when the thermal load is considered using different approaches during SI. Peak temperatures are noted in the figures. 
+
+33/40 10 -3 10 -2 10 -1 0 100 200 300 400 500 Cost Function J Cost function Iterations (a) When the temperature field is interpolated .10 -5 10 -4 10 -3 10 -2 10 -1 10 010 10 100 200 300 400 500 Total Cost J = J ₁ + J ₂ 
+
+> Displacement Cost J ₁
+> Temperature Cost J ₂
+> Cost function Iterations
+
+(b) When the temperature field is identified : Monolithic 
+
+approach. 10 -5 10 -4 10 -3 10 -2 10 -1 10 010 10 20 40 60 80 100 120 Total Cost J = J ₁ + J ₂
+
+> Displacement Cost J ₁
+> Temperature Cost J ₂
+> Cost function Iterations
+
+(c) When the temperature field is identified : Partitioned 
+
+approach. Coupling iteration: 104, Overall iteration: 997. 
+
+Figure 29. Footbridge. Localized thermal field. Convergence plots when the thermal load is considered using different approaches during SI. 
+
+Quantitative Comparison 
+
+A quantitative comparison based on the relative discrete L2 error ( ϵL2 ) and its percentage change ( δϵ L2 ) is presented in this example as well. At the start of system identification, the relative discrete L2 error in Young’s modulus distribution was 3.584 · 10 −1, in the temperature field for the linearly varying thermal field was 2.829 · 10 −1, while for the localized thermal field was 5.732 · 10 −1. These errors are considered as the reference errors to evaluate the performance of different approaches and also serve as the baseline to compute percentage change in the relative discrete L2 errors ( δϵ L2 ) for each case. Table 5 tabulates the ϵL2 and δϵ L2 for the Young’s modulus distributions for Scenarios 1 and 2, where thermal 
+
+Table 5. Footbridge. Identification errors in Young’s modulus distributions for Scenarios 1 and 2 where thermal effects are ignored or accounted for using a constant temperature field. Percentage changes are computed relative to the errors at optimization start. 
+
+Approach for system identification Type of thermal field ϵL2 [-] δϵ L2 [%] Scenario 1: Thermal load not accounted for during SI 
+
+SI without considering temperature Linearly varying 3.623 · 10 −1 1.084 Localized 3.623 · 10 −1 1.084 
+
+Scenario 2: Thermal load accounted as a constant temperature field during SI 
+
+SI considering constant 20 ◦C temperature field Linearly varying 4.466 · 10 −1 24.599 Localized 4.892 · 10 −1 36.479 
+
+34/40 Table 6. Footbridge. Identification Errors in Young’s modulus ( E) and temperature ( ∆T) fields for Scenarios ( 3and 4 ) incorporating temperature sensor information to account for thermal effects. Percentage changes are computed relative to the errors at optimization start. 
+
+Approach accounting for thermal effects 
+
+ϵL2 [-] δϵ L2 [%] E ∆T E ∆TCase 1: Linearly varying thermal field 
+
+temperature interpolation 3.014 · 10 −1 5.598 · 10 −2 −15.907 −80.212 temperature identification Monolithic approach 1.987 · 10 −1 2.501 · 10 −2 −44.557 −91.161 Partitioned approach 2.047 · 10 −1 3.868 · 10 −2 −42.881 −86.329 
+
+Case 2: Localized thermal field 
+
+temperature interpolation 1.839 · 10 −1 3.237 · 10 −1 −48.690 −43.524 temperature identification Monolithic approach 1.698 · 10 −1 3.209 · 10 −1 −52.620 −44.011 Partitioned approach 1.664 · 10 −1 3.220 · 10 −1 −53.565 −43.834 effects were unaccounted, and accounted for using a constant 20 ◦C temperature field. The superscripts ‘ E’ and ‘∆T’ in ϵ and δϵ refer to errors in the Young’s modulus and temperature fields. From Scenario 1, it can be observed that failing to account for thermal effects during SI results in higher errors than at the start of the optimization. The increase in ϵL2 is not that high numerically, because during SI, the Young’s modulus throughout the structure increases from the initial value of 1.98 · 10 11 and stagnates at the bound of 2 · 10 11 . This small change results in a small increase in the ϵL2 . However, the overarching consequence of this is that it leads to complete failure to detect any damage on the structure as observed in the visual examination in Fig. 21. In Scenario 2, where a simplistic (constant 20 ◦C thermal field) approach to account for thermal effects was applied, the errors increased and were much higher than in Scenario 1. From the convergence plots for this case in Fig. 22, it was observed that the cost function reduced a few magnitudes, which happens because the algorithm, unaware of the correct thermal field, attempts to reduce the displacement sensor errors by changing the Young’s modulus distribution. Therefore, even though the optimization cost function reduces, the ϵL2 ,which compares the identified field to the target field, increases. Table 6 tabulates the ϵL2 and δϵ L2 for the Young’s modulus and temperature distributions, where the temperature sensor information was incorporated to account for thermal effects, i.e., Scenario 3 (via temperature interpolation) and Scenario 4 (via temperature identification). The table is grouped by thermal field type. For the linearly varying thermal field case, the interpolation case shows some improvement in the Young’s modulus identification ( δϵ EL2 = −15.907%), which can be attributed to the better approximation of the thermal field ( δϵ TL2 = −80.212%). The monolithic and partitioned approaches in the identification case demonstrated much better accuracy than the interpolation case for Young’s modulus identification with reductions in δϵ EL2 of over 40% and reductions in δϵ TL2 of over 86% in the temperature distribution errors. These values are consistent with the visual examination in Figs. 24 and 25. For the localized thermal field case, the interpolation case yielded good approximations for the Young’s modulus and temperature distributions with over 40% reductions in δϵ EL2 and δϵ TL2 . The monolithic and partitioned approaches in the identification case outperformed the interpolation case with marginally better identifications of Young’s modulus and temperature fields. These values corroborate the observations in Figs. 27 and 28. Between the two thermal field cases, the linearly varying thermal field case saw almost double the reduction in δϵ TL2 than the localized thermal field case. This indicates that the current 8 temperature sensors and their positioning are better suited to capture the linearly varying thermal field than the localized thermal field used here. This can also be inferred by looking at the sensor locations in Fig. 23. 
+
+# 5 CONCLUSION 
+
+In this work, an optimization-driven adjoint-based high-fidelity system identification procedure for localizing weakness and identifying the temperature field in one-way thermo-mechanical coupled structures using displacement and temperature measurements is proposed. This work highlights the need to accurately account for thermal effects on structures during SI. The underlying framework formulates the identification problem as 
+
+> 35/40
+
+an optimization problem that minimizes the aggregated weighted errors between the measured and simulated responses. Results show that failing to account for thermal effects during SI leads to catastrophic damage localization with many false positives and, even more severely, to complete localization failure (i.e., no damage is detected). Therefore, building upon the standard SI method, this work proposed two alternative approaches, namely, monolithic and partitioned approaches, to account for thermal effects within the SI framework for two-field (Young’s modulus and temperature fields) identification in one-way thermo-mechanical coupled structures, where temperature affects the mechanical response. The monolithic approach formulates the SI problem as a single global optimization problem that minimizes the combined errors from displacement and temperature measurements and the model response, and simultaneously identifies the Young’s modulus and temperature distributions. On the other hand, the partitioned approach divides the SI problem into two sub-optimizations, each responsible for updating one control field, and uses a Gauss-Seidel-type fixed-point iteration loop on top to couple these two sub-optimizations. The sub-optimizations are solved inexactly with loose convergence, accumulating incremental refinements to both fields and converging to the overall solutions. The proposed methodology was tested using two numerical examples of a Plate With a Hole and a Footbridge FE model. The Plate With a Hole example was designed to study the effect of the number and locations of temperature sensors on SI and was investigated for 6- and 16-temperature sensor configurations, with a fixed 14-displacement sensor configuration. The Footbridge example was intended to examine the methodology’s applicability to a realistic, fine-meshed, mixed (beams and shells) FE model, and was investigated for an 8-temperature and 8-displacement sensor configuration. Both examples were tested on linearly varying and localized (Gaussian-type) thermal load cases. For all cases, ‘target’ Young’s modulus and temperature distributions were prescribed, together with external mechanical loads. The ‘measurement data’ were obtained by extracting the displacements and temperatures at the measurement locations by simulating this target model. The structure was assumed to be in a near-pristine (undamaged) Young’s modulus condition, and an initial temperature distribution was assumed at the start of the optimization. The optimization algorithm, then, depending on the SI approach (monolithic or partitioned), minimized sensor errors by tuning the control fields (Young’s modulus and temperature distributions) to recover the prescribed target distributions. In this work, different optimization algorithms with different step size methods were used to demonstrate independence from the algorithm type. It is well established in the literature that these high-fidelity inverse problems are highly ill-conditioned due to a much smaller number of measurement points and a much larger number of design variables. This issue is further compounded in these two fields, Young’s modulus and temperature fields identification, because not only can different combinations of variables within one field produce the same model response, but also different combinations of variables between the two fields also produce the same response. This can lead the optimization algorithm to a completely wrong local optimum, even when the cost function is similar to that of the correct target solution. To help mitigate this issue, Vertex Morphing filtering was used in this work, which can be understood as a convolution operation on variables and gradients to smooth the discrete, noisy solutions. In all cases, both the proposed monolithic and partitioned SI approaches accurately identified the Young’s modulus distribution (i.e., localized damage) and the temperature distribution (i.e., thermal load) in the structure. In general, it was observed that the linearly varying thermal field was identified with better accuracy (ϵTL2 = O(10 −3 − 10 −2)) than the localized thermal field ( ϵTL2 = O(10 −1)). This can be attributed to the linear trend being more easily captured than the localized trend, especially when the heated zone is devoid of temperature sensors. Additionally, VM filtering smooths and smears the fields, thus losing the capability to capture sharp gradients in the solution fields. For the Plate With Hole example, across the 6- and 16-temperature sensor configurations, the 16-sensor configuration yielded better results than the 6-sensor configuration for the linearly varying thermal field. However, the 16-sensor configuration underperformed compared to the 6-sensor configuration for the localized (Gaussian-like) thermal field. Thus, having more temperature sensors yields better results when they collectively capture the thermal field more accurately. If the sensors are placed such that they do not accurately capture the features of the thermal field, then even more sensors do not yield better results, as observed in the 16-sensor configuration with a localized thermal field where the middle heated zone is devoid of temperature sensors. Across both examples, the performance of the monolithic and partitioned approaches was very similar, with minor differences due to ill-conditioning. However, in most cases, Young’s modulus identification using the monolithic approach was marginally better than that using the partitioned approach, especially in reducing false damage identifications. It was interesting to observe that even though the solution fields from both approaches were very similar, visually and quantitatively ( ϵL2 ), the cost function convergence showed a stark contrast in trend. In the monolithic cases, the cost function was dominated by the displacement error term, which was 1-3 orders of 
+
+> 36/40
+
+magnitude higher than the temperature error term. On the contrary, in the partitioned cases, the cost function was dominated by the temperature error term, which was 1-3 orders of magnitude higher than the temperature error term. This is the clearest evidence of an ill-conditioned SI, where both approaches, despite very similar costs and solution fields, have landed in different local optima. The results from the proposed methodology were also compared against other methods of accounting for thermal effects. In the simplest case, a constant-temperature distribution was assumed throughout the structure. In general, some improvement was observed compared to the case in which thermal effects were entirely unaccounted for, but major deficiencies remained, with large regions of false damage identifications. To obtain a better estimate of the thermal field, temperature sensor measurements were used to interpolate it throughout the structure. A major improvement was observed in the interpolation cases; however, there were still major deficiencies in the localized thermal field cases, where the damage localization was poor. The proposed methodology proved most beneficial in cases where the temperature sensors, due to their number and/or location, were unable to fully capture the underlying trend in the temperature distribution through interpolation. Despite the proposed monolithic and partitioned approaches successfully identifying the Young’s modulus and temperature distributions in this one-way thermo-mechanical coupled SI, further research is required to address several open questions: • Extending the methodology to strongly coupled multi-physics SI problems, such as fluid-structure-interaction, and fluid-structure-thermal-interaction, • Effect of relative weighting of the displacement cost and temperature cost terms in the composite cost function on the SI solution, • Effect of relaxation on the Gauss-Seidel-based partitioned SI approach, • Exploring strategies to promote balanced convergence of multiple identified fields, preventing dominance of individual cost terms during SI, • Extending the methodology to account for other relevant environmental effects such as wind, rain, cloud cover, etc. 
+
+# DECLARATION OF COMPETING INTEREST 
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. 
+
+# DATA AVAILABILITY STATEMENT 
+
+All the examples shown in the article are clearly defined and do not require any further data for reproducibility. 
+
+# CREDIT AUTHORSHIP CONTRIBUTION STATEMENT 
+
+Conceptualization, T.A., S.W., R.L. and R.W.; methodology, T.A., S.W., and I.A.; software, T.A. and S.W.; validation, T.A. and I.A.; formal analysis and investigation, T.A.; data curation, T.A. and S.W.; writing—original draft preparation, T.A.; writing—review and editing, T.A., S.W., I.A., H.A., R.L., and R.W.; visualization, T.A.; supervision, H.A., R.L., and R.W.; project administration, R.L. and R.W.; funding acquisition, R.L. and R.W. 
+
+# ACKNOWLEDGMENTS 
+
+This research was funded by SIEMENS AG and the Technical University of Munich, Institute for Advanced Study, Lichtenbergstrasse 2a, D-85748, Garching, Germany. The GMU team is also partially supported by the Office of Naval Research (Award No: N00014-24-1-2147), NSF grant DMS-2408877, and the Air Force Office of Scientific Research (Award No: FA9550-25-1-0231). We would like to acknowledge support from the Leonhard Obermeyer Center, Technical University of Munich, and funding by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under Germany ´s Excellence Strategy – EXC 2163/1 - Sustainable and Energy Efficient Aviation – Project-ID 390881007. The authors acknowledge Dr. Facundo Airaudo for valuable discussions related to this work. 
+
+# REFERENCES 
+
+Facundo N Airaudo, Rainald Löhner, Roland Wüchner, and Harbir Antil. Adjoint-based determination of weaknesses in structures. Computer Methods in Applied Mechanics and Engineering , 417:116471, 2023. doi: https://doi.org/10.1016/j.cma.2023.116471. 
+
+> 37/40
+
+T. Ansari, S. Warnakulasuriya, I. Antonau, A. K. Goldbach, R. Loehner, H. Antil, F. Airaudo, and R. Wuechner. Adjoint-based constitutive parameters identification in membrane structures using deformation measure-ments. In Proceedings of the XII International Conference on Textile Composites and Inflatable Structures (Structural Membranes) , 2025a. doi: 10.23967/membranes.2025.015. Talhah Shamshad Ali Ansari, Rainald Löhner, Roland Wüchner, Harbir Antil, Suneth Warnakulasuriya, Ihar Antonau, and Facundo Airaudo. Adjoint-based recovery of thermal fields from displacement or strain measurements. Computer Methods in Applied Mechanics and Engineering , 438:117818, 2025b. doi: https: //doi.org/10.1016/j.cma.2025.117818. Talhah Shamshad Ali Ansari, Facundo N. Airaudo, Suneth Warnakulasuriya, Ihar Antonau, Rainald Lohner, Harbir Antil, and Roland Wuechner. System identification in structures subject to dynamic loading. In AIAA SCITECH 2026 Forum , 2026a. doi: https://doi.org/10.2514/6.2026-2456. Talhah Shamshad Ali Ansari, Suneth Warnakulasuriya, Ihar Antonau, Facundo N. Airaudo, Harbir Antil, Rainald Lohner, and Roland Wuechner. High-fidelity load identification using deformation measurements for static and dynamic problems. In AIAA SCITECH 2026 Forum , 2026b. doi: https://doi.org/10.2514/6. 2026-2453. TSA Ansari, S Warnakulasuriya, R Wüchner, K-U Bletzinger, I Antonau, R Löhner, H Antil, and F Airaudo. Adjoint-based system identification for model validation and qualification. In Engineering Materials, Structures, Systems and Methods for a More Sustainable Future , pages 1392–1397. CRC Press, 2025c. Harbir Antil. Mathematical opportunities in digital twins (math-dt). arXiv preprint arXiv:2402.10326 , 2024. Harbir Antil and Dmitriy Leykekhman. A brief introduction to pde-constrained optimization. Frontiers in PDE-constrained optimization , 163:434, 2018. Ihar Antonau. Enhanced computational design methods for large industrial node-based shape optimization problems .PhD thesis, Technische Universität München, 2023. URL https://mediatum.ub.tum.de/1695301 .Ihar Antonau, Suneth Warnakulasuriya, Kai-Uwe Bletzinger, Fabio Michael Bluhm, Majid Hojjat, and Roland Wüchner. Latest developments in node-based shape optimization using vertex morphing parameter-ization. Structural and Multidisciplinary Optimization , 65(7):198, 2022. doi: https://doi.org/10.1007/ s00158-022-03279-w. Ihar Antonau, Suneth Warnakulasuriya, Roland Wuechner, Facundo Airaudo, Rainald Lohner, Harbir Antil, and Talhah Ansari. Comparison of the first order algorithms to solve system identification problems of high-fidelity digital twins. In AIAA SCITECH 2025 Forum , page 0285. American Institute of Aeronautics and Astronautics, 2025. doi: https://doi.org/10.2514/6.2025-0285. Alemdar Bayraktar, Mehmet Akköse, Yavuzhan Ta¸ s, Arif Erdi¸ s, and Altok Kur¸ sun. Long-term strain behavior of in-service cable-stayed bridges under temperature variations. Journal of Civil Structural Health Monitoring ,12(4):833–844, 2022. Md Delwar Hossain Bhuyan, Guillaume Gautier, Nicolas Le Touz, Michael Döhler, Falk Hille, Jean Dumoulin, and Laurent Mevel. Vibration-based damage localization with load vectors under temperature changes. 
+
+Structural Control and Health Monitoring , 26(11):e2439, 2019. Kiet Anh Bui, Pakawat Sancharoen, Ganchai Tanapornraweekit, Somnuk Tangtermsirikul, and Pruettha Nanakorn. An evaluation of thermal effects on behavior of a concrete arch dam. Songklanakarin Journal of Science and Technology , 41(5):1059–1068, 2019. Hongjie Chen and Zaobao Liu. Temperature control and thermal-induced stress field analysis of gongguoqiao rcc dam. Journal of Thermal Analysis and Calorimetry , 135(4):2019–2029, 2019. Pooyan Dadvand, Riccardo Rossi, and Eugenio Oñate. An object-oriented environment for developing finite element codes for multi-disciplinary applications. Archives of computational methods in engineering , 17(3): 253–297, 2010. Jian-Sheng Fan, Bao-Luo Li, Cheng Liu, and Yu-Fei Liu. An efficient model for simulation of temperature field of steel-concrete composite beam bridges. In Structures , volume 43, pages 1868–1880. Elsevier, 2022. 
+
+> 38/40
+
+Vicente Mataix Ferrándiz, Philipp Bucher, Rubén Zorrilla, Suneth Warnakulasuriya, Alejandro Cornejo, Riccardo Rossi, Carlos Roig, jcotela, Josep Maria, tteschemacher, Miguel Masó, Guillermo Casas, Marc Núñez, Pooyan Dadvand, Salva Latorre, Ignasi De Pouplana, Joaquín Irazábal González, AFranci, Ferran Arrufat, riccardotosi, Aditya Ghantasala, Klaus Sautter, Peter Wilson, dbaumgaertner, Bodhinanda (Nanda) Chandra, Armin Geiser, Máté Kelemen, lluís, Inigo Lopez, and jgonzalezusua. Kratosmultiphysics/kratos: v10.2.3, June 2025. URL 
+
+https://doi.org/10.5281/zenodo.15687676 .Roger Fletcher. On the barzilai-borwein method. In Optimization and Control with Applications , pages 235–256. Springer, 2005. doi: https://doi.org/10.1007/0-387-24255-4_10. Aditya Ghantasala, Reza Najian Asl, Armin Geiser, Andrew Brodie, Efthymios Papoutsis, and Kai-Uwe Bletzinger. Realization of a framework for simulation-based large-scale shape optimization using vertex morphing. Journal of Optimization Theory and Applications , 189:164–189, 2021. doi: https://doi.org/10.1007/ s10957-021-01826-x. Theo Glashier, Rolands Kromanis, and Craig Buchanan. Temperature-based measurement interpretation of the mx3d bridge. Engineering Structures , 305:116736, 2024. Majid Hojjat, Electra Stavropoulou, and Kai-Uwe Bletzinger. The Vertex Morphing method for node-based shape optimization. Computer Methods in Applied Mechanics and Engineering , 268:494–513, 2014. doi: https: //doi.org/10.1016/j.cma.2013.10.015. Minshui Huang, Yongzhi Lei, and Shaoxi Cheng. Damage identification of bridge structure considering temperature variations based on particle swarm optimization-cuckoo search algorithm. Advances in Structural Engineering , 22(15):3262–3276, 2019. Minshui Huang, Wei Zhao, Jianfeng Gu, and Yongzhi Lei. Damage identification of a steel frame based on integration of time series and neural network under varying temperatures. Advances in Civil Engineering , 2020 (1):4284381, 2020. Chenhao Jin, Jingcheng Li, Shinae Jang, Xiaorong Sun, and Richard Christenson. Structural damage detection for in-service highway bridge under operational and environmental variability. In Sensors and smart structures technologies for civil, mechanical, and aerospace systems 2015 , volume 9435, pages 943–952. SPIE, 2015. Chenhao Jin, Shinae Jang, Xiaorong Sun, Jingcheng Li, and Richard Christenson. Damage detection of a highway bridge under severe temperature changes using extended kalman filter trained neural network. Journal of Civil Structural Health Monitoring , 6:545–560, 2016. Art ¯uras Kilikeviˇ cius, Darius Baˇ cinskas, Jaroslaw Selech, Jonas Matijošius, Kristina Kilikeviˇ cien ˙e, Darius Vain-orius, Dariusz Ulbrich, and Dawid Romek. The influence of different loads on the footbridge dynamic parameters. Symmetry , 12(4):657, 2020. Branislav Kosti´ c and Mustafa Gül. Vibration-based damage detection of bridges under varying temperature effects using time-series analysis and artificial neural networks. Journal of Bridge Engineering , 22(10):04017065, 2017. Rolands Kromanis and Prakash Kripakaran. Predicting thermal response of bridges using regression models derived from measurement histories. Computers & Structures , 136:64–77, 2014. Nonthachart Kulprapha and Pennung Warnitchai. Structural health monitoring of continuous prestressed concrete bridges using ambient thermal responses. Engineering Structures , 40:20–38, 2012. Peng Lin, Haoyang Peng, Qixiang Fan, Yunfei Xiang, Zongli Yang, and Ning Yang. A 3d thermal field restructuring method for concrete dams based on real-time temperature monitoring. KSCE Journal of Civil Engineering , 25:1326–1340, 2021. Xinghong Liu, Chao Zhang, Xiaolin Chang, Wei Zhou, Yonggang Cheng, and Yin Duan. Precise simulation analysis of the thermal field in mass concrete with a pipe water cooling system. Applied Thermal Engineering ,78:449–459, 2015. Rainald Lohner, Facundo Airaudo, Harbir Antil, Roland Wüchner, Fabian Meister, and Suneth Warnakulasuriya. High-fidelity digital twins: Detecting and localizing weaknesses in structures. In AIAA SCITECH 2024 Forum ,page 2621, 2024. doi: https://doi.org/10.2514/6.2024-2621. Wenda Ma, Bo Wu, Dingsong Qin, Bin Zhao, and Xianyi Yang. Statistical analyses of the non-uniform longitudinal temperature distribution in steel box girder bridge. Buildings , 13(5):1316, 2023. 
+
+> 39/40
+
+V Meruane and Ward Heylen. Structural damage assessment under varying temperature conditions. Structural Health Monitoring , 11(3):345–357, 2012. Yurii Nesterov. A method for unconstrained convex minimization problem with the rate of convergence o (1/k2). In Dokl. Akad. Nauk. SSSR , volume 269, page 543, 1983. Viet Ha Nguyen, Jean Mahowald, J-C Golinval, and S Maas. Damage detection in civil engineering structure considering temperature effect. In Dynamics of Civil Structures, Volume 4: Proceedings of the 32nd IMAC, A Conference and Exposition on Structural Dynamics, 2014 , pages 187–196. Springer, 2014. YQ Ni, HF Zhou, and JM Ko. Generalization capability of neural network models for temperature-frequency correlation using monitoring data. Journal of structural engineering , 135(10):1290–1300, 2009. Jianwen Pan, Wenju Liu, Jinting Wang, Feng Jin, and Fudong Chi. A novel reconstruction method of temperature field for thermomechanical stress analysis of arch dams. Measurement , 188:110585, 2022. F. Pedregosa, G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O. Grisel, M. Blondel, P. Prettenhofer, R. Weiss, V. Dubourg, J. Vanderplas, A. Passos, D. Cournapeau, M. Brucher, M. Perrot, and E. Duchesnay. Scikit-learn: Machine learning in Python. Journal of Machine Learning Research , 12:2825–2830, 2011. URL http: //jmlr.org/papers/v12/pedregosa11a.html .Bart Peeters, Johan Maeck, and Guido De Roeck. Vibration-based damage detection in civil engineering: excitation sources and temperature effects. Smart materials and Structures , 10(3):518, 2001. Haoyang Peng, Peng Lin, Yunfei Xiang, WenQi Chen, Shaowu Zhou, Ning Yang, and Yu Qiao. A positioning method of temperature sensors for monitoring dam global thermal field. Frontiers in Materials , 7:587738, 2020. Edwin Reynders, Gersom Wursten, and Guido De Roeck. Output-only structural health monitoring in changing environmental conditions by means of nonlinear system identification. Structural Health Monitoring , 13(1): 82–93, 2014. D Santillán, E Salete, and MÁ Toledo. A new 1d analytical model for computing the thermal field of concrete dams due to the environmental actions. Applied Thermal Engineering , 85:160–171, 2015. William Soo Lon Wah and Yung-Tsang Chen. A new approach toward damage localization and quantification of structures under changing temperature condition. Journal of Low Frequency Noise, Vibration and Active Control ,39(3):572–587, 2020. Berhanu Tefera, Adil Zekaria, and Abrham Gebre. Challenges in applying vibration-based damage detection to highway bridge structures. Asian Journal of Civil Engineering , 24(6):1875–1894, 2023. Xiang Wang, Qingfei Gao, and Yang Liu. Damage detection of bridges under environmental temperature changes using a hybrid method. Sensors , 20(14):3999, 2020. Xing Ping Yang, Xiao Lin Chang, and Xing Hong Liu. Fem simulation of temperature and thermal stress of xiaowan arch dam. Applied Mechanics and Materials , 212:887–890, 2012. MT Yarnold and FL Moon. Temperature-based structural health monitoring baseline for long-span bridges. 
+
+Engineering Structures , 86:157–167, 2015. Dong Zheng, Ze-Kuai Du, and Shao-Cai Peng. Simulation of two-dimensional temperature field via kriging method based on limited conditioning points in an arc dam. In IOP Conference Series: Earth and Environmental Science , volume 304, page 032058. IOP Publishing, 2019. Guang-Dong Zhou and Ting-Hua Yi. A summary review of correlations between temperatures and vibration properties of long-span bridges. Mathematical Problems in Engineering , 2014(1):638209, 2014. Huawei Zhou, Zhiguo Pan, Zhipeng Liang, Chunju Zhao, Yihong Zhou, and Fang Wang. Temperature field reconstruction of concrete dams based on distributed optical fiber monitoring data. KSCE Journal of Civil Engineering , 23:1911–1922, 2019.

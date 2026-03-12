@@ -1,0 +1,341 @@
+Title: Non-Invasive Reconstruction of Cardiac Activation Dynamics Using Physics-Informed Neural Networks
+
+URL Source: https://arxiv.org/pdf/2603.03832v1
+
+Published Time: Thu, 05 Mar 2026 01:47:33 GMT
+
+Number of Pages: 25
+
+Markdown Content:
+# Non-Invasive Reconstruction of Cardiac Activation Dynamics Using Physics-Informed Neural Networks 
+
+# Nathan Dermul 1 and Hans Dierckx 2,3,4 
+
+> 1
+
+Department of Cardiovascular Sciences, Cardiovascular Imaging and Dynamics, KU Leuven, Belgium. 
+
+> 2
+
+Department of Cardiology, Leiden University Medical Centre, Albinusdreef 2, Leiden, 2333 ZA, the Netherlands. 
+
+> 3
+
+Mathematical Institute, Leiden University, Einsteinweg 55, Leiden, 2333 CC, the Netherlands. 
+
+> 4
+
+Leiden Institute of Physics, Leiden University, Niels Bohrweg 2, Leiden, 2333 CA, the Netherlands. Contributing authors: nathan.dermul@kuleuven.be; h.j.f.dierckx@lumc.nl; 
+
+Abstract 
+
+Cardiac arrhythmogenesis is governed by complex electromechanical interac-tions that are not directly observable in vivo, motivating the development of non-invasive computational approaches for reconstructing three-dimensional acti-vation dynamics. We present a physics-informed neural network framework for recovering cardiac activation patterns, active tension propagation, deformation fields, and hydrostatic pressure from measurable deformation data in simpli-fied left ventricular geometries. Our approach integrates nonlinear anisotropic constitutive modeling, heterogeneous fiber orientation, weak formulations of the governing mechanics, and finite-element-based loss functions to embed physical constraints directly into training. We demonstrate that the proposed framework accurately reconstructs spatiotem-poral activation dynamics under varying levels of measurement noise and reduced spatial resolution, while preserving global propagation patterns and activa-tion timing. By coupling mechanistic modeling with data-driven inference, this method establishes a pathway toward patient-specific, non-invasive reconstruc-tion of cardiac activation, with potential applications in digital phenotyping and computational support for arrhythmia assessment. 
+
+1 
+
+> arXiv:2603.03832v1 [physics.med-ph] 4 Mar 2026 Keywords: cardiac deformation, inverse problem, ultrasound imaging, physics-informed neural networks
+
+# 1 Introduction 
+
+Cardiac arrhythmias represent a major global health challenge, and arise from com-plex disturbances in the hearts electrical activity. While atrial fibrillation is the most widespread rhythm disorder, ventricular arrhythmias are particularly dangerous, often leading to sudden cardiac death due to their disruption of the coordinated pump-ing of blood. Understanding and visualizing the spatiotemporal dynamics of electrical wave propagation is therefore essential for effective diagnosis and treatment. Current clinical practice relies on catheter-based mapping, which provides valuable informa-tion but remains invasive, time-consuming, and limited to surface measurements of the myocardium [1]. These constraints highlight the need for alternative non-invasive strategies capable of capturing the full three-dimensional nature of electrical activa-tion. A promising path to such non-invasive assessment of cardiac activation lies in recent advances in three-dimensional echocardiography, which enable rapid and cost-effective measurement of strain-related variables [2]. By measuring the local onset of mechanical contraction, pilot studies in electromechanical wave imaging (EWI) have identified arrhythmia types and locations. These mechanical markers have been shown, in experimental settings, to reflect the underlying electrical wave propagation in both normal and arrhythmic conditions [3]. In contrast to electrocardiographic imaging (EGCi), which relies on projected information on the body surface to visualize wave propagation in the heart, deformation measures provide access to local information [4, 5]. However, measuring mechanical activation is an assessment of the effect of cardiac activation, caused by active tension development, which is in turn triggered by electrical depolarization. In this work, we aim to reconstruct the source of the deformation, i.e. the local active tension developed by the myofibers. Previous synthetic studies have already explored classical inversion methods grounded in data assimilation [6–8]. While these techniques are well established in the literature and conceptually robust, their reliance on extensive forward evaluations makes them computationally inefficient when applied to more complex situations with large amounts of degrees of freedom. Alternatively, supervised machine learn-ing approaches have been introduced to solve the inverse problem, first in simple cubic geometries and more recently demonstrated accurate results in handling more complex models in intricate three-dimensional geometries [9, 10]. Once trained, such models can deliver rapid predictions without requiring additional physical input. Yet, the training phase in such methods is computationally intensive, especially without real-world datasets, which then requires extensive simulations. Fully data-driven supervised machine learning frameworks also lack interpretability, require new methodology to insert patient-specific information and may produce results that do not satisfy the laws of physics. 2Physics-informed neural networks (PINN) strike a balance between classical physics-based inversion methods and the function-approximation and optimization techniques of supervised machine learning[11]. By representing functions as neural networks and optimizing them through a loss function that incorporates both data and physics terms, PINNs avoid the need to explicitly solve governing equations [11]. In recent years, they have achieved success across multiple fields of applied science [12]. More specifically, in cardiac electrophysiology PINNs have been used to interpolate electroanatomical mapping data [13], estimate fiber orientations [14], and reconstruct tissue parameters [15]. Within cardiac mechanics, researchers have utilized these approaches both in forward simulations [16] and in the inverse estimation of passive material properties [17]. More recently, Caforio et al. have also extended their use to estimating active contractility parameters under homogeneous activation times [18]. In earlier work, we demonstrated on synthetic two-dimensional data that PINNs can be used to infer activation waves, used as a proxy for the underlying electrical activity, from noisy and low resolution deformation data [19]. In the present study, we extend these results to more complex scenarios, requiring new methodology. A simpli-fied three-dimensional (3D) geometry of a left ventricle (LV) is used, with non-linear deformation rules as opposed to linear ones, and activation waves are simulated using more realistic biophysically inspired formulations. In addition, strong anisotropy is introduced through spatially varying fiber orientations. To address these challenges, we adopt the recently proposed delta-PINN frame-work [20]. Compared to standard PINNs [11], delta-PINNs incorporate a transformed input space based on Laplacian eigenfunctions. We optimize with finite-element-based losses derived from the weak Galerkin formulation, which was also used in other stud-ies [21]. These adaptations are well suited to more complex three-dimensional domains and were shown to facilitate faster convergence and greater accuracy than conven-tional continuous PINNs or graph neural network approaches. After extending this framework to volumetric data, we estimate 3D active tension wave propagation from deformation data using hyperelastic materials commonly used in cardiac modeling. To satisfy the incompressibility constraint, we simultaneously optimize an auxiliary Lagrange multiplier field p, which can be identified with the hydrostatic pressure. This paper is organized as follows. Section 2.1 describes the generation of the synthetic dataset, including the physics of non-linear deformation models in cardiac mechanics and the forward simulations. Section 2.2 presents the weak formulation of the governing equations, from which the physics-based loss term is constructed using finite elements, followed by a discussion of the full PINN optimization framework. Section 3 reports the main results: first on the reference dataset, and subsequently on tests assessing the robustness of the PINN under Gaussian noise and reduced spatial resolution. Section 4 concludes with a discussion of the findings and an outlook on future directions. 32 Methods 
+
+# 2.1 Generation of synthetic data 
+
+2.1.1 Physics of active hyperelastic soft tissue 
+
+We work in the framework of non-linear solid mechanics. In the frame of reference of the undeformed material with coordinates X, we then define the new positions of each material point as x = x(X) as well as the deformation gradient F = ∂x/∂ X,or in index notation: Fij = ∂x i/∂X j . This tensor can be used to transform between frames of reference and J = det( F) represents the volumetric change. In this study, deformation data U are related through F = I + ∂U/∂ X. The governing equations of non-linear deformation of an incompressible material in steady-state equilibrium are written in the referential frame as 
+
+∇ · P = 0 in Ω 0 × [0 , T ], (1) 
+
+J = 1 . (2) The first equation encompasses the equilibrium of stresses inside the material, where P is the first Piola-Kirchoff stress tensor. The steady-state approximation, meaning there is no acceleration term in the equation, is often assumed in cardiac modeling as the mechanical timescales are much faster than the electrical ones, sim-plifying the type of partial differential equation (PDE) significantly [22]. The second equation is the incompressibility constraint, enforcing the material to deform without change in volume. This approximation is also commonly adopted for myocardial tissue because its substantial water content limits volumetric changes. This set of equations has to be closed by suitable boundary conditions. To solve these equations, a constitutive relation must be specified linking defor-mation to the resulting stresses. Due to the active properties of the myocardium, the stress tensor is first split into a passive Pp and active part Pa. The passive contribution is modeled by hyperelastic material which are defined by a well chosen energy-density function W such that Pp = ∂W/∂ F. In this work, we make use of the Guccione model [23] 
+
+Wguccione = C
+
+2 (eQ − 1) (3) 
+
+Q = bf E2 
+
+> F, 11
+
++ bt(E2 
+
+> F, 22
+
++ E2 
+
+> F, 33
+
++ 2 E2
+
+> F, 23
+
+) + bf s (2 E2 
+
+> F, 12
+
++ 2 E2
+
+> F, 13
+
+) (4) with 4 scalar parameters C, b f , b t, b f s . EF denotes the Green-Lagrange strain tensor 
+
+E = 12 (FT F − I), rotated in the local fiber-sheet-normal coordinate system, i.e., EF =
+
+QT EQ with Q = [ f0, s0, n0]. This results in axially symmetric, anisotropic response of the passive tissue. The corresponding stress tensor can then be written as [24] 4Pp = ∂W guccione 
+
+∂F = FCe QQ(a ◦ EF)QT (5) where the matrix a includes the anisotropy values 
+
+a =
+
+ bf bf s bf s 
+
+bf s bt bt
+
+bf s bt bt
+
+ . (6) The active contribution to the stress is more directly formulated as 
+
+Pa = TaF · (f0 ⊗ f0). (7) where the generated force acts only in the direction of the fibers. Finally, to enforce the incompressibility constraint (Eq. 2), an additional term Wvol = −p(J −1) is added to the passive contribution, penalizing volumetric changes. The factor p serves as a Lagrange multiplier and can be identified with the hydrostatic pressure. We thus end up with the following total stress tensor 
+
+P = Pp + Pa − pJ F−T . (8) 
+
+2.1.2 Forward simulations 
+
+To evaluate our inversion method, synthetic data were generated by solving the full cardiac electro-mechanical equations. Simulations were performed using the publicly available software package simcardems [25], a FEniCS-based Finite Element solver written in python to simulate cardiac electro-mechanics, developed and maintained by the simula research group. The reference configuration of the undeformed left ventricle (LV) was represented by an idealized three-dimensional ellipsoid, generated with the software package cardiac-geometries [26], similar to other computational studies [27]. The LV base was modeled as a circle of radius 10 mm, centered at the point (0 , 0, 5), with the apex located at z = −20 mm. The transmural wall thickness was set to 3 mm. Additionally, rule-based fibers were created, varying from 60 o on the endocar-dial to −60 o on the epicardial surface. The final mesh contained 19061 tetrahedral elements connecting 4708 nodes, with two to three elements across the wall thickness. The electrical wave propagation was modeled by the monodomain formulation of electrophysiology, while the local cell dynamics were described by the O’Hara-Rudy model, coupled to the Land model to generate active tension [28, 29]. Default parameter values for both models were used, see the simcardems GitHub documenta-tion. The computed Ta was then provided as input to the mechanics solver at each timestep. The quasi-static balance equations of non-linear deformation (Eq. 1) were solved in the finite element (FEM) framework, while the incompressibility constraint was enforced by employing the Lagrange multiplier method in which one solves for both the displacement U and the hydrostatic pressure p simultaneously. This mixed FE formulation used Taylor-Hood elements consisting of quadratic Lagrangian ele-ments for U and linear elements for p. The passive stresses were modeled using the Guccione constitutive law (Eq. 3) with parameters C = 2 kPa, bf = 8, bt = 2, bf s = 4, 5as in [27] and assumed to be known in this study. Mechanical boundary conditions were imposed by constraining the LV base with no-deformation Dirichlet conditions, while the endocardial and epicardial surfaces were assigned traction-free Neumann conditions. The simulation was initiated by injecting a short current stimulus at the endocar-dial position (0 , 7, −5) within a sphere of radius 2 mm. This triggered the propagation of the electrical wave, followed by the delayed rise of intracellular calcium and the subsequent development of active tension. The final dataset used in this work, con-sisted of nodal values for the active tension Ta(r, t ), mechanical deformation U(r, t )and hydrostatic pressures p(r, t ) recorded over a duration of 100 ms with an output interval of 2 ms. It should be noted that the simulation itself employed finer time steps of 0 .5 ms and the electrophysiology was solved on a refined mesh, necessary to ensure convergent solutions. 
+
+2.1.3 Postprocessing 
+
+To test the robustness of our method, we reduced the quality of deformation data by either introducing additive noise or lowering the spatial resolution. Gaussian noise was added to each component j of the deformation vector such that new data points Uj
+
+were given by 
+
+Uj = Uj, 0 + ηj p U j,max (9) where Uj, 0 are the original values and Uj,max is the maximum value over the full spatial and temporal range. Moreover, ηj were sampled from a standard normal dis-tribution, while p is the noise level of choice, expressed as a fraction of the maximum deformation. To mimic loss of spatial resolution, while retaining the original volumetric mesh, we used a combination of smoothing and subsampling. First, all components of the deformation were smoothed with a Gaussian filter with standard deviation equal to σ,expressed in units of average vertex length ≈ 1.16 mm. The discrete filter used all data points in a radius of 4 σ. Second, s = 1 /8sigma data points were randomly sampled from the original dataset. This reflects the principle that halving the resolution in all three dimensions reduces the number of retained points to one eighth, effectively averaging the information over one characteristic length i.e σ = 1. 
+
+# 2.2 Optimization of the PINN 
+
+We adopted PINNs to estimate underlying active tension waves from the resulting deformation. These methods combine the performance of neural networks in data fitting with ability to work with sparse data and impose physical or physiological constraints. In general, PINNs can be seen as flexible nonlinear function approxima-tors, optimized on the combination of available data and physical equations. Here, we utilize the recently proposed Delta-PINN framework [20], which was introduced to handle more complex spatial domains as well as to facilitate the learning process. 6First, we discuss the formulation and numerical calculation of the incorporated physics and afterwards present the full optimization scheme of the PINN. 
+
+2.2.1 Weak formulation of the mechanical equations 
+
+The physics information is enforced based upon a weak formulation of the governing equations. This lowers the order of derivative and incorporates Neumann bound-ary conditions naturally. The weak formulation of the balance equation (Eq. (1)) is obtained with the standard Galerkin variational methodology, where the strong formu-lation is multiplied with a test vector function v(r) and integrated over the reference domain Ω 0:
+
+Z
+
+> Ω0
+
+(∇ · P) · vdV = 0 . (10) The divergence theorem then allows splitting the integral into two parts 
+
+Z
+
+> ∂Ω0
+
+(P · v) · ndS −
+
+Z
+
+> Ω0
+
+(P : ∇v)dV = 0 . (11) Next, at every boundary surface ∂Ω0, a Dirichlet or Neumann boundary condition is imposed. For the latter we can write P · n = t which is the traction vector on the boundary and is connected to the pressures on boundary surfaces such as the endo-or epicardium. In this work, these are set to zero. The former will also vanish if the test function is chosen to be zero at the Dirichlet boundary. We thus end up with following integral over the whole reference domain 
+
+Z
+
+> Ω0
+
+(P : ∇v)dV = 0 (12) which has to be satisfied for all test functions v(r). 
+
+2.2.2 Finite element formulation 
+
+To calculate the residual (Eq. 12) numerically, all fields of interest are represented by finite elements formulated on a 3D volumetric mesh. We thus need only to estimate nodal values, which reduces the search space in comparison to the optimization of continuous functions in classical PINNs. This approach also allows to enforce Dirichlet boundary conditions in a hard way. To lower the computational cost of our method, we make use of linear tetrahedral elements with N shape functions Nk(r) for each node k. The test function v(r) (similar to the trial function u(r))is then calculated as the multiplication of the (N,1) vector of shape functions and the 2nd order tensor ˆv
+
+with shape (N,3) representing the nodal values of all three components 
+
+v(r) = N(r) · ˆv = N1(r) N2(r) N3(r) ...  ·
+
+
+
+v1,x v1,y v1,z 
+
+v2,x v2,y v2,z 
+
+v3,x v3,y v3,z 
+
+... ... ... 
+
+ . (13) 7We can then insert this in our variational residual formulation (Eq. 12) to find following expression in index notation 
+
+Z
+
+> Ω0
+
+Σ3 
+
+> i
+
+Σ3 
+
+> j
+
+Pij (r)∂i(Σ Nk Nk(r)vkj )dV = 0 . (14) This equation should hold for any test function (that vanishes on the Dirichlet boundary), so for any values of vkj . This leads to the tensor equation Σ3
+
+> i
+
+Z
+
+> Ω0
+
+Pij ∂i(Nk)dV = 0 (15) for every j = 1 , 2, 3 and k = 1 , 2, 3, ..N ′ with N ′ = N − Ndir taking into account the Ndir Dirichlet boundary nodes. To calculate the integral we make use of the finite element Nk being only non-zero in elements neighboring the node k. Additionally, working with linear elements for the deformation U, active tension Ta, hydrostatic pressure p as well as (approximately) linear fiber direction data, we can see from Eqs. (5-8) that the active part of P will be of cubic order, while the pressure term is linear and the Guccione contribution exponential. For this reason we calculate the integrals over the elements with Gaussian quadrature rules which are exact up to order 3. With the 5 quadrature points rq inside one element and corresponding weights wq , we can write the residual then as 
+
+Rj,k = Σ 3 
+
+> i
+
+Σek 
+
+> e
+
+Σ5 
+
+> q
+
+(Pij (rq )) e (∂i(Nk)) e Ve = 0 (16) for every j = 1 , 2, 3 and k = 1 , 2, 3, ..N ′, while using ek to denote all elements which include node k. 
+
+2.2.3 Optimization Problem 
+
+A schematic overview of the PINN methodology to estimate the spatiotemporal active tension field is shown in Fig. (1). The input consists of a 3D volumetric mesh and available deformation data Ui, defined on the nodes of the mesh. An key feature of the Delta-PINN framework [20] is to employ the eigenfunctions of the Laplacian operator as the spatial input space of the PINN. In comparison to the spatial coor-dinates of the original PINNs [11, 13, 19], they naturally incorporate the 3D domain information in the optimization problem and help to facilitate learning by providing more suitable and flexible input features. The calculation of the eigenfunctions is done before the optimization as a preprocessing step by solving the corresponding eigenvalue problem numerically on the tetrahedral mesh. We represent our fields of interest, the deformation vector U(r, t ), the active ten-sion Ta(r, t ) and the hydrostatic pressure p(r, t ) as separate fully connected Neural Networks (NN) with parameters θU , θTa and θp. The input nodes of the NN consist of the first n eigenfunctions fn(r) together with the time coordinate t, while the fields of interest form the output nodes. We chose here to combine the deformation compo-nents in one NN as these are generally connected and can share similar patterns. The active tension field is first transformed through a sigmoid function and multiplied by 8Tmax = 10 kPa to only allow positive values. In addition, the time coordinates and deformation outputs are standardized with mean 0 and std 1, which facilitates the optimization of the NN. 
+
+Fig. 1 : Schematic overview of the PINN framework. The input consists of a 3D volumetric mesh together with available deformation data defined on the vertices. Laplacian eigenfunctions fn(r) are then calculated as a preprocessing step and serve as the input coordinates for the PINN. The spatial-temporal fields of the deformation vector U(r, t ), active tension Ta(r, t ) and hydrostatic pressure p(r, t ) are represented by three fully connected NNs. The optimization is done by minimizing two terms that make up the total loss function: the data loss which is evaluated on Nd data points and the physics loss enforced on Nc collocation points. The optimization of the PINN is done by minimizing a loss function L defined as the weighted sum of two different terms 
+
+L = Ldata + αLphys (17) for N iterations. During every iteration, Nd data points are randomly selected and the data loss term is calculated in the standard quadratic manner as 
+
+Ldata = 1
+
+NdNdX
+
+> d=1
+
+|| ˆUd − U(rd, t d)|| 2 (18) where ˆUd is the deformation vector the selected data points and U(rd, t d) are its current predictions. To enforce the momentum balance equation on the solution, we need to minimize the residual from Eq. (16). As a matrix equation, it needs to be fulfilled for all directions j = 1 , 2, 3 and all nodes k = 1 , 2, 3, ..N . Similar to the data term, we can formulate this in mini-batches as following. First, Nc collocation nodes are randomly sampled over the full spatial-temporal domain, and all relevant 9properties for element which include the sampled nodes are gathered as well. This constitutes of variables which are constant over an element i.e. the volume and gradient of the shape functions and variables which need to be known at the quadrature points namely the spatial coordinates (eigenfunction values) and the fiber directions. Note that all these matrices are precomputed. Then, for every sampled node k we calculate all three j components of the residual Eq. (16). The terms will depend on the current predicted fields at the quadrature points. Finally, if we denote all necessary evaluations of variable Z i.e. at all quadrature points in elements around the sampled node k, as 
+
+Z(N (k)) = Z(rN (k), t N (k)), we can formulate the physics loss function as 
+
+Lphys = 1
+
+NcNcX
+
+> k
+> 3
+
+X
+
+> j
+
+Rj,k (U(N (k)) , T a(N (k)) , p (N (k))) 2. (19) Note that all nodes k can be chosen except those with Dirichlet boundary con-ditions. Moreover, because the boundary conditions are strictly enforced, Dirichlet boundary nodes are assigned zero values when evaluating the physics term, thereby removing those degrees of freedom from the system. Before the N iterations on the full loss function, we first optimize the PINN with only the data term (i.e. α = 0) for 2000 iterations. This step ensures that the initial deformations do not lead to excessively large values in the physics loss, which depends exponentially on them. In both phases, the optimization is done using the Adam optimizer [30] and its default parameters, while all NNs are initialized according to the Glorot scheme. Following hyperparameters were kept constant for all experiments. We chose to include the first 200 eigenfunctions as these expressed a good range of low and higher frequency signals and the necessary the necessary variation across the myocardial wall (starting from around 100), without making the optimization overly challeng-ing by introducing too much redundant inputs. Similarly, hidden layers of [50 , 50 , 25] were sufficient to represent the type of data patterns in this study. Mini-batches con-tained Nd = Nc = 64 nodal points and the number of iterations N was set to 60000 (Npre = 2000) where both loss terms were seen to be converged. To select the weights 
+
+α, initial values of 10 0 were tested and restarted after 5000 iterations with one order of magnitude lower when the loss exhibited unstable behavior. All optimizations were executed on a HP Z-book, 11th Gen Intel Core i7-11800H, while JAX’s [31] auto-matic CPU parallelization used all 16 available virtual nodes, taking on average 3 h of computation time. As a postprocessing step, we also calculated the local activation time (LAT) of the active tension wave by identifying, for each spatial point, the first timestep at which Ta exceeded the threshold of 0 .5 kPa. 
+
+# 3 Results 
+
+All results shown were obtained by utilizing the constant hyperparameters mentioned in the previous section. The selected α values for each dataset can be seen in Table 1. Note that in noisy data sets, the data loss relatively high, and the physics term can get larger. Contrarily, when less data points available (e.g. with reduced resolution) this is the opposite. 10 3.1 Reference solution 
+
+In this section, we present the PINN results for the reference simulation data, i.e. when no Gaussian noise added and all data points are included. Figs. 2 and 3 show the predicted fields in two distinct slices throughout the 3D volumetric mesh evaluated at different times during wave propagation. Both slices intersect the source location: the longitudinal view corresponds to the plane at x = 0 mm, while the radial view corresponds to the z = −5 mm plane, see the first column of Figs. 5 and 6 for the 3D orientation. All fields are visualized by the underlying linear finite elements. Panels (a) and (b) of Fig. 2 show the y-component of the deformation field as a representative component. The PINN is able to accurately learn the deformation data points. The overall evolution over time and finer differences between endo- and epicardial surfaces are both recovered in the PINN predictions. Similar results are obtained for the other deformation components. Panels (c) and (d) compare the true to the estimated Lagrange multiplier p (pressure) used in the forward simulation to satisfy the incompressibility constraint and identified with the hydrostatic pressure of the blood. Again, the global evolution through the ellipsoid is captured in the PINN and we see comparable magnitudes for every timestep. However, the PINN prediction seems to avoid large values on the surfaces, especially on the endocardium and the estimation is also less smooth than the true field. This fragmented behavior could be related to the indirect violation of the inf-sup condition in mixed FE formulations in which the Lagrange field ( p) should be one order less than the main field of interest i.e. the deformation U [32]. The main objective of this study however, lies in the estimation of the active tension field which represents the underlying signals contracting the tissue. Fig. 3 shows the PINN predictions of the active tension Ta in the same 2D-slices as the previous Fig. 2. The last column consists of the LAT maps, calculated after the optimization as described earlier. The active tension wave is reconstructed accurately, starting from the source position at T = 30 ms, while propagating and increasing in magnitude throughout the ellipsoid. This is also reflected in the corresponding LAT maps which clearly show the initial onset and the subsequent progression to the other side, resulting in a symmetrical map in panel (b) due to the specific slice orientation. Additionally, we observe that finer details in the Ta-field are partially recovered by the PINN as well, such as the absence of Ta at the source point and the smaller mag-nitudes at the apex and at the epicardial surface. While the first of these properties appears to be an artificial consequence of the numerical forward simulation, it is nevertheless encouraging that the PINN can reconstruct the Ta-field on finer spatial scales, despite the inherent data–model mismatch in the function space of U.To investigate the transmural variations in Ta and LAT, panel (a) of Fig. 4 shows the endo- and epicardial surfaces in polar (bullseye) view, where the radial direction in the figure corresponds to the longitudinal axis. More specifically, the coordinates are given by x′ = r cos( θ) and y′ = r sin( θ), with r denoting the scaled longitudinal coordinate and θ the circumferential angle. As before, we see good correspondence between the true and predicted fields, both in propagation of the wave and magnitude. 11 (a) (b)  
+
+> (c) (d)
+
+Fig. 2 : PINN results for the estimated deformation field U and hydrostatic pressure 
+
+p, optimized on all available data points. The fields are visualized by slicing the 3D volumetric mesh with the x = 0 mm plane (longitudinal, left) and the z = −5 mm plane (radial, right). Both planes slice through the source point, see Fig. 5 for the 3D orientation. Panels (a) and (b) show the y-component of the deformation, while panels (c) and (d) consist of the hydrostatic pressure p, used in the forward simulation to satisfy the incompressibility constraint. From this perspective, it is clearly seen that the active tension reaches higher values on the endocardial surface, which is also recovered by the PINN. Due to the transmural change in fiber direction, small differences in propagation direction are observed in the dataset, for example at time T = 40 ms. The PINN prediction captures these variations only partially, with the directional change appearing less pronounced. Panel (b) of Fig. 4 illustrates these results as well. Here, the visualized cross-sections, unlike previous figures, do not intersect the source point, but are situated on the plane at 
+
+x = −5 mm to the left of the source point in the surface plots of panel (a). Around 
+
+T = 40 ms the wavefront has arrived first on the epicardium above the source, while the the opposite is true in the region below. The PINN prediction finds primarily the first discrepancy, resulting in an LAT map that shares the same diagonal line above the source but is less pronounced in the lower part. To recover the full transmural differences with highly varying fiber directions, two to three elements in the transmural direction might not be sufficient. 12 (a) 
+
+> (b)
+
+Fig. 3 : PINN results for the estimated active tension Ta, optimized on all available data points. The fields are visualized by slicing the 3D volumetric mesh with the 
+
+x = 0 mm plane (longitudinal, panel (a) ) and the z = −5 mm plane (radial, panel 
+
+(b) ). Both planes slice through the source point, see Fig. 5 for the 3D orientation. In addition to the Ta-field, the last column shows the corresponding LAT map for the activation wave. 
+
+# 3.2 Effect of Gaussian noise 
+
+In this section, we investigate the reconstruction of the active tension wave when the deformation data is corrupted with noise. We added Gaussian variation on top of the deformation components with standard deviations equal to 5 % and 10 % of the maximum magnitude over all time steps, see Section 2.1 for details. Fig. 5 shows the effect on the estimated fields and compares the three datasets to the true fields. Panel (a) and panel (b) show the cross-sections through the source point for the longitudinal (x = 0 mm) and radial ( z = −5 mm) plane, respectively, similar to the reference figures (Figs. 2, 3). The first column illustrates the Gaussian noise through a 3D scatter plot of the y-component of the deformation, as well as the cross-section plane used in the adjacent figures. Comparing the PINN predictions to the true solution, we can observe only a small influence of the added noise. The Ta-wave propagation is 13 (a) 
+
+> (b)
+
+Fig. 4 : PINN results for the estimated active tension Ta, optimized on all available data points. Panel (a) shows polar maps of the endo- and epicardial surfaces, cal-culated from the longitudinal and circumferential coordinates. The continuous field is visualized by linearly interpolating the vertex values in the new space. Panel (b) 
+
+presents a cross-section of the volume by slicing the 3D volumetric mesh with the 
+
+x = −5 mm plane which, unlike other figures, does not go through the source point, revealing the transmural differences in wave propagation. still clearly seen in the reconstructions, which is also reflected in the predicted LAT maps. Table 1, which reports the RMSE across all variables, confirms that the added noise has only a minor impact on overall accuracy. Only features on fine spatial scales such as the absence of early Ta at the source, diminish with increasing noise levels, resulting in slightly smoother fields. This can be clearly seen in panel (a) between the 0 % and 5 % case. Overall, we can conclude that the PINN demonstrates robustness to additive noise, while providing accurate reconstructions of wave propagation. 
+
+# 3.3 Effect of reduced spatial resolution 
+
+Lastly, we tested the PINN framework against data with reduced spatial resolution. To this purpose, the original deformation data were smoothed with a Gaussian kernel and a subset of the available points was randomly selected. In Fig. 6 we present the 14 (a) 
+
+> (b)
+
+Fig. 5 : PINN results for the estimated active tension Ta and corresponding LAT map, optimized on all available data points with Gaussian noise levels of 5 % and 10 % of the maximum values. The datasets are illustrated in the first column by the y-component of the deformation at one timestep. The plane in the first row indicates the 3D orientation of the cross-sections, panel ( a) for the longitudinal view (( x = 0 mm) and panel ( b) for the radial ( z = −5 mm). Both planes go through the source point. 15 results of using only 50 % and 25 % of the total dataset. Similar to the structure of Fig. 5, the used datasets are illustrated in the first column for the y-component of the deformation in which the size of the scatter points relates to the approximated volume they represent. Overall, PINN predictions optimized on lower-resolution datasets still follow the reference PINN estimation and the true field, as seen in both the Ta-field and the LAT map. However, unlike the 10 % noise case, accuracy of the prediction begins to decline after T = 60 ms declines when the resolution is reduced to 25 % of the total points. More specifically, the predicted Ta-fields seem coarser with steeper gradients, as shown in the longitudinal view of panel (a). Similarly, while the radial view in panel (b) shows that the magnitude of Ta in the 25% dataset approaches the true field at 
+
+T = 80 ms, the overall propagation remains less accurate, as reflected in the LAT-map. This loss of accuracy is also evident in Table 1, where the RMSE of Ta and the error in 
+
+p increase markedly, in contrast to the deformation error. The difficulty in predicting 
+
+p and Ta could be partially explained by the lack of transmural information as the 25% subsample dataset corresponds to a Gaussian smoothing with σ = 2 /3 of the average vertex distance. This heavily reduces the amount of information, especially in the transmural direction where only 3 − 4 data points or 2 − 3 elements are present in the original dataset. Generally speaking however, our proposed PINN framework is still able to estimate the active tension wave and related LAT map, even when data is reduced in resolution.                                                               
+
+> Dataset αRMSE Ta(kPa) RMSE U(mm) RMSE p(kPa) Reference 10 −10.333 ±0.013 (705 .3±4.6) ·10 −50.1811 ±0.0031 5% noise 10 00.3445 ±0.0045 0.0127 ±0.0014 0.2161 ±0.0025 10% noise 10 00.388 ±0.028 0.0156 ±0.0018 0.2204 ±0.0053 0.50 resolution 10 −10.400 ±0.048 0.00863 ±0.00052 0.2248 ±0.0024 0.25 resolution 10 −20.491 ±0.023 0.00130 ±0.00022 0.2799 ±0.0058
+
+Table 1 : Summarization of the chosen α values for each dataset and the resulting PINN accuracies for the active tension Ta, the deformation U and pressure p. The optimization is repeated 3 times where the initialization of the NN weights, the mini-batch sampling and the gaussian noise if applicable is different. Average values over the runs and standard deviation are shown. The RMSE value of one run is calculated by taking the average over the full spatial and temporal domain, while all three com-ponents of U are averaged jointly. 
+
+# 4 Discussion 
+
+In this work, we employed Physics-Informed Neural Networks to address the inverse problem of estimating active tension waves from observed deformation in a LV geom-etry. Building on our previous studies with 2D square domain and linear models [19], we extended the approach to more complex scenarios concerning both spatial domain and material model. The undeformed 3D domain was defined as a truncated ellipsoid, representing an idealized LV. Deformation was described using non-linear 16 (a) 
+
+> (b)
+
+Fig. 6 : PINN results for the estimated active tension Ta and corresponding LAT map, optimized on data with reduced spatial resolution. The data was first smoothed with a discrete Gaussian before randomly subsampled to mimic reduced resolution in the data. This was done for 50 % and 25 % of all points, see Section 2.1 for details. The datasets are illustrated in the first column by the y-component of the deformation at one timestep. The plane in the first row indicates the 3D orientation of the cross-sections, panel ( a) for the longitudinal view (( x = 0 mm) and panel ( b) for the radial (z = −5 mm). Both planes go through the source point. 17 theory with incompressible, hyperelastic material properties and anisotropic passive behavior. Active stress generation was also anisotropic, producing stress only along the fiber direction, which varied significantly across the wall. To tackle this chal-lenging inversion task, we adopted the recently proposed delta-PINN framework to simultaneously estimate 3D-deformation, active tension, and hydrostatic pressure fields. As shown in Fig. 3, the method accurately reconstructed active tension propa-gation, with activation times closely matching the ground truth. This was achieved despite the activation fields originating from detailed biophysically inspired cell models and the inherent data–model mismatch in the function space of U. Fig. 4 further demonstrated that transmural variations were captured in the reconstruction, although the true differences between endocardial and epicardial surfaces were not fully reproduced. This discrepancy could stem from the larger Ta-magnitudes and the smaller spatial dimensions of the endocardial surface, which, together with the limited number of elements across the wall thickness, tend to bias the reconstruction in favor of the endocardium. To assess robustness, we tested the method on data of reduced quality. With Gaussian noise levels up to 10% of the total deformation, the reconstructions remained consistent, losing only small, finer spatial features. This confirmed that PINNs can effectively handle noisy data and that incorporating defor-mation reconstruction within the framework is feasible. We also examined the impact of reduced spatial resolution by smoothing and subsampling the data, thereby heavily diminishing the original information. Even under these conditions, the estimated Ta
+
+preserved global propagation patterns in both active tension and LAT maps. How-ever, in the most extreme case of retaining only 25 % of the points, reconstruction accuracy declined, which was also seen in the estimated pressure fields. The delta-PINN framework is built upon several principles. A central aspect of the framework lies in its input space, which is constructed from the eigenfunctions of the Laplacian. Owing to spectral bias often seen in PINNs [33, 34], these eigenfunc-tions provide a powerful means of representing the domain and, as demonstrated, are capable of capturing complex spatial patterns. To account for variations in the transmural direction, we included the first 200 Laplacian eigenfunctions. However, this number could potentially be reduced through more targeted identification of transmural modes, selectively incorporating them into the input space rather than relying on a broad inclusion of all preceding modes. In addition, the time dimension was introduced as one input node alongside the spatial eigenfunctions. Although this leads to imbalance in the input space, the network could still be optimized success-fully. Nevertheless, alternative strategies, such as transforming temporal coordinates or coupling them directly to spatial coordinates, could offer improved efficiency. Another important property is the choice to optimize a weak formulation of the governing equations, explored in other PINN studies as well [21, 35]. In the original Delta-PINN paper [20], examples were presented using the energy formulation, where minimizing the energy density function of hyperelastic materials proved efficient. This approach avoids explicit computation of stress tensors and relies on a relatively simple energy expression (see Eq. 3). However, in our preliminary tests for this prob-lem, direct minimization of the energy did not yield a well-posed inverse problem for 18 estimating Ta. This limitation, also noted in [36], led us to adopt the full Galerkin method with more extensive physical loss formulations. The finite element formulation of the loss function, defined over the mesh nodes, introduced further advantages. For instance, Dirichlet boundary conditions could now be enforced strictly instead of incorporating them softly through an additional loss term. Moreover, restricting the search space to nodal values simplifies the opti-mization problem. The large amount of FEM research can also help the development of this kind of discrete PINNs. For example, we observed a recurring difficulty in estimating hydrostatic pressure, particularly at the boundaries. In principle, sufficient information should exist to recover two scalar fields from three balance equations, given that deformation is partially known. However, similar challenges have been known to exist in forward mixed FEM formulations where the inf-sup condition is not fully satisfied. One possible way to address this limitation is to employ second-order elements for the deformation field, although the associated increase in computational cost is not ideal. Alternatively, a quasi-incompressibility approach could be adopted, in which a large bulk modulus penalizes volumetric changes and removes the need to explicitly estimate p. A further strategy would be to decouple the deformation gradient and stress tensor into isochoric and volumetric components. All these strate-gies are possible in principle, but their relative performance and stability will likely depend on the specific data and desired accuracy. To advance this work toward clinical applications, further research will be required to validate the methodology. A first step is to investigate how parameter mismatches affect the final solution. Some parameters could be estimated simultaneously, while others must be selected a priori from literature values or incorporated as patient-specific data to ensure individualization of the model. The choice of hyperparameters within the PINN framework is also important. In this study, we set α to values that broadly balanced the loss terms and prevented instability during optimization. How-ever, more advanced balancing schemes could be introduced to improve efficiency [37, 38]. Such refinements, combined with more effective GPU parallelization, would enable faster and more stable optimization. Both speed and flexibility are impor-tant properties as they represent central advantages of PINNs over large supervised machine learning models, which, although accurate, are inherently more rigid and require extensive retraining when conditions change. Second, we have not yet investigated the reconstruction of the transmembrane potential directly, instead relying on active tension as a proxy. In abnormal or arrhythmic conditions, these quantities may diverge, necessitating additional inversion strategies. Incorporating more realistic boundary conditions, such as endocardial blood pressure, will also be essential. This can be achieved naturally within the weak formu-lation by introducing different Neumann boundary conditions and a single additional scalar parameter to be optimized. Finally, validation on more realistic synthetic datasets will be necessary, ideally generated through a full simulation pipeline combined with echocardiographic mea-surements, capturing observational noise and resolution effects more accurately. Such 19 testing will help determine whether additional regularization of the active tension fields is required. The temporal dimension, in particular, offers a promising avenue for introducing this regularization, as it is not yet fully exploited in the current frame-work. Other studies [18, 19], for example, have imposed fixed temporal schemes, either during optimization or in a subsequent step, thereby reducing the estimation problem to a smaller set of parameters rather than requiring reconstruction across the entire timeline. With regard to clinical potential and impact, physics-informed approaches have the advantage that they can impose physiological constraints, diminishing the risk of hallucinations or non-physical solutions seen in supervised methods. Such constraints also add to the explainability and robustness of the method. Also, since the PINN is optimized to reconstruct activation in a single patient, optimization is computationally relatively cheap, and no data needs to be distributed between hospitals. This approach therefore also does not require data augmentation using computer simulations, which introduces methodological concerns and biases in supervised machine learning methods applied to small datasets. Conceptually, PINNs offer a manner to integrate artificial intelligence (AI) approaches in medicine in a trustworthy manner, as this type of reconstruction lies closer to medical imaging than pure data analysis seen in supervised methods. The pathway for application to patient data is also clear. High-framerate ultra-sound imaging can capture with one non-invasive imaging modality the deforming geometry of the heart, replacing the simplified LV shape in this work. Fitting the geometry in moving meshes will benefit from modern reconstruction operating with sparse data, which is also possible with PINNs [39]. We expect a significantly better reconstruction compared to e.g. ECGi in the interventricular septum, which is not directly accessible via body-surface potentials. Validation of this method can be per-formed via non-invasive prediction of ectopic sources in the ventricle, pacemaker lead positions or infarcts, and validated via endocardial mapping or magnetic resonance imaging. The advantage of the ultrasound methodology is that it contains no ionizing radiation, and its probes are relatively cheap relative to medical imaging hardware. When combined with non-invasive ablation methods [40], this research line contributes to fully external treatment of cardiac rhythm disturbances. 
+
+# 5 Conclusion 
+
+In this study, we demonstrated that physics-informed neural networks can effec-tively reconstruct activation waves in three-dimensional left ventricular geometries. The non-convex 3D geometry, passive material models, and anisotropy required a more advanced PINN framework, which incorporated transformed spatial inputs, weak formulations, and finite element–based loss functions. As a result, we were able to accurately reconstruct active tension waves alongside the deformation fields and hydrostatic pressure. The method proved robust to noise and reduced spatial resolution, preserving global propagation patterns and confirming its potential for handling imperfect clinical data. Looking forward, further refinement of parameter estimation, boundary conditions, and temporal regularization will be key steps toward 20 clinical translation. With these advances, PINNs could provide a powerful tool for patient-specific modeling and non-invasive assessment of the electrical wave patterns in practice. 
+
+# Declarations 
+
+• This research was funded by KU Leuven project C24E/21/031 and the LUMC Fellowship 2024. 
+
+• The authors declare no conflict of interest. 
+
+• Ethics approval and consent to participate: not applicable. 
+
+• Consent for publication: not applicable. 
+
+• Data will be made publicly available on zenodo.org upon publication. 
+
+• Materials availability: not applicable. 
+
+• Code will be made publicly available on gitlab.com upon publication. 
+
+• CRediT Author contributions: ND contributed to conceptualization, methodology, software and visualization and writing - original draft; HD contributed to conceptu-alization, funding acquisition, development of methodology and writing - reviewing and editing. 
+
+# References 
+
+[1] Zeppenfeld, K., Tfelt-Hansen, J., Riva, M., Winkel, B.G., Behr, E.R., Blom, N.A., Charron, P., Corrado, D., Dagres, N., Chillou, C., Eckardt, L., Friede, T., Haugaa, K.H., Hocini, M., Lambiase, P.D., Marijon, E., Merino, J.L., Peichl, P., Priori, S.G., Reichlin, T., Schulz-Menger, J., Sticherling, C., Tzeis, S., Verstrael, A., Volterrani, M.: 2022 ESC Guidelines for the management of patients with ven-tricular arrhythmias and the prevention of sudden cardiac death. European heart journal 43 (40), 3997–4126 (2022) https://doi.org/10.1093/eurheartj/ehac262 [2] Lang, R.M., Addetia, K., Narang, A., Mor-Avi, V.: 3-Dimensional Echocardiogra-phy: Latest Developments and Future Directions. JACC: Cardiovascular Imaging 
+
+11 (12), 1854–1878 (2018) https://doi.org/10.1016/j.jcmg.2018.06.024 [3] Christoph, J., Chebbok, M., Richter, C., Schr¨ oder-Schetelig, J., Bittihn, P., Stein, S., Uzelac, I., Fenton, F.H., Hasenfuß, G., Gilmour, R.F., Luther, S.: Electrome-chanical vortex filaments during cardiac fibrillation. Nature 555 (7698), 667–672 (2018) https://doi.org/10.1038/nature26001 [4] Ramanathan, C., Ghanem, R.N., Jia, P., Ryu, K., Rudy, Y.: Noninvasive elec-trocardiographic imaging for cardiac electrophysiology and arrhythmia. Nature Medicine 10 (4), 422–428 (2004) https://doi.org/10.1038/nm1011 [5] Cluitmans, M., Brooks, D.H., MacLeod, R., D¨ ossel, O., Guillem, M.S., Dam, P.M., Svehlikova, J., He, B., Sapp, J., Wang, L., Bear, L.: Validation and Opportunities of Electrocardiographic Imaging: From Technical Achievements to Clinical Appli-cations. Frontiers in Physiology Volume 9 - (2018) https://doi.org/10.3389/ 21 fphys.2018.01305 [6] Beam, C.B., Linte, C.A., Otani, N.F.: Reconstructing Cardiac Wave Dynamics from Myocardial Motion Data. Computing in Cardiology 2020-Septe , 2–5 (2020) https://doi.org/10.22489/CinC.2020.216 [7] Kovacheva, E., Th¨ amer, L., Fritz, T., Seemann, G., Ochs, M., D¨ ossel, O., Loewe, A.: Estimating cardiac active tension from wall motion—An inverse problem of cardiac biomechanics. International Journal for Numerical Methods in Biomedical Engineering 37 (12), 1–22 (2021) https://doi.org/10.1002/cnm.3448 [8] Lebert, J., Christoph, J.: Synchronization-based reconstruction of electrome-chanical wave dynamics in elastic excitable media. Chaos 29 (9) (2019) https: //doi.org/10.1063/1.5101041 [9] Christoph, J., Lebert, J.: Inverse mechano-electrical reconstruction of cardiac excitation wave patterns from mechanical deformation using deep learning. Chaos 
+
+30 (12) (2020) https://doi.org/10.1063/5.0023751 arXiv:2008.01640 [10] Lebert, J., Deng, D., Fan, L., Lee, L.C., Christoph, J.: Deep Learning-based Prediction of Electrical Arrhythmia Circuits from Cardiac Motion: An In-Silico Study (May) (2023) arXiv:2305.07822 [11] Raissi, M., Perdikaris, P., Karniadakis, G.E.: Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations. Journal of Computational Physics 378 ,686–707 (2019) https://doi.org/10.1016/j.jcp.2018.10.045 [12] Luo, K., Zhao, J., Wang, Y., Li, J., Wen, J., Liang, J., Soekmadji, H., Liao, S.: Physics-informed neural networks for PDE problems: a comprehen-sive review. Artificial Intelligence Review 58 (10) (2025) https://doi.org/10.1007/ s10462-025-11322-7 [13] Sahli Costabal, F., Yang, Y., Perdikaris, P., Hurtado, D.E., Kuhl, E.: Physics-Informed Neural Networks for Cardiac Activation Mapping. Frontiers in Physics 
+
+8(February), 1–12 (2020) https://doi.org/10.3389/fphy.2020.00042 [14] Maga˜ na, E., Pezzuto, S., Sahli Costabal, F.: Ensemble learning of the atrial fibre orientation with physics-informed neural networks. Journal of Physiology 0, 1–18 (2025) https://doi.org/10.1113/JP288001 [15] Herrero Martin, C., Oved, A., Chowdhury, R.A., Ullmann, E., Peters, N.S., Bharath, A.A., Varela, M.: EP-PINNs: Cardiac Electrophysiology Character-isation Using Physics-Informed Neural Networks. Frontiers in Cardiovascular Medicine 8(February), 1–15 (2022) https://doi.org/10.3389/fcvm.2021.768419 arXiv:2112.07703 22 [16] Dalton, D., Husmeier, D., Gao, H.: Physics-informed graph neural network emu-lation of soft-tissue mechanics. Computer Methods in Applied Mechanics and Engineering 417 (August), 116351 (2023) https://doi.org/10.1016/j.cma.2023. 116351 [17] Caforio, F., Regazzoni, F., Pagani, S., Karabelas, E., Augustin, C., Haase, G., Plank, G., Quarteroni, A.: Physics-informed neural network estimation of mate-rial properties in soft tissue nonlinear biomechanical models. Computational Mechanics (2024) https://doi.org/10.1007/s00466-024-02516-x arXiv:2312.09787 [18] Caforio, F., Regazzoni, F., Pagani, S., Karabelas, E., Augustin, C., Haase, G., Plank, G., Quarteroni, A.: Physics-informed neural network estimation of active material properties in time-dependent cardiac biomechanical models. arXiv (2025) https://doi.org/10.1007/s00466-024-02516-x arXiv:2312.09787 [19] Dermul, N., Dierckx, H.: Reconstruction of excitation waves from mechanical deformation using physics-informed neural networks. Scientific Reports 14 (1), 1–16 (2024) https://doi.org/10.1038/s41598-024-67597-3 arXiv:2401.03948 [20] Sahli Costabal, F., Pezzuto, S., Perdikaris, P.: ∆-PINNs: Physics-informed neural networks on complex geometries. Engineering Applications of Artificial Intel-ligence 127 (September 2023) (2024) https://doi.org/10.1016/j.engappai.2023. 107324 [21] Gao, H., Zahr, M.J., Wang, J.X.: Physics-informed graph neural Galerkin net-works: A unified framework for solving PDE-governed forward and inverse problems. Computer Methods in Applied Mechanics and Engineering 390 , 114502 (2022) https://doi.org/10.1016/j.cma.2021.114502 arXiv:2107.12146 [22] Quarteroni, A., Lassila, T., Rossi, S., Ruiz-Baier, R.: Integrated Heart—Coupling multiscale and multiphysics models for the simulation of the cardiac function. Computer Methods in Applied Mechanics and Engineering 314 , 345–407 (2017) https://doi.org/10.1016/j.cma.2016.05.031 [23] Guccione, J.M., Costa, K.D., McCulloch, A.D.: Finite element stress analysis of left ventricular mechanics in the beating dog heart. Journal of Biomechanics 
+
+28 (10), 1167–1177 (1995) https://doi.org/10.1016/0021-9290(94)00174-3 [24] Hadjicharalambous, M., Chabiniok, R., Asner, L., Sammut, E., Wong, J., Carr-White, G., Lee, J., Razavi, R., Smith, N., Nordsletten, D.: Analysis of passive cardiac constitutive laws for parameter estimation using 3D tagged MRI. Biome-chanics and modeling in mechanobiology 14 (4), 807–828 (2015) https://doi.org/ 10.1007/s10237-014-0638-9 [25] Finsberg, H.N.T., Herck, I.G.M., Daversin-Catty, C., Arevalo, H., Wall, S.: sim-cardems: A FEniCS-based cardiac electro-mechanics solver. Journal of Open Source Software 8(81), 4753 (2023) https://doi.org/10.21105/joss.04753 23 [26] Henrik, F.: cardiac-geometry. GitHub (2022) [27] Land, S., Gurev, V., Arens, S., Augustin, C.M., Baron, L., Blake, R., Bradley, C., Castro, S., Crozier, A., Favino, M., Fastl, T.E., Fritz, T., Gao, H., Gizzi, A., Griffith, B.E., Hurtado, D.E., Krause, R., Luo, X., Nash, M.P., Pezzuto, S., Plank, G., Rossi, S., Ruprecht, D., Seemann, G., Smith, N.P., Sundnes, J., Jeremy Rice, J., Trayanova, N., Wang, D., Wang, Z.J., Niederer, S.A.: Veri-fication of cardiac mechanics software: Benchmark problems and solutions for testing active and passivematerial behaviour. Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences 471 (2184) (2015) https: //doi.org/10.1098/rspa.2015.0641 [28] O’Hara, T., Vir´ ag, L., Varr´ o, A., Rudy, Y.: Simulation of the undiseased human cardiac ventricular action potential: Model formulation and experimental valida-tion. PLoS Computational Biology 7(5) (2011) https://doi.org/10.1371/journal. pcbi.1002061 [29] Land, S., Park-Holohan, S.-J., Smith, N.P., Dos Remedios, C.G., Kentish, J.C., Niederer, S.A.: A model of cardiac contraction based on novel measurements of tension development in human cardiomyocytes. Journal of molecular and cellular cardiology 106 , 68–83 (2017) https://doi.org/10.1016/j.yjmcc.2017.03.008 [30] Kingma, D.P., Ba, J.: Adam: A Method for Stochastic Optimization. CoRR 
+
+abs/1412.6980 (2014) [31] Bradbury, J., Frostig, R., Hawkins, P., Johnson, M.J., Leary, C., Maclaurin, D., Necula, G., Paszke, A., VanderPlas, J., Wanderman-Milne, S., Zhang, Q.: JAX: Composable Transformations of Python+NumPy programs, (2018). http: //github.com/jax-ml/jax [32] Gatica, G.N.: A Simple Introduction to the Mixed Finite Element Method: Theory and Applications. (2014). 
+
+https://api.semanticscholar.org/CorpusID:117312585 
+
+[33] Rafiq, M., Rafiq, G., Choi, G.S.: DSFA-PINN: Deep Spectral Feature Aggregation Physics Informed Neural Network. IEEE Access 10 , 22247–22259 (2022) https: //doi.org/10.1109/ACCESS.2022.3153056 [34] Taylor, J.M., Pardo, D., Muga, I.: A Deep Fourier Residual method for solv-ing PDEs using Neural Networks. Computer Methods in Applied Mechanics and Engineering 405 , 115850 (2023) https://doi.org/10.1016/j.cma.2022.115850 [35] Li, W., Bazant, M.Z., Zhu, J.: A physics-guided neural network framework for elastic plates: Comparison of governing equations-based and energy-based approaches. Computer Methods in Applied Mechanics and Engineering 383 ,113933 (2021) https://doi.org/10.1016/j.cma.2021.113933 24 [36] Herrmann, L., Kollmannsberger, S.: Deep learning in computational mechan-ics: a review. Computational Mechanics (2024) https://doi.org/10.1007/ s00466-023-02434-4 [37] Xiang, Z., Peng, W., Liu, X., Yao, W.: Self-adaptive loss balanced Physics-informed neural networks. Neurocomputing 496 , 11–34 (2022) https://doi.org/ 10.1016/j.neucom.2022.05.015 [38] McClenny, L.D., Braga-Neto, U.M.: Self-adaptive physics-informed neural net-works. Journal of Computational Physics 474 , 111722 (2023) https://doi.org/10. 1016/j.jcp.2022.111722 [39] Verh¨ ulsdonk, J., Grandits, T., Costabal, F.S., Pinetz, T., Krause, R., Auric-chio, A., Haase, G., Pezzuto, S., Effland, A.: Shape of my heart: Cardiac models through learned signed distance functions. In: Burgos, N., Petit-jean, C., Vakalopoulou, M., Christodoulidis, S., Coupe, P., Delingette, H., Lartizien, C., Mateus, D. (eds.) Proceedings of The 7nd International Con-ference on Medical Imaging with Deep Learning. Proceedings of Machine Learning Research, vol. 250, pp. 1584–1605. PMLR, Cambridge MA (2024). 
+
+https://proceedings.mlr.press/v250/verhulsdonk24a.html 
+
+[40] Cuculich, P.S., Schill, M.R., Kashani, R., Mutic, S., Lang, A., Cooper, D., Faddis, M., Gleva, M., Noheria, A., Smith, T.W., Hallahan, D., Rudy, Y., Robinson, C.G.: Noninvasive cardiac radiation for ablation of ventricular tachycardia. New England Journal of Medicine 377 (24), 2325–2336 (2017) https://doi.org/10.1056/ NEJMoa1613773 https://www.nejm.org/doi/pdf/10.1056/NEJMoa1613773 25

@@ -1,0 +1,282 @@
+Title: Efficient design of continuation methods for hyperbolic transport problems in porous media
+
+URL Source: https://arxiv.org/pdf/2603.10730v1
+
+Published Time: Thu, 12 Mar 2026 00:58:28 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+# Efficient design of continuation methods for hyperbolic transport problems in porous media 
+
+## Peter von Schultzendorff ∗ Jakub Wiktor Both † Jan Martin Nordbotten ‡
+
+## Tor Harald Sandve §
+
+Abstract 
+
+Full-physics modeling of multiphase flow in porous media, e.g., for carbon storage and groundwater management, requires the nonlinear coupling of various physical processes. In-dustry standard nonlinear solvers, typically of Newton-type, are not unconditionally convergent and computationally expensive. Homotopy continuation solvers have recently been studied as a robust and versatile alternative. They tackle challenging nonlinear problems by first solving a simple auxiliary problem and then tracing a solution curve towards the more complex target problem. Robustness and efficiency of the method depends on the iterative numerical curve-tracing algorithm as well as on careful design of the auxiliary problem. We assess the traceability of the solution curve for different choices of the auxiliary problem. For the Buckley–Leverett equation, modeling two-phase flow in one dimension, we exemplarily compare the previously introduced vanishing-diffusion and linear constitutive laws homotopy continuation, and a new approach based on the entropy solution of the problem. This provides insight toward system-atically and robustly designing homotopy continuation methods for solving complex multiphase flow in porous media. 
+
+# 1 Introduction 
+
+Modeling fluid flow in subsurface reservoirs involves strongly nonlinear interactions between fluid phases and components governed by constitutive laws. The resulting nonlinear systems of equations often challenge standard nonlinear solvers, which may fail to converge for large time steps, forcing unnecessary time-step reductions that hinder computational efficiency. Hyperbolic transport of fluid phases or components, exemplified by the classical Buckley-Leverett equation for one-dimensional two-phase flow [12], highlights typical difficulties for non-linear solvers. The characteristics of these hyperbolic, in the presence of capillary forces, weakly parabolic, transport problems are governed by the nonlinear flow functions that determine the fraction of total flow carried by the phase or component of interest. The discretized numeri-cal flow functions introduce inflections and kinks that often cause nonconvergence [6, 15, 10]. Moreover, degeneracies in the non-saturated regime cause slowly propagating saturation fronts that further slow nonlinear convergence [7]. Several strategies aim to improve nonlinear robustness. Damping methods such as Apple-yard chopping and trust-region methods constrain saturation updates between Newton steps to 
+
+> ∗
+
+Department of Mathematics, University of Bergen, All´ egaten 44, 5007 Bergen, Norway. Email: 
+
+peter.schultzendorff@uib.no .
+
+> †
+
+Department of Mathematics, University of Bergen, All´ egaten 44, 5007 Bergen, Norway. Email: 
+
+jakub.both@uib.no .
+
+> ‡
+
+Department of Mathematics, University of Bergen, All´ egaten 44, 5007 Bergen, Norway. NORCE, Nyg˚ ardsgaten 112, 5008 Bergen, Norway. Email: jan.nordbotten@uib.no .
+
+> §
+
+NORCE, Nyg˚ ardsgaten 112, 5008 Bergen, Norway. Email: tosa@norceresearch.no .
+
+1
+
+> arXiv:2603.10730v1 [math.NA] 11 Mar 2026
+
+prevent crossing steep gradients, inflection points, or kinks in the flow functions [6, 15, 10]. Hy-brid upwinding methods evaluate viscous, buoyancy, and capillary phase mobilities separately, thereby smoothing the flow functions [10, 4]. However, except for Appleyard chopping, these methods require explicit fractional flow functions, limiting their use with implicit or black-box constitutive laws, such as hybrid physics-based, data-driven models [11]. A versatile alternative is the homotopy continuation (HC) method, which has been applied to solve nonlinear problems in multiphase flow in porous media [7, 13, 5, 8, 14] and computational fluid dynamics [2, 3]. HC constructs a convex combination of a simpler auxiliary problem and the original system resulting in a solution curve connecting both problems. The HC curve is traced using a predictor-corrector (PC) algorithm. If the solution varies smoothly along the curve, each predictor remains within the convergence region of the subsequent corrector, enabling robust solution of highly nonlinear PDEs that challenge traditional solvers. The overall efficiency and robustness of the HC method depend on the PC scheme and on the auxiliary problem, which governs the geometric traceability of the HC curve. This work investigates the HC curve traceability for the Buckley–Leverett equation using three auxiliary problems. We compare curvature, which governs the accuracy of first-order predictors, following the approach of [3], and Newton convergence to determine admissible PC step sizes. The auxiliary problems are a vanishing diffusion formulation [7, 13, 8], a linear constitutive-law approach [14], and a new formulation based on the entropy solution of the hyperbolic transport problem. To our knowledge, curve traceability for continuation methods in porous media flow has not been systematically assessed. The rest of the article is organized as follows. Section 2 describes the Buckley–Leverett problem and discretization. Section 3 introduces the HC method, auxiliary problems, and traceability metrics. Section 4 presents the numerical assessment of HC curves. 
+
+# 2 Buckley–Leverett equation and its numerical solution 
+
+For this study, we consider the Buckley–Leverett equation, which describes incompressible and immiscible flow of two fluid phases in a one-dimensional homogeneous porous medium. The one-dimensional setting enables direct visualization and study of the HC curves. Despite its simplicity, the Buckley–Leverett equation captures key complexities that also appear in the higher-dimensional full-physics model, for example, when one fluid displaces another through narrow channels in heterogeneous formations, where the behavior is effectively one-dimensional. Given a domain Ω = [0 , L ] and a time interval I = [0 , T ], the mathematical model reads 
+
+∂S ∂t + vϕ∂f (S)
+
+∂x = 0 on Ω × (0 , T ], (1a) 
+
+S(x, 0) = S0, S(0 , t ) = Si, (1b) Here, the unknown S(x, t ) ∈ [0 , 1] describes the wetting phase saturation, the flow function f (S)represents the ratio of wetting volumetric flow rate to the total flow rate, and v and ϕ are total volumetric flow and porosity, respectively. By choosing a suitable rescaling of the time t, we can assume that vϕ = 1. For the common Corey relative permeability model kr, w = Snw and 
+
+kr, n = (1 − S)nn and a constant viscosity ratio M = μw 
+
+> μn
+
+, the fractional flow function is given by 
+
+f (S) = Snw
+
+Snw + M (1 − S)nn (2) 
+
+## 2.1 Fully implicit finite volume discretization 
+
+To solve (1) numerically, we consider a partitioning of the spatial domain into NK control volumes 
+
+
+
+xk− 12 , x k+ 12
+
+
+
+of uniform size ∆ x, k = 1 , ..., N K , and a partitioning of the temporal domain into time intervals [ tn−1, t n) of size τ n = tn − tn−1, n = 1 , ..., N n. We denote by Snk
+
+2the approximate cell average of the saturation in cell Kk at time tn. Discretizing the Buckley– Leverett equation with the implicit Euler method, cell-centered finite volumes (CCFVM), and upstream mobility weighting, we obtain for each discrete time and each control volume the discrete problem 
+
+Snk − Sn−1
+
+> k
+
+τ n + f (Snk−1) − f (Snk )∆x = 0 , k = 1 , . . . , N K , n = 1 , . . . , N n. (3) 
+
+## 2.2 Newton’s method & nonlinear solver challenges 
+
+The nonlinear system of coupled equations at discrete time tn, denoted by Fn(Xn) = 0, is typically solved with Newton’s method. Newton’s method is also the nonlinear solver of our choice for the corrector step of the HC method, as described in Section 3. However, we emphasize that the presented HC method and the framework for numerical analysis can be combined with other iterative nonlinear solvers. In the purely viscous case, Newton’s method is unconditionally convergent for linear, convex, or concave flux functions. However, for S-shaped flux functions Newton may be non-convergent whenever a cell saturation update crosses an inflection point where f ′′ (S) = 0 [6]. In the degenerate regime, where one phase invades a medium initially saturated with the other and the initial saturation is close to an immobile state S0 = 0 or S0 = 1, nonlinear relative permeabilities cause the saturation front to advance only by one grid cell per Newton step. This severely limits the overall convergence rate [7]. 
+
+# 3 Homotopy continuation method & traceability metrics 
+
+The homotopy continuation (HC) method is a globalization technique that aims at improving robustness and overall convergence speed compared to Newton’s method. It has proven effective for solving nonlinear PDEs, in CFD [2, 3] and porous media flow [7, 13, 8]. Rather than solving the nonlinear system 
+
+F : Rn → Rn, F(X) = 0 (4) directly, the problem is embedded into the higher-dimensional space Rn+1 using the HC frame-work. The key idea is to iteratively deform a simpler auxiliary problem 
+
+G : Rn → Rn, G(X) = 0 , (5) into the target problem. The auxiliary problem should be chosen such that its solution can be efficiently obtained with standard nonlinear solvers. The HC method then considers a convex combination with the target problem 
+
+H : Rn+1 → Rn, H(X; λ) := λG(X) + (1 − λ)F(X) = 0 , λ ∈ [0 , 1] . (6) For λ = 1, the HC problem reduces to the auxiliary problem H(X; 1) = G(X), while for λ = 0 the target problem H(X; 0) = F(X) is recovered. The HC method proceeds by tracing the solution curve 
+
+H := {(X; λ) | ∃ λ ∈ [0 , 1] s.t. H (X; λ) = 0 } (7) from λ = 1 to λ = 0. For the numerical solution of PDEs, a predictor-corrector (PC) algorithm is commonly used for curve tracing [3, 7], while alternative algorithms exist [1]. The PC algorithm discretizes λ as λ0 = 1 , λ 1, λ 2, · · · → 0. At each HC step i, the predictor provides an initial guess for solving the subproblem H  X, λ i = 0. The corrector refines the initial guess by solving the subproblem up to the desired precision. A common choice is to use a first-order Euler predictor step and Newton’s method as the corrector [1, 3]. 
+
+33.1 HC design criteria & auxiliary problem 
+
+Robustness and efficiency of the HC method hinge on how accurately the PC algorithm traces the curve. Robustness requires corrector convergence at each continuation step, necessitating accurate predictor steps and/or sufficiently short step sizes ∆ λ = λi+1 − λi. Efficiency demands minimizing the total number of PC steps. These challenges can be addressed in two comple-mentary ways. On the algorithmic level, the PC method can be improved through higher-order predictors, better nonlinear solvers in the corrector, or adaptive stopping criteria to reduce over-all computational cost. Conversely, geometric traceability of the HC curve can be improved by optimizing the auxiliary problem. Following the design criteria for HC outlined in [3], the auxiliary problem should be chosen such that: 1. The auxiliary problem G(X) = 0 has a unique solution that can be found robustly, ideally unconditionally, using a standard nonlinear solver. 2. The HC curve can be traced reliably and efficiently using a PC method. This is governed by two key characteristics of the curve: (a) The curvature κ of the curve is small, enabling accurate initial guesses to the sub-problems H(X; λ) = 0 with low-order predictors. (b) The nonlinear subproblems admit large convergence regions, allowing corrector con-vergence from relatively poor initial guesses. 3. The HC curve is free of bifurcation points that necessitate small steps along the curve [1]. 4. The linearized subproblems along the HC curve are computationally tractable and ideally simpler to solve than those of the target problem. To improve robustness and efficiency of HC for the Buckley–Leverett problem, we focus on the choice of the auxiliary problem with regard to the first two criteria listed above. We compare three auxiliary problems presented in more detail in the following subsections. 
+
+3.1.1 Vanishing artificial diffusion 
+
+Suggested for use in porous media flow in [7] and extended in [13, 8], the vanishing diffusion HC augments the governing equations with an artificial diffusion term 
+
+Hd(X) = F(X) + λD(X). (8a) In the discretized Buckley–Leverett problem, the artificial diffusion term reads 
+
+β τ n
+
+∆x
+
+ Sn+1  
+
+> i−1
+
+− 2Sn+1  
+
+> i
+
++ Sn+1 
+
+> i+1
+
+ , (8b) where β is a tunable parameter. The diffusion regularizes the hyperbolic transport problem, by making the auxiliary problem more parabolic. Consequently, at λ = 1 mass can disperse globally across the domain, towards the approximate final destination. As λ → 0, the diffusion term vanishes and the target problem is recovered, but mass only has to move locally. This enables robust convergence if the Newton steps in the corrector do not have to cross inflection or transition points in the flow function. The vanishing diffusion HC has also been shown to speed up convergence in degenerate cases where the initial saturation is close to the immobile saturation S0 = 0 or S0 = 1 [7]. A drawback of the vanishing diffusion approach is that the HC curve formally extends to the fully diffusive limit as λ → ∞ , so a finite starting point of the curve must be imposed by prescribing the diffusion strength at λ = 1. For the one-dimensional transport problem, a CFL-type argument and numerical tests suggest β = ω max |f ′(S)|, with ω = 2 · 10 −3, whereas for two-dimensional coupled flow and transport a much smaller value ω = 10 −5 is suggested [7]. This highlights the inherent limitation of the artificial diffusion HC that necessitates numerical determination of the initial diffusion strength. 
+
+43.1.2 Linear relative permeabilities 
+
+Linear relative permeabilities yield a linear, convex, or concave flow function, cf. Figures 3a and 3b, for which the discretized problem (3) is unconditionally convergent [6]. In the degenerate regime, linear relative permeabilities also allow the saturation front to advance more than one grid cell per Newton step, improving convergence. This motivates starting the HC with linear relative permeabilities: 
+
+Gn
+
+> lin
+
+(Xn)k = S,n +1  
+
+> k
+
+− S,n k
+
+τ n + flin (Sn+1  
+
+> k−1
+
+) − flin (Sn+1  
+
+> k
+
+)∆x , (9a) 
+
+Hlin = λGlin (X) + (1 − λ)F(X). (9b) This HC has previously been used in [14], where it was combined with adaptive stopping criteria. 
+
+3.1.3 Convex/concave hull 
+
+For hyperbolic conservation problems, the analytical solution of the Riemann problem depends only on the upper concave or lower convex hull of the flow function, depending on wave direc-tion. Replacing the flow function f (S) with its convex hull fc(S) therefore yields a modified Buckley–Leverett problem with the same entropy solution. This motivates an HC design in which the auxiliary problem uses the convex/concave hull. By construction, fc(S) is globally convex/concave and linear near the immobile saturation of the invading phase. Consequently, the auxiliary problem offers the same benefits as linear relative permeabilities: unconditional convergence for all initial conditions and fast convergence in degenerate regimes. 
+
+Gn 
+
+> c
+
+(Xn)k = S,n +1  
+
+> k
+
+− S,n k
+
+τ n + fc(Sn+1  
+
+> k−1
+
+) − fc(Sn+1  
+
+> k
+
+)∆x , (10a) 
+
+Hc = λGc(X) + (1 − λ)F(X) (10b) This idea is conceptually similar to the corrected operator splitting for convection-diffusion equations. The convective splitting step places the shock at the correct location, analogous to solving the convex/concave hull problem, while the diffusive splitting step restores the correct shock profile, analogous to solving the target problem [9]. 
+
+## 3.2 HC curve traceability 
+
+To study curvature and convergence properties of the Newton corrector step along the HC curve we introduce two quantitative metrics. We emphasize that curvature and Newton convergence along the HC curve are highly problem-dependent. They are influenced by the physical model, the geometry and dimensionality, and the discretization of the problem of interest. Therefore, extrapolating results on traceability of HC curves from the Buckley–Leverett problem to higher-dimensional and full-physics simulations is possible only on an abstract conceptual level. 
+
+3.2.1 HC curvature 
+
+Given an arclength parametrization q(s) := ( X(s), λ (s)) of the HC curve H satisfying ˙ q(s) ·
+
+˙q(s) = 1 and assuming the HC curve is traced with steps of constant arclength ∆ s, a Taylor expansion of H (X(s); λ(s)) shows that the prediction error of a first-order Euler predictor scales as e ∼ s2tot κ, where 
+
+κ(s) = p¨q(s) · ¨q(s) (11) is the total curvature of the HC curve and stot is the total arclength of the curve [3]. Although the magnitude of s2tot κ depends on the specific problem, comparatively large values indicate that large predictor steps taken along the tangent may yield poor initial guesses for the Newton corrector loop. 
+
+5Table 1: Parameters for the Riemann problem test cases ( nw = nn = 2, NK = 100, τ 1 = 25 .0). 
+
+Case M S0 
+
+> L,R
+
+Si
+
+1 1.0 0, 1 0.0 2a 10.0 0, 1 0.0 Case M S0 
+
+> L,R
+
+Si
+
+2b 10.0 1, 0 1.0 2c 10.0 0.8, 0.2 0.8 
+
+3.2.2 Newton convergence along the HC curve 
+
+Determining the region of Newton convergence for complex nonlinear problems is inherently challenging. To the best of the authors’ knowledge, no theoretical result on Newton convergence exists for the discretized one-dimensional hyperbolic transport problem when the flow function is neither linear, convex, nor concave. In practice, PC algorithms often use zero-order or first-order predictors [1, 3]. In both cases, given a previous solution along the curve, q(s), the initial guess for the Newton corrector step is taken along the line qpred (s)( γ) = {q(s) + γ ˙q(s) | γ ∈ R+}. To quantify the longest admissible predictor step size along the line, we define 
+
+r(s) = max 
+
+> r
+
+(
+
+r Newton converges for H (X; λpred (s)( γ)) from qpred (s)( γ) ∀ 0 < γ ≤ r
+
+)
+
+, (12a) and the normalized measure ˜r(s) = r(s) ˙λ(s)
+
+λ(s) ∈ [0 , 1] . (12b) A value of ˜ r(s) = 1 indicates that the target system can be solved with an initial guess on the tangent predictor. Alternatively, nonlinear complexity along the curve can be characterized by auxiliary di-mensionless numbers [3]. In porous media flow these are the Peclet number, representing the ratio of viscous to capillary forces, the gravity number, representing the ratio of buoyancy to viscous forces [10], and the CFL number, corresponding to the maximum domain of wave prop-agation [7]. 
+
+# 4 Numerical analysis 
+
+We compare curvature and Newton convergence of the linear relative permeability HC, the convex/concave hull HC, and the vanishing diffusion HC with three initial diffusion strengths 
+
+ω ∈ 10 −5, 2 × 10 −3, 10 −1 , on four Riemann problems. Constant initial conditions S0 |[0 ,0.5] =
+
+S0right , S 0 |[0 .5,1] = S0left are prescribed on each half of the domain. Initial conditions, saturation at the inlet Si and the viscosity ratio M are varied as reported in Table 1, while the Corey exponents are kept constant nw = nn = 2. The domain is discretized into NK = 100 cells and a single time step of size τ 1 = 25 .0 is solved. Appleyard damping and physical saturation bounds 
+
+S ∈ [0 , 1] are enforced after each Newton update in the corrector loop. Across all test cases, the linear relative permeability HC shows relatively high curvature at λ = 1, but curvature consistently decreases along the curve, indicating good overall curve traceability regardless of problem parameters. When the convex/concave hull closely matches the target flow function, it achieves the lowest curvature among all HC designs, cf. Figure 1. However, when the invading phase has the larger viscosity, the linear part of the convex/concave hull deviates significantly from the target flow function, increasing curvature. Inspection of the solution curve suggests that this is caused by added numerical diffusion that prevents accurate numerical resolution of the shock at λ = 1, cf. Figure 5. 
+
+6The vanishing diffusion HC with ω = 2 × 10 −3 shows a rapid increase in curvature in the last third of the curve for all problems, cf. Figures 1a, 1c, 2a and 2c. Nevertheless, early-stage curvature remains low enough for ˜ r(s) to attain its maximum along the entire curve. These findings should be interpreted cautiously. Even a slight initial curvature increase reduces ˜ r(s), as seen for the linear relative permeability HC in Figure 2b. In the non-degenerate case Figure 2c, the curvature is significantly lower than in the degenerate cases with immobile invading phase saturation Figures 1a, 1c and 2a. For all problems, the vanishing diffusion HC with ω = 10 −1 fails to converge at λ = 1. Conversely, the HC with ω = 10 −5 converges robustly and achieves the lowest curvature in three of the four cases, indicating easy traceability Figures 1a, 1c, 2a and 2c. However, it is presumably a poor choice for the auxiliary problem, as it is too close to the target problem, as discussed below. The results confirm that ω = 2 × 10 −3 is indeed a suitable choice for the Buckley–Leverett equation.          
+
+> (a) Curvature (Case 1) (b) Metric (Case 1)
+> (c) Curvature (Case 2a) (d) Metric (Case 2a)
+> Figure 1: Curvature and relative convergence metrics for Case 1 ( M= 1) and Case 2a ( M= 10).
+
+The solution curves for Case 2a Figure 4 illustrate these trends. The convex/concave hull HC accurately reproduces the shock and the rarefaction wave of the target solution. The flow function in the linear relative permeability HC has a similar profile to the target flow func-tion Figure 3c, producing a similarly accurate solution despite lacking a shock. The vanishing diffusion HC with ω = 2 × 10 −3 significantly smears the saturation front, whereas ω = 10 −5
+
+yields an auxiliary solution that is almost indistinguishable from the target. Finally, cases symmetric with respect to phase labeling, for example the Riemann problem with M = 0 .1, S 0left = 1 .0, S 0right = 0 .0, S i = 1 .0, which corresponds to case 2a, exhibit identical curvature and convergence behavior. 
+
+Data availability statement The complete source code is publicly accessible at https: //doi.org/10.5281/zenodo.18863360 .
+
+7(a) Curvature (Case 2b) (b) Metric (Case 2b)    
+
+> (c) Curvature (Case 2c) (d) Metric (Case 2c)
+
+Figure 2: Curvature and relative convergence metrics for Case 2b ( M = 10 , S i = 1 .0) and Case 2c ( M = 10 , S i = 0 .8).      
+
+> (a) Case 1 (b) Case 2a (c) Case 2b and 2c
+
+Figure 3: Target, linear relative permeabilities, and convex hull flow functions for the different cases. 
+
+8(a) Linear relative permeabilities HC. (b) Convex/concave hull HC.          
+
+> (c) Vanishing diffusion HC with ω= 2 ×10 −3.(d) Vanishing diffusion HC with ω= 10 −5.
+
+Figure 4: Evolution of the solution along the HC curve beginning from the different auxiliary problems for case 2a. 
+
+Figure 5: Solution curve for Case 2b using the convex/concave hull HC. 
+
+9Use of generative AI statement The authors used M365 Copilot to improve clarity and phrasing of the manuscript. GitHub Copilot was used to generate unit tests, write code documentation, and optimize the source code for the traceability measures. The authors have reviewed and revised all AI-generated content and take full responsibility for the final work. 
+
+Acknowledgements The authors acknowledge funding from the Centre of Sustainable Subsurface Resources (CSSR), grant nr. 331841, supported by the Research Council of Nor-way, research partners NORCE Norwegian Research Centre and the University of Bergen, and user partners Equinor ASA, Wintershall Dea Norge AS, Sumitomo Corporation, Earth Science Analytics, GCE Ocean Technology, and SLB Scandinavia. JWB acknowledges partial support from the FRIPRO project “Unlocking maximal geological CO2 storage through experimentally validated mathematical modeling of dissolution and convective mixing (TIME4CO2)”, grant nr. 355188, funded by the Research Council of Norway. 
+
+# References 
+
+[1] E. L. Allgower and K. Georg. Introduction to Numerical Continuation Methods . Society for Industrial and Applied Mathematics, 2003. doi: 10.1137/1.9780898719154. [2] D. A. Brown and D. W. Zingg. A monolithic homotopy continuation algorithm with ap-plication to computational fluid dynamics. Journal of Computational Physics , 321:55–75, 2016. doi: 10.1016/j.jcp.2016.05.031. [3] D. A. Brown and D. W. Zingg. Design and evaluation of homotopies for efficient and robust continuation. Applied Numerical Mathematics , 118:150–181, 2017. doi: 10.1016/j.apnum.2017.03.001. [4] F. P. Hamon, B. T. Mallison, and H. A. Tchelepi. Implicit Hybrid Upwind scheme for coupled multiphase flow and transport with buoyancy. Computer Methods in Applied Me-chanics and Engineering , 311:599–624, 2016. doi: 10.1016/j.cma.2016.08.009. [5] M. Jakobsen, X. Huang, and R.-S. Wu. Homotopy analysis of the Lippmann–Schwinger equation for seismic wavefield modelling in strongly scattering media. Geophysical Journal International , 222(2):743–753, 2020. doi: 10.1093/gji/ggaa159. [6] P. Jenny, H. A. Tchelepi, and S. H. Lee. Unconditionally convergent nonlinear solver for hyperbolic conservation laws with S-shaped flux functions. Journal of Computational Physics , 228(20):7497–7512, 2009. doi: 10.1016/j.jcp.2009.06.032. [7] J. Jiang and H. A. Tchelepi. Dissipation-based continuation method for multiphase flow in heterogeneous porous media. Journal of Computational Physics , 375:307–336, 2018. doi: 10.1016/j.jcp.2018.08.044. [8] J. Jiang and H. Pan. Efficient dissipation-based nonlinear solver for multiphase flow in discrete fractured media. Journal of Computational Physics , 479:112006, 2023. doi: 10.1016/j.jcp.2023.112006. [9] K. H. Karlsen, K.-A. Lie, J. R. Natvig, H. F. Nordhaug, and H. K. Dahle. Operator split-ting methods for systems of convection–diffusion equations: Nonlinear error mechanisms and correction strategies. Journal of Computational Physics , 173(2):636–663, 2001. doi: 10.1006/jcph.2001.6901. [10] B. Li and H. A. Tchelepi. Nonlinear analysis of multiphase transport in porous media in the presence of viscous, buoyancy, and capillary forces. Journal of Computational Physics ,297:104–131, 2015. doi: 10.1016/j.jcp.2015.04.057. [11] Y. Li, T. Zhang, and S. Sun. Acceleration of the NVT flash calculation for multicomponent mixtures using deep neural network models. Industrial & Engineering Chemistry Research ,58(27):12312–12322, 2019. doi: 10.1021/acs.iecr.9b00527. 
+
+10 [12] Ø. Pettersen. Grunnkurs i reservoarmekanikk . Matematisk institutt, Universitetet i Bergen, Bergen, 1990. [13] P. Salinas, C. C. Pain, H. Osman, C. Jacquemyn, Z. Xie, and M. D. Jackson. Vanishing artificial diffusion as a mechanism to accelerate convergence for multiphase porous media flow. Computer Methods in Applied Mechanics and Engineering , 359:112535, 2020. doi: 10.1016/j.cma.2019.07.004. [14] P. von Schultzendorff, J. W. Both, J. M. Nordbotten, T. H. Sandve, and M. Vohral´ ık. Adaptive homotopy continuation solver for incompressible two-phase flow in porous media. (in preparation). [15] X. Wang and H. A. Tchelepi. Trust-region based solver for nonlinear transport in het-erogeneous porous media. Journal of Computational Physics , 253:114–137, 2013. doi: 10.1016/j.jcp.2013.06.041. 
+
+11
