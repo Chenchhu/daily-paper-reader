@@ -1,0 +1,1975 @@
+Title: A blended approach for evolving phase fields using peridynamics: Cyclic loading in quasi-brittle fracture
+
+URL Source: https://arxiv.org/pdf/2603.12210v1
+
+Published Time: Fri, 13 Mar 2026 01:21:20 GMT
+
+Number of Pages: 33
+
+Markdown Content:
+# A blended approach for evolving phase fields using peridynamics: Cyclic loading in quasi-brittle fracture 
+
+Hayden Bromley a, Robert Lipton a
+
+> aDepartment of Mathematics, Louisiana State University, Lockett Hall, Baton Rouge, 70803-4918, LA, USA
+
+Abstract 
+
+A field theory is presented for predicting damage and fracture in quasi brittle materials incorporating effects of irreversible (plastic) deformation as well as elastic moduli that soften with damage. The new observation made here is that material degradation models consistent with plastic dissipation can be described by a two-point history-dependent phase field. This approach blends a two-point phase field with the deformation evolving according to Newton’s second law by way of a nonlocal constitutive law. Here the nonlocality is in both space and time. The strain is given by an additive decomposition of elastic strain and irreversible strain. The stress-strain behavior is described by a strength envelope and a family of unloading laws based on damage and plasticity with elastic moduli that degrade in coordination with the accumulation of irreversible strain. The material displacement field is uniquely determined by the initial boundary value problem. The theory satisfies energy balance, with positive energy dissipation rate in accordance with the laws of thermodynamics. The fracture energy of flat cracks is recovered directly from the model and is the product of energy release rate and the crack area, moreover this formula is independent of the length scale of non-locality. The formulation delivers a mesh free method for predicting crack patterns and simulations show quantitative and qualitative agreement with experiments, including hysteresis and damage associated with three-point bending tests on concrete and size effects for quasi-brittle materials. 
+
+Keywords: Quasi-brittle, Fracture Mechanics, Damage plasticity, Peridynamics, Phase Field Fracture, Nonlocal Modeling 
+
+1. Introduction 
+
+The identification of a suitable field theory from which to pose the fracture initial boundary value problem (IBVP) is a longstanding problem of continuum mechanics. Ideally the IBVP should deliver an evolution for the displacement of the material inside a sample Ω based upon Newton’s second law. From this a displacement damage-fracture pair is sought. The evolution is informed by initial values for the displacements and velocities and driven by boundary conditions that change in time. The associated numerical methods for obtaining the solution follow on discretization of the IBVP. During the past fifty years there has been conceptual and theoretical progress in understanding this challenge along several directions by physicists and engineers as well as a growing number of applied mathematicians, see Freund (1972), Willis (1975), Xu and Needleman (1994), Marder and Gross (1995), Ortiz and Pandolfi (1999), Silling (2000), Buehler et al. (2003), Nicaise and Sandig (2007), Du et al. (2015), and Dal Maso et al. (2016). These citations while not exhaustive do provide important developments in the theory and computation of crack patterns employing an evolution equation based exclusively on Newton’s second law. The phase field theory expressed in this paper uses a peridynamic interpretation of Newton’s second law, Silling (2000), Silling et al. (2007), to evolve the displacement of the material and there is no separate equation for phase field evolution. Instead, the phase field is introduced as part of a history dependent constitutive law determined by the displacement field. The dynamics can be articulated as an evolution on the product space Ω × Ω of strains between pairs of points y and x inside Ω, see Lipton and Bhattacharya (2025). A constitutive law for the relationship between force and strain between two points is provided in terms of the phase field, see Lipton and Bhattacharya (2025), Coskun et al. (2025). The dynamic evolution of the displacement autonomously selects the pairs of points for which there is no longer force exerted between them. When the pairs are aligned transverse to a surface we recognize the surface as a new component of 
+
+> arXiv:2603.12210v1 [cond-mat.mtrl-sci] 12 Mar 2026
+
+boundary, i.e., a crack. The energy necessary to form a crack follows directly from the evolution equation via geometric measure theory, Lipton and Bhattacharya (2025) and agrees with the Griffith fracture energy given by the critical energy release rate multiplied by the surface area of the crack. The method developed here makes exclusive use of Newton’s second law and differs from traditional phase field methods. Traditional phase field methods couple a time evolved phase field with an time evolution equation for the displacement. The first such approach is formulated as a phase field displacement system with the phase field evolving according to a Ginzburg-Landau equation and the displacement evolution based on Newton’s second law. In this system the phase field equation is driven by the displacement field and the displacement equation is coupled to the phase field, see Aranson et al. (2000); Karma et al. (2001). The second type of phase field methodology is originally developed for quasi static fracture and the displacement is coupled to damage through the Ambrosio and Tortorelli (1990) energy, see Bourdin et al. (2000). These phase field methods are extended to the dynamic case and the displacement evolves according to Newton’s second law and is coupled to damage through an Ambrisio-Torterelli energy either through a variational constraint or a second evolution equation. The variational constraint is given by a crack stability condition expressed as a minimum principle Bourdin et al. (2011); Larsen et al. (2010). For this case the total energy is seen to converge in the limit of vanishing non-locality to the linear elastic fracture energy of classical fracture in Section 7 of Lipton (2016). Subsequently a thermodynamically consistant phase field method is developed using Newton’s second law employing a second evolution equation for the phase field based again on an Ambrosio-Tortorelli energy Borden et al. (2012). We point out that the methodology presented here recovers the same dynamic fracture results obtained in Borden et al. (2012) for brittle fracture evolution see Coskun et al. (2025). In this article we extend the phase field - peridynamic (blended) approach initiated in Lipton and Bhat-tacharya (2025), Coskun et al. (2025) and describe plastic hysteresis and damage in cyclically loaded materials in terms of a well posed initial value problem. We recover damage localization and fracture using only New-ton’s second law. It is shown here that material degradation models consistent with plastic dissipation can be described by a pair of two-point history-dependent phase fields. The two phase fields are two independent damage variables and account for two distinct damage states due to tensile forces and compressive forces. In the blended method the two-point phase fields are part of the constitutive law, handling fracture evolution from quasi-static to dynamic loading. The main feature being that the constitutive law evolves with the displacement providing the necessary two way coupling between displacement and material behavior. 
+
+In this paper a well posed initial boundary value problem is formulated for which the material displace-ment field, elastic stress and both elastic and irrecoverable (plastic) strain field are uniquely determined. This is done via constitutive modeling through unloading laws that foliate the evolving strength domain. This implicitly guarantees that only admissible stress-strain pairs lie within the evolving strength domain of the material, see Figures 1b and 4b. In this formulation the strain is the difference quotient of the displacement between two points and given by an additive decomposition of elastic strain and irreversible strain due to plastic damage. The phase field is a function of the two point strain and characterizes the stiffness of the material between two points. It is determined by an elastic softening that is consistent with the irreversible strain between x and y accumulated up to the present time, see Section 2.1. This combination of elastic softening and irreversible strain delivers a non-local damage plasticity model. The force between two points is referred to as the bond between y and x. The bond is said to fail when the force between the two points vanishes. The strategy taken here is straight forward and a field theoretic approach to dynamic damage and fracture is developed from which a numerical implementation is realized as a discretization of the continuum equations. It is found that energy balance between the potential energy due to elastic displacement and the energy dissipated by damage and plasticity follows directly from the equations of motion, with a positive energy dissipation rate consistent with thermodynamics. Moreover, the failure energy can be explicitly computed for flat cracks using elementary geometric measure theory. For this case, the failure energy is recognized as a product of two factors: one providing an explicit formula for the energy release rate, and the other giving the crack length. These properties are not postulated but instead are consequences of the constitutive law and evolution equation and follow directly only using integration by parts, see section 5. A mesh free numerical method then follows for numerically predicting crack patterns using discrete approximations of the proposed continuum model. The nonlocal method is motivated by the differentiable peridynamic constitutive laws given in Lipton 2(2014); Lipton et al. (2019). For these cases one can show that any sequence of solutions associated with vanishing non-locality have subsequences converging to cluster points that are solutions of the dynamic Navier equation away from cracks (see Lipton (2014, 2016)). Additionally one can develop methods originally used to solve De Georgi’s conjecture on non local approximations to the Mumford Shaw functional, see Gobbino (1998) to show the associated peridynamic energy Γ-converges to the sum of the elastic energy and the Griffith fracture energy as shown in Lipton (2014, 2016). The elastic interaction between the crack and surrounding peridynamic field converges to the classic zero traction condition on the crack lips, this is demonstrated for straight cracks in Lipton and Jha (2021). The crack tip driving force is found to match the product of the energy release rate and crack tip velocity in the limit of vanishing non-locality. This approach bypasses Mott’s hypothesis, and the result emerges directly from the evolution equation, see Jha and Lipton (2020). In turn, this provides the explicit formula relating crack velocity and the energy flowing through the crack tip, see Freund (1972). In summary one replaces derivatives with difference quotients and the Naiver operator with a nonlocal integral operator. The aforementioned analysis shows rigorously that in the absence of plastic strain the blended evolutions converge in the limit of vanishing non-locality to linear elastodynamics off the crack and the limit fields interact elastically with the crack according to the classical theory, see Freund (1990). Numerical experiments show the discretization of the model presented here delivers results in accord with experiment, see Section 8. In our approach the elasticity, strength and fracture toughness can be prescribed independently of each other. For this model, only essential material properties are used and no more. Here the bond degradation is calibrated only by the specimen strength, critical energy release rate, the material stiffness, and the unloading ratio as defined in Grassl (2009), see section 2. The blended model handles both brittle fracture and quasi-brittle fracture across loading conditions, from quasi-static to dynamic fracture evolution, accommodating both monotonic and cyclic loading cases. An explicit length scale L that is characteristic of the evolution emerges from the material parameters used to calibrate the nonlocal constitutive law. The admissible values of L are constrained by the shape of the strength envelope described in the next section. The ratio of fracture toughness to material strength is naturally linked to L, see Section 7.3. The methods used in this paper to calibrate the blended model to the elastic moduli, fracture toughness, and strength are not the same as those customarily used in peridynamics. In the blended approach the calibration of fracture toughness and elasticity coefficients follow directly from Γ-convergence and geometric measure theory, and the material strength is calibrated as an independent parameter as in Carpinteri and Sih (1984), Hillerborg et al. (1976), Xu and Needleman (1994), Ortiz and Pandolfi (1999). Additionally we introduce the unloading ratio β providing the ratio between plastic strain associated with elastic softening and irrecoverable strain as introduced by Grassl (2009), Grassl et al. (2013). The value of the unloading ratio and choice of constitutive law enables one to model both brittle fracture and quasi-brittle fracture within the blended framework. Most importantly in our framework the length scale of non-locality “ ϵ,” is not a material property and is not used in the calibration of strength, fracture energy, elastic or plastic properties .The blended model is understood as a well-posed approximation theory under which the effects of damage and plasticity can localize onto surfaces, see Figures 6 and 11. The length scale of localization is controlled by ϵ.The methodology can be applied to quasi-brittle materials including geomaterials, masonry, and concrete. As a specific application we consider tensile failure in concrete. We discretize the blended model and are quantitatively able to capture the hysteresis associated with crack mouth opening versus load for cyclic three-point bending experiments using our model, see Section 8. Notably, the deterministic size effect Bažant and Planas (1998), Carpinteri and Sih (1984), emerges directly from our initial boundary value problem and is observed in numerical simulations, consistent with size-effects reported by Hobbs et al. (2022) using an exponential peridynamic potential, see Section 8. Here the numerical method used to obtain solution is meshfree in that there are no elements or geometrical connections between the nodes and discretization is based on quadrature as in Silling and Askari (2005). The paper is organized as follows: The initial boundary value problem for the fracture evolution of quasi-brittle material is formulated in the next two sections. Section 4 establishes existence and uniqueness of the evolution problem using fixed-point methods for differential equations posed in Banach space. In section 5 we multiply the evolution equation by the velocity and integrate by parts to identify the damage power ˙D(t)
+
+and the elastic power ˙E(t). This delivers a power balance law that is consistent with thermodynamics. In section 6 we integrate the stress power in each bond with respect to time and then integrate in space with 3respect to the endpoints of the bonds y and x. This gives us the forms of the energies E(t) and D(t) and the energy balance. In Section 7, it is shown that the model calibration follows directly from the two-point interaction potential and energy balance and given values of elastic moduli, strength, energy release rate and unloading raatio. The IBVP delivers a mesh free numerical method for predicting crack patterns and the results of our numerical experiments are presented in Section 8. 
+
+2. A nonlocal phase field formulation incorporating irreversible tensile strain and elastic com-pression 
+
+The body containing the damaging material Ω is a bounded domain in two or three dimensions. Adimensional analysis is carried out and a characteristic length scale L associated with the evolution is determined in Section 7.3. This length scale depends explicitly on the ratio of fracture toughness and strength. Nonlocal interactions between a point x and its neighbors y are confined to the sphere (disk) of radius ϵ denoted by Hϵ(x) = {y : |y − x| < ϵ }. The length scale ϵ is taken smaller than L and small enough to resolve the process zone. Here V ϵd = ωdϵd is the d-dimensional volume of the ball Hϵ(x) centered at x
+
+where ωd is the volume of the unit ball in d dimensions. The displacement of a point x inside the material at time t is u(t, x) and is defined for 0 ≤ t ≤ T and x in Ω. We write u(t) = u(t, ·) and introduce the two-point strain S(y, x, u(t)) between the point x and any point y ∈ H ϵ(x) resolved along the direction e given by 
+
+S(y, x, u(t)) = (u(t, y) − u(t, x)) 
+
+|y − x| · e, where e = y − x
+
+|y − x| , (2.1) and introduce the scaled strain 
+
+r := r(y, x, u(t)) = 
+
+r |y − x|
+
+L S(y, x, u(t)) . (2.2) The strain satisfies the symmetry S(y, x, u(t)) = S(x, y, u(t)) .Displacement loads are prescribed on the boundary of the specimen Ω. For the nonlocal model, the displacement U(t, x) is prescribed on a layer ΩϵD surrounding part of the specimen see, e.g., Du et al. (2015). We write Ω∗ = Ω ∪ ΩϵD where the layer is of maximum thickness greater than or equal to ϵ, see Figure 3 . With this in mind, we write 
+
+ρϵ(y, x) = χΩ∗ (y)Jϵ(|y − x|)
+
+ϵV ϵd
+
+, (2.3) where χΩ∗ is the characteristic function of Ω∗, Jϵ(|y − x|) is the influence function, a positive function on the ball of radius ϵ centered at x and is radially decreasing taking the value M at the center of the ball and 
+
+0 for |y − x| ≥ ϵ. The radially symmetric influence function is written Jϵ(|y − x|) = J(|y − x|/ϵ ). The nonlocal kernel is scaled by ϵ−1(V ϵd )−1 enabling the model to be characterized by, 1) the linear elastic shear 
+
+G and Lamé λ moduli in regions away from the damage, 2) the critical energy release rate Gc and, 3) the strength of the material, this is done in Section 7. 
+
+2.1. Constitutive laws with memory: Initial Boundary Value problem for Quasi-Brittle fracture incorporating irreversible strain and damage under loading. 
+
+To illustrate the ideas we begin by describing a constitutive model describing material that damages under tensile loading and to first approximation behaves elastically under compressive loading. The tensile strain in undamaged material is elastic while damaged material responds to force with elastic-plastic behavior given by an additive decomposition of elastic strain and irreversible strain. For a bond in tension the loading law for the stress is initially linear for tensile strain up to SYt , then yields and goes nonlinear exhibiting strain hardening up to peak tensile stress. Here the strain SCt corresponds to the strain at peak tensile stress, and 
+
+SFt corresponds to the tensile strain at failure. The stress-strain behavior is described by a strength envelope and a family of elastic-damage plastic unloading laws. The force between two points is a function of the strain. 
+
+Definition 1 (Bond) . The force associated with the interval between two points y and x is referred to as a bond. 4σ
+
+SCt SFt
+
+P ∗
+
+S
+
+(g+)′(r∗)/p|y − x|/L 
+
+¯μ γ ¯μ
+
+βS Ft
+
+> (a)
+
+σ (g−)′(r∗)/p|y − x|/L 
+
+SYc
+
+SCc
+
+SFc
+
+¯μ γ− ¯μ
+
+S
+
+β−SFc
+
+> (b)
+
+Figure 1: (a) Tensile stress vs strain curve sketched for bond strain with plastic yielding only after peak stress is reached, i.e., 
+
+SYt = SCt . Blue lines are admissible stress strain curves in compression and green lines are admissible stress strain curves in tension. These broken lines foliate the strength domain and are admissible constitutive laws for admissible bond stress-strain pairs (σ, S ). Stress-strain pairs on the strength envelope of unloading laws g′(r∗)/p|y − x|/L given by dashed curve. The strain is reversible and elastic with constant bond stiffness until S∗ = SYt = SCt . For SCt ≤ S∗ ≤ SFt then bonds exhibit plasticity and elastic softening. The bond stiffness is proportional to the phase field and corresponding unloading laws are the broken green-blue lines. The plastic tensile strain is P ∗ given by (2.10) and is the S axis intercept of the unloading law. The stiffness decreases from μ = ∂r g(rCt )/r Ct smoothly to 0. The bond offers zero tensile stiffness for bonds broken in tension (red), see Definition 3. However the bond continues to elastically resist negative strains, see blue unloading line connected to red line. (b) Stress versus strain curve sketched with plastic yielding before peak stress now given for compression loading. In this figure the sign of compressive strain and stress are reversed. 
+
+The bond stiffness at the strains SYt , SCt , and SFt depend on the scaled bond length p|y − x|/L and are given by rYt , rCt , and rFt determined by the material 
+
+SYt = rYt
+
+p|y − x|/L SCt = rCt
+
+p|y − x|/L SFt = rFt
+
+p|y − x|/L . (2.4) The square root dependence on relative bond length is introduced in the regularized bond model Lipton (2014), Lipton (2016) and provides the envelope for fast fracture in Lipton and Bhattacharya (2025). It also provides the envelope for the blended model Coskun et al. (2025) brittle and quasi-brittle materials. The rational behind the scaling is that its required for delivering energy balance between the elastic, fracture, and kinetic energies associated with the evolution equation, see Section 6. We introduce the memory function given by the maximum strain up to time t given by 
+
+S∗(t, y, x, u) = max  
+
+> 0≤τ≤t
+
+{S(y, x, u(τ )) }. (2.5) and set 
+
+r∗ := r∗(t, y, x, u) = 
+
+r |y − x|
+
+L S∗(y, x, u(t)) .
+
+To shorten the exposition and when appropriate we will denote S∗(t, y, x, u) by S∗(t) and r∗(t, y, x, u)
+
+by r∗(t). We introduce the strength envelope associated with the nonlinear potential function g(r) given by 
+
+∂r g(r), see Figure 1b. The piece wise linear unloading laws foliating the strength domain are characterized by strains that are additively decomposed into elastic and plastic parts. The plastic strain is given by the r∗ axis intercept of the unloading law in Figure 1b. Here the elastic force is linearly related to the reversible strain, i.e., the elastic part of the strain. Importantly damage and plasticity are in effect meaning the elasticity 5of the material is decreasing with increasing irreversible tensile strain. On the other hand, for compressive strain the force between two points is a simple elastic force and characterized by a constant elastic stiffness. The strength envelope (see Figure 1b) is defined by 
+
+∂r∗ g(r∗(t)) 
+
+p|y − x|/L . (2.6) On the strength envelope, the present strain at time t is the maximum strain and r∗ = r. As an example, consider the simple bilinear model where rYt = rCt defined for bonds in tension given by 
+
+∂r∗ g(r∗) = 
+
+
+
+μr ∗, r∗ < r Ct ,μr CtrFt −r∗ 
+
+> rFt−rCt
+
+, rCt ≤ r∗ ≤ rFt ,
+
+0, rFt < r ∗.
+
+(2.7) We introduce the phase field γ(t, y, x, u) that describes softening of elastic moduli with 0 ≤ γ(t, y, x, u) ≤
+
+1. When the bond is elastic with no irreversible strain and no elastic softening then γ(t, y, x, u) = 1 . At the other extreme when the bond is fully damaged with maximum irreversible strain, consistent with complete elastic softening, then γ(t, y, x, u) = 0 . To begin we suppose no elastic softening occurs so bond stiffness remains at ¯μ and only plastic strain is accrued by the bond under tensile loading and this strain is denoted by P ∗ 
+
+> i
+
+(t, y, x, u). For this case the maximum remaining recoverable strain associated with a point on the strength envelope (S∗, ∂ r∗ g(r∗)/p|y − x|/L ) is 
+
+∂r∗ g(r∗(t, y, x, u)) 
+
+μp|y − x|/L , (2.8) so the plastic tensile strain without elastic softening is given by 
+
+P ∗ 
+
+> i
+
+(t, y, x, u) = S∗(t, y, x, u) − ∂r∗ g(r∗(t, y, x, u)) 
+
+μp|y − x|/L ≥ 0. (2.9) Similarly the plastic strain that takes into account material softening is expressed in terms of the phase field 
+
+γ(t, y, x, u) and given by 
+
+P ∗(t, y, x, u) = S∗(t, y, x, u) − ∂r∗ g(r∗(t, y, x, u)) 
+
+μγ (t, y, x, u)p|y − x|/L ≥ 0. (2.10) To complete the definition of the phase field we introduce the unloading parameter characterizing the combination of degradation in elastic moduli and plastic strain associated with the material Grassl (2009). 
+
+Definition 2. The unloading ratio β.
+
+The parameter β is the ratio of plastic strain that takes into account material softening to the plastic strain strain in the absence of material softening and 0 ≤ β ≤ 1.The explicit formula for the phase field follows from the definition of β and is given by 
+
+β = P ∗(t, y, x, u)
+
+P ∗ 
+
+> i
+
+(t, y, x, u) . (2.11) Here β is a coarse scale measure of microscale physics taking place on length scales below those resolved by the IBVP. The multiscale nature of the β parameter is discussed in section 7.4. This choice of P ∗(t, y, x, u)
+
+based on β insures that 0 ≤ γ(t, y, x, u) ≤ 1 and Lipchitz continuous in a suitable Banach space norm as shown in Section 4. Rearranging terms in (2.11) gives the explicit formula for the phase field 
+
+γ(t, y, x, u)) = μ−1 ∂r∗ g(r∗(t, y, x, u)) (S∗ − βP ∗ 
+
+> i
+
+(t, y, x, u)) p|y − x|/L , for β fixed and chosen in 0 ≤ β ≤ 1. (2.12) For any fixed value of 0 ≤ β < 1 the phase field γ is one for an undamaged bond corresponding to 
+
+−∞ < S ∗(t, y, x, u) < S Yt , becomes decreasing with respect to increasing irreversible strain for SYt ≤
+
+6S∗(t, y, x, u) ≤ SFt and zero for a fully damaged bond corresponding to SFt ≤ S∗(t, y, x, u). For −∞ <S∗(t, y, x, u) < SYt one has P ∗(t, y, x, u) = 0 and this corresponds to the numerator and denomina-tor of (2.12) taking the common value μS ∗(t, y, x, u)p|y − x|/L and γ(t, y, x, u) = 1 . The graph of 
+
+γ(t, y, x, u) = γ(p|y − x|/LS ∗(t, y, x, u)) is shown in Figure 2. The edge case β = 0 represents soften-ing of elastic moduli under loading with no plastic strain being accrued and all unloading curves return to the origin, this case was considered in Coskun et al. (2025). The edge case given by β = 1 , corresponds no softening of elastic moduli under loading and increasing plastic strain. Values 0 < β ≤ 1 deliver softening elastic moduli under loading and increasing plastic strain. The condition 0 ≤ β ≤ 1 insures all stress strain pairs inside the evolving strength domain belong to a unique unloading law, see Figure 1b. To expedite the presentation we set γ(t) := γ(t, y, x, u) when representing the phase field associated with a bond between y and x. Note γ(t) is constant on unloading curves and ˙γ(t) < 0 only when the unloading curve intersects the strength envelope and r∗(t, y, x, u) > r Yt . The time corresponding to r∗(t, y, x, u) = rYt
+
+is denoted by tY 
+
+> y,x
+
+and the time r∗(t, y, x, u) = rFt is denoted by tF
+
+> y,x
+
+, and we abbreviate the notation and write tY and tF when there is no chance of confusion. A prototypical phase field profile is given in Figure 2. It is evident that ˙P ∗(t, y, x, u) is non-negative, since 
+
+˙P ∗(t, y, x, u) = β ˙S∗(t, y, x, u) − ∂t∂r∗ g(r∗(t, y, x, u)) 
+
+μp|y − x|/L 
+
+!
+
+≥ 0. (2.13) The elastic strain E(y, x, u(t)) is given by 
+
+E(y, x, u(t)) := S(y, x, u(t)) − P ∗(t, y, x, u). (2.14) Using (2.10) one easily checks that 
+
+μγ (t) ( S∗(t, y, x, u) − P ∗(t, y, x, u)) = ∂r∗ g(r∗(t, y, x, u)) 
+
+p|y − x|/L , (2.15) and we point out that when P ∗(y, x, t, u) = 0 the bond is in the linear elastic regime. If (μγ (t)E∗(y, x, u(t)) is the current stress on the intersection of the unloading curve and strength enve-lope and μγ (t)E(y, x, u(τ )) is any other stress belonging to the same unloading curve at some time τ then from (2.13) we get 
+
+(μγ (t)E∗(y, x, u(t)) − μγ (t)E(y, x, u(τ ))) ˙P ∗(t, y, x, u) ≥ 0, (2.16) which is precisely the postulate of maximum plastic dissipation proposed independently by Mises (1928), Taylor (1947), and Hill (1948), but now in the context of damage and plasticity. We assume the material resists compressive strain elastically and we write the elastic stiffness defined for tensile and compressive strain as 
+
+μγ (t) := 
+
+ μγ (t), E(y, x, u(t)) > 0,μ, E(y, x, u(t)) < 0. (2.17) The constitutive law relating bond stress σ to bond strain S(y, x, u(t)) is continuous in t for y, x fixed 1 and described by 
+
+σ(t, y, x, u) := 
+
+
+
+μγ (t)E(y, x, u(t)) , E(y, x, u(t)) > 0,
+
+0, E(y, x, u(t)) = 0 
+
+μE (y, x, u(t)) , E(y, x, u(t)) < 0.
+
+(2.18) The constitutive law relating bond force per unit volume to elastic strain is described by 
+
+f ϵ(t, y, x, u) = ρϵ(y, x)σ(t, y, x, u)e, (2.19) where σ is defined by (2.18). The unloading curves for each pair of points y, x described by (2.19) are given by the broken lines as portrayed in Figure 1b.       
+
+> 1more precisely a.e. for (y,x)in Ω×Ω
+
+71
+
+0 StY StF
+
+S∗
+
+γ(t, y, x, u)) = γ(p|y − x|/LS ∗(t, y, x, u))                 
+
+> Figure 2: γ(t, y,x,u)is one for S∗≤SYtthen decays to zero for SYt< S ∗< S Ft. It is evident from the graph that γis Lipchitz continuous in S∗.
+
+Ω
+
+ΩϵD     
+
+> Figure 3: Domain Ωwith prescribed Dirichlet data on ΩϵD. The union is denoted by Ω∗
+
+Definition 3 (Broken Bond) . In this treatment, we say a bond between two points y and x “fails in tension” or “broken in tension” if and only if the force between y and x is zero when the total strain S(y, x, u(t)) is 
+
+SF , i.e., from (2.14)), when irreversible strain is equal to βS F and elastic strain is equal to (1 − β)SF . The broken bond corresponds to a vanishing phase field, γ(t) = 0 .This notion of bond failure still allows the “bond” to resist compressive force due to elastic strain, see Figure 1b. The nonlocal force density Lϵ[u]( t, x) defined for all points x in Ω is given by 
+
+Lϵ[u]( t, x) = −
+
+Z
+
+> Ω∗
+
+f ϵ(t, y, x, u) dy. (2.20) The initial boundary value problem for fracture evolution is to find a displacement u(t, x) on Ω∗ that satisfies 
+
+u(t, x) = U(t, x) for x in ΩϵD , (2.21) and for x in Ω satisfies the evolution equation 
+
+ρ¨u(t, x) + Lϵ[u]( t, x) = b(t, x), (2.22) for 0 < t < T , and satisfies the initial conditions on the displacement and velocity given by 
+
+u(0 , x) = u0(x),
+
+˙u(0 , x) = v0(x). (2.23) To illustrate ideas, we fix all bonds crossing the interface between Ω and ΩϵD to be purely elastic throughout the evolution and have stiffness μ as well as all bonds between points in ΩϵD .
+
+2.2. Elastic Resistance to Compression Across a Crack 
+
+In this model, cracks are created by bonds that offer zero stiffness under tension. On the other hand, bonds under compressive stress continue to resist elastically. When a bond ceases to resist tension the 8constitutive relation is illustrated by the red branch of the force-strain relation in Figure 1b. Let n denote the unit normal vector perpendicular to the crack. Let y − x denote all line segments that cross a planar crack such that (y − x) · n > 0 and ϵ > |y − x|. For deformation fields such that (u(t, y) − u(t, x)) ∥n
+
+and (u(t, y) − u(t, x)) · n < 0, basic geometric considerations show that the total strain is compressive, ie., S(y, x, u(t)) < 0 for all bonds |y − x| < ϵ . Since P ∗(t, y, x, u(t)) ≥ 0 we get E(y, x, u(t)) < 0 for 
+
+S(y, x, u(t)) < 0 and the constitutive relation (2.17) shows that the bond force elastically opposes the compressive strain across the crack. 
+
+3. A nonlocal phase field formulation incorporating irreversible tensile strain and compression. 
+
+We extend the two point constitutive law between y and x to include elastic-plastic damage for both tensile strain and compressive strain. The memory function used for tensile strain and the memory func-tion used for compressible strain are given by S∗(t, y, x, u) = max τ ≤t{S(y, x, u(τ )) } and S∗(t, y, x, u) = 
+
+min τ ≤t{S(y, x, u(τ )) } respectively. In this context we denote the phase field in tension defined by (2.12) as 
+
+γ+(y, x, t, u) and the unloading ratio in tension defined by (2.11) as β+. Here the derivative of the potential for a bond in tension is now denoted by ∂r∗ g+(r∗).For a bond in compression the loading law for the stress is initially linear for compressive strain up to SYc ,then yields and goes nonlinear exhibiting strain hardening up to peak compressive stress. Here the strain SCc
+
+corresponds to the strain at peak compressive stress, and SFc corresponds to the compressive strain at failure. The bond potential for compression is prescribed and given by ∂r∗ g−(r∗), see Figure 4a. The compressive potential is characterized by the compressive strains SYc , SCc , and SFc depends on the scaled bond length p|y − x|/L and are given by rYc rCc , and rFc determined by the material with, 
+
+SYc = rYc
+
+p|y − x|/L SCc = rCc
+
+p|y − x|/L SFc = rFc
+
+p|y − x|/L , (3.1) and set 
+
+r∗ := r∗(t, y, x, u) = 
+
+r |y − x|
+
+L S∗(y, x, u(t)) .
+
+It is noted that the length scale under compression L can be different than under tension. The plastic compressive strain in the absence of elastic softening is given by 
+
+P∗,i (t, y, x, u) := S∗(t, y, x, u) − ∂r∗ g−(r∗(t, y, x, u)) 
+
+μp|y − x|/L 
+
+!
+
+≤ 0, (3.2) and the plastic strain consistent with elastic softening is defined through the unloading ratio in compression by 
+
+β− = P∗(t, y, x, u)
+
+P∗i(t, y, x, u) , 0 ≤ β− ≤ 1. (3.3) This choice of plastic strain P∗(t, y, x, u) based on β− insures that 0 ≤ γ−(t, y, x, u) ≤ 1 and is Lipchitz continuous in a suitable Banach space norm as shown in Section 4. It follows from (3.3) that 
+
+P∗(t, y, x, u) = β− S∗(t, y, x, u) − ∂r∗ g−(r∗(t, y, x, u)) 
+
+μp|y − x|L
+
+!
+
+= S∗ − ∂r∗ g−(r∗(t, y, x, u)) 
+
+μγ −(t, y, x, u)p|y − x|/L ≤ 0. (3.4) 9From (3.3) the compressive phase field γ− is defined by 
+
+γ−(t, y, x, u) = μ−1 ∂r∗ g−(r∗(t, y, x, u)) (S∗ − P∗(t, y, x, u)) p|y − x|/L . (3.5) For any fixed value of 0 ≤ β− < 1 the phase field γ− is one for an undamaged bond corresponding to 
+
+∞ > S ∗(t, y, x, u) > S Yc and becomes decreasing with respect to decreasing irreversible strain in compres-sion for SYc ≥ S∗(t, y, x, u) ≥ SFc and zero in compression for a fully damaged bond corresponding to SFc ≥
+
+S∗(t, y, x, u). For ∞ > S ∗(t, y, x, u) > S Yc there is zero plastic strain, i.e., P∗(t, y, x, u)) = 0 and this cor-responds with the numerator and denominator of (3.5) taking the common value μS ∗(t, y, x, u)p|y − x|/L ,hence γ−(t) = 1 . Last it follows from (3.5) that 
+
+μγ −(t) ( S∗(t, y, x, u) − P∗(t, y, x, u)) = ∂r g−(r∗(t, y, x, u)) 
+
+p|y − x|/L , (3.6) For tensile loading outlined in the previous section, the derivitave of the bond stress potential is labeled 
+
+∂r g+(r∗) and the unloading ratio in tension is now rewritten as 
+
+β+ = P ∗(t, y, x, u)
+
+P ∗ 
+
+> i
+
+(t, y, x, u) , 0 ≤ β+ ≤ 1. (3.7) As mentioned earlier this choice of P ∗(t, y, x, u) based on β+ insures that 0 ≤ γ+(t, y, x, u) ≤ 1 and is Lipchitz continuous in a suitable Banach space norm as shown in Section 4. The phase field is defined by 
+
+γ+(t, y, x, u)) = μ−1 ∂r∗ g+(r∗(t, y, x, u)) (S∗ − P ∗(t, y, x, u))) p|y − x|/L , (3.8) for β+ fixed and chosen in 0 ≤ β+ ≤ 1. and the plastic strain P ∗(y, x, t, u) is given by 
+
+P ∗(t, y, x, u) = β+ S∗(t, y, x, u) − ∂r∗ g+(r∗(t, y, x, u)) 
+
+μp|y − x|/L 
+
+!
+
+= S∗ − ∂r∗ g+(r∗(t, y, x, u)) 
+
+μγ +(t, y, x, u)p|y − x|/L . (3.9) It follows from (3.8) that 
+
+μγ +(t) ( S∗(t, y, x, u) − P ∗(t, y, x, u)) = ∂r g+(r∗(t, y, x, u)) 
+
+p|y − x|/L , (3.10) The elastic strain for bonds that can exhibit tensile failure and compressive failure is given by 
+
+E(y, x, u(t)) = S(y, x, u(t)) − (P ∗(t, y, x, u) + P∗(t, y, x, u)) . (3.11) The extended constitutive law is of the form 
+
+σ(t, y, x, u) := 
+
+
+
+μγ +(t)E(y, x, u(t)) , E(y, x, u(t)) ≥ 0,
+
+0, E(y, x, u(t)) = 0 ,μγ −(t)E(y, x, u(t)) , E(y, x, u(t)) < 0.
+
+(3.12) In Section 4 we show that γ±(t, y, x, u), P ∗(t, y, x, u), and P∗(t, y, x, u) are absolutely continuous in t for almost every (y, x). Hence ∂tγ± exists and γ±(t, y, x, u) = R t 
+
+> 0
+
+∂τ γ±(τ, y, x, u) dτ , etc. 
+
+In summary the extended constitutive law features five properties: 
+
+1. There now two phase fields γ±(y, x, t, u) one being a phase field in tension γ+(y, x, t, u) and the second given by a phase field in compression γ−(y, x, t, u), with 0 ≤ γ± ≤ 1.10 S
+
+σ
+
+A BC
+
+> (a)
+
+E
+
+σ
+
+¯μ γ+ ¯μ
+
+¯μ
+
+γ− ¯μ                   
+
+> (b)
+> Figure 4: (a) A bond that degrades in tension and compression undergoing stress-strain cycling plotted in (S, σ )coordinates to illustrate the evolution of the sum of irreversible tensile and compressive strain P∗(t, y,x,u) + P∗(t, y,x,u)At the beginning of this cycle Athere is no plastic strain, after tension loading there is tensile plastic stress Bafter compressive loading the sum of the plastic stress under compression and tension is given by C. (b) A bond that degrades in tension and compression undergoing stress-strain cycling now plotted in (E, σ )coordinates to show stiffness degradation under tension and compression. Here the cycle starts with strain loading and then unloads then reverses and is loaded in compression and again unloads. Both figures correspond to the same loading cycle with bilinear tensile loading followed by linear-exponential compression loading.
+
+2. When the bond between y and x is in tension the compressive phase field γ−(y, x, t, u) is constant in 
+
+t and when the bond is in compression the tensile phase field γ+(y, x, t, u) is constant in t.3. When the bond between y and x is under tension then S∗(y, x, u(t)) is constant in t and when the bond is in compression S∗(y, x, u(t)) is constant in t.4. When the bond between y and x is under tension P∗(y, x, t, u) is constant in t and when the bond is under compression P ∗(t, y, x, t, u) is constant in t.5. P ∗(t, y, x, t, u) = 0 for S∗(y, x, u(t)) ≤ SYt and is nonzero and positive for S∗(y, x, u(t)) ≥ SYt and 
+
+P∗(t, y, x, t, u) = 0 for S∗(y, x, u(t)) ≥ SYc and is nonzero and negative for S∗(y, x, u(t)) ≤ SYc
+
+For this case, the initial boundary value problem for fracture evolution is to find a displacement u(t, x) on 
+
+Ω∗ that satisfies 
+
+u(t, x) = U(t, x) for x in ΩϵD , (3.13) and for x in Ω satisfies the evolution equation 
+
+ρ¨u(t, x) + Lϵ[u]( t, x) = b(t, x), (3.14) for 0 < t < T , and satisfies the initial conditions on the displacement and velocity given by 
+
+u(0 , x) = u0(x),
+
+˙u(0 , x) = v0(x). (3.15) To illustrate ideas, we fix all bonds crossing the interface between Ω and ΩϵD to be purely elastic throughout the evolution and have stiffness μ as well as all bonds between points in ΩϵD . In summary, the general initial boundary problem with two phase fields suitable for bonds that evolve in both compression and tension is given by the evolution equation (3.14), initial conditions (3.15), and displacement boundary conditions (3.13), but now governed by the general constitutive law (3.12). 
+
+4. Existence and uniqueness of displacement and damage evolution. 
+
+In this section, we state and outline the existence of solution for the fracture evolution subject to body loading and boundary displacement and general cyclic constitutive law given by the vector phase field 11 described in Section 3 . We recall the space of all bounded measurable functions L∞(Ω; Rd). To expedite the presentation, we denote L∞(Ω; Rd) by X. The norm on C2([0 , T ]; X) is given by (4.1). 
+
+∥u(t, x)∥C2([0 ,T ]; X) = sup 
+
+> 0≤t≤T
+
+{
+
+> 2
+
+X
+
+> i=0
+
+|| ∂it u(t, x)|| X }. (4.1) To simplify the notation, we denote the space C([0 , T ]; X) as CX with the corresponding norm ∥ · ∥ CX .Similarly, we write C2([0 , T ]; X) as C2X. To characterize all admissable boundary loads we introduce the Banach space X∗ = L∞(Ω ∗, Rd), and the Banach space C1([0 , T ]; X∗). The imposed boundary displacement 
+
+U(t, x) belongs to C1([0 , T ]; X∗) and is zero for x in Ω and is a prescribed nonzero function U(t, x) on ΩϵD .
+
+Theorem 1 (Existence and Uniqueness of Solution of the Displacement and Force Controlled Fracture Evolution). The initial boundary value problem given by (3.12) , (3.13) , (3.14) , and (3.15) with initial data in X∗, b(t, x) belonging to CX , and imposed boundary displacement U(t, x) in C1X∗, has a unique solution u(t, x) belonging to C1X∗ and C2X with two strong derivatives in time. 
+
+The initial value problem delivers a unique displacement phase field pair: uϵ(t), γ ±(t). The key points are that the operator Lϵu is a map from CX into itself, and it is Lipschitz continuous in u with respect to the CX norm. The existence and uniqueness of solution then follows from the Banach fixed-point theorem. We provide a sketch of the proof of Theorem 1. The theorem follows from the Lipchitz continuity of the stress field σ(t, y, x, u) with respect to the displacement u and this follows from a two step calculation. The first calculation similar to Coskun et al. (2025) delivers the point wise estimates 
+
+|S∗(y, x, u, t ) − S∗(y, x, w, t )| ≤ max   
+
+> 0≤τ≤t
+
+|S(y, x, u(τ ) − w(τ )) | ≤ C
+
+|y − x| ∥u − w∥CX , (4.2) 
+
+|S∗(y, x, u, t ) − S∗(y, x, w, t )| ≤ max   
+
+> 0≤τ≤t
+
+|S(y, x, u(τ ) − w(τ )) | ≤ C
+
+|y − x| ∥u − w∥CX , (4.3) 
+
+|P ∗(t, y, x, u) − P ∗(t, y, x, w)| ≤ C max   
+
+> 0≤τ≤t
+
+|S(y, x, u(τ ) − w(τ )) | ≤ C
+
+|y − x| ∥u − w∥CX , (4.4) and 
+
+|P∗(t, y, x, u) − P∗(t, y, x, w)| ≤ C max   
+
+> 0≤τ≤t
+
+|S(y, x, u(τ ) − w(τ )) | ≤ C
+
+|y − x| ∥u − w∥CX , (4.5) where C is a constant independent of u and w. Hence 
+
+|E(t, y, x, u) − E(t, y, x, w)| ≤ C max   
+
+> 0≤τ≤t
+
+|S(y, x, u(τ ) − w(τ )) | ≤ C
+
+|y − x| ∥u − w∥CX , (4.6) and 
+
+|γ±(t, y, x, u) − γ±(t, y, x, w)| ≤ C max   
+
+> 0≤τ≤t
+
+|S(y, x, u(τ ) − w(τ )) | ≤ C
+
+|y − x| ∥u − w∥CX . (4.7) The second and final step used for demonstrating Lipchitz continuity of the stress field σ(t, y, x, u) accounts for both the tension and compression states of a bond associated with two independent displacement fields 
+
+u and w. These are given by the four conditions on the stress free strain given by 
+
+
+
+E(y, x, u(t)) > 0, E (y, x, w(t)) > 0,E(y, x, u(t)) < 0, E (y, x, w(t)) < 0,E(y, x, u(t)) < 0, E (y, x, w(t)) > 0,E(y, x, u(t)) > 0, E (y, x, w(t)) < 0
+
+(4.8) 12 We now demonstrate point-wise estimates for the first and third case noting that the second and fourth case follow in the same way. For ease of exposition we let γ+(p|y − x|/LS ∗(t, y, x, u)) = γ+(S∗(t, u)) and 
+
+E(y, x, u(t)) = E(u(t)) . For the first case we have 
+
+|σ(t, y, x, u) − σ(t, y, x, w)| = |μγ +(S∗(t, u)) E(u(t)) − μγ +(S∗(t, w)) E(w(t)) |≤ | μγ +(S∗(t, u)) E(u(t)) − μγ +(S∗(t, u)) E(w(t)) | + |[μγ +(S∗(t, u)) − μγ +(S∗(t, w))] E(w(t)) |≤ μ|E(u(t)) − E(w(t)) | + μ(1 + β+ + β−)(1 + SFt + |SFc |)|γ+(S∗(t, u)) − γ+(S∗(t, w)) |≤ C max   
+
+> 0≤τ≤t
+
+|S(y, x, u(τ ) − w(τ )) | ≤ C
+
+|y − x| ∥u − w∥CX . (4.9) where the first term in the third inequality follows from 0 ≤ γ+ ≤ 1, and the second term in the third inequality follow from bounds on the maximum strain |E(w(t)) | corresponding to nonzero post peak stress, the fourth inequality follows from (4.2) and (4.4) together with the Lipchitz continuity of γ+ with respect to the variable S∗, see Figure 2. For the third case we have 
+
+|σ(t, y, x, u) − σ(t, y, x, w)| = |μγ −(S∗(t, u)) E(u(t)) − μγ +(S∗(t, w)) E(w(t)) |≤ | μE (u(t)) − μE (w(t)) | ≤ C
+
+|y − x| ∥u − w∥CX . (4.10) So for all for cases given by (4.8) we conclude 
+
+|σ(t, y, x, u) − σ(t, y, x, w)| ≤ C
+
+|y − x| ∥u − w∥CX , (4.11) and it follows that 
+
+∥L ϵ[u] − L ϵ[w]∥CX ≤ C∥u − w∥CX 
+
+With this result in hand Theorem 1 is established using the Banach fixed point theorem as in Emmrich and Phust (2015), Lipton and Bhattacharya (2025), Coskun et al. (2025). We get the absolute continuity in time for the phase fields and plastic strains as an immediate consequence of the existence of solution in C2X. This is summarized in 
+
+Lemma 1. The solution u of the IBVP given by Theorem 1 belongs to C2X, hence, the mapping 
+
+t 7 → (γ+(t, y, x, u), γ −(t, y, x, u), P ∗(t, y, x, u), P ∗(t, y, x, u)) : R → R4 (4.12) 
+
+is absolutely continuous for a.e. (y, x) in Ω × Ω.
+
+To establish this lemma note as in Lipton and Bhattacharya (2025) that if u is the solution of the IBVP then it belongs to C2X so S∗(t, y, x, u) and S∗(t, y, x, u) are Lipchitz continuous in time. The Lemma follows noting further that γ+(S∗), γ−(S∗), ∂r g+(S∗) and ∂r g−(S∗) are Lipchitz continuous in their arguments. 
+
+5. Power balance for fracture evolutions with damage and plasticity 
+
+In this section, we establish the power balance for fracture evolutions with body force and boundary displacement loadings. Here, the boundary displacement U(t, x) and body force b(t, x) are prescribed. Multiplying the linear momentum equation given in (2.22) with ˙u(t, x) and integrating over the domain Ω
+
+results in Z
+
+> Ω
+
+ρ¨u(x, t ) · ˙u(x, t ) dx +
+
+Z
+
+> Ω
+
+Lϵ[u]( t, x) · ˙u(x, t ) dx =
+
+Z
+
+> Ω
+
+b(t, x) · ˙u(x, t ) dx. (5.1) 13 We apply the identity χΩ∗ = χΩ +χΩϵD integrate by parts noting that S∗(t, y, x, u), S∗(t, y, x, u), P∗(t, x, y, u)
+
+and, P∗(t, x, y, u) are invariant under swapping y and x and a careful calculation gives 
+
+˙K(t) + 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)μγ +(t, y, x, u)E(y, x, u(t)) E(y, x, ˙u(t)) dy dx
+
+12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)μγ −(t, y, x, u)E(y, x, u(t)) E(y, x, ˙u(t)) dy dx
+
++ 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)μγ +(t, y, x, u)E(y, x, u(t))( ˙P ∗(t, y, x, u) + ˙P∗(t, y, x, u)) dy dx
+
++ 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)μγ −(t, y, x, u)E(y, x, u(t))( ˙P ∗(t, y, x, u) + ˙P∗(t, y, x, u)) dy dx
+
++ ˙Iϵ(t) = ˙Rϵ(t) + 
+
+Z
+
+> Ω
+
+b(t, x) · ˙u(x, t ) dx, (5.2) where 
+
+K(t) = 
+
+Z
+
+> Ω
+
+ρ| ˙u(t)|2
+
+2 dx, (5.3) is the Kinetic energy and recalling all bonds connecting the displacement loading region are elastic and undamaged gives that the power is related to the change in elastic energy density there, i.e., 
+
+˙Iϵ(t) = 12
+
+Z
+
+> Ω
+
+Z
+
+> ΩϵD
+
+|y − x| Jϵ(|y − x|)
+
+ϵV ϵd
+
+∂t
+
+
+
+¯μ E2(y, x, u(t)) 2
+
+
+
+dydx
+
++ 12
+
+Z
+
+> ΩϵD
+
+Z
+
+> Ω
+
+|y − x| Jϵ(|y − x|)
+
+ϵV ϵd
+
+∂t
+
+
+
+¯μ E2(y, x, u(t)) 2
+
+
+
+dydx (5.4) and on the displacement loading zone 
+
+˙Rϵ(t) = 
+
+Z
+
+> ΩϵD
+
+Z
+
+> Ω
+
+Jϵ(|y − x|)
+
+ϵV ϵd
+
+¯μE (y, x, u(t)) ex−y · ˙U(t, x)dydx. (5.5) To obtain power balance, we rewrite the second term in (5.2) using the product rule for the time derivative to get 
+
+12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)∂t
+
+
+
+μγ +(t) E(y, x, u(t)) 2
+
+2
+
+
+
+− ∂t(μγ +(t)) E(y, x, u(t)) 2
+
+2 dy dx, (5.6) The third term is rewritten in a similar way and upon substitution and rearrangement in (5.2) we get 
+
+˙K(t) + 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)) ∂t
+
+
+
+μγ +(t) E(y, x, u(t)) 2
+
+2
+
+
+
+dy dx
+
++ 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)μγ +(t)E(y, x, u(t))( ˙P ∗(t, y, x, u) + ˙P∗(t, y, x, u)) − ∂t(μγ +(t)) E(y, x, u(t)) 2
+
+2 dy dx
+
++ 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)) ∂t
+
+
+
+μγ −(t) E(y, x, u(t)) 2
+
+2
+
+
+
+dy dx
+
++ 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)μγ −(t)E(y, x, u(t))( ˙P ∗(t, y, x, u) + ˙P∗(t, y, x, u)) − ∂t(μγ −(t)) E(y, x, u(t)) 2
+
+2 dy dx
+
++ ˙Iϵ(t) = ˙Rϵ(t) + 
+
+Z
+
+> Ω
+
+b(t, x) · ˙u(x, t ) dx, (5.7) Next we examine the integrand of the third integral in (5.7). We begin by noting that ∂tγ+(t, y, x, u) < 0,
+
+˙P∗(y, x, u) = 0 , ˙P ∗(y, x, u)̸ = 0 and positive only when S(y, x, u(t)) = S∗(t, y, x, u) and ∂tγ−(t, y, x, u) < 0,14 ˙P ∗(y, x, u = 0 , ˙P∗(y, x, u)̸ = 0 and negative only when S(y, x, u(t)) = S∗(t, y, x, u). Suppose first that 
+
+S(y, x, u(t)) = S∗(t, y, x, u) then applying formula (3.10) we find that 
+
+μγ +(t)E(y, x, u(t)) ˙P ∗(t, y, x, u) = ∂r g+(r∗(t)) 
+
+p|y − x|/L 
+
+˙P ∗(t, y, x, u) + μγ +(t) ˙P ∗
+
+(t, y, x, u)P∗(t, y, x, u),
+
+= L
+
+|y − x|
+
+
+
+∂tg+(r∗(t)) − ∂r g+(r∗(t)) ∂t
+
+ ∂r g+(r∗(t)) 
+
+μγ +(t)
+
+ 
+
+− μγ +(t) ˙P ∗
+
+(t, y, x, u)P∗(t, y, x, u). (5.8) Note that when ˙γ+(t, y, x, u)̸ = 0 we have 
+
+−∂t(μγ +(t)) (E(y, x, u(t)) 2
+
+2 = − L
+
+|y − x|
+
+∂tγ+(t)( ∂r g+(r∗(t))) 2
+
+2μγ 2+(t)+ ∂tγ+
+
+ ∂r g+(r∗(t)) 2
+
+μγ +(t) P∗(t, y, x, u)
+
+
+
+− 12 ∂tγ+(t)P 2 
+
+> ∗
+
+(t, y, x, u). (5.9) where each term on the right hand side of (5.9) is positive and we get 
+
+μγ +(t)E(y, x, u(t)) ˙P ∗(t, y, x, u) − ∂t(μγ +(t)) E(y, x, u(t)) 2
+
+2= L
+
+|y − x| ∂t
+
+
+
+g+(r∗(t)) − (∂r∗ g+(r∗(t))) 2
+
+2μγ +(t)
+
+
+
+− μγ +(t) ˙P ∗
+
+(t, y, x, u)P∗(t, y, x, u)+ ∂tγ+
+
+∂r g+(r∗(t)) 
+
+μγ +(t)p|y − x|/L P∗(t, y, x, u)
+
+!
+
+− 12 ∂tγ+(t)P 2 
+
+> ∗
+
+(t, y, x, u), (5.10) where all terms on the right hand side of (5.10) are positive. For S(y, x, u(t)) = S∗(t, y, x, u) we see in the same way that 
+
+μγ −(t)E(y, x, u(t)) ˙P∗(t, y, x, u) − ∂t(μγ −(t)) E(y, x, u(t)) 2
+
+2= L
+
+|y − x| ∂t
+
+
+
+g−(r∗(t)) − (∂r∗ g−(r∗(t))) 2
+
+2μγ −(t)
+
+
+
+− μγ −(t) ˙P∗(t, y, x, u)P ∗(t, y, x, u)+ ∂tγ−(t) ∂r g−(r∗(t)) 
+
+μγ −(t)p|y − x|/L P ∗(t, y, x, u)
+
+!
+
+− 12 ∂tγ−(t)( P ∗(t, y, x, u)) 2, (5.11) where all terms on the right hand side of (5.11) are positive. Labeling the second and fourth integrals of (5.7) as ˙E(t) and third and fifth integrals of (5.7) ˙D(t) respectively we get that the power related to the elasticity is given by 
+
+˙E = 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρ∗,ϵ (y, x)) 
+
+
+
+∂t
+
+
+
+μγ +(t) E(y, x, u(t)) 2
+
+2
+
+
+
++ ∂t
+
+
+
+μγ −(t) E(y, x, u(t)) 2
+
+2
+
+ 
+
+dy dx + ˙Iϵ(t)
+
+(5.12) 15 and that the dissipation rate is given by 
+
+˙D = L
+
+2
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+ρϵ(y, x)∂t
+
+
+
+g+(r∗(t)) − (∂r∗ g+(r∗(t))) 2
+
+2μγ +(t)
+
+
+
+dydx
+
+− 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)μγ +(t) ˙P ∗
+
+(t, y, x, u)P∗(t, y, x, u) dy dx
+
++ 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)∂tγ+(t) ∂r g+(r∗(t)) 
+
+μγ +(t)p|y − x|/L P∗(t, y, x, u)
+
+!
+
+− 12 ∂tγ+(t)( P∗(t, y, x, u)) 2 dy dx
+
++ L
+
+2
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+ρϵ(y, x)∂t
+
+
+
+g−(r∗(t)) − (∂r∗ g−(r∗(t))) 2
+
+2μγ −(t)
+
+
+
+dydx
+
+− 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)μγ −(t) ˙P∗(t, y, x, u)P ∗(t, y, x, u) dy dx
+
++ 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)∂tγ−(t) ∂r g−(r∗(t)) 
+
+μγ −(t)p|y − x|/L P ∗(t, y, x, u)
+
+!
+
+− 12 ∂tγ−(t)( P ∗(t, y, x, u)) 2 dy dx.
+
+(5.13) One readily checks that the integrand in first and fourth term of (5.13) is positive since first time derivatives are increasing and the positivity of the second, third, fifth and sixth terms term follow from the properties of γ±(t), ∂tγ±(t), P ∗, ˙P ∗, P∗, and ˙P∗, hence the dissipation rate ˙D is either zero or positive in accord with thermodynamics. On collecting results we obtain 
+
+Power balance for for fracture in quasi brittle materials with damage and plasticity 
+
+˙K(t) + ˙Eϵ(t) + ˙Dϵ(t) = ˙R(t) + 
+
+Z
+
+> Ω
+
+b(t) · ˙u(t) dx. (5.14) Since ˙Dϵ(t) ≥ 0, these observations are summarized in the following Lemma. 
+
+Lemma 2 (Growth of the dissipation for fracture in quasi-brittle materials). 
+
+˙Dϵ(t) = 
+
+Z
+
+> Ω
+
+b(t) · ˙u(t) dx + Rϵ(t) − ˙K(t) − ˙Eϵ(t) ≥ 0. (5.15) The power balance is used to identify a condition when energy dissipation occurs. 
+
+Corollary 2.1 (Condition for energy dissipation in fracture evolution for quasi brittle materials). 
+
+If the rate of energy put into the system exceeds the material’s capacity to generate kinetic and elastic energy through elastic strain and velocity, then energy dissipation occurs through damage manifested as softening elastic moduli and non-recoverable strain. 
+
+Note here that (5.15) is consistent with thermodynamics and follows from the initial value problem directly through the equations of motion (3.14) and the Dirichlet boundary conditions. In summary, power balance for quasi-brittle crack growth shows that ˙D > 0 only where damage is occurring and zero elsewhere. If a crack exists, the strain is greatest in the neighborhood of its tips and the region where ˙D > 0 corresponds to the process zone in front of a crack. 
+
+6. Energy balance satisfied by fracture evolutions. 
+
+To obtain an explicit formula for the elastic energy and dissipation energy, one exchanges time and space integrals in R t 
+
+> 0
+
+˙E(τ )dτ and R t 
+
+> 0
+
+˙D(τ ) dτ . Exchanging time and space integration and using (5.12) we get 
+
+E(t) = 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)
+
+
+
+μγ +(t, y, x, u) E2(y, x, u(t)) 2
+
+
+
+dy dx
+
+= 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρϵ(y, x)
+
+
+
+μγ −(t, y, x, u) E2(y, x, u(t)2
+
+
+
+dy dx
+
++ Iϵ(t). (6.1) 16 and 
+
+E(0) = 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+|y − x|ρ∗,ϵ (y, x)χEZ ϵ(0) 
+
+
+
+μ E2(y, x, u(t)2
+
+
+
+dy dx + Iϵ(0) . (6.2) Recalling that D(0) = 0 , exchanging space and time integration and collecting results shows the damage energy expended from 0 to t is given by the non-negative quantity 
+
+D(t) = L
+
+2
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+ρϵ(y, x)
+
+
+
+g+(r∗(t)) − (∂r∗ g+(r∗(t))) 2
+
+2μγ +(t)
+
+
+
+dydx
+
+− 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+Z t
+
+> 0
+
+|y − x|ρϵ(y, x) μγ +(τ ) ˙P ∗
+
+(τ, y, x, u)P∗(τ, y, x, u) dτ d y dx
+
++ 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+Z t
+
+> 0
+
+|y − x|ρϵ(y, x)∂tγ+(τ ) ∂r g+(r∗(τ )) 
+
+μγ +(τ )p|y − x|/L P∗(τ, y, x, u)
+
+!
+
+− 12 ∂tγ+(τ )( P∗(τ, y, x, u)) 2dτ d y dx
+
++ L
+
+2
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+ρϵ(y, x)
+
+
+
+g−(r∗(t)) − (∂r∗ g−(r∗(t))) 2
+
+2μγ −(t)
+
+
+
+dydx
+
+− 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+Z t
+
+> 0
+
+|y − x|ρϵ(y, x)μγ −(τ ) ˙P∗(τ, y, x, u)P ∗(τ, y, x, u) dτ d y dx
+
++ 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+Z t
+
+> 0
+
+|y − x|ρϵ(y, x)∂tγ−(τ ) ∂r g−(r∗(τ )) 
+
+μγ −(τ )p|y − x|/L P ∗(τ, y, x, u)
+
+!
+
+− 12 ∂tγ−(τ )( P ∗(τ, y, x, u)) 2dτ d y dx
+
+. (6.3) We conclude that the power balance delivers the energy balance given by: 
+
+Energy balance for fracture with damage and plasticity 
+
+Dϵ(t) = 
+
+Z t
+
+> 0
+
+Z 
+
+> Ω
+
+b(τ ) · ˙u(τ ) dx + Rϵ(τ )
+
+
+
+dτ − (K(t) + Eϵ(t) − K (0) − E ϵ(0)) , (6.4) where Dϵ(t) is given by (6.3). The energy of the subset of the specimen where all the bonds have failed in tension and where all the bonds have failed in compression can be identified. Let Γ+(t) denote the set of bonds in the specimen that have failed in tension at time t and Γ−(t) denote the set of bonds in the specimen that have failed in compression at time t. Clearly γ+(t, y, x, u) = 0 , ∂tγ+(t, y, x, u) = 0 and ∂r∗ g+(rFt ) = 0 for all for all bonds in Γ+(t) and from (6.3) it is evident that the total energy dissipated by all bonds that have failed at time t
+
+is 
+
+Ftension (t) = 12
+
+Z Z 
+
+> Γ+(t)
+
+ρϵ(y, x)L g+(rFt ) dydx. (6.5) Clearly γ−(t, y, x, u) = 0 , ∂tγ−(t, y, x, u) = 0 , and ∂r∗ g−(rFc ) = 0 for all for all bonds in Γ−(t) and from (6.3) it is evident that the total energy dissipated by all bonds that have failed in compression at time t is 
+
+Fcompression (t) = 12
+
+Z Z 
+
+> Γ−(t)
+
+ρϵ(y, x)L g−(rFc ) dydx. (6.6) It is clear that Ftension (t) and Fcompression (t) are non-decreasing in time and will be calculated for tension and compression cracks in the next section. 
+
+7. Calibration of nonlocal model using measured properties of the material 
+
+In this section, we calibrate the model using quantities obtained directly from the dynamics and equating them to the material properties of the specimen. The elastic moduli and critical energy release rate follow from Γ-convergence as ϵ → 0, see Lipton (2016), Lipton and Bhattacharya (2025). But they are obtained here by Taylor series and geometric measure theory arguments presented in Lipton and Bhattacharya (2025). 17 7.1. Elastic properties 
+
+The horizon length scale ϵ is chosen small enough to resolve the process zone hence smaller than the length scale of the process zone of the material. The Lamé constants for undamaged material are used to calibrate μ.. Inside undamaged material containing a neighborhood Hϵ(x) the elastic energy density is given by 
+
+Wϵ(t, x) = 12
+
+Z
+
+> Ω
+
+ρϵ(y, x)|y − x|μ S2(y, x, u(t)) 2 dy. (7.1) When the displacement is linear across Hϵ(x), i.e., u = M x where M is a constant matrix, then S(y, x, u(t)) = 
+
+F e · e, where F = ( M + M T )/2, and changing variables y = x + ϵζ , with |ζ| < 1, gives 
+
+Wϵ(t, x) = 14ωd
+
+Z
+
+> H1(0)
+
+|ζ|J(|ζ|)μ(F e · e)2 dζ. (7.2) Observe that (F e · e)2 = P 
+
+> ijkl
+
+Fij Fkl eiej ekel so 
+
+Wϵ(t, x) = 12
+
+X
+
+> ijkl
+
+Cijkl Fij Fkl (7.3) where 
+
+Cijkl = μ
+
+2ωd
+
+Z
+
+> H1(0)
+
+|ξ|J(|ξ|) eiej ekel dξ. (7.4) On the other hand, the potential elastic energy per unit volume of a material characterized by shear moduli 
+
+G and Lamé constant λ is given by 
+
+U = 12
+
+X
+
+> ijkl
+
+˜Cijkl Fij Fkl (7.5) where 
+
+˜Cijkl = G(δik δjl + δil δkj ) + λδ ij δkl (7.6) Setting U = Wϵ(t, x), we get ˜C = C and we arrive at the calibration for determining μ given by 
+
+G = λ = μ
+
+8
+
+Z 10
+
+r2J(r)dr, d = 2 and (7.7) 
+
+G = λ = μ
+
+10 
+
+Z 10
+
+r3J(r)dr, d = 3 . (7.8) With Possion ratio ν = 1 /3 for d = 2 and ν = 1 /4 for d = 3 . These formulas are consistent with those obtained from Γ-convergence of peridynamic energies obtained in Lipton (2016). 
+
+7.2. Strength 
+
+The domain of elastic behavior is calibrated to that of the material. Here, we use the tensile stress of a material corresponding to the onset of nonlinear behavior σC . The critical stain in tension rCt is determined by 
+
+σCt = g′(rCt )/p|y − x|/L. (7.9) The critical stain in compression rCc is determined by 
+
+σCc = g′(rCc )p|y − x|/L.. (7.10) The stain in tension rYt where the bond stiffness departs from linear behavior and exhibits plastic stiffening is determined by 
+
+σYt = μS Yt . (7.11) The stain in compression SYc where the bond stiffness departs from linear behavior and exhibits plastic stiffening is determined by 
+
+σYc = μS Yc . (7.12) 18 7.3. Critical energy release rate and determination of characteristic dimension 
+
+The measured value of the critical energy release rate of the material is used to calibrate the nonlocal constitutive parameters. First suppose the critical energy release rate for a mode I crack is given and the value is denoted by G+ 
+
+> c
+
+. We then use (6.5) and calculate the dissipation energy of a flat crack. The mode 1 crack is denoted by Rt and is a line segment for d = 2 and a piece of flat surface in d = 3 . The domains 
+
+Γ+(t) and Γ−(t) for a line crack is illustrated in Figure 6. The length of a line segment is written as H1(Rt)
+
+and the area of a flat piece of surface is H2(Rt). Explicit computation as in Lipton and Bhattacharya (2025) using Crofton’s formula gives 
+
+Ftension (t) = 12
+
+Z Z 
+
+> Γ+(t)
+
+ρϵ(y, x)L g+(rFt ) dydx
+
+= G+ 
+
+> c
+
+× H d−1(Rt). (7.13) Its clear that this is a fracture energy and the energy release rate G+ 
+
+> c
+
+is given in terms of the constants used in the nonlocal model and is 
+
+G+ 
+
+> c
+
+= Lg +(rFt )22ωd−1
+
+ωd
+
+Z 10
+
+rdJ(r)dr, for d = 2 , 3 (7.14) where ωd−1 and ωd are the areas of the unit ball in dimension d − 1 and d respectively. To calibrate we set 
+
+G+ 
+
+> c
+
+= G+ 
+
+> c
+
+.Similarly we can consider compression and mode II sliding cracks with prescribed critical energy release rate G− 
+
+> c
+
+. Explicit computation as before gives 
+
+Fcompression (t) = 12
+
+Z Z 
+
+> Γ−(t)
+
+ρϵ(y, x)L g−(rFc ) dydx
+
+= G− 
+
+> c
+
+× H d−1(Rt). (7.15) As before its clear that this is also a fracture energy and the energy release rate G− 
+
+> c
+
+is given in terms of the constants used in the nonlocal model and is 
+
+G− 
+
+> c
+
+= Lg −(rFc )22ωd−1
+
+ωd
+
+Z 10
+
+rdJ(r)dr, for d = 2 , 3. (7.16) To calibrate we set G− 
+
+> c
+
+= G− 
+
+> c
+
+.In this treatment we illustrate the ideas numerically for materials that fail in tension and are linear elastic in compression. In all simulations we apply the bilinear model and choose influence function J(r) given by 
+
+1 for 0 < r < 1 and zero for 1 ≤ r and L is determined by setting G+ 
+
+> c
+
+= G+ 
+
+> c
+
+and we get 
+
+L = 3πG +
+
+> c
+
+rFt σC , rFt ≥ rCt = σC
+
+9E . (7.17) 
+
+7.4. Unloading ratio 
+
+The unloading ratio provides a coarse scale means for comparing how different microscale physics effects coarse scale behavior. For quasi-brittle fracture it is a measure of the ratio of irreversible strain due to frictional sliding over microscopic cracks to the irreversible strain consistent with the combined effects of frictional sliding and degradation of elastic properties through creation of micro-voids and opening micro-cracks, Zhu et al. (2011). One can compute this number from available experimental results. Here the crack mouth opening displacement(CMOD) data for 3 point bending tests versus force history is used. It is obtained from boundary loads centered over the single pre-crack, see Figure 7. As an example in the next section we pull the unloading ratio from the cyclic load-CMOD curve for a specific batch of concrete made and tested in Chen and Liu (2023), see Figure 10. Here an unloading curve highlighted in Figure 5 is selected. The x axis intercept x1 is the plastic strain with elastic softening for the batch. We then choose the common point P on the loading curve and construct a line through this point of slope equal to μ and calculate the x axis intercept x2 of this line. The unloading ratio for the batch is β+ = x1/x 2. An analogous calibration using compression loading determines the unloading ratio under compression β−.19 Experimental Data 
+
+P
+
+¯μ
+
+x2x1
+
+Force (kN) 
+
+CMOD (mm) 
+
+Figure 5: Calibration of β± based on experimental data. x1 is the x axis intercept of a chosen unloading curve as measured by experiment and x2 is the point of unloading that would occur without any loss in elasticity. The ratio of these values is the unloading ratio, β± = x1/x 2
+
+.
+
+Rϵt
+
+ℓϵ(t)
+
+ℓ(0) 
+
+2ϵ
+
+Figure 6: Flat cracks and bond alignment. The crack Rϵt = {x1 = 0; ℓ(0) < x 2 < ℓ (t)} and zone Γ±(t) where at least one bond is experiencing plastic strain and γ±(t, y, x, u) < 1 is given by the gray shaded region. We call this alignment/localization because bonds experiencing plastic strain and γ±(t, y, x, u) < 1 cross the flat crack set Rt. The energy of all the broken bonds are integrated up in the calculation of the failure energy F(t) associated with the crack. 
+
+20 8. Results 
+
+This section provides the details on how the model is implemented in computational simulations. Amesh convergence study is carried out to ensure numerical accuracy. Following this study, the numerical experiments are carried out and compared with true experimental data across four benchmark problems: (i) monotonic and cyclic Mode I fracture, (ii) cyclic mixed-mode fracture, (iii) mixed-mode fracture induced by a corner singularity, (iv) the size effect in concrete beams, and (v) comparison with other dynamic phase field fracture simulations. All simulations use a simple bilinear strength envelope to describe the constitutive law throughout this section, see (2.7). Eq. (2.12) provides the explicit form of the two-point phase field used within this study. The details of the calibration of the material constants are provided in Section 7. The rational behind using a simple strength envelope is to demonstrate that the method gives solid agreement with experimental results and other phase field methods for the simplest nonlinear constitutive law between two point force and strain. The quasi-static results were obtained using the dynamic relaxation method Underwood (1983). Adamping term is added to the equation of motion given in (2.22), and the central difference time integration algorithm is used to obtain the displacement field satisfying the static equilibrium at each time step. However, the time step corresponds to the loading step rather than the physical time step used in transient analyses. Since this technique is an explicit iterative algorithm, the critical time step should be calculated accordingly. In this study, the critical time step is calculated as described by Silling and Askari (2005). The numerical algorithm for the utilized dynamic relaxation method is provided in the supplementary materials of Coskun et al. (2025). This study focuses on the quasi-brittle failure in which tension softening and plastic deformation occur. For numerical simulation we choose a bilinear failure envelope given by (2.7). Hence, the bond force densities can be calculated using (2.19). Using (3.1), and (7.7), with an influence function of J(r) = 1 for two-dimensional domains, the calibration of the constant μ results in μ = 9 E. where E is the Young’s Modulus of the material. Then, using (7.9), and (2.7) (3.1), the critical bond strain is 
+
+SC =
+
+s
+
+L
+
+|y − x|
+
+σC
+
+9E , (8.1) where σC is the tensile strength of the material, and L is the characteristic length of the domain. For static quasi-brittle failure, the characteristic length is the smallest dimension of the domain. The failure bond strain is calibrated using (7.14), (2.7), and is 
+
+SF = 3π G c
+
+pL|y − x| σC (8.2) where Gc is the critical energy release rate of the material, and (8.2) is consistent with (7.17). Only uniform meshes and 2D domains are considered here. The displacement boundary conditions are applied at least to the horizon size of the layer nodes. The damping coefficient is selected as 2.0 × 10 7 kg /m3s unless otherwise stated. Finally, the horizon size is selected as 3.015 times of the uniform grid size. As Trageser and Seleson (2020) stated earlier, Poisson’s ratio is limited inherently due to the two-parameter formulation of the bond-based peridynamics. Therefore, Poisson’s ratio is used as 0.33 throughout this study. The data is extracted from the experimental literature using WebPlotDigitizer described in Rohatgi (2024). 
+
+8.1. Mesh Convergence Study 
+
+The mesh convergence study was conducted using a three point bending test (TBP). The material properties are given in Table 1 and the dimensions of the specimen are given in Figure 7. Only a uniform grid spacing was used to conduct the study so the analysis of things such as non-uniform, and mesh orientation are not addressed here. 21 9.1 Mode-I fracture test on high-strength concrete beam under monotonic and cyclic loading 
+
+uThickness = 50 mm 54 mm 45 mm 300 mm 300 mm 150 mm Figure 7: Dimensions and boundary conditions of the mode-I fracture test with a high strength concrete beam. Table 1: Material constants used in the mode-I fracture test of the high-strength concrete beam. Symbol Values Units 
+
+E 33 .89 GPa 
+
+f t 3.39 MPa 
+
+G f 116 .15 N/m 0 0.1 0.2 0.3 0.4 0.5 0.6 0.70123
+
+CMOD (mm) Reaction Force (kN)  Experiment ML [24] Current Study ML (a) 0 0.1 0.2 0.3 0.4 0.5 0.6 0.70123
+
+CMOD (mm) Reaction Force (kN)  Experiment ML [24] Current Study ML (b) Figure 8: Comparison of the force vs CMOD curves resulted from (a) monolithic, and (b) cyclic loading. 27 Figure 7: Dimensions and boundary conditions of the mode-I fracture test with a high strength concrete beam. Table 1: Material constants used in the mode-I fracture test of the high-strength concrete beam. 
+
+Symbol Values Units 
+
+E 33 .89 GPa 
+
+σC 3.39 MPa 
+
+Gc 116 .15 N/m 
+
+Two convergence types were analyzed for this study: ϵ-convergence and m-convergence. ϵ denotes the horizon and m denotes the ratio of the horizon to grid spacing. Hence, we have ϵ = hm where h is the size of the uniform grid. ϵ-convergence considers a decreasing horizon with a fixed m value. m-convergence considers an fixed horizon and increasing m value. When m → ∞ , the numerical solution is a discrete approximation of field theory. The simulated data can only be compared with the experimental data shown in Figure 10a. For the m−convergence, the horizon was fixed at 4, 6, and 8 mm and the m value is increase from 2 mm to 8 mm. Additionally, A more in-depth analysis was conducted for a horizon fixed at 6 mm with five m
+
+values selected from m = 2 to m = 8 . Figure 8 shows the reaction force vs crack mouth opening displacement (CMOD) for each setup. From the results, the difference between m = 4 and m = 8 is minimal, and virtually unnoticeable when going from m = 6 to m = 8 indicating that increasing m beyond 8 is unlikely to provide additional insight and we can reasonably conclude that the proposed model converges as m → ∞ .0 5 · 10 −2 0.1 0.15 0.2 0.25 0.3 0.35                                   
+
+> 0
+> 0.5
+> 1
+> 1.5
+> 2
+> 2.5
+> 3
+> 3.5
+> CMOD (mm)
+> Reaction Force (kN)
+> ϵ=4 mm m=2
+> ϵ=4 mm m=4
+> ϵ=4 mm m=8
+> ϵ=6 mm m=2
+> ϵ=6 mm m=4
+> ϵ=6 mm m=8
+> ϵ=8 mm m=2
+> ϵ=8 mm m=4
+> ϵ=8 mm m=8
+> (a) 05·10 −20.10.15 0.20.25 0.30.35
+> 0
+> 0.5
+> 1
+> 1.5
+> 2
+> 2.5
+> 3
+> 3.5
+> CMOD (mm)
+> Reaction Force (kN)
+> ϵ= 6 mm, m= 2
+> ϵ= 6 mm, m= 3
+> ϵ= 6 mm, m= 4
+> ϵ= 6 mm, m= 6
+> ϵ= 6 mm, m= 8 (b)
+
+Figure 8: m-convergence test for ϵ = 4 , 6, and 8 
+
+The ϵ−convergence test followed a similar setup. The m value was fixed at 2,4, and 8 and the horizon was decreased from 8 to 4 mm. In addition to this, a more in depth analysis was done for a fixed m value 22 of 4 with the horizon decreasing from 10 mm to 4 mm. The results of these can be seen in Figure 9. When compared to the experimental results of Chen and Liu (2023), Our simulations recorded a maximum load of 2.8 kN for ϵ = 10 mm and m = 4 , a maximum load of 3.5 kN for ϵ = 4 mm and m = 4 , and the experimental data delivered a maximum load of 3.4 kN. 0 5 · 10 −2 0.1 0.15 0.2 0.25 0.3 0.35                                       
+
+> 0
+> 0.5
+> 1
+> 1.5
+> 2
+> 2.5
+> 3
+> 3.5
+> CMOD (mm)
+> Reaction Force (kN)
+> ϵ=8 mm m=2
+> ϵ=6 mm m=2
+> ϵ=4 mm m=2
+> ϵ=8 mm m=4
+> ϵ=6 mm m=4
+> ϵ=4 mm m=4
+> ϵ=8 mm m=8
+> ϵ=6 mm m=8
+> ϵ=4 mm m=8
+> (a) 05·10 −20.10.15 0.20.25 0.30.35
+> 0
+> 0.5
+> 1
+> 1.5
+> 2
+> 2.5
+> 3
+> 3.5
+> CMOD (mm)
+> Reaction Force (kN)
+> ϵ= 10 mm, m= 4
+> ϵ= 8 mm, m= 4
+> ϵ= 6 mm, m= 4
+> ϵ= 4 mm, m= 4 (b)
+> Figure 9: ϵ-convergence test for fixed m= 2 ,m= 4 , and m= 8 .
+
+8.2. Mode I fracture test for high-strength concrete under monolithic and cyclic loading 
+
+The first numerical study was simulating mode I fracture under monolithic and cyclic loading. The material properties and the dimensional setup are shown in Figure 7 and Table 1. The material properties where pulled directly from Chen and Liu (2023) and the results are directly compared with their experimental results. It should be noted that in the study conducted by Chen and Liu (2023), the loading was displacement controlled and the unloading was force controlled whereas for the numerical simulations, both loading and unloading are both displacement controlled. The horizon is selected to be 6 mm a with a uniform grid-spacing of 2 mm and a characteristic length of 150 mm. The stable time step was calculated to be 4.97 × 10 −7 s. The unloading ratio β+ is calibrated from the experimental data given by the 5th unloading-reloading cycle for a centered pre crack. From this calibration a β+ value of 0.7 was used. Figure 10 presents the force vs CMOD for both monolithic loading and cyclic loading. The corresponding numerical simulations for both monolithic and cyclic loads exhibit close agreement with the experimental results. Plastic strain concentration within the material can be assessed using the maximum value of plastic strain among all bonds within a horizon. Here we fix x and measure P ∗(t, y, x, u) relative to the critical plastic strain βS F (y, x) among all bonds connected to x within the horizon ϵ given by 
+
+Z(t, x, u) = max 
+
+> y∈Hϵ(x)
+
+ rp(t, u)
+
+βr F
+
+
+
+= max 
+
+> y∈Hϵ(x)
+
+ P ∗(t, y, x, u)
+
+βS F (y, x)
+
+
+
+. (8.3) The quantity Z(t, x, u) is referred to as the strain concentration. The value of Z(t, x, u) is greater than zero if there is a plastic strain between y and x. It takes the value one if at least one bond has failed. Figure 11 shows the localization and evolution of the plastic strain at four loading stages one before and three after the peak stress has been reached. Z(t, x, u ) was plotted everywhere in the domain and is only nonzero around the crack and equal to 1 adjacent to the crack. The loading stages are shown in Figure 10b. 23 0 5 · 10 −2 0.1 0.15 0.2 0.25 0.3 0.35 
+
+> 0
+> 0.5
+> 1
+> 1.5
+> 2
+> 2.5
+> 3
+> 3.5
+> CMOD (mm)
+> Reaction Force (kN)
+> Chen and Liu (2023)
+> Current Study
+
+(a) 0 5 · 10 −2 0.1 0.15 0.2 0.25 0.3 0.35  
+
+> 0
+> 0.5
+> 1
+> 1.5
+> 2
+> 2.5
+> 3
+> 3.5
+> CMOD (mm)
+> Reaction Force (kN)
+> Chen and Liu (2023)
+> Current Study
+
+(b) 
+
+Figure 10: Comparison of Force vs CMOD for monolithic and cyclic loading for the centered pre notch. 
+
+Figure 11: Plastic strain contours at four loading stages highlighted by the red dot in Figure 10 b. Here we see localization of plastic strain around a growing crack. The figures show that the crack is preceded by a process zone of finite size. 
+
+24 8.3. Mixed-mode fracture of concrete beam under cyclic loading 
+
+The next simulation is for mixed mode fracture of concrete beams where both shear and tensile stresses are present. This was carried out using a three point bending test with a prenotch that was offset at four different lengths. The dimensions of the beam and the material properties are selected to be consistent with Jenq and Shah (1988) and are shown in Figure 12 and Table 2, respectively. However, the maximum tensile strength and the critical energy release rate are not specified by Jenq and Shah (1988), so these values are selected and remain unchanged throughout this section. (b) Figure 11: Local damage contour plots showing the crack trajectories obtained under (a) monolithic loading, and (b) cyclic loading. 
+
+9.2 Mixed-mode fracture tests on concrete beams under cyclic loading 
+
+uThickness = 28.6 mm x23 mm 24 mm 152 mm 152 mm 70 mm Figure 12: Dimensions and boundary conditions of the mixed-mode fracture tests on concrete beams. Table 2: Material constants used in the mixed-mode fracture tests of the concrete beams. Symbol Values Units 
+
+E 32 .8 GPa 
+
+f t * 3 MPa 
+
+G f * 95 N/m *Not provided in the experimental study [25]. 29 
+
+> Figure 12: Dimensions and boundary conditions of the mixed-mode fracture tests on concrete beams. Table 2: Material constants used in the mixed-mode fracture tests of the concrete beams.
+
+Symbol Values Units 
+
+E 32 .8 GPa 
+
+σC * 3.25 MPa 
+
+Gc* 115 N/m *Not provided in the experimental study by Jenq and Shah (1988). 
+
+The horizon was selected to be 3 mm and the grid spacing was set at 1 mm. The time step was calculated to be 2.5 × 10 −7 s and the characteristic length was set at 70 mm. β+ for the Jenq and Shah (1988) concrete specimens are calculated as in section 7.4 for a centered crack and found to be 0.722. We then set β+ to this value for all simulations run in this section. The parameter γ is defined as the ratio of the distance 
+
+x shown in Figure 12 to half the length of the specimen. This is used to describe offset distance of the prenotch. Figure 13 shows the force versus CMOD for four different values of γ. We also calibrated β+ for each different offset γ and numerically computed the force versus CMOD for comparison. As expected the simulations become more accurate when this is done. 25 0 5 · 10 −2 0.1 0.15 0.2 0.25 0.3                                                     
+
+> 0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> 0.9
+> 1
+> CMOD (mm)
+> Reaction Force (kN)
+> Jenq and Shah (1988)
+> β= 0 .722 (a) x= 0 mm, γ= 0 05·10 −20.10.15 0.20.25 0.3
+> 0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1
+> 1.2
+> CMOD (mm)
+> Reaction Force (kN)
+> Jenq and Shah (1988)
+> β= 0 .722
+> β= 0 .696 (b) x= 25 mm, γ= 1 /605·10 −20.10.15 0.20.25 0.3
+> 0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1
+> 1.2
+> CMOD (mm)
+> Reaction Force (kN)
+> Jenq and Shah (1988)
+> β= 0 .722
+> β= 0 .650
+> (c) x= 50 mm, γ= 1 /305·10 −20.10.15 0.20.25 0.3
+> 0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1
+> 1.2
+> 1.4
+> 1.6
+> 1.8
+> 2
+> CMOD (mm)
+> Reaction Force (kN)
+> Jenq and Shah (1988)
+> β= 0 .722
+> β= 0 .798 (d) x= 76 mm, γ= 1 /2
+
+Figure 13: Comparison of experimental and numerical results for various γ values. 
+
+While there were four different sized specimens used in the original study, the experimental data for the Force vs CMOD curve is only given for a single study. Furthermore, the specific loading and unloading data is not given in the original study so the specific unloading points were selected to match the experimental data as closely as possible. Nevertheless, for the experimental data that is given, we see excellent agreement between the proposed model and the experimental data. Figure 14 shows the crack path for each setup. The crack paths were pulled directly from the images of the damaged specimens shown in Figure 15 of Jenq and Shah (1988). The displacement jumps in x component of the computationally generated displacement field follows the direction of the experimental crack paths for the different offsets. 
+
+9. Mixed mode fracture of L-shaped concrete specimen 
+
+The next numerical example is conducted for an L-shaped concrete beam without a prenotch. The dimensions and loading setup are shown in Figure 15 and the reference study was conducted by Winkler (2001). The material properties are shown in Table 2 and selected to be consistent with Winkler (2001) except for the elastic modulus which is selected to be 18 GPa which better represents the initial slope. 26 (a) x = 0 mm (b) x = 25 mm (c) x = 50 mm (d) x = 76 mm 
+
+> Figure 14: Comparison of experimental (gray) and numerical (blue) crack paths for different offsets.
+
+## 9.3 Mixed-mode fracture of concrete L-shaped panel 
+
+u500 mm 250 mm 250 mm 220 mm Thickness = 100 mm Figure 15: Dimensions and boundary conditions of the mixed mode fracture test with l-shaped concrete panel. Table 3: Material constants used in the mixed-mode fracture test of the concrete panel. Symbol Values Units 
+
+E* 18 GPa 
+
+ω* 0.33 →
+
+f t 2.7 MPa 
+
+G f 90 .0 N/m *Di !erent than the experimental values[27]: E=25.85 GPa, ω = 0 .18. 
+
+Experiment[27] Current Study (a) 
+
+0 0.1 0.2 0.3 0.4 0.5 0.602468
+
+Displacement (mm) Force (kN) Experiment[27] Current Study (b) Figure 16: (a) Damage contour plot, and (b) comparison of the force vs displacement curves. 
+
+> Figure 15: Dimensions and boundary conditions of the mixed mode fracture test with : L-shaped concrete panel. Table 3: Material constants used in the mixed-mode fracture test of the concrete panel.
+
+Symbol Values Units 
+
+E* 20 GPa 
+
+σC 2.7 MPa 
+
+Gc 90 .0 N/m *Different than the experimental values provided by Winkler (2001): E=25.85 GPa. 
+
+The boundary conditions fix the displacement in both the vertical and horizontal directions and the support is chosen to have a height equal to the horizon. The horizon is selected to be 7.875 mm with a gridsize of 2.5 mm. The local damping is set at 2.0 × 10 7 kg/m 3 s, and the characteristic length is set to 250 mm. The critical timestep is calculated to be 9.04 ×10 −7 s, and the specimen is loaded to a final displacement of 0.65 mm. Figure 16 presents the reaction force vs displacement comparison for the numerical simulations and the experimental data. The ultimate load-carrying capacity and the subsequent decrease in load carrying capacity are predicted by the proposed model. The maximum forces are essentially equal with both the experimental data and the numerical simulation, predicting a maximum force of roughly 7 kN. The post-peak softening behavior follows the general trend of the experimental data, though the numerical model predicts a slightly more rapid decrease in load capacity after 0.3 mm compared to the experimental range. On the other hand we are using a simple bilinear envelope for modeling the bond degredation and failure. The use of an exponential bond model with bonds that soften to zero at infinity will decrease the bond decay. The crack path obtained from the numerical simulation is presented using a local damage variable. The damage variable can take any value between zero and one. Here zero indicates no softening of elastic properties and values greater than zero indicate softening and one indicates completely damaged points. Local damage at the material point x at time t, D(x, t ) can be calculated from the two point phase field as 27 0 0.1 0.2 0.3 0.4 0.5 0.6
+
+0
+
+2
+
+4
+
+6
+
+8
+
+Displacement (mm) 
+
+> Reaction Force (kN)
+
+Winkler (2001) 
+
+Current Study Figure 16: Force vs Displacement for L-shaped Concrete Specimen 
+
+D(x, t ) = 1 −
+
+R 
+
+> Hϵ(x)
+
+γ+(t, y, x, u) dy
+
+R 
+
+> Hϵ(x)
+
+dy , (9.1) where γ+(t, y, x, u) is the two-point phase field described in Figure 2. Figure 17 shows the crack path predicted by the model and it compares within an acceptable accuracy to the experimental results of Winkler (2001). We recover mode mixity along the crack by examining the jump discontinuities of the displacement across the crack. At the corner of the L-shaped domain it is a mode one jump progressing into a jump discontinuity given by a mixture of mode one and mode two (sliding) as one moves away from the corner along the crack path.   
+
+> (a) (b)
+> Figure 17: a) Crack path for L-shaped Concrete Specimen as presented by damage variable., b) Crack path presented by discontinuity set for displacement. The displacement field on either side of the crack represented by arrows. The displacement field jumps only on either side of the crack. Note that at the corner it is a mode one jump going into a mixture of mode one and mode two (sliding) as one moves away from the corner along the crack path.
+
+28 10. Size effect in concrete beams 
+
+The final numerical test examines the deterministic size effect in concrete beams. Bažant and Planas (1998) define the structural size-effect as the deviation of the actual load-carrying capacity of the structure, due to the change of its size, from the one predicted by any deterministic theory where the failure of the material is expressed in terms of stress and/or strain. Classical plastic failure theories or theories based on maximum stress or strain predict that the stress at which a structure will begin to fail is independent of the size of that structure. This has been shown to be inaccurate through experimental testing. A mode I failure test was used to study the size effect and the numerical results were compared directly with the experimental results from García-Álvarez et al. (2012). Three different sized beams were used to carry out this study. Table 4 gives the dimensions for each setup and Table 5 shows the material properties which were fixed for each beam and are consistent with the García-Álvarez et al. (2012).                         
+
+> Table 4: Dimensions of the beams tested for the mode-I failure test.
+> Specimen Depth (mm) Span (mm) Thickness (mm) Prenotch Length (mm) Beam 1 80 200 50 20 Beam 2 160 400 50 40 Beam 3 320 800 50 80
+> Table 5: Material constants used in the mode-I fracture test of the concrete beams.
+> Symbol Values Units
+> E33 .8GPa
+> σC3.5MPa
+> Gc80 .0N/m
+
+The horizon is selected to be 6.03 mm with a uniform grid spacing of 2 mm. The local damping was set to 
+
+3.0 × 10 7kg/m 3 s and the critical timestep was calculated to be 4.99 × 10 −7 s. The characteristic length was set to 160 mm and was kept consistent across all three setups. Figure 18 shows the force vs CMOD curves for each beam size as well as the experimental results from and García-Álvarez et al. (2012) and the results from another peridynamic model proposed by Hobbs et al. (2022). It should be noted that the experiments by García-Álvarez et al. (2012) only include two experiments for beam 3 whereas beam 1 and 2 both have three experiments. The gradual decrease in reaction force for larger beam dimensions indicates that the model is capable of capturing the size effect. To further verify this, the ligament stress was calculated at the maximum load for each setup. The ligament stress can be calculated using 
+
+σlig = 1 .5 Fult sb h 2 (10.1) where Fult represents the maximum force carried, s is the span of the beam, b is the thickness of the beam, and h is difference between the depth of the beam and the length of the prenotch. Once the ligament stress is calculated for each beam, it is plotted vs the beam depth in Figure 19. It is clear from the figure that the model clearly captures the size effects for each beam and is consistent with the experimental data. 
+
+11. Conclusions 
+
+The model is formulated as a mathematically well-posed initial value boundary value problem for the displacement inside a quasi-brittle material. The solution delivers the displacement, damage field, irreversible strain and crack set history. The model is based on a blend of a nonlocal constitutive law and a two point phase field. Displacement evolutions satisfy energy balance principles, with a positive energy dissipation rate that is consistent with thermodynamics. These properties are not postulated but are consequences of the evolution equation. 29 0 5 · 10 −2 0.1 0.15 0.2
+
+0
+
+2
+
+4
+
+6
+
+8
+
+10 
+
+12 
+
+CMOD (mm) 
+
+> Reaction Force (kN)
+
+Experiment by Garc´ ıa- ´Alvarez et al. (2012) Beam 1 
+
+Hobbs et al. (2022) Beam 1 
+
+Current Study Beam 1 
+
+Experiment by Garc´ ıa- ´Alvarez et al. (2012) Beam 2 
+
+Hobbs et al. (2022) Beam 2 
+
+Current Study Beam 2 
+
+Experiment by Garc´ ıa- ´Alvarez et al. (2012) Beam 3 
+
+Hobbs et al. (2022) Beam 3 
+
+Current Study Beam 3 Figure 18: Comparison of force vs CMOD curves for mode I fracture test 80 160 320 
+
+3.5 
+
+4
+
+5
+
+6
+
+Beam Depth (mm) 
+
+> σlig  (MPa)
+
+Tensile Strength = 3 .5 MPa 
+
+Experiments by Garcia 
+
+Hobbs 
+
+Current Study L = 160 
+
+> Figure 19: Nominal stress values vs beam depth
+
+In the numerical examples, the simplest possible constitutive rule is intentionally chosen to minimize the number of material and numerical constants. By utilizing the prescribed Young’s modulus, tensile strength, fracture energy, and unloading ratio the constants appearing in the numerical model can be determined. This delivers both qualitative and quantitative results that align closely with the experimental data. The numerical simulations demonstrate excellent agreement with the experimental results for several benchmark problems, including cyclic loading and mode-I fracture in concrete beams, cyclic loading and mixed-mode fracture in notched specimens, and mixed mode fracture in L-shaped panels. In particular, the same set of material constants and constitutive model successfully capture the size-effect phenomenon across three different beam sizes without any explicit rules for determining strength based on sample size. These results confirm the model’s ability to replicate real-world material behavior with minimal computational complexity. Most importantly in our framework the length scale of non-locality “ ϵ,” is not a material property and is not used in the calibration of strength, fracture energy, elastic or plastic properties . The blended model is a well-posed approximation theory under which the effects of damage and plasticity can localize onto surfaces. 30 The length scale of localization is controlled by ϵ.This basic work establishes the theoretical and computational validity of the blended approach for phys-ically meaningful problems and agrees well with experiment. It provides opportunity for prediction of damage and plastic localization and the emergence of fracture. It also opens up an opportunity to extend the ideas to anisotropic media and composite materoals using vector valued or tensor valued phase fields and fully state based peridynamic formulations of Newton’s second law. 
+
+12. Acknowledgment 
+
+This material is based upon work supported by the U.S. Army Research Laboratory and the U.S. Army Research Office under Contract/Grant Number W911NF-19-1-0245 and W911NF-24- 2-0184. 
+
+Data availability The code used to generate the results in this study is available at https://github.com/SemsiCoskun/PDBlend. 
+
+References 
+
+Ambrosio, L., Tortorelli, V.M., 1990. Approximation of functionals depending on jumps by elliptic functionals via Γ-convergence. Comm. Pure Appl. Math 43, 999–1036. Aranson, I., Kalatsky, V., Vinokur, V., 2000. Continuum field description of crack propagation. Physical review letters 85, 118. doi:https://doi.org/10.1103/PhysRevLett.85.118. Bažant, Z., Planas, J., 1998. Fracture and Size Effect in Concrete and Other Quazibrittle Materials. volume 1. CRC Press. doi:https://doi.org/10.1201/9780203756799. Borden, M.J., Verhoosel, C.V., Scott, M.A., Hughes, T.J., Landis, C.M., 2012. A phase-field descrip-tion of dynamic brittle fracture. Computer Methods in Applied Mechanics and Engineering 217, 77–95. doi:https://doi.org/10.1016/j.cma.2012.01.008. Bourdin, B., Francfort, G.A., Marigo, J.J., 2000. Numerical experiments in revisited brittle fracture. Journal of the Mechanics and Physics of Solids 48, 797–826. doi:https://doi.org/10.1016/S0022-5096(99)00028-9. Bourdin, B., Larsen, C., Richardson, C., 2011. A time-discrete model for dynamic fracture based on crack regularization. Int. J. Fracture 168, 133–143. Buehler, M., Abraham, F., Gao, H., 2003. Hyperelasticity governs dynamic fracture at a critical length scale. Nature 426, 141–146. Carpinteri, A., Sih, G.C., 1984. Damage accumulation and crack growth in bilinear materials with softening: Application of strain energy density theory. Theoretical and Applied Fracture Mechanics 1, 145–159. doi:https://doi.org/10.1016/0167-8442(84)90011-9. Chen, H., Liu, D., 2023. Fracture process zone of high-strength concrete under monotonic and cyclic loading. Engineering Fracture Mechanics 277, 108973. doi:https://doi.org/10.1016/j.engfracmech.2022.108973. Coskun, S., Damircheli, D., Lipton, R., 2025. Quasi-brittle fracture: The blended approach. Journal of the Mechanics and Physics of Solids 205, 106302. doi:https://doi.org/10.1016/j.jmps.2025.106302. Dal Maso, G., Larsen, C.J., Toader, R., 2016. Existence for constrained dynamic griffith fracture with a weak maximal dissipation condition. The Mechanics and Physics of Solids 95, 697–708. Du, Q., Tao, Y., Tian, X., 2015. A peridynamic model of fracture mechanics with bond-breaking. J. Elasticity 132, 197–218. doi:https://doi.org/10.1007/s10659-017-9661-2. Emmrich, E., Phust, D., 2015. A short note on modeling damage in peridynamics. J. Elasticity doi:https://doi.org/10.1007/s10659-015-9550-5. 31 Freund, L., 1972. Energy flux into the tip of an extending crack in an elastic solid. Journal of Elasticity 2, 341–349. doi:https://doi.org/10.1007/BF00045718. Freund, L.B., 1990. Dynamic fracture mechanics. Cambridge university press. García-Álvarez, V.O., Gettu, R., Carol, I., 2012. Analysis of mixed-mode fracture in concrete using interface elements and a cohesive crack model. Sadhana 37, 187–205. doi:https://doi.org/10.1007/s12046-012-0076-2. Gobbino, M., 1998. Finite difference approximation of the mumford-shah functional. Communications on Pure and Applied Mathematics: A Journal Issued by the Courant Institute of Mathematical Sciences 51, 197–228. Grassl, P., 2009. On a damage-plasticity approach to model concrete failure, in: Proceedings of the ICE – Engineering and Computational Mechanics, pp. 221–231. Grassl, P., Xenos, D., Nyström, U., Rempling, R., Gylltoft, K., 2013. CDPM2: A damage-plasticity approach to modelling the failure of concrete. International Journal of Solids and Structures 50, 3805–3816. Hill, R., 1948. Q. J. Mech. Appl. Math. 1, 18. Hillerborg, A., Modéer, M., E., P.P., 1976. Analysis of crack formation and crack growth in con-crete by means of fracture mechanics and finite elements. Cement Concrete Res. 6, 773–782. doi:https://doi.org/10.1016/0008-8846(76)90007-7. Hobbs, M., Dodwell, T., Hattori, G., Orr, J., 2022. An examination of the size effect in quasi-brittle materials using a bond-based peridynamic model. Engineering Structures 262, 114207. doi:https://doi.org/10.1016/j.engstruct.2022.114207. Jenq, Y., Shah, S., 1988. Mixed-mode fracture of concrete. International Journal of Fracture 38, 123–142. doi:https://doi.org/10.1007/BF00033002. Jha, P.K., Lipton, R., 2020. Kinetic relations and local energy balance for lefm from a nonlocal peridynamic model. International Journal of Fracture 226, 81–95. doi:https://doi.org/10.1007/s10704-020-00480-0. Karma, A., Kessler, D.A., Levine, H., 2001. Phase-field model of mode iii dynamic fracture. Physical Review Letters 87, 045501. doi:https://doi.org/10.1103/PhysRevLett.87.045501. Larsen, C., Ortner, C., Süli, E., 2010. Existence of solutions to a regularized model of dynamic fracture. Mathematical Models and Methods in Applied Sciences 20, 1021–1048. doi:https://doi.org/10.1142/S0218202510004520. Lipton, R., 2014. Dynamic brittle fracture as a small horizon limit of peridynamics. Journal of Elasticity 117, 21–50. doi:https://doi.org/10.1007/s10659-013-9463-0. Lipton, R., 2016. Cohesive dynamics and brittle fracture. Journal of Elasticity 124, 143–191. doi:https://doi.org/10.1007/s10659-015-9564-z. Lipton, R., Lehoucq, R., Jha, P., 2019. Complex fracture nucleation and evolution with nonlocal elastody-namics. Journal of Peridynamics and Nonlocal Modeling 1, 122–130. doi:https://doi.org/10.1007/s42102-019-00010-0. Lipton, R.P., Bhattacharya, D., 2025. Energy balance and damage for dynamic fast crack growth from a nonlocal formulation. Journal of Elasticity 157, 1–32. doi:https://doi.org/10.1007/s10659-024-10098-1. Lipton, R.P., Jha, P.K., 2021. Nonlocal elastodynamics and fracture. Nonlinear Differential Equations and Applications doi:https://doi.org/10.1007/s00030-021-00683-x. Marder, M., Gross, S., 1995. Origin of crack tip instabilities. Journal of the Mechanics and Physics of Solids 43, 1–48. 32 Mises, R.v., 1928. Z angew. Math. Mech. 8, 161. Nicaise, S., Sandig, A.M., 2007. Dynamic crack propagation in a 2d elastic body: the out-of-plane case. J. Math. Anal, Appl. 329, 1–30. Ortiz, M., Pandolfi, A., 1999. Finite-deformation irreversible cohesive elements for three-dimensional crack-propagation analysis. International journal for numerical methods in engineering 44, 1267–1282. doi:https://doi.org/10.1002/(SICI)1097-0207(19990330)44:9<1267::AID-NME486>3.0.CO;2-7. Rohatgi, A., 2024. WebPlotDigitizer. URL: https://github.com/automeris-io/WebPlotDigitizer .Silling, S., 2000. Reformulation of elasticity theory for discontinuities and long-range forces. Journal of the Mechanics and Physics of Solids 48, 175–209. doi:https://doi.org/10.1016/S0022-5096(99)00029-0. Silling, S.A., Askari, E., 2005. A meshfree method based on the peridynamic model of solid mechanics. Computers & structures 83, 1526–1535. doi:https://doi.org/10.1016/j.compstruc.2004.11.026. Silling, S.A., Epton, M., Weckner, O., Xu, J., Askari, E., 2007. Peridynamic states and constitutive modeling. Journal of Elasticity 88, 151–184. doi:https://doi.org/10.1007/s10659-007-9125-1. Taylor, G.I., 1947. Proc. Roy. London A145, 362–388. Trageser, J., Seleson, P., 2020. Bond-based peridynamics: A tale of two poisson’s ratios. Journal of Peridy-namics and Nonlocal Modeling 2, 278–288. doi:https://doi.org/10.1007/s42102-019-00021-x. Underwood, P., 1983. Dynamic relaxation, in: Computational Methods in Mechanics, Vol 1: Computational methods for transient analysis. Elsevier Science Publishers B.V., pp. 245–265. Willis, J., 1975. Equations of motion for propagating cracks. The Mechanics and Physics of Fracture. The Metals Society 4, 57–67. Winkler, B.J., 2001. Traglastuntersuchungen von unbewehrten und bewehrten Betonstrukturen auf der Grundlage eines objektiven Werkstoffgesetzes für Beton. Innsbruck University Press. Xu, X.P., Needleman, A., 1994. Numerical simulations of fast crack growth in brittle solids. Journal of the Mechanics and Physics of Solids 42, 1397–1434. doi:https://doi.org/10.1016/0022-5096(94)90003-5. Zhu, Q., Shao, J.F., Kondo, D., 2011. A micromechanics-based thermodynamic formulation of isotropic damage with unilateral and friction effects. European Journal of Mechanics-A/Solids 30, 316–325. 33

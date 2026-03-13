@@ -1,0 +1,1310 @@
+Title: Four-field mixed finite elements for incompressible nonlinear elasticity
+
+URL Source: https://arxiv.org/pdf/2603.08992v1
+
+Published Time: Wed, 11 Mar 2026 00:21:56 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+FOUR-FIELD MIXED FINITE ELEMENTS FOR INCOMPRESSIBLE NONLINEAR ELASTICITY  
+
+> SANTIAGO BADIA †, WEI LI †,∗, AND RICARDO RUIZ-BAIER †
+> Abstract. We present a stable finite element method for incompressible nonlinear elasticity based on a four-field mixed formulation involving the displacement, displacement gradient, first Piola–Kirchhoff stress and pressure. Unlike existing four-field mixed formulations, such as the compatible strain mixed finite element method (CSFEM), the proposed approach employs a discontinuous displacement field and requires no stabilisation in either 2D or 3D. A Newton–Raphson linearisation is derived and finite element pairs satisfying the relevant inf-sup conditions are identified. To recover accurate continuous displacement fields, an efficient postprocessing technique is further introduced. We establish the well-posedness of the linearised continuous problem together with a priori error estimates for the discrete formulation. Extensive numerical experiments in both 2D and 3D demonstrate optimal or even super convergence rates and enhanced robustness, particularly in 3D where CSFEM typically requires stabilisation.
+
+1. Introduction 
+
+Nonlinear modelling of incompressible solids arises in a wide range of engineering and scientific applications, including biomedical tissue mechanics [24, 32], rubber elasticity [37] and soft-material design [30]. Since analytical solutions to the underlying initial boundary-value problems are often infeasible, the finite element method ( FEM ) is a ubiquitous tool for approximating their solutions. Over the past decades, FEM has developed a rigorous mathematical foundation for nonlinear continuum mechanics [11, 41]. In parallel, advances in solvers and high-performance computing have expanded the range of problems that FEM can handle, enabling simulations at extreme scales [8]. In solid mechanics, variational principles are commonly categorised into single-field, two-field, three-field and four-field formulations. Many FEM s are built on these principles, from displacement-based approaches to mixed and hybrid methods [11, 28, 41]. The stationary potential energy principle yields a weak formulation in which displacement is the only independent variable. For (nearly) incompressible materials, it is often combined with a penalty approach that treats the material as slightly compressible through a large bulk modulus. After finite element ( FE ) discretisation, the stiffness matrix becomes increasingly ill-conditioned as the penalty parameter grows, yet a sufficiently large penalty is needed to enforce incompressibility [25]. Consequently, displacement-based formulations can suffer severe volumetric locking and perform poorly for nearly or fully incompressible materials [12]. To mitigate locking, multi-field variational principles introduce additional independent fields and lead to mixed FEM s [4]. A common two-field principle uses a Lagrange multiplier (hydrostatic pressure) to impose incompressibility, yielding a mixed displacement–pressure formulation. After discretisation, the resulting system is of saddle-point type, and well-posedness requires compatible FE spaces for displacement and pressure that satisfy an inf-sup condition at the discrete level. Several two-field FE pairs satisfy the discrete inf-sup condition, including the Crouzeix–Raviart element [13], the Taylor–Hood element [36] and the MINI element [3]. A biorthogonal construction is proposed in [29], with pressure test functions biorthogonal to the trial functions, and a stress–displacement two-field formulation follows from the Hellinger–Reissner principle [23, 31] (see, e.g., [39] for nearly incompressible elasticity). While many of these pairs are stable for linear mixed formulations, stability can deteriorate in large-deformation incompressible hyperelasticity; for instance, the MINI element has a reduced stability range in 2D nonlinear incompressible elasticity [5]. Adding one more field can lead to more robust three-field principles. The Simo–Taylor–Pister ( STP )principle [34], based on the Hu–Washizu framework [27, 40], augments displacement and pressure with a third kinematic variable whose constraint is enforced through pressure. The enhanced strain mixed method [33]    
+
+> †School of Mathematics, Monash University, Clayton, Victoria 3800, Australia.
+> ∗Corresponding author.
+> E-mail addresses :santiago.badia@monash.edu, wei.li@monash.edu, ricardo.ruizbaier@monash.edu .
+> Date : 11 March 2026.
+> Key words and phrases. mixed finite element methods, nonlinear elasticity, incompressibility, large deformation.
+> 1
+> arXiv:2603.08992v1 [math.NA] 9 Mar 2026 FOUR-FIELD MIXED FINITE ELEMENTS 2
+
+derived from this principle decomposes the deformation gradient into conforming and enhanced parts, extending incompatible mode ideas to the nonlinear regime. Another three-field method in [17] uses the symmetric Kirchhoff stress together with displacement and pressure; it preserves stress symmetry but requires a heuristic choice of stabilisation constant in the lowest-order case. Four-field mixed formulations for (nearly) incompressible solids have recently attracted increasing interest. Typically based on the Hu–Washizu principle [27, 40], they treat displacement, displacement gradient, stress and pressure as independent fields. The compatible-strain mixed finite element method ( CSFEM ) [2] yields robust methods for 2D [16] and 3D [15], but requires different element pairs across dimensions and, in 3D, non-standard FE s and additional stabilisation. The normal displacement tangential-normal stress continuous ( NDTNS )method [18], based on the mass-conserving mixed stress formulation [22] and the Hu–Washizu functional, avoids inverting the constitutive law and allows flexibility in field regularity, but still relies on stabilisation and non-standard matrix-valued tangential-normal continuous FE spaces. In this work, we develop a stable four-field mixed FE formulation for incompressible solids. We analyse the linearised nonlinear elasticity problem to identify stable element pairs and study their error convergence. Unlike CSFEM , the same stable pairs apply in both 2D and 3D. In contrast to CSFEM and NDTNS , our approach uses standard FE s (e.g., Lagrange and Brezzi–Douglas–Marini ( BDM )), making implementation straightforward and avoiding additional stabilisation and parameter tuning. We present 2D and 3D numerical experiments, including comparisons with CSFEM , showing that the method avoids common artefacts (locking and checkerboarding) while remaining robust and accurate. The remainder of the article is organised as follows. Sect. 2 introduces the notation and mathematical setting and presents a four-field formulation with its Newton–Raphson linearisation. Sect. 3 describes the FE discretisation, identifies stable pairs and introduces a discontinuous displacement correction. Sect. 4 establishes well-posedness and derives a priori error estimates. Sect. 5 presents 2D and 3D numerical experiments, including comparisons with CSFEMs. Sect. 6 concludes and outlines future work. 2. A mixed formulation for incompressible nonlinear elasticity 
+
+2.1. Notation. Let Ω ⊂ R𝑑 , 𝑑 ∈ { 2, 3}, be an open, connected Lipschitz domain with piecewise smooth boundary Γ  𝜕 Ω, representing the referential (or material) configuration of a deformable body. Let n denote the outward unit normal vector on Γ. The boundary is partitioned into the displacement and traction boundaries, 
+
+Γ𝑑 and Γ𝑡 , respectively, with Γ𝑑 ∩ Γ𝑡 = ∅ and Γ𝑑 ∪ Γ𝑡 = Γ .We consider a scalar field 𝑝 : Ω → R, a vector field v : Ω → R𝑑 and a second-order tensor field T : Ω → R𝑑 ×𝑑 .Let L2 (Ω), L2 (Ω) and L2 (Ω) denote square-integrable scalar, vector and second-order tensor fields, respectively, with norms ∥·∥ L2 (Ω) , ∥·∥ L2 (Ω) and ∥·∥ L2 (Ω) . We then introduce the standard grad - and div -conforming spaces 
+
+H1 (Ω)  {𝑝 ∈ L2 (Ω) : ∇𝑝 ∈ L2 (Ω)} , H1 (Ω)  {v ∈ L2 (Ω) : ∇v ∈ L2 (Ω)} ,
+
+H(div , Ω)  {v ∈ L2 (Ω) : ∇ · v ∈ L2 (Ω)} , H(div , Ω)  {T ∈ L2 (Ω) : ∇ · T ∈ L2 (Ω)} .
+
+The curl -conforming spaces depend on the spatial dimension: 
+
+H(curl , Ω) 
+
+(
+
+{v ∈ L2 (Ω) : ∇ × v ∈ L2 (Ω)} , 𝑑 = 2,
+
+{v ∈ L2 (Ω) : ∇ × v ∈ L2 (Ω)} , 𝑑 = 3,
+
+H(curl , Ω) 
+
+(
+
+{T ∈ L2 (Ω) : ∇ × T ∈ L2 (Ω)} , 𝑑 = 2,
+
+{T ∈ L2 (Ω) : ∇ × T ∈ L2 (Ω)} , 𝑑 = 3.
+
+Each space is equipped with its natural norm. For instance, the norm in H(div , Ω) is 
+
+∥T∥H(div ,Ω) =
+
+
+
+∥T∥2  
+
+> L2(Ω)
+
++ ∥ ∇ · T∥L2 (Ω)
+
+1/2
+
+.
+
+The 𝐿 2-inner product for scalar, vector and tensor fields is denoted uniformly by ⟨⟨· , ·⟩⟩ 𝐷 . For example, 
+
+⟨⟨ 𝑝, 𝑞 ⟩⟩ Ω =
+
+∫
+
+> Ω
+
+𝑝𝑞 d𝑉, ⟨⟨ u, v⟩⟩ Γ =
+
+∫
+
+> Γ
+
+u · v d𝑆, ⟨⟨ T, S⟩⟩ Ω =
+
+∫
+
+> Ω
+
+T : S d𝑉, 
+
+where 𝑝, 𝑞 are scalar fields, u, v are vector fields and T, S are second-order tensor fields. The symbol “ :” denotes the Frobenius inner product, i.e., 
+
+T : S =∑︁ 
+
+> 𝑖, 𝑗
+
+T𝑖, 𝑗 S𝑖, 𝑗 .FOUR-FIELD MIXED FINITE ELEMENTS 3
+
+2.2. Incompressible nonlinear elasticity. In this subsection, we review the essential ingredients of finite deformation. The displacement vector field u  x − X maps each material point X in the referential configuration to its spatial (or current) position x in the deformed configuration. The displacement gradient in the material description is the second-order tensor 
+
+K  ∇u. (2.1) Let I denote the second-order identity tensor; then the deformation gradient is 
+
+F  ∇u + I,
+
+with the Jacobian determinant 
+
+𝐽  det F = det (∇u + I) > 0,
+
+which measures the solid volume change during deformation. An important strain measure in material coordinates is the right Cauchy–Green deformation tensor 
+
+C  FtF,
+
+where the superscript (·) t denotes the transpose operator. The constitutive behaviour of the material is encoded in a strain energy density function ˜Ψ, representing the work per unit reference volume done by the stress in deforming the material system. It is expressed solely in terms of the deformation gradient. For simplicity, we adopt a generic incompressible neo-Hookean material law, although the proposed method applies straightforwardly to other models. The strain energy density reads 
+
+˜Ψ(F) = 𝜇 
+
+2 (𝐼 1 − 𝑑 ), (2.2) where 𝜇 is the Lamé parameter, 𝐼 1 = tr C and tr (·) denotes the trace operator. Incompressible solids that maintain constant volume during deformation are characterised by the incompressibility constraint 𝐽 = 1. To impose this constraint, we introduce a smooth function 𝐶 : R+ → R satisfying 𝐶 (𝐽 ) = 0 if and only if 𝐽 = 1. As suggested by [15, 16, 18], we employ two common choices: 
+
+𝐶 1 (𝐽 ) = 𝐽 − 1, (2.3a) 
+
+𝐶 2 (𝐽 ) = ln (𝐽 ). (2.3b) To derive a constitutive law for incompressible materials, we introduce the modified strain energy 
+
+Ψ(F) = ˜Ψ(F) − 𝑝𝐶 (𝐽 ),
+
+where 𝑝 ∈ L2 (Ω) is the hydrostatic pressure, i.e., the Lagrange multiplier enforcing incompressibility in the finite strain regime. The first Piola–Kirchhoff stress tensor is then 
+
+P = 𝜕 Ψ
+
+𝜕 F = 𝜕 ˜Ψ
+
+𝜕 F − 𝑝 𝜕𝐶 𝜕 F = ˜P(K) − 𝑝 Q(K). (2.4) For neo-Hookean materials, it follows directly that 
+
+˜P(K) = 𝜇 (K + I), (2.5) and 
+
+Q1 (K) = 𝜕𝐶 1
+
+𝜕 K = det (K + I)( K + I)−t, (2.6a) 
+
+Q2 (K) = 𝜕𝐶 2
+
+𝜕 K = (K + I)−t. (2.6b) In the inertial reference frame under static mechanical equilibrium, combining the balance of linear momentum, the constitutive relation, the incompressibility constraint and the boundary conditions yields the following strong form: 
+
+∇ · P = −𝜌 0b in Ω, (2.7a) 
+
+P = ˜P(K) − 𝑝 Q(K) in Ω, (2.7b) 
+
+K = ∇u in Ω, (2.7c) 
+
+𝐶 (𝐽 ) = 0 in Ω, (2.7d) where 𝜌 0 > 0 is the reference medium density and b ∈ L2 (Ω) is the body force per unit undeformed volume. The above governing equations are supplemented with displacement and traction boundary conditions 
+
+u = ¯u on Γ𝑑 , and Pn = ¯t on Γ𝑡 , (2.8) where ¯u ∈ H1/2 (Γ𝑑 ) and ¯t ∈ H−1/2 (Γ𝑡 ) are the prescribed displacement and traction, respectively. FOUR-FIELD MIXED FINITE ELEMENTS 4
+
+2.3. A four-field mixed formulation. We now test equations (2.7a) -(2.7d) against suitable functions. Unlike the approach in [15, 16], where integration by parts is applied to (2.7a) , we integrate by parts in (2.7c) to form a new four-field mixed weak formulation: find (u, K, P, 𝑝 ) ∈ L2 (Ω) × L2 (Ω) × H ¯t (div , Ω) × L2 (Ω) such that 
+
+⟨⟨ v, ∇ · P⟩⟩ Ω = −⟨⟨ v, 𝜌 0b⟩⟩ Ω ∀v ∈ L2 (Ω), (2.9a) 
+
+⟨⟨ γ, P − ˜P(K) + 𝑝 Q(K)⟩⟩ Ω = 0 ∀γ ∈ L2 (Ω), (2.9b) 
+
+⟨⟨ τ , K⟩⟩ Ω + ⟨⟨ ∇ · τ , u⟩⟩ Ω = ⟨⟨ τ n , ¯u⟩⟩ Γ𝑑 ∀τ ∈ H0 (div , Ω), (2.9c) 
+
+⟨⟨ 𝑞, 𝐶 (𝐽 )⟩⟩ Ω = 0 ∀𝑞 ∈ L2 (Ω). (2.9d) Here, H0 (div , Ω)  {T ∈ H(div , Ω) : Tn = 0} and H ¯t (div , Ω)  {T ∈ H(div , Ω) : Tn = ¯t}. This four-field formulation ensures that the displacement gradient, stress and pressure are not postprocessed from the displacement. In contrast to the formulations of [15, 16], the displacement boundary condition is imposed weakly via (2.9c), whereas the traction boundary condition is enforced strongly through the space H ¯t (div , Ω).2.4. Linearisation. We now apply a Newton–Raphson linearisation to (2.9) , starting from an initial guess. Using the identities for the derivative of the inverse transpose and the determinant of a tensor, we obtain 
+
+𝑑 𝑑 F (F−t)| u = −F−t (∇ u)tF−t, 𝑑 𝑑 F (det F)| u = 𝐽 (F−t : ∇u)I.
+
+We initialise the iteration from the stress-free, motionless state 
+
+(u𝑘 =0, K𝑘 =0, P𝑘 =0, 𝑝 𝑘 =0) = (0, 0, 0, 0).
+
+For simplicity, we set the traction boundary data ¯t = 0; the linearised problem reduces to finding (u, k, σ, 𝑝 ) ∈ 
+
+L2 (Ω) × L2 (Ω) × H0 (div , Ω) × L2 (Ω) such that 
+
+⟨⟨ v, ∇ · σ⟩⟩ Ω = −⟨⟨ v, 𝜌 0b⟩⟩ Ω ∀v ∈ L2 (Ω),
+
+− 𝜇 ⟨⟨ γ, k⟩⟩ Ω + ⟨⟨ γ, σ⟩⟩ Ω + ⟨⟨ tr (γ), 𝑝 ⟩⟩ Ω = ⟨⟨ tr (γ), 𝜇 ⟩⟩ Ω ∀γ ∈ L2 (Ω),
+
+⟨⟨ ∇ · τ , u⟩⟩ Ω + ⟨⟨ τ , k⟩⟩ Ω = ⟨⟨ τ n , ¯u⟩⟩ Γ𝑑 ∀τ ∈ H0 (div , Ω),
+
+⟨⟨ 𝑞, tr (k)⟩⟩ Ω = 0 ∀𝑞 ∈ L2 (Ω).
+
+(2.10) 3. Finite element discretisation 
+
+Let Tℎ be a shape-regular partition of Ω into triangles in 2D or tetrahedra in 3D. The mesh size is defined as ℎ  max {ℎ𝐾 : 𝐾 ∈ T ℎ }, where 𝐾 is an element from Tℎ with diameter ℎ𝐾 . Given an integer 𝑘 > 0, for each 𝐾 ∈ T ℎ, we denote by P𝑘 (𝐾 ) the space of polynomials on 𝐾 of degree at most 𝑘 and by P𝑘 (T ℎ) its global counterpart (similarly for the other discrete spaces below). We define P𝑘 (𝐾 )  [P𝑘 (𝐾 )] 𝑑 as the vector-valued polynomial space on 𝐾 . The BDM FE space on 𝐾 is given by BDM 𝑘 (𝐾 )  P𝑘 (𝐾 ). We then introduce the discrete spaces: 
+
+H𝑘,ℎ  P𝑘 (T ℎ) ∩ 𝐶 0 (Ω) ⊂ H1 (Ω), H𝑘,ℎ  [BDM 𝑘 (T ℎ)] 𝑑 ⊂ H(div , Ω),
+
+H𝑘,ℎ  P𝑘 (T ℎ) ∩ 𝐶 0 (Ω) ⊂ H1 (Ω), H𝑘 −1,ℎ  P𝑘 −1 (T ℎ) ⊂ L2 (Ω).
+
+Finally, we define the div -conforming subspaces with prescribed normal traces on Γ𝑡 :
+
+H0 
+
+> 𝑘,ℎ
+
+ {Tℎ ∈ H𝑘,ℎ : Tℎn = 0 on Γ𝑡 }, H ¯t 
+
+> 𝑘,ℎ
+
+ {Tℎ ∈ H𝑘,ℎ : Tℎn = ¯t on Γ𝑡 },
+
+and the grad -conforming subspaces with prescribed displacements on Γ𝑑 :
+
+H0 
+
+> 𝑘,ℎ
+
+ {vℎ ∈ H𝑘,ℎ : vℎ = 0 on Γ𝑑 }, H ¯u 
+
+> 𝑘,ℎ
+
+ {vℎ ∈ H𝑘,ℎ : vℎ = ¯u on Γ𝑑 }.
+
+3.1. A mixed finite element method for incompressible nonlinear elasticity. Based on the continuous variational formulation (2.9) , we can derive its discrete counterpart. After discretisation, appropriate FE spaces must be chosen to satisfy the inf-sup conditions; such combinations are referred to as stable FE pairs .With the numerical analysis done in Sect. 4.2, we arrive at the following discrete formulation of (2.9) : find 
+
+(uℎ, Kℎ, Pℎ, 𝑝 ℎ) ∈ H𝑘 −1,ℎ × H𝑘,ℎ × H ¯t 
+
+> 𝑘,ℎ
+
+× H𝑘,ℎ such that 
+
+⟨⟨ vℎ, ∇ · Pℎ⟩⟩ Ω = −⟨⟨ vℎ, 𝜌 0b⟩⟩ Ω ∀vℎ ∈ H𝑘 −1,ℎ ,
+
+⟨⟨ γℎ, Pℎ − ˜P(Kℎ) + 𝑝 ℎQ(Kℎ)⟩⟩ Ω = 0 ∀γℎ ∈ H𝑘,ℎ ,
+
+⟨⟨ τℎ, Kℎ⟩⟩ Ω + ⟨⟨ ∇ · τℎ, uℎ⟩⟩ Ω = ⟨⟨ τℎn, ¯u⟩⟩ Γ𝑑 ∀τℎ ∈ H0
+
+> 𝑘,ℎ
+
+,
+
+⟨⟨ 𝑞 ℎ, 𝐶 (𝐽 )⟩⟩ Ω = 0 ∀𝑞 ℎ ∈ H𝑘,ℎ .
+
+(3.11) FOUR-FIELD MIXED FINITE ELEMENTS 5
+
+3.2. Finite elements. For notational convenience, we use a two-character symbol to denote both the type and the polynomial order of each FE space. The symbols used throughout this paper are summarised in Tab. 1. Note that we also include the special Nédélec elements ˆc1, which combine six second-kind first-order and nine first-kind third-order Nédélec shape functions. These elements are essential for the 3D CSFEM [15]. Symbol Description Conformity Order range Pi Continuous Lagrange elements of order i. H1 (Ω) i ∈ ( 1, 2)
+
+Pi Discontinuous Lagrange elements of order i. L2 (Ω) i ∈ ( 0, 1)
+
+ci Second-kind Nédélec elements of order i. H(curl , Ω) i ∈ ( 0, 1)
+
+ˆc1 Special Nédélec elements proposed in [15]. H(curl , Ω) N/A di BDM elements of order i. H(div , Ω) i ∈ ( 1, 2)
+
+di Raviart-Thomas elements of order i. H(div , Ω) i ∈ ( 0, 1)
+
+Table 1. Notation for the FE spaces considered in this work. Since our method is based on a four-field formulation, we encode each mixed FE combination by eight characters, with each two-character segment specifying the FE space for one field. For example, P1d2d2P2 uses a discontinuous vector-valued Lagrange space of order 1 ( H1,ℎ ) for uℎ, a second-order tensor-valued BDM space ( H2,ℎ ) for Kℎ and Pℎ, and a continuous scalar-valued Lagrange space of order 2 ( H2,ℎ ) for 𝑝 ℎ. Note that vector-valued Lagrange spaces are constructed by stacking 𝑑 copies of the corresponding scalar Lagrange space, while tensor-valued FE spaces of a given type are built from the corresponding vector-valued spaces by treating each row or column of the tensor as a vector field. As shown in Sect. 4.2, the stable FE pairs in 2D and 3D are P0d1d1P1 and P1d2d2P2. Higher-order pairs may also be stable but are computationally expensive, so we focus on these two. Figure 1 presents the element-wise degrees of freedom (DoFs) of the two stable pairs in 2D. The low-order pair P0d1d1P1 has 29 DoFs per cell, while the high-order pair P1d2d2P2 has 60 DoFs. In 3D, these counts increase to 79 and 202 DoFs, respectively. In the numerical experiments, we compare these pairs with the CSFEM pairs P1c1d0P0 (25 DoFs) and P2c2d1P1 (55 DoFs) in 2D and P2 ˆc1d0P0 (88 DoFs) in 3D. The low-order pairs (P0d1d1P1 and P1c1d0P0) and high-order pairs (P1d2d2P2 and P2c2d1P1) have comparable DoF counts per element in 2D, allowing for direct comparison. In 3D, however, P1d2d2P2 has significantly more DoFs than P2 ˆc1d0P0, so a more balanced comparison is between P0d1d1P1 and P2 ˆc1d0P0. Pair uℎ Kℎ Pℎ 𝑝 ℎ DoFs P0d1d1P1 29 P1d2d2P2 60 
+
+Figure 1. Illustration of element-wise DoFs for the proposed stable pairs in 2D. 3.3. Discontinuous displacement correction. In the proposed method, the displacement field is approximated in discontinuous Lagrange spaces. Therefore, the deformed configuration may exhibit inter-element discontinuities, especially on coarse meshes and for the pair P0d1d1P1. These discontinuities manifest as gaps or overlaps between neighbouring elements in the visualisation of the deformed geometry. Moreover, since displacement boundary conditions are imposed weakly, the discrete displacement field may not satisfy the prescribed boundary data pointwise, and noticeable deviations can occur in the vicinity of displacement boundaries. Although the inflation experiments in Sect. 5.2.1 confirm the expected convergence of the discrete displacement, a postprocessing FOUR-FIELD MIXED FINITE ELEMENTS 6
+
+procedure is introduced to recover a globally continuous displacement field that satisfies the displacement boundary conditions strongly and improves the approximation in an energy-consistent sense. The proposed strategy is reliable and computationally inexpensive, as it involves the solution of a symmetric positive-definite problem posed on a higher-order conforming space. The correction procedure is conceptually related to Stenberg-type postprocessing techniques for mixed FEM s [35], where improved displacement fields are reconstructed from discrete fluxes. The main difference is that our approach is global rather than element-wise, operating over the entire mesh. Specifically, starting from the FE solution (uℎ, Kℎ, Pℎ, 𝑝 ℎ) ∈ H𝑘 −1,ℎ × H𝑘,ℎ × H ¯t 
+
+> 𝑘,ℎ
+
+× H𝑘,ℎ , the continuous relation (2.1) is enforced in a weak sense to reconstruct a conforming displacement. The reconstruction problem reads: find ˜uℎ ∈ H ¯u 
+
+> 𝑘 +1,ℎ
+
+such that for all vℎ ∈ H0
+
+> 𝑘 +1,ℎ
+
+,
+
+⟨⟨ ∇ ˜uℎ, ∇vℎ⟩⟩ Ω = ⟨⟨ Kℎ, ∇vℎ⟩⟩ Ω.
+
+The resulting FE tuple ( ˜uℎ, Kℎ, Pℎ, 𝑝 ℎ) ∈ H ¯u 
+
+> 𝑘 +1,ℎ
+
+×H𝑘,ℎ ×H ¯t 
+
+> 𝑘,ℎ
+
+×H𝑘,ℎ features a globally continuous displacement field and satisfies both the displacement and traction boundary conditions in a strong sense. It is natural to use continuous Lagrange spaces for ˜uℎ. Since the relation (2.1) involves a gradient acting on the displacement, the displacement correction space can be chosen one polynomial order higher than that of the displacement gradient FE space. Accordingly, we use, e.g., P2 elements to correct P0d1d1P1 displacements. This postprocessing step is computationally much cheaper than the nonlinear solvers: it requires solving only a single, much smaller, symmetric positive-definite system. In the numerical experiments, we append the tag “(corr)” after any pair whose displacement field has been postprocessed. For example, “P0d1d1P1(corr)” denotes the corrected FE solution ( ˜uℎ, Kℎ, Pℎ, 𝑝 ℎ), where ˜uℎ is reconstructed from Kℎ while the remaining fields are taken from the original P0d1d1P1 FE solution. 4. Continuous and discrete analysis of the linearised problem 
+
+4.1. Well-posedness analysis of the linearised problem. Reordering the unknowns and equations, we write the linearised problem (2.10) as follows: find (k, (σ, 𝑝 ), u) ∈ L2 (Ω) × [ H0 (div , Ω) × L2 (Ω)] × L2 (Ω) such that 
+
+𝜇 ⟨⟨ k, γ⟩⟩ Ω − ⟨⟨ σ, γ⟩⟩ Ω − ⟨⟨ 𝑝, tr (γ)⟩⟩ Ω = ⟨⟨ 𝜇, tr (γ)⟩⟩ Ω ∀γ ∈ L2 (Ω),
+
+−⟨⟨ k, τ ⟩⟩ Ω − ⟨⟨ u, ∇ · τ ⟩⟩ Ω = −⟨⟨ ¯u, τ n ⟩⟩ Γ𝑑 ∀τ ∈ H0 (div , Ω),
+
+−⟨⟨ tr (k), 𝑞 ⟩⟩ Ω = 0 ∀𝑞 ∈ L2 (Ω),
+
+− ⟨⟨ ∇ · σ, v⟩⟩ Ω = ⟨⟨ 𝜌 0b, v⟩⟩ Ω ∀v ∈ L2 (Ω).
+
+(4.12) Defining the operators 
+
+𝐴 : L2 (Ω) → L2 (Ω)′, ⟨𝐴 (k), γ⟩  𝜇 ⟨⟨ k, γ⟩⟩ Ω,𝐵 1 : L2 (Ω) → [ H0 (div , Ω) × L2 (Ω)] ′, ⟨𝐵 1 (γ), (τ , 𝑞 )⟩  −⟨⟨ γ, τ ⟩⟩ Ω − ⟨⟨ tr (γ), 𝑞 ⟩⟩ Ω,𝐵 2 : [H0 (div , Ω) × L2 (Ω)] → L2 (Ω)′, ⟨𝐵 2 (τ , 𝑞 ), v⟩  −⟨⟨∇ · τ , v⟩⟩ Ω,𝐹 1 : L2 (Ω) → R, ⟨𝐹 1, γ⟩  ⟨⟨ 𝜇, tr (γ)⟩⟩ Ω,𝐹 2 : [H0 (div , Ω) × L2 (Ω)] → R, ⟨𝐹 2, (τ , 𝑞 )⟩  −⟨⟨ ¯u, τ n ⟩⟩ Γ𝑑 ,𝐹 3 : L2 (Ω) → R, ⟨𝐹 3, v⟩  ⟨⟨ 𝜌 0b, v⟩⟩ Ω,
+
+problem (4.12) can be compactly written as 
+
+©«
+
+𝐴 𝐵 ′ 
+
+> 1
+
+0
+
+𝐵 1 0 𝐵 ′
+
+> 2
+
+0 𝐵 2 0
+
+ª®¬©«
+
+k
+
+(σ, 𝑝 )
+
+u
+
+ª®¬
+
+= ©«
+
+𝐹 1
+
+𝐹 2
+
+𝐹 3
+
+ª®¬
+
+in (L2 (Ω) × [ H0 (div , Ω) × L2 (Ω)] × L2 (Ω)) ′.
+
+The abstract theory for twofold saddle-point problems is stated in [20, Theorem 2.2] (see also [26]). 
+
+Theorem 4.1. Denote V2  ker (𝐵 2). Assume that the following conditions hold: 
+
+• The operator 𝐴 is linear, bounded and coercive in L2 (Ω);
+
+• The linear operator 𝐵 1 satisfies an inf-sup condition on the kernel V2;
+
+• The linear operator 𝐵 2 satisfies an inf-sup condition. FOUR-FIELD MIXED FINITE ELEMENTS 7
+
+Then, for any given linear functionals 𝐹 1, 𝐹 2 and 𝐹 3, there exists a unique solution (k, (σ, 𝑝 ), u) ∈ L2 (Ω) × [H0 (div , Ω) × L2 (Ω)] × L2 (Ω) to (4.12) . Furthermore, there exists a constant 𝐶 > 0 depending only on the continuity, coercivity and inf-sup constants, such that 
+
+∥( k, (σ, 𝑝 ), u)∥ ≤ 𝐶 (∥ 𝐹 1 ∥ + ∥ 𝐹 2 ∥ + ∥ 𝐹 3 ∥) .
+
+We now examine the properties of the bilinear forms and linear functionals. The boundedness of 𝐴 (• , •) ,
+
+𝐵 1 (• , •) and 𝐵 2 (• , •) follows directly from Hölder’s inequality and the definitions of the norms. In addition, 
+
+𝐴 (• , •) is coercive on L2 (Ω). It therefore remains to prove the corresponding inf-sup conditions. 
+
+Lemma 4.1. There exists a constant 𝛽 2 > 0 such that 
+
+sup    
+
+> (τ,𝑞 ) ∈ H0(div ,Ω) × L2(Ω)\{ 0}
+
+⟨𝐵 2 (τ , 𝑞 ), v⟩∥( τ , 𝑞 )∥ ≥ 𝛽 2 ∥v∥L2 (Ω) ∀ v ∈ L2 (Ω).
+
+Proof. It follows by taking 𝑞 = 0 and noting that 
+
+sup  
+
+> (τ,𝑞 )
+
+⟨𝐵 2 (τ , 𝑞 ), v⟩∥( τ , 𝑞 )∥ ≥ sup   
+
+> τ∈H0(div ,Ω)\{ 0}
+
+−⟨⟨ ∇ · τ , v⟩⟩ Ω
+
+∥τ ∥H(div ,Ω)
+
+.
+
+The right-hand side is bounded from below by a standard argument based on the surjectivity of the divergence operator; we include the details for completeness. Given v ∈ L2 (Ω), consider z ∈ H1 (Ω) by solving 
+
+−𝚫 z = v in Ω, z = 0 on Γ𝑑 , ∇z n = 0 on Γ𝑡 . (4.13) Next, define ˜τ  ∇z. Then 
+
+∇ · ˜τ = −v in Ω, ˜τ n = 0 on Γ𝑡 ,
+
+so that ˜τ ∈ H0 (div , Ω). By Poincaré’s inequality and the standard data regularity for problem (4.13) , there exists a constant ¯𝐶 > 0 such that 
+
+∥ ˜τ ∥H(div ,Ω) ≤ ¯𝐶 ∥v∥L2 (Ω) .
+
+Therefore, 
+
+sup   
+
+> τ∈H0(div ,Ω)\{ 0}
+
+−⟨⟨ ∇ · τ , v⟩⟩ Ω
+
+∥τ ∥H(div ,Ω)
+
+≥ −⟨⟨ ∇ · ˜τ , v⟩⟩ Ω
+
+∥ ˜τ ∥H(div ,Ω)
+
+= ∥v∥2 
+
+> L2(Ω)
+
+∥ ˜τ ∥H(div ,Ω)
+
+≥ 1¯𝐶 ∥v∥L2 (Ω) .
+
+Setting 𝛽 2  ¯𝐶 −1 concludes the proof. □
+
+Next, we have the following characterisation for the kernel of 𝐵 2:
+
+V2  ker (𝐵 2) = {( τ , 𝑞 ) ∈ H0 (div , Ω) × L2 (Ω) : ⟨𝐵 2 (τ , 𝑞 ), v⟩ = 0 ∀ v ∈ L2 (Ω)} 
+
+= {( τ , 𝑞 ) ∈ H0 (div , Ω) × L2 (Ω) : ∇ · τ = 0 in Ω}.
+
+Indeed, the second equality follows by choosing v = ∇ · τ ∈ L2 (Ω).We also recall the following auxiliary estimate, which is a direct consequence of [1, Lemmas 3.1–3.2]: there exists a constant 𝛾 0 > 0 such that 
+
+∥τ ∥H(div ,Ω) ≤ 𝛾 0
+
+  τ dev   
+
+> L2(Ω)
+
++ ∥ ∇ · τ ∥L2 (Ω)
+
+ ∀ τ ∈ H0 (div , Ω), (4.14) where τ dev  τ − tr (τ ) 
+
+> 𝑑
+
+I is the deviatoric part of τ and tr (τ dev ) = 0.
+
+Lemma 4.2. There exists a constant 𝛽 1 > 0 such that 
+
+sup   
+
+> γ∈L2(Ω)\{ 0}
+
+⟨𝐵 1 (γ), (τ , 𝑞 )⟩ ∥γ ∥L2 (Ω)
+
+≥ 𝛽 1
+
+ ∥τ ∥H(div ,Ω) + ∥ 𝑞 ∥L2 (Ω)
+
+ ∀ ( τ , 𝑞 ) ∈ V2.
+
+Proof. A related proof for the 2D case with pure displacement boundary conditions can be found in [19]. We adapt the argument to the present setting. Consider a generic pair (τ , 𝑞 ) ∈ V2. By the characterisation of V2, we know that τ ∈ H0 (div , Ω), 𝑞 ∈ L2 (Ω) and ∇ · τ = 0 in Ω.
+
+Case 1: ∥𝑞 ∥L2 (Ω) ≤ ∥ τ ∥H(div ,Ω) . Choose ˜γ  −τ dev . Then 
+
+⟨𝐵 1 ( ˜γ), (τ , 𝑞 )⟩ ∥ ˜γ ∥L2 (Ω)
+
+= ⟨⟨ τ , τ dev ⟩⟩ Ω + ⟨⟨ tr (τ dev ), 𝑞 ⟩⟩ Ω
+
+τ dev L2 (Ω)
+
+= τ dev 2  
+
+> L2(Ω)
+
++ ⟨⟨ tr (τ ) 
+
+> 𝑑
+
+I, τ dev ⟩⟩ Ω
+
+τ dev L2 (Ω)
+
+= τ dev   
+
+> L2(Ω)
+
+.
+
+Using (4.14), ∇ · τ = 0 and ∥𝑞 ∥L2 (Ω) ≤ ∥ τ ∥H(div ,Ω) we obtain 
+
+τ dev   
+
+> L2(Ω)
+
+≥ 𝛾 −10 ∥τ ∥H(div ,Ω) ≥ 12 𝛾 −10
+
+ ∥τ ∥H(div ,Ω) + ∥ 𝑞 ∥L2 (Ω)
+
+.FOUR-FIELD MIXED FINITE ELEMENTS 8
+
+Case 2: ∥𝑞 ∥L2 (Ω) ≥ ∥ τ ∥H(div ,Ω) . Choose ˆγ  τ − 𝑞 I. Then 
+
+⟨𝐵 1 ( ˆγ), (τ , 𝑞 )⟩ = −⟨⟨ τ , τ − 𝑞 I⟩⟩ Ω − ⟨⟨ tr (τ − 𝑞 I), 𝑞 ⟩⟩ Ω = − ∥ τ ∥2  
+
+> L2(Ω)
+
++ 𝑑 ∥𝑞 ∥2L2 (Ω) .
+
+Moreover, by the triangle inequality, 
+
+∥ ˆγ ∥L2 (Ω) ≤ ∥ τ ∥L2 (Ω) + 𝑑 ∥𝑞 ∥L2 (Ω) .
+
+Therefore, with ∥𝑞 ∥L2 (Ω) ≥ ∥ τ ∥H(div ,Ω) ,
+
+⟨𝐵 1 ( ˆγ), (τ , 𝑞 )⟩ ∥ ˆγ ∥L2 (Ω)
+
+≥ 𝑑 − 1
+
+𝑑 + 1 ∥𝑞 ∥L2 (Ω) ≥ 𝑑 − 12(𝑑 + 1)
+
+ ∥τ ∥H(div ,Ω) + ∥ 𝑞 ∥L2 (Ω)
+
+.
+
+By choosing 
+
+𝛽 1  min 
+
+n 12 𝛾 −10 , 𝑑 −12(𝑑 +1)
+
+o
+
+we finish the proof. □
+
+Theorem 4.2. There exists a unique 
+
+(k, (σ, 𝑝 ), u) ∈ L2 (Ω) × H0 (div , Ω) × L2 (Ω) × L2 (Ω)
+
+satisfying 
+
+⟨𝐴 (k), γ⟩ + ⟨ 𝐵 1 (γ), (σ, 𝑝 )⟩ = 𝐹 1 (γ), ∀γ ∈ L2 (Ω),
+
+⟨𝐵 1 (k), (τ , 𝑞 )⟩ + ⟨ 𝐵 2 (τ , 𝑞 ), u⟩ = 𝐹 2 (τ , 𝑞 ), ∀( τ , 𝑞 ) ∈ H0 (div , Ω) × L2 (Ω),
+
+⟨𝐵 2 (σ, 𝑝 ), v⟩ = 𝐹 3 (v), ∀v ∈ L2 (Ω),
+
+(4.15) 
+
+and moreover there exists a constant 𝐶 > 0 such that 
+
+∥k∥L2 (Ω) + ∥( σ, 𝑝 )∥ H(div ,Ω) × L2 (Ω) + ∥ u∥L2 (Ω) ≤ 𝐶  ∥𝜌 0b∥L2 (Ω) + ∥ ¯u∥H1/2 (Γ𝑑 )
+
+.
+
+Proof. The result follows directly from Lemmas 4.1 and 4.2, together with Theorem 4.1. □
+
+4.2. Discrete solvability analysis for the linearised problem. After discretisation, we select the FE spaces described in Sect. 3.1. The associated Galerkin scheme for (4.15) then reads: find (kℎ, (σℎ, 𝑝 ℎ), uℎ) ∈ 
+
+H𝑘,ℎ × [ H0 
+
+> 𝑘,ℎ
+
+× H𝑘,ℎ ] × H𝑘 −1,ℎ such that 
+
+⟨𝐴 (kℎ), γℎ⟩ + ⟨ 𝐵 1 (γℎ), (σℎ, 𝑝 ℎ)⟩ = 𝐹 1 (γℎ), ∀γℎ ∈ H𝑘,ℎ ,
+
+⟨𝐵 1 (kℎ), (τℎ, 𝑞 ℎ)⟩ +⟨ 𝐵 2 (τℎ, 𝑞 ℎ), uℎ⟩ = 𝐹 2 (τℎ, 𝑞 ℎ),∀( τℎ, 𝑞 ℎ) ∈ H0 
+
+> 𝑘,ℎ
+
+× H𝑘,ℎ ,
+
+⟨𝐵 2 (σℎ, 𝑝 ℎ), vℎ⟩ = 𝐹 3 (vℎ), ∀vℎ ∈ H𝑘 −1,ℎ .
+
+(4.16) It is worth noting that the continuous FE space H𝑘,ℎ is a design choice. We then state the discrete version of Theorem 4.1; see also [20, Theorem 3.2]. 
+
+Theorem 4.3. Denote V2ℎ = ker (𝐵 2)| H0  
+
+> 𝑘,ℎ ×H𝑘,ℎ
+
+. Assume that 
+
+• The operator 𝐴 is linear, bounded and coercive in H𝑘,ℎ ;
+
+• The linear operator 𝐵 1 satisfies a discrete inf-sup condition on the discrete kernel V2ℎ;
+
+• The linear operator 𝐵 2 satisfies a discrete inf-sup condition. Then there exists a unique solution (kℎ, (σℎ, 𝑝 ℎ), uℎ) ∈ H𝑘,ℎ × [ H0 
+
+> 𝑘,ℎ
+
+× H𝑘,ℎ ] × H𝑘 −1,ℎ to the Galerkin method associated with (4.12) . Furthermore, there exists a constant 𝐶 > 0, independent of ℎ, but depending on the inf-sup constants, continuity and coercivity constants, such that 
+
+∥( kℎ, (σℎ, 𝑝 ℎ), uℎ)∥ ≤ 𝐶  ∥𝐹 1 ∥ + ∥ 𝐹 2 ∥ + ∥ 𝐹 3 ∥.
+
+Lemma 4.3. There exists a constant ˜𝛽 1 > 0, independent of ℎ, such that 
+
+sup   
+
+> γ∈H𝑘 +1,ℎ \{ 0}
+
+⟨𝐵 1 (γℎ), (τℎ, 𝑞 ℎ)⟩ ∥γℎ ∥L2 (Ω)
+
+≥ ˜𝛽 1 (∥ τℎ ∥H(div ,Ω) + ∥ 𝑞 ℎ ∥L2 (Ω) ) ∀( τℎ, 𝑞 ℎ) ∈ V2ℎ .
+
+Proof. For the selected FE spaces H𝑘,ℎ × [ H0 
+
+> 𝑘,ℎ
+
+× H𝑘,ℎ ] × H𝑘 −1,ℎ , the proof of Lemma 4.2 carries over verbatim. Indeed, the FE spaces for kℎ and σℎ coincide, and for any 𝑞 ℎ ∈ H𝑘,ℎ , the piecewise linear and overall continuous tensor 𝑞 ℎI is contained in the BDM space H𝑘,ℎ . □FOUR-FIELD MIXED FINITE ELEMENTS 9
+
+4.3. Error estimates for the discrete linearised problem. We begin by introducing the following interpolation operators: 
+
+𝜋 ℎ : L 2 (Ω) → H𝑘,ℎ , ¯𝜋 ℎ : L2 (Ω) → H𝑘 −1,ℎ , 𝜋 div  
+
+> ℎ
+
+: H(div , Ω) → H𝑘,ℎ ,
+
+which satisfy the following commutativity and L2 (Ω)-orthogonality properties (see, e.g. [14]): 
+
+∇ ·
+
+
+
+𝜋 div  
+
+> ℎ
+
+(σ)
+
+
+
+= ¯𝜋 ℎ (∇ · σ) ∈ H𝑘 −1,ℎ ∀σ ∈ H(div , Ω), (4.17a) 
+
+⟨⟨ u − ¯𝜋 ℎ (u), vℎ⟩⟩ Ω = 0 ∀vℎ ∈ H𝑘 −1,ℎ . (4.17b) 
+
+Theorem 4.4 (A priori error estimates) . Let (k, (σ, 𝑝 ), u) denote the exact solution of the continuous prob-lem (4.15) , and assume that these fields are sufficiently smooth. Denote by (kℎ, (σℎ, 𝑝 ℎ), uℎ) the solution of the discrete problem (4.16) . Then there exists a constant 𝐶 > 0, independent of ℎ, such that the errors 𝜀 k = k − kℎ,
+
+𝜀 σ = σ − σℎ, 𝜀 𝑝 = 𝑝 − 𝑝 ℎ and 𝜀 u = u − uℎ satisfy 
+
+∥𝜀 k ∥L2 (Ω) + ∥ 𝜀 σ ∥H(div ,Ω) + 𝜀 𝑝 L2 (Ω) + ∥ 𝜀 u ∥L2 (Ω)
+
+≤ 𝐶ℎ 𝑘 
+
+ℎ ∥k∥H𝑘 +1 (Ω) + ∥ σ∥H𝑘 +1 (Ω) + ℎ ∥ 𝑝 ∥H𝑘 +1 (Ω) + ∥ u∥H𝑘 (Ω)
+
+
+
+. (4.18) 
+
+Moreover, 
+
+∥𝜀 k ∥L2 (Ω) + 𝜀 𝑝 L2 (Ω) ≤ 𝐶ℎ 𝑘 +1 
+
+∥k∥H𝑘 +1 (Ω) + ∥ σ∥H𝑘 +1 (Ω) + ∥ 𝑝 ∥H𝑘 +1 (Ω)
+
+
+
+. (4.19) 
+
+Proof. For each unknown, we decompose the total error 𝜀 into an interpolation error and a discrete error: 
+
+𝜀 k = k − kℎ = k − 𝜋 div  
+
+> ℎ
+
+(k) + ( 𝜋 div  
+
+> ℎ
+
+(k) − kℎ) = 𝜂 k + 𝜉 k,𝜀 σ = σ − σℎ = σ − 𝜋 div  
+
+> ℎ
+
+(σ) + ( 𝜋 div  
+
+> ℎ
+
+(σ) − σℎ) = 𝜂 σ + 𝜉 σ,𝜀 𝑝 = 𝑝 − 𝑝 ℎ = 𝑝 − 𝜋 ℎ ( 𝑝 ) + ( 𝜋 ℎ ( 𝑝 ) − 𝑝 ℎ) = 𝜂 𝑝 + 𝜉 𝑝 ,𝜀 u = u − uℎ = u − ¯𝜋 ℎ (u) + ( ¯𝜋 ℎ (u) − uℎ) = 𝜂 u + 𝜉 u.
+
+The interpolation errors 𝜂 depend only on the regularity of the exact solution and satisfy the standard estimates: 
+
+∥𝜂 k ∥L2 (Ω) ≤ 𝐶ℎ 𝑘 +1 ∥k∥H𝑘 +1 (Ω) , 𝜂 𝑝 L2 (Ω) ≤ 𝐶ℎ 𝑘 +1 ∥ 𝑝 ∥H𝑘 +1 (Ω) , (4.20) 
+
+∥𝜂 σ ∥L2 (Ω) ≤ 𝐶ℎ 𝑘 +1 ∥σ∥H𝑘 +1 (Ω) , ∥𝜂 u ∥L2 (Ω) ≤ 𝐶ℎ 𝑘 ∥u∥H𝑘 (Ω) , ∥𝜂 σ ∥H(div ,Ω) ≤ 𝐶ℎ 𝑘 ∥σ∥H𝑘 +1 (Ω) .
+
+Subtracting the discrete problem (4.16) from the continuous problem (4.15), we obtain the error equations: 
+
+⟨𝐴 (𝜉 k), γℎ⟩ + ⟨ 𝐵 1 (γℎ), (𝜉 σ, 𝜉 𝑝 )⟩ = −⟨ 𝐴 (𝜂 k), γℎ⟩ − ⟨ 𝐵 1 (γℎ), (𝜂 σ, 𝜂 𝑝 )⟩ , ∀γℎ ∈ H𝑘,ℎ ,
+
+⟨𝐵 1 (𝜉 k), (τℎ, 𝑞 ℎ)⟩ + ⟨ 𝐵 2 (τℎ, 𝑞 ℎ), 𝜉 u⟩ = −⟨ 𝐵 1 (𝜂 k), (τℎ, 𝑞 ℎ)⟩ − ⟨ 𝐵 2 (τℎ, 𝑞 ℎ), 𝜂 u⟩, ∀( τℎ, 𝑞 ℎ) ∈ H0 
+
+> 𝑘,ℎ
+
+× H𝑘,ℎ ,
+
+⟨𝐵 2 (𝜉 σ, 𝜉 𝑝 ), vℎ⟩ = −⟨ 𝐵 2 (𝜂 σ, 𝜂 𝑝 ), vℎ⟩, ∀vℎ ∈ H𝑘 −1,ℎ .
+
+In the second equation, the term ⟨𝐵 2 (τℎ, 𝑞 ℎ), 𝜂 u⟩ = ⟨⟨ 𝜂 u, ∇ · τℎ⟩⟩ Ω vanishes. Indeed, for any τℎ ∈ H0
+
+> 𝑘,ℎ
+
+, we have ∇ · τℎ ∈ H𝑘 −1,ℎ . Hence, by applying the L2 (Ω)-orthogonality (4.17b): 
+
+⟨⟨ u − ¯𝜋 ℎ (u), ∇ · τℎ⟩⟩ Ω = 0.
+
+Likewise, in the third equation, the term involving 𝐵 2 and (𝜂 σ, 𝜂 𝑝 ) also vanishes by using the commutativity and 
+
+L2 (Ω)-orthogonality in (4.17): 
+
+⟨𝐵 2 (𝜂 σ, 𝜂 𝑝 ), vℎ⟩ = ⟨⟨ ∇ · 𝜂 σ, vℎ⟩⟩ Ω = ⟨⟨ ∇ · ( σ − 𝜋 div  
+
+> ℎ
+
+(σ)) , vℎ⟩⟩ Ω = ⟨⟨ ∇ · σ − ¯𝜋 ℎ (∇ · σ), vℎ⟩⟩ Ω = 0.
+
+The operator 𝐴 is bounded: 
+
+⟨𝐴 (k), γ⟩ = 𝜇 ⟨⟨ k, γ⟩⟩ Ω ≤ 𝜇 ∥k∥L2 (Ω) ∥γ ∥L2 (Ω) ≤ 𝐶 ∥k∥L2 (Ω) ∥γ ∥L2 (Ω) .
+
+Similarly, the operator 𝐵 1 is bounded: 
+
+⟨𝐵 1 (γ), (σ, 𝑝 )⟩ = −⟨⟨ γ, σ⟩⟩ Ω − ⟨⟨ tr (γ), 𝑝 ⟩⟩ Ω ≤ ∥ σ∥L2 (Ω) ∥γ ∥L2 (Ω) + ∥ 𝑝 ∥L2 (Ω)
+
+√𝑑 ∥γ ∥L2 (Ω)
+
+≤ 𝐶 ∥γ ∥L2 (Ω)
+
+
+
+∥σ∥L2 (Ω) + ∥ 𝑝 ∥L2 (Ω)
+
+
+
+.
+
+Invoking the stability results of Theorem 4.3, together with the boundedness of 𝐴 and 𝐵 1, we obtain the estimate for the discrete errors: 
+
+∥𝜉 k ∥L2 (Ω) + ∥ 𝜉 σ ∥H(div ,Ω) + 𝜉 𝑝 L2 (Ω) + ∥ 𝜉 u ∥L2 (Ω) ≤ 𝐶 
+
+
+
+∥𝜂 k ∥L2 (Ω) + ∥ 𝜂 σ ∥L2 (Ω) + 𝜂 𝑝 L2 (Ω)
+
+
+
+. (4.21) Finally, applying the triangle inequality ∥𝜀 ∥ = ∥𝜂 + 𝜉 ∥ ≤ ∥ 𝜂 ∥ + ∥ 𝜉 ∥ and combining the interpolation errors (4.20) with the discrete errors (4.21) yields (4.18). Starting from (4.21), we also derive (4.19). □FOUR-FIELD MIXED FINITE ELEMENTS 10 
+
+4.4. Error estimates for the post-processed displacement field. As introduced in Sect. 3.3, in the linearised setting the discontinuous displacement approximation uℎ can also be enhanced by solving an additional elliptic problem. Assuming homogeneous displacement boundary condition for simplicity, given kℎ ∈ H𝑘,ℎ , we define the post-processed displacement ˜uℎ ∈ H0 
+
+> 𝑘 +1,ℎ
+
+as the solution of 
+
+⟨⟨ ∇ ˜uℎ, ∇vℎ⟩⟩ Ω = ⟨⟨ kℎ, ∇vℎ⟩⟩ Ω, ∀vℎ ∈ H0 
+
+> 𝑘 +1,ℎ
+
+. (4.22) The bilinear form 
+
+𝑎 ( ˜uℎ, vℎ)  ⟨⟨ ∇ ˜uℎ, ∇vℎ⟩⟩ Ω
+
+is continuous and coercive on H0
+
+> 𝑘 +1,ℎ
+
+; therefore, existence and uniqueness of ˜uℎ follow from the Lax–Milgram theorem. 
+
+Corollary 1 (Error estimates for the post-processed displacement field) . Assume that Ω is convex. Let 
+
+(k, (σ, 𝑝 ), u) denote the exact solution of the continuous problem (4.15) and (kℎ, (σℎ, 𝑝 ℎ), uℎ) the solution of the discrete problem (4.16) . Let ˜uℎ ∈ H0 
+
+> 𝑘 +1,ℎ
+
+be defined by (4.22) . Then there exists a constant 𝐶 > 0,independent of ℎ, such that 
+
+∥∇(u − ˜uℎ)∥ L2 (Ω) ≤ 𝐶ℎ 𝑘 +1 (∥ ∇u∥H𝑘 +1 (Ω) + ∥ σ∥H𝑘 +1 (Ω) + ∥ 𝑝 ∥H𝑘 +1 (Ω) ). (4.23) 
+
+Moreover, 
+
+∥u − ˜uℎ ∥L2 (Ω) ≤ 𝐶ℎ 𝑘 +2 (∥ ∇u∥H𝑘 +1 (Ω) + ∥ σ∥H𝑘 +1 (Ω) + ∥ 𝑝 ∥H𝑘 +1 (Ω) ). (4.24) 
+
+Proof. Let πℎ : L2 (Ω) → H0 
+
+> 𝑘 +1,ℎ
+
+be a suitable interpolation operator. We decompose the total error as 
+
+𝜀 ˜u = u − ˜uℎ = u − πℎ (u) + πℎ (u) − ˜uℎ = 𝜂 ˜u + 𝜉 ˜u.
+
+The interpolation error 𝜂 ˜u admits 
+
+∥𝜂 ˜u ∥L2 (Ω) ≤ 𝐶ℎ 𝑘 +2 ∥u∥H𝑘 +2 (Ω) , ∥∇𝜂 ˜u ∥L2 (Ω) ≤ 𝐶ℎ 𝑘 +1 ∥∇u∥H𝑘 +1 (Ω) .
+
+Since the exact solution satisfies k = ∇u, we have 
+
+⟨⟨ ∇u, ∇vℎ⟩⟩ Ω = ⟨⟨ k, ∇vℎ⟩⟩ Ω, ∀vℎ ∈ H0 
+
+> 𝑘 +1,ℎ
+
+.
+
+Subtracting (4.22) from the above equation yields 
+
+⟨⟨ ∇𝜉 ˜u, ∇vℎ⟩⟩ Ω = ⟨⟨ 𝜀 k − ∇𝜂 ˜u, ∇vℎ⟩⟩ Ω.
+
+Choosing vℎ = 𝜉 ˜u and applying the Cauchy–Schwarz and triangle inequalities give 
+
+∥∇𝜉 ˜u ∥2  
+
+> L2(Ω)
+
+= ⟨⟨ 𝜀 k − ∇𝜂 ˜u, ∇𝜉 ˜u⟩⟩ Ω ≤
+
+
+
+∥𝜀 k ∥L2 (Ω) + ∥ ∇𝜂 ˜u ∥L2 (Ω)
+
+
+
+∥∇𝜉 ˜u ∥L2 (Ω) .
+
+Using the previously established estimate for 𝜀 k and 𝜀 𝑝 in (4.19), we obtain 
+
+∥𝜀 k ∥L2 (Ω) ≤ ∥ 𝜀 k ∥L2 (Ω) + 𝜀 𝑝 L2 (Ω) ≤ 𝐶ℎ 𝑘 +1 
+
+∥k∥H𝑘 +1 (Ω) + ∥ σ∥H𝑘 +1 (Ω) + ∥ 𝑝 ∥H𝑘 +1 (Ω)
+
+
+
+.
+
+Recalling that k = ∇u, we obtain (4.23) . We now derive the optimal L2 (Ω) error estimate for the post-processed displacement. Consider the dual problem: find z ∈ H1 
+
+> 0
+
+(Ω) such that 
+
+−𝚫 z = 𝜀 ˜u in Ω, z = 0 on 𝜕 Ω. (4.25) Assuming that Ω is convex, elliptic regularity gives 
+
+∥z∥H2 (Ω) ≤ 𝐶 ∥𝜀 ˜u ∥L2 (Ω) .
+
+Using (4.25) and integrating by parts, we achieve 
+
+∥𝜀 ˜u ∥2  
+
+> L2(Ω)
+
+= ⟨⟨ 𝜀 ˜u, 𝜀 ˜u⟩⟩ Ω = −⟨⟨ 𝜀 ˜u, 𝚫 z⟩⟩ Ω = ⟨⟨ ∇𝜀 ˜u, ∇z⟩⟩ Ω.
+
+Let zℎ  πℎ (z) ∈ H0 
+
+> 𝑘 +1,ℎ
+
+be an interpolant of z and it comes with the property 
+
+∥∇z − ∇zℎ ∥L2 (Ω) ≤ 𝐶ℎ ∥z∥H2 (Ω) .
+
+We then decompose z = (z − zℎ) + zℎ and obtain 
+
+∥𝜀 ˜u ∥2  
+
+> L2(Ω)
+
+= ⟨⟨ ∇𝜀 ˜u, ∇z − ∇zℎ⟩⟩ Ω + ⟨⟨ ∇𝜀 ˜u, ∇zℎ⟩⟩ Ω.
+
+The term ⟨⟨ ∇𝜀 ˜u, ∇zℎ⟩⟩ Ω disappears due to Galerkin orthogonality. By the Cauchy–Schwarz inequality, the interpolation property and the elliptic regularity, we reach 
+
+∥𝜀 ˜u ∥2  
+
+> L2(Ω)
+
+≤ ∥ ∇𝜀 ˜u ∥L2 (Ω) ∥∇z − ∇zℎ ∥L2 (Ω) ≤ 𝐶ℎ ∥∇𝜀 ˜u ∥L2 (Ω) ∥z∥H2 (Ω)
+
+≤ 𝐶ℎ ∥∇𝜀 ˜u ∥L2 (Ω) ∥𝜀 ˜u ∥L2 (Ω) .FOUR-FIELD MIXED FINITE ELEMENTS 11 
+
+Cancelling ∥𝜀 ˜u ∥L2 (Ω) from both sides and invoking the estimate in (4.23), we obtain (4.24). □
+
+5. Numerical experiments 
+
+We evaluate our method through extensive numerical experiments in both 2D and 3D. For brevity, the method is referred to as discontinuous displacement mixed finite element method ( DDFEM ). We consider two DDFEM stable pairs, P0d1d1P1 and P1d2d2P2, defined in Sect. 3.2. When the displacement approximation is postprocessed as described in Sect. 3.3, the tag “(corr)” is appended to the corresponding pairs. 5.1. Compatible-strain mixed finite element methods. To demonstrate the accuracy of DDFEM s, we compare DDFEM s with CSFEM s, which are also four-field formulations for incompressible nonlinear elasticity. At the continuous level, the weak formulation of the 3D CSFEM [15] reads: find (u, K, P, 𝑝 ) ∈ H1¯u (Ω) × H(curl , Ω) × 
+
+H(div , Ω) × L2 (Ω) such that 
+
+⟨⟨ P, ∇v⟩⟩ Ω + 𝛼𝑠 1 (u, K, v) = ⟨⟨ 𝜌 0b, v⟩⟩ Ω + ⟨⟨ ¯t, v⟩⟩ Γ𝑡 , ∀v ∈ H1 
+
+> 0
+
+(Ω),
+
+⟨⟨ eP(K), κ⟩⟩ Ω + ⟨⟨ 𝑝 Q(K), κ⟩⟩ Ω − ⟨⟨ P, κ⟩⟩ Ω + 𝛼𝑠 2 (u, K, κ) = 0, ∀κ ∈ H(curl , Ω),
+
+⟨⟨ ∇u, ψ⟩⟩ Ω − ⟨⟨ K, ψ⟩⟩ Ω = 0, ∀ψ ∈ H(div , Ω),
+
+⟨⟨ 𝐶 (𝐽 ), 𝑞 ⟩⟩ Ω = 0, ∀𝑞 ∈ L2 (Ω).
+
+The spaces H1¯u (Ω) and H1 
+
+> 0
+
+(Ω) denote subspaces of H1 (Ω) consisting of displacement fields that satisfy prescribed and homogeneous displacement boundary conditions on Γ𝑑 , respectively. The stabilisation terms 
+
+𝑠 1 (u, K, v)  ⟨⟨ ∇u − K, ∇v⟩⟩ Ω, 𝑠 2 (u, K, κ)  ⟨⟨ K − ∇u, κ⟩⟩ Ω,
+
+are weighted by the parameter 𝛼 . For 2D problems, such stabilisations are unnecessary, so 𝑠 1 and 𝑠 2 can be safely omitted [16]. Regarding feasible CSFEM pairs, P1c1d0P0 and P2c2d1P1 are the best-performing first- and second-order choices in 2D [16]. In 3D, however, neither pair is admissible, and P2 ˆc 1d0P0 was proposed in [15]. The notation for these CSFEM pairs follows that of the DDFEM pairs and is detailed in Tab. 1. In our experiments, we use P1c1d0P0 and P2c2d1P1 for 2D examples and P2 ˆc 1d0P0 with stabilisation parameter 𝛼 = 10 5 for 3D simulations. In addition to the choice of stable pairs, the principal differences between the FE formulations of DDFEM sand CSFEMs are summarised as follows: 
+
+• DDFEMs employ discontinuous displacements, whereas CSFEMs use continuous displacement fields. 
+
+• DDFEM s utilise div -conforming displacement gradients, while CSFEM s adopt curl -conforming dis-placement gradients. 
+
+• DDFEMs require continuous pressure fields, whereas CSFEMs can have discontinuous pressure fields. 
+
+• In DDFEM s without displacement correction, displacement boundary conditions are imposed weakly and traction boundary conditions are imposed strongly; the opposite holds for CSFEMs. 5.2. Examples. Here we present a detailed comparison between DDFEM s and CSFEM s. For simplicity, all experiments employ neo-Hookean materials with Lamé parameter 𝜇 = 1, assuming no body forces, i.e., b = 0.Possible choices of incompressibility constraint functions 𝐶 are listed in (2.3) , with the corresponding Q functions defined in (2.6) . Depending on the specific problem, either 𝐶 1 or 𝐶 2, or both, are used. Both formulations are implemented in the open-source FEM framework Gridap.jl [9, 38], and the resulting nonlinear FE systems are solved using Newton–Raphson’s method with a Hager–Zhang line search and a tolerance of 10 −9.5.2.1. Radial inflation. As an initial benchmark, we consider the radial inflation of a cylindrical shell in 2D and a hollow spherical ball in 3D, following the setups used in CSFEM s [15, 16]. The geometries and the prescribed displacement boundary conditions are illustrated in Fig. 2. The inner and outer radii are 𝑅 in = 0.5 and 𝑅 out = 1,respectively. Displacement boundary conditions are imposed on the outer boundary for the shell and on the inner boundary for the ball, while all remaining boundaries are traction-free. In both the 2D and 3D cases, the displacement boundary data can be represented by the form 
+
+¯u = (𝜆 − 1)X,
+
+where X is the referential position vector and 𝜆 ≥ 1 is the displacement intensity parameter. FOUR-FIELD MIXED FINITE ELEMENTS 12 
+
+¯u2D 
+
+𝑅 in 
+
+𝑅 out 
+
+𝑅 in 𝑅 out 
+
+¯u3D 
+
+Figure 2. Geometries and displacement boundary conditions for the inflation problems. Left: a 2D cylindrical shell; right: a 3D hollow spherical ball. Let 𝑑 ∈ { 2, 3} denote the spatial dimension and define 𝑅 = ∥X∥. The exact radial map is given by 
+
+𝑟 (𝑅 ) = (𝑅 𝑑 + ( 𝜆 𝑑 − 1)𝑅 𝑑 
+
+> out
+
+)1/𝑑 , and in 3D we additionally define 𝑔 (𝑅 ) = 𝑅 (3𝑟 3 (𝑅 ) + ( 𝜆 3 − 1)𝑅 3out )/ 𝑟 4 (𝑅 ). The exact displacement field is then expressed as 
+
+u(X) =
+
+ 𝑟 (𝑅 )
+
+𝑅 − 1
+
+
+
+X,
+
+and the exact pressure reads 
+
+𝑝 (X) =
+
+
+
+−𝜇 𝑅 2  
+
+> 𝑟 2(𝑅 )
+
++ 𝜇 (𝜆 2 −1) 𝑅 2out 
+
+> 2
+
+ 1   
+
+> 𝑟 2(𝑅 in )
+
+− 1 
+
+> 𝑟 2(𝑅 )
+
+
+
++ 𝜇 ln 
+
+ 𝑟 (𝑅 in ) 𝑅 𝑟 (𝑅 ) 𝑅 in 
+
+
+
+if 𝑑 = 2,
+
+−𝜇 𝑅 4out    
+
+> 𝑟 4(𝑅 out )
+
++ 𝜇  
+
+> 2
+
+[𝑔 (𝑅 ) − 𝑔 (𝑅 out )] if 𝑑 = 3.
+
+We impose the incompressibility constraint using the function 𝐶 1 (𝐽 ) = 𝐽 − 1. The exact displacement gradient is computed from K = ∇u + I and the exact first Piola–Kirchhoff stress is then given by P = ˜P(K) + 𝑝 Q1 (K),where ˜P and Q1 are defined in (2.5) and (2.6a) , respectively. Due to symmetry, we model only one quarter of the 2D shell and one eighth of the 3D ball to reduce computational cost. The Cartesian mesh on [0, 0.5]2 is mapped to the upper-right quarter of the shell, while the one-eighth domain of the ball is discretised directly using Delaunay meshes. We set 𝜆 = 3 and compare the DDFEM solutions directly against the exact ones; the corresponding error convergence curves are plotted in Fig. 3, with reference slopes provided in the figure caption. We first focus on the 2D convergences in Fig. 3a. For both DDFEM pairs P0d1d1P1 and P1d2d2P2, the discontinuous displacement approximations converge at optimal rates. After postprocessing, the displacement errors reduce significantly while preserving the expected rates of the underlying continuous Lagrange elements, confirming both the accuracy of discontinuous displacement solutions and the effectiveness of the correction. The displacement gradient also attains the expected convergence for both pairs. The H(div , Ω) errors, displayed in the third subfigure of Fig. 3a, exhibit super-convergence: for both pairs, the observed rates are one order higher than expected. This occurs because the body force is zero, i.e., b = 0, implying ∇ · P = 0. Thus, the H(div , Ω) error of Pℎ coincides with its L2 (Ω) error. For the pressure, P0d1d1P1 achieves the expected convergence rate while P1d2d2P2 shows super-convergence, with a slope higher than the nominal order of three. For the 3D convergence results in Fig. 3b, the observations closely mirror those in 2D. Convergence curves are slightly noisier, reflecting the added difficulty of discretising the domain with quasi-uniform 3D Delaunay meshes. It is worth noting that the displacement correction remains effective in 3D, producing more accurate approximations while maintaining the expected super-convergence rates. Overall, Fig. 3 shows that both DDFEM pairs deliver accurate solutions for the 2D radial inflation problem. More importantly, DDFEM s extend robustly to 3D cases without any stabilisation or modification of standard FE bases, whereas these are necessary in 3D CSFEM s [15]. The convergences in Fig. 3 also show that DDFEM achieves the expected error estimates from (4.18) , (4.19) and (4.24) for all four fields plus the corrected displacement, and in some cases even surpasses them. Figure 4 displays the convergence results for the 2D inflation problem using the CSFEM pairs P1c1d0P0 and P2c2d1P1, computed on the same Cartesian meshes as in Fig. 3a. Both pairs achieve the expected H1 and L2
+
+convergence rates for displacement and pressure, respectively. However, the displacement gradient converges one order suboptimally: order 1 instead of 2 for P1c1d0P0 and order 2 instead of 3 for P2c2d1P1. The stress approximation is even less robust: P1c1d0P0 fails to reach first-order convergence, while P2c2d1P1 stagnates on FOUR-FIELD MIXED FINITE ELEMENTS 13 0.1 0.02 0.05       
+
+> Mesh size
+> 10 −9
+> 10 −8
+> 10 −7
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> 10 −1
+> || uh − u|| L2
+> 0.1 0.02 0.05
+> Mesh size
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> || Kh − K|| L2
+> 0.1 0.02 0.05
+> Mesh size
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> || Ph − P|| H(div )
+> 0.1 0.02 0.05
+> Mesh size
+> 10 −7
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> || ph − p|| L2
+> P0d1d1P1 P1d2d2P2 P0d1d1P1(corr) P1d2d2P2(corr)
+
+(a) 0.1 0.08 0.2       
+
+> Mesh size
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> 10 −1
+> || uh − u|| L2
+> 0.1 0.08 0.2
+> Mesh size
+> 10 −2
+> 10 −1
+> || Kh − K|| L2
+> 0.1 0.08 0.2
+> Mesh size
+> 10 −2
+> 10 −1
+> || Ph − P|| H(div )
+> 0.1 0.08 0.2
+> Mesh size
+> 10 −3
+> 10 −2
+> || ph − p|| L2
+> P0d1d1P1 P1d2d2P2 P0d1d1P1(corr) P1d2d2P2(corr)
+
+(b) 
+
+Figure 3. Error convergence of the FE solution errors versus mesh size for various FE pairs in typical inflation problems. The displacement boundary data parameter is taken as 𝜆 = 3.Reference slopes: 1 (dotted lines), 2 (dashed lines), 3 (dot-dashed lines), 4 (solid lines). Panels: (a) 2D results, (b) 3D results. coarse meshes before eventually recovering the expected rate. Compared with DDFEM s, CSFEM s are more sensitive to mesh quality. In particular, on Delaunay meshes, as reported in [16], the displacement gradient convergence for P1c1d0P0 is slightly improved. In contrast, DDFEM pairs achieve expected convergence rates on both Cartesian and Delaunay meshes, as reflected in Fig. 3. 0.1 0.02 0.05    
+
+> Mesh size
+> 10 −3
+> 10 −2
+> 10 −1
+> || uh − u|| H1
+> P1c1d0P0 P2c2d1P1
+> 0.1 0.02 0.05
+> Mesh size
+> 10 −3
+> 10 −2
+> 10 −1
+> || Kh − K|| L2
+> 0.1 0.02 0.05
+> Mesh size
+> 10 −2
+> 10 −1
+> || Ph − P|| L2
+> 0.1 0.02 0.05
+> Mesh size
+> 10 −3
+> 10 −2
+> || ph − p|| L2
+
+Figure 4. Error convergence of the CSFEM solution errors versus mesh size in the 2D inflation problem. The displacement boundary intensity parameter is 𝜆 = 3. Reference slopes: 1 (dotted lines), 2 (dashed lines). 5.2.2. Cook’s membrane. The Cook’s membrane problem is a classic benchmark for evaluating the performance of FEM s in capturing combined bending and shear responses. We consider the 2D and 3D geometries shown in Fig. 5, taken from [16] and [15], respectively. The 3D membrane is formed by extruding the 2D membrane by 10 units along the 𝑧 -direction. In 2D, the membrane is discretised structurally using 2 × 𝑛 2 triangular elements. For the 3D case, we exploit symmetry of the domain and problem configuration and use Delaunay meshes to discretise only half of the membrane along the 𝑧 -direction. Regarding the boundary conditions, the left edge (2D) FOUR-FIELD MIXED FINITE ELEMENTS 14 
+
+and face (3D) are clamped, while the right edge (2D) and face (3D) are subjected to, respectively, the following vertical tractions: 
+
+¯t2D = (0, 𝑓 )t, ¯t3D = (0, 𝑓 , 0)t.
+
+All other boundaries are traction-free. Due to the abrupt change of boundary condition types, singularities appear at the top-left vertex in 2D and along the corresponding edge in 3D. As recommended in [16], we employ 
+
+𝐶 2 (2.3b) as the constraint function for both CSFEMs and DDFEMs. 
+
+𝐴 
+
+44 16 48 
+
+¯t2D 
+
+𝐴 
+
+10 
+
+¯t3D 
+
+Figure 5. Geometries and traction boundary conditions for the Cook’s membrane problems. Left: a 2D membrane; right: a 3D membrane. Table 2 reports the tip deflection at point 𝐴 for the 2D Cook’s membrane. The first two rows correspond to DDFEM pairs, followed by their displacement-corrected counterparts, while the last two rows correspond to the CSFEM pairs. For a very coarse mesh ( 𝑛 = 6), the deflection from P0d1d1P1 shows a slight deviation, but it converges steadily to high-order solutions as the mesh is refined. After applying the displacement correction in Sect. 3.3, the P0d1d1P1(corr) results closely match those of P1c1d0P0 and P2c2d1P1. The high-order DDFEM pair P1d2d2P2 produces consistent deflections that agree well with the CSFEM results, and its corrected values, denoted by P1d2d2P2(corr), show little further improvement. Notably, on the finest mesh ( 𝑛 = 48 ), the high-order CSFEM pair P2c2d1P1 fails to converge for large traction ( 𝑓 = 0.4), which is consistent with the observations reported in [18]. The FE solutions on the deformed geometry are presented in Fig. 6, computed on a mesh of 2 × 24 2 triangles. The top and bottom rows correspond to the high-order pairs P1d2d2P2(corr) and P2c2d1P1, respectively. Overall, the solution patterns produced by P1d2d2P2(corr) closely resemble those of P2c2d1P1, with only minor differences. Several notable nuances are revealed after closer inspection. Firstly, near the singular vertex, P1d2d2P2 produces more distorted and rotated elements than P2c2d1P1, a behaviour that is physically more consistent with the expected large deformation in this region. Secondly, in the stress solutions (second column of Fig. 6), P2c2d1P1 exhibits visible checkerboarding around the singular vertex, despite not employing the lowest-order stress and pressure FE pair. In contrast, the P1d2d2P2 stress solution shows no such numerical artefacts. Lastly, the overall stress solution obtained with P1d2d2P2 appears smoother and more consistent with the expected stress distribution, suggesting a more natural and robust approximation than that provided by P2c2d1P1. For the 3D Cook’s membrane, the deflection at point 𝐴 versus element count is shown in Fig. 7. As in the 2D case, the results obtained with P1d2d2P2 closely match those of the 3D CSFEM pair P2 ˆc 1d0P0 across all mesh resolutions. The low-order DDFEM pair P0d1d1P1 converges toward the P2 ˆc 1d0P0 response as the mesh is refined. Owing to the challenges associated with 3D quasi-uniform meshing, its convergence curves are noticeably noisier than in 2D. Nevertheless, after postprocessing, the P0d1d1P1(corr) curves become visually indistinguishable from those of P2 ˆc1d0P0, indicating highly accurate displacement predictions. As already shown in Tab. 2, the corrected P1d2d2P2 displacements are nearly identical to the original solutions and are therefore omitted from the figure. Figure 8 shows the FE solution fields for P0d1d1P1(corr) and P2 ˆc 1d0P0 on the finest mesh used in Fig. 7. A direct comparison between P1d2d2P2 and P2 ˆc1d0P0 is not meaningful, since, as mentioned in Sect. 3.2, P1d2d2P2 utilises high-order BDM elements and requires significantly more DoFs. The deformed geometry for the DDFEM results is visualised using the corrected displacement to enhance clarity. Once again, we observe similar patterns in the FE solutions obtained with P0d1d1P1 and P2 ˆc1d0P0. However, FOUR-FIELD MIXED FINITE ELEMENTS 15                                                                                                                                        
+
+> Pair 𝑓 =0.2𝑓 =0.4
+> 𝑛 u𝑥 (X𝐴 )u𝑦 (X𝐴 )𝑛 u𝑥 (X𝐴 )u𝑦 (X𝐴 )
+> P0d1d1P1 6-12.0410 12.9525 6-20.0804 20.0880 12 -12.8011 13.5491 12 -21.2474 20.8351 24 -13.2271 13.8653 24 -21.9595 21.2735 48 -13.4641 14.0320 48 -22.3480 21.4985 P1d2d2P2 6-13.6393 14.1568 6-22.5085 21.6388 12 -13.6878 14.1896 12 -22.5591 21.6425 24 -13.7104 14.1988 24 -22.8951 21.8188 48 -13.7249 14.2044 48 -22.6051 21.6443 P0d1d1P1(corr) 6-14.2161 14.1681 6-22.8054 21.6237 12 -13.9479 14.1875 12 -22.6705 21.6312 24 -13.8282 14.1967 24 -22.6967 21.6829 48 -13.7775 14.2027 48 -22.7294 21.7081 P1d2d2P2(corr) 6-14.0563 14.1492 6-22.7314 21.6333 12 -13.8711 14.1790 12 -22.6474 21.6390 24 -13.7904 14.1915 24 -22.9333 21.8209 48 -13.7598 14.2002 48 -22.6209 21.6438 P1c1d0P0 6-13.4500 14.0621 6-22.2027 21.2951 12 -13.5719 14.1252 12 -22.2393 21.3996 24 -13.6271 14.1524 24 -22.2966 21.4585 48 -13.6620 14.1651 48 -22.3751 21.5034 P2c2d1P1 6-13.5575 14.1325 6-22.2118 21.4396 12 -13.6271 14.1506 12 -22.2911 21.4642 24 -13.6635 14.1625 24 -22.3571 21.4964 48 -13.6846 14.1716 48 Failed Failed
+
+Table 2. Deflection of the tip 𝐴 for the 2D Cook’s membrane problem under different traction boundary data 𝑓 for various element pairs. the stress field produced by P0d1d1P1 is smoother and more physically natural, owing to the richer FE s employed for the stress approximation. It is also insightful to examine how the 𝐿 2 norms of the FE solutions change as the mesh becomes finer, which offers a global comparison between the two methods. The 𝐿 2 norms for different pairs and traction levels 𝑓 
+
+are illustrated in Fig. 9. The norms of the corrected displacements are nearly identical to those of the original DDFEM displacements; for clarity, the corrected curves are therefore omitted in the first subfigure. For the DDFEM pairs P0d1d1P1 and P1d2d2P2, the convergence curves are almost flat, indicating robust and consistent solutions even on coarse meshes. Interestingly, despite using a piecewise-constant space for the displacement in P0d1d1P1, the overall FE solutions remain accurate. In contrast, for P2 ˆc 1d0P0, the stress and pressure FE solutions are inaccurate on coarse meshes, indicating that the 3D CSFEM employs stress and pressure FE spaces that are not sufficiently rich. 5.2.3. Stretching of perforated blocks. As the final set of examples, we consider the stretching of blocks with holes. The 2D and 3D geometries are shown in Fig. 10. Both the 2D square and 3D cube have side length 1. In 2D, the square contains four larger circular holes with diameter 0.2 and four smaller circular holes with diameter 0.1. The centres of the larger circles are located at: (0.2, 0.15 ), (0.25 , 0.55 ), (0.8, 0.2), and (0.8, 0.75 ),while the smaller circles are centred at: (0.15 , 0.85 ), (0.45 , 0.8), (0.5, 0.25 ), and (0.6, 0.5). The left edge of the square is fixed, the right edge is subjected to a horizontal displacement boundary condition ¯u2D , and the remaining edges are traction-free. In 3D, the cube has a spherical hole of diameter 0.6 at its centre. The left and right faces are subjected to equal and opposite horizontal displacement boundary conditions ¯u3D , and the other faces are traction-free. Again, owing to the symmetry of the problem, only one-eighth of the cube is modelled. The incompressibility constraint is enforced using 𝐶 1 (2.3a) for CSFEM s. The displacement boundary data can FOUR-FIELD MIXED FINITE ELEMENTS 16 
+
+Figure 6. FE solutions on the deformed 2D Cook’s membrane for traction boundary data 
+
+𝑓 = 0.4 and mesh parameter 𝑛 = 24 . Columns show (1) displacement gradient magnitude, (2) stress magnitude and (3) pressure. Top row: P1d2d2P2(corr); bottom row: P2c2d1P1. 1000 400 4000 
+
+Number of elements    
+
+> −26
+> −24
+> −22
+> −20
+> −18
+> −16
+> −14
+> Horizontal displacement of point A
+> f= 0 .2
+> f= 0 .4P0d1d1P1 P1d2d2P2 P0d1d1P1(corr) P2ˆ c1d0P0
+> 1000 400 4000
+
+Number of elements 
+
+> 16
+> 18
+> 20
+> 22
+> Vertical displacement of point A
+
+Figure 7. Deflection of the point 𝐴 for the 3D Cook’s membrane problem under different traction boundary data 𝑓 for various pairs. be expressed as 
+
+¯u2D =
+
+(
+
+(0, 0)t on the left edge ,
+
+(𝑢, 0)t on the right edge , ¯u3D =
+
+(
+
+(− 𝑢, 0, 0)t on the left face ,
+
+(𝑢, 0, 0)t on the right face .
+
+The FE solutions on the deformed square are shown in Fig. 11, with P1d2d2P2(corr) in the top row and P2c2d1P1 in the bottom. The Delaunay mesh contains 3,344 elements with finer cells around the smaller holes. FOUR-FIELD MIXED FINITE ELEMENTS 17 
+
+Figure 8. FE solutions on the deformed 3D Cook’s membrane for traction boundary data 
+
+𝑓 = 0.4. Columns show (1) displacement gradient magnitude, (2) stress magnitude and (3) pressure. Top row: P0d1d1P1(corr); bottom row: P2 ˆc1d0P0. 1000 400 4000      
+
+> Number of elements
+> 700
+> 800
+> 900
+> 1000
+> 1100
+> || uh|| L2
+> f= 0 .2
+> f= 0 .4P0d1d1P1 P1d2d2P2 P2ˆ c1d0P0
+> 1000 400 4000
+> Number of elements
+> 45
+> 50
+> 55
+> 60
+> || Kh|| L2
+> 1000 400 4000
+> Number of elements
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> 90
+> || Ph|| L2
+> 1000 400 4000
+> Number of elements
+> 80
+> 81
+> 82
+> 83
+> 84
+> 85
+> 86
+> || ph|| L2
+
+Figure 9. 𝐿 2 norms of displacement, displacement gradient, stress and pressure versus number of elements for the 3D Cook’s membrane problem under different traction boundary data 𝑓 for various pairs. Visually, the P2c2d1P1 displacement closely matches the corrected P1d2d2P2 solution. Overall, the displacement gradient solutions (first column of Fig. 11) obtained by the two pairs exhibit very similar patterns, except near the midpoint of the right edge, where notable differences occur. To further investigate this dissimilarity, we present the Jacobian determinant solutions computed by 𝐽 ℎ = det (Kℎ + I) in the second column of Fig. 11. We observe that the P2c2d1P1 Jacobian determinant becomes very small in that region, with the minimum value turning negative (nonphysical). In contrast, the P1d2d2P2 Jacobian determinant remains close to 1 throughout most of the domain, with only minor regions showing relatively large or small values, but never negative. Regarding the stress solutions, similar to the observations in Sect. 5.2.2, P1d2d2P2 produces smoother and more natural FE FOUR-FIELD MIXED FINITE ELEMENTS 18 
+
+¯u2D ¯u3D 
+
+Figure 10. Geometries and displacement boundary conditions for the stretching problems. Left: a 2D square with randomly distributed holes; right: a 3D cube with a central hollow sphere. solutions than P2c2d1P1. As expected, the continuous pressure solution by P1d2d2P2 is also smoother compared to the discontinuous pressure solution of P2c2d1P1. 
+
+Figure 11. FE solutions obtained by different pairs on the deformed 2D perforated block. The displacement boundary data 𝑢 = 1.5. Columns show (1) displacement gradient magnitude, (2) Jacobian, (3) stress magnitude and (4) pressure. Top row: P1d2d2P2(corr); bottom row: P2c2d1P1. We examine the projected Jacobian determinants as box plots in Fig. 12. To obtain the L2-projection of the Jacobian, we first solve the 2D stretching problem using all four element pairs on the same Delaunay mesh consisting of 3,344 triangular elements. We then project the computed FE Jacobian 𝐽 ℎ = det (Kℎ + I) onto a discontinuous Lagrange FE space ( H𝑘,ℎ ). The order of the projection space matches the order of the FE space used for the displacement gradient: we use H1,ℎ for projecting P0d1d1P1 and P1c1d0P0 Jacobian determinants, and H2,ℎ for P1d2d2P2 and P2c2d1P1. Finally, we plot the nodal values of the projected Jacobian determinant for each pair as box plots in Fig. 12. The whiskers indicate the minimum and maximum values lying within 1.5 times the interquartile range. Due to the geometric complexity, it is natural that the box plots for all element pairs exhibit numerous fliers. The box plots clearly indicate that P1d2d2P2 preserves volume best, with its Jacobian determinant values tightly concentrated around 1, while P1c1d0P0 exhibits the largest spread and thus the poorest volume preservation. Figure 12 also provides insights into why P1c1d0P0 fails under large deformations: its projected Jacobian determinant contains a significant number of negative values. In contrast, P0d1d1P1 shows no negative Jacobian determinants, and P1d2d2P2 only has one negative value, making these two DDFEM pairs more reliable than CSFEM pairs for this 2D stretching problem. The FE solutions for the 3D stretching problem solved by P0d1d1P1(corr) and P2 ˆc1d0P0 are displayed in the top and bottom rows of Fig. 13, respectively. The Delaunay mesh consists of 4,131 tetrahedra, and the deformed geometry for P0d1d1P1 is corrected as described in Sect. 3.3. The deformed geometries and overall solution patterns are broadly similar for both pairs. However, pronounced checkerboarding appears in the stress and pressure fields of P2 ˆc1d0P0, indicating again that the corresponding 3D stress and pressure FE pair is insufficiently rich. In contrast, the P0d1d1P1 stress and pressure solutions are much smoother. On this mesh, P2 ˆc 1d0P0 has 122,242 DoFs, whereas P0d1d1P1 has 166,135 DoFs. Although P0d1d1P1 requires around 36% more DoFs, it avoids numerical artefacts such as checkerboarding and yields more natural and visually appealing stress and pressure solutions. FOUR-FIELD MIXED FINITE ELEMENTS 19 −1.0 −0.5 0.0 0.5 1.0 1.5 2.0 2.5 3.0
+
+> Projected Jacobian determinant
+> P0d1d1P1
+> P1d2d2P2
+> P1c1d0P0
+> P2c2d1P1
+
+Figure 12. Box plot of the projected Jacobian determinant values for the 2D stretching problem. The displacement boundary data 𝑢 = 1.5. The Delaunay mesh consists of 3,344 elements. 
+
+Figure 13. FE solutions obtained by different element pairs on the deformed 3D perforated block. The displacement boundary data 𝑢 = 0.5. Columns show (1) displacement gradient magnitude, (2) stress magnitude and (3) pressure. Top row: P0d1d1P1(corr); bottom row: P2 ˆc1d0P0. To assess the consistency and accuracy of DDFEM s and CSFEM s across different mesh resolutions, we plot the 𝐿 2 norms of the FE solutions against the DoFs in 2D and against element counts in 3D, as displayed in Fig. 14. For the 2D case, the two low-order pairs, P0d1d1P1 and P1c1d0P0, use the same set of meshes, while the other two high-order pairs, P1d2d2P2 and P2c2d1P1, share a different common set. All four pairs exhibit strong consistency in both the displacement and displacement gradient solutions, as reflected by their nearly flat curves. However, due to the use of order 0 Raviart–Thomas elements, the low-order CSFEM pair P1c1d0P0 converges more slowly, while the other three pairs yield consistent stress results, as indicated by their flat stress curves. For the pressure solution at small deformation ( 𝑢 = 0.5), all four pairs converge, with P1c1d0P0 slower than P0d1d1P1, and P2c2d1P1 slower than P1d2d2P2 in terms of DoFs. Under large deformation ( 𝑢 = 1.5), both CSFEM pairs show poor convergences, and P2c2d1P1 fails on the finest mesh. This is not surprising, as negative Jacobian values already occur on the second finest mesh for the P2c2d1P1 solution, as shown in Fig. 12. For the two DDFEM pairs, the pressure solutions converge even under large deformations, with P0d1d1P1 converging FOUR-FIELD MIXED FINITE ELEMENTS 20 
+
+slightly faster than P1d2d2P2. It is also important to compare the DoFs among low- and high-order pairs on the same mesh. For the displacement, P0d1d1P1 has more DoFs than P1c1d0P0 and P1d2d2P2 possesses more than P2c2d1P1. For the displacement gradient, the low-order pairs and high-order pairs have the same DoFs, since BDM elements can be constructed by rotating second-kind Nédélec elements of the same order. For the stress, BDM elements are richer than Raviart-Thomas elements of one order lower, so DDFEM pairs have more DoFs. For the pressure, DDFEM pairs have fewer DoFs. Overall, on the same 2D mesh, P0d1d1P1 has around 30% more DoFs than P1c1d0P0, and P1d2d2P2 has roughly 18% more than P2c2d1P1. 10 3 10 4       
+
+> uhDoFs
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> || uh|| L2
+> u= 0 .5
+> u= 1 .5P0d1d1P1 P1d2d2P2 P1c1d0P0 P2c2d1P1
+> 10 4
+> KhDoFs
+> 0.6
+> 0.8
+> 1.0
+> 1.2
+> 1.4
+> || Kh|| L2
+> 10 4
+> PhDoFs
+> 1.2
+> 1.4
+> 1.6
+> 1.8
+> 2.0
+> 2.2
+> 2.4
+> 2.6
+> || Ph|| L2
+> 10 310 4
+> phDoFs
+> 0.37
+> 0.38
+> 0.39
+> 0.40
+> 0.41
+> 0.42
+> 0.43
+> || ph|| L2
+
+(a) 1000 2000 4000         
+
+> Number of elements
+> 0.05
+> 0.06
+> 0.07
+> 0.08
+> 0.09
+> 0.10
+> 0.11
+> 0.12
+> || uh|| L2
+> u= 0 .2
+> u= 0 .5P0d1d1P1 P1d2d2P2 P2ˆ c1d0P0
+> 1000 2000 4000
+> Number of elements
+> 0.20
+> 0.25
+> 0.30
+> 0.35
+> 0.40
+> || Kh|| L2
+> 1000 2000 4000
+> Number of elements
+> 0.35
+> 0.40
+> 0.45
+> 0.50
+> 0.55
+> 0.60
+> 0.65
+> 0.70
+> 0.75
+> || Ph|| L2
+> 1000 2000 4000
+> Number of elements
+> 0.13
+> 0.14
+> 0.15
+> 0.16
+> 0.17
+> 0.18
+> 0.19
+> 0.20
+> || ph|| L2
+
+(b) 
+
+Figure 14. 𝐿 2 norms of displacement, displacement gradient, stress and pressure versus number of elements for the 2D and 3D stretching problems under different displacement data 𝑢 . Panels: (a) 2D results, (b) 3D results. In the 𝐿 2 norms for the 3D stretching cases shown in Fig. 14b, both DDFEM pairs exhibit nearly flat curves across all four fields, indicating accurate and stable FE solutions over different mesh resolutions. The 3D CSFEM pair P2 ˆc1d0P0 achieves fast convergence for displacement and displacement gradient solutions; nonetheless, its stress and pressure solutions converge slowly due to the use of the insufficiently rich lowest-order Raviart–Thomas FE s. For large deformations ( 𝑢 = 0.5), the pressure convergence deteriorates further. Overall, on sufficiently fine meshes, the FE solutions from all three pairs are in good agreement. 6. Concluding remarks 
+
+The proposed four-field mixed formulation with discontinuous displacement offers an accurate, robust and scalable alternative for the simulation of incompressible nonlinear solids. Its stabilisation-free performance in 3D and compatibility with standard FE spaces make it particularly attractive for large-deformation applications. Future work will focus on extending the formulation to aggregated FE spaces [10] to better handle complex geometries, exploring the benefits of integrating neural networks [6, 7] in such strongly nonlinear regimes, and combining the method with the active strain or active stress approaches [21] to address more challenging couplings of multiphysics and multiscale problems, such as cardiac electromechanics, tumour growth, brain tissue characterisation, or gastric function simulations. 
+
+Acknowledgments. This research was partially funded by the Australian Government through the Australian Research Council (project number DP220103160), by the Institut Mittag–Leffler in Djursholm Sweden, under the research program Interfaces and unfitted discretization methods (grant no. 2021-06594 from the Swedish Research Council), and by the Centre of Advanced Study (CAS) at the Norwegian Academy of Science and REFERENCES 21 
+
+Letters under the program Mathematical Challenges in Brain Mechanics . Computational resources were provided by the Australian Government through NCI under the NCMAS Merit Allocation Schemes. 
+
+Reproducibility. The Gridap routines employed to generate the numerical results in the paper can be accessed from https://github.com/wei3li/four-field-elasticity .
+
+References 
+
+[1] M. Alvarez, G. N. Gatica and R. Ruiz-Baier. “An augmented mixed-primal finite element method for a coupled flow-transport problem”. In: ESAIM: M2AN 49.5 (Aug. 2015), pp. 1399–1427. [2] A. Angoshtari and A. Yavari. “Hilbert complexes of nonlinear elasticity”. In: Zeitschrift für angewandte Mathematik und Physik 67.6 (Nov. 2016), p. 143. [3] D. N. Arnold, F. Brezzi and M. Fortin. “A stable finite element for the stokes equations”. In: Calcolo 21.4 (Dec. 1984), pp. 337–344. [4] D. N. Arnold. “Mixed finite element methods for elliptic problems”. In: Computer Methods in Applied Mechanics and Engineering 82.1 (1990), pp. 281–300. [5] F. Auricchio et al. “Approximation of incompressible large deformation elastic problems: some unresolved issues”. In: Computational Mechanics 52.5 (Nov. 2013), pp. 1153–1167. [6] S. Badia, W. Li and A. F. Martín. “Compatible finite element interpolated neural networks”. In: Computer Methods in Applied Mechanics and Engineering 439 (2025), p. 117889. [7] S. Badia, W. Li and A. F. Martín. “Finite element interpolated neural networks for solving forward and inverse problems”. In: Computer Methods in Applied Mechanics and Engineering 418 (2024), p. 116505. [8] S. Badia, A. F. Martín and J. Principe. “Multilevel Balancing Domain Decomposition at Extreme Scales”. In: SIAM Journal on Scientific Computing 38.1 (2016), pp. C22–C52. [9] S. Badia and F. Verdugo. “Gridap: An extensible Finite Element toolbox in Julia”. In: Journal of Open Source Software 5.52 (2020), p. 2520. [10] S. Badia, F. Verdugo and A. F. Martín. “The aggregated unfitted finite element method for elliptic problems”. In: Computer Methods in Applied Mechanics and Engineering 336 (2018), pp. 533–553. [11] J. Bonet and R. D. Wood. Nonlinear Continuum Mechanics for Finite Element Analysis . 2nd ed. Cambridge University Press, 2008. [12] F. Brezzi and M. Fortin. Mixed and Hybrid Finite Element Methods . Ed. by F. Brezzi and M. Fortin. New York, NY: Springer New York, 1991. [13] M. Crouzeix and P. - A. Raviart. “Conforming and nonconforming finite element methods for solving the stationary Stokes equations I”. In: Revue française d’automatique informatique recherche opérationnelle. Mathématique 7 (1973), pp. 33–75. [14] A. Ern and J. -L. Guermond. Theory and Practice of Finite Elements . Vol. 159. Appl. Math. Sci. New York: Springer, 2004. [15] M. Faghih Shojaei and A. Yavari. “Compatible-strain mixed finite element methods for 3D compressible and incompressible nonlinear elasticity”. In: Computer Methods in Applied Mechanics and Engineering 
+
+357 (2019), p. 112610. [16] M. Faghih Shojaei and A. Yavari. “Compatible-strain mixed finite element methods for incompressible nonlinear elasticity”. In: Journal of Computational Physics 361 (2018), pp. 247–279. [17] P. E. Farrell, L. F. Gatica, B. P. Lamichhane, R. Oyarzúa and R. Ruiz-Baier. “Mixed Kirchhoff stress– displacement–pressure formulations for incompressible hyperelasticity”. In: Computer Methods in Applied Mechanics and Engineering 374 (2021), p. 113562. [18] G. Fu, M. Neunteufel, J. Schöberl and A. Zdunek. “A four-field mixed formulation for incompressible finite elasticity”. In: Computer Methods in Applied Mechanics and Engineering 444 (2025), p. 118082. [19] G. N. Gatica, M. González and S. Meddahi. “A low-order mixed finite element method for a class of quasi-Newtonian Stokes flows. Part I: a priori error analysis”. In: Computer Methods in Applied Mechanics and Engineering 193.9 (2004), pp. 881–892. [20] G. N. Gatica, N. Heuer and S. Meddahi. “On the numerical analysis of nonlinear twofold saddle point problems”. In: IMA Journal of Numerical Analysis 23.2 (Apr. 2003), pp. 301–330. [21] G. Giantesio and A. Musesti. “On the modeling of active deformation in biological transversely isotropic materials”. In: Journal of Elasticity 157.1 (2025), p. 10. [22] J. Gopalakrishnan, P. L. Lederer and J. Schöberl. “A mass conserving mixed stress formulation for the Stokes equations”. In: IMA Journal of Numerical Analysis 40.3 (May 2019), pp. 1838–1874. REFERENCES 22 
+
+[23] E. Hellinger. “Die Allgemeinen Ansätze der Mechanik der Kontinua”. In: Mechanik . Ed. by F. Klein and C. Müller. Wiesbaden: Vieweg+Teubner Verlag, 1907, pp. 601–694. [24] M. S. Henke et al. “Electromechanical computational model of the human stomach”. In: Computer Methods in Applied Mechanics and Engineering 449 (2026), p. 118549. [25] G. A. Holzapfel. Nonlinear Solid Mechanics. A Continuum Approach for Engineering . English. second print. John Wiley & Sons, 2001. [26] J. S. Howell and N. J. Walkington. “Inf–sup conditions for twofold saddle point problems”. In: Numerische Mathematik 118.4 (Aug. 2011), pp. 663–693. [27] Hu, Hai-Chang. “On some variational principles in the theory of elasticity and the theory of plasticity”. In: 
+
+Acta Physica Sinica 10.3 (1954), pp. 259–290. [28] T. J. R. Hughes. The Finite Element Method: Linear Static and Dynamic Finite Element Analysis . Dover Civil and Mechanical Engineering. Mineola, NY: Dover Publications, 2000. [29] B. P. Lamichhane. “A mixed finite element method for non-linear and nearly incompressible elasticity based on biorthogonal systems”. In: International Journal for Numerical Methods in Engineering 79.7 (2009), pp. 870–886. [30] Y. Liu, H. Zhang, Y. Zheng, S. Zhang and B. Chen. “A nonlinear finite element model for the stress analysis of soft solids with a growing mass”. In: International Journal of Solids and Structures 51.17 (2014), pp. 2964–2978. [31] E. Reissner. “On a Variational Theorem in Elasticity”. In: Journal of Mathematics and Physics 29.1-4 (1950), pp. 90–95. [32] S. Rossi, T. Lassila, R. Ruiz-Baier, A. Sequeira and A. Quarteroni. “Thermodynamically consistent orthotropic activation model capturing ventricular systolic wall thickening in cardiac electromechanics”. In: European Journal of Mechanics - A/Solids 48 (2014), pp. 129–142. [33] J. C. Simo and F. Armero. “Geometrically non-linear enhanced strain mixed methods and the method of incompatible modes”. In: International Journal for Numerical Methods in Engineering 33.7 (1992), pp. 1413–1449. [34] J. C. Simo, R. L. Taylor and K. S. Pister. “Variational and projection methods for the volume constraint in finite deformation elasto-plasticity”. In: Computer Methods in Applied Mechanics and Engineering 51.1 (1985), pp. 177–208. [35] R. Stenberg. “Postprocessing schemes for some mixed finite elements”. In: ESAIM: M2AN 25.1 (1991), pp. 151–167. [36] C. Taylor and P. Hood. “A numerical solution of the Navier-Stokes equations using the finite element technique”. In: Computers & Fluids 1.1 (1973), pp. 73–100. [37] G. L. R. Treloar. The Physics of Rubber Elasticity . Oxford University Press, Oct. 2005. [38] F. Verdugo and S. Badia. “The software design of Gridap: A Finite Element package based on the Julia JIT compiler”. In: Computer Physics Communications 276 (July 2022), p. 108341. [39] N. Viebahn, K. Steeger and J. Schröder. “A simple and efficient Hellinger–Reissner type mixed finite element for nearly incompressible elasticity”. In: Computer Methods in Applied Mechanics and Engineering 
+
+340 (2018), pp. 278–295. [40] K. Washizu. On the variational principles of elasticity and plasticity . ASRL TR. M.I.T. Aeroelastic and Structures Research Laboratory, 1955. [41] O. C. Zienkiewicz and R. L. Taylor. The Finite Element Method for Solid and Structural Mechanics .Butterworth-Heinemann, 2005.

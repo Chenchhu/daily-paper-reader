@@ -1,0 +1,509 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-03-13T19:27:50.439378+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 14,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2603.12210v1",
+      "title": "A blended approach for evolving phase fields using peridynamics: Cyclic loading in quasi-brittle fracture",
+      "abstract": "A field theory is presented for predicting damage and fracture in quasi brittle materials incorporating effects of irreversible (plastic) deformation as well as elastic moduli that soften with damage. The new observation made here is that material degradation models consistent with plastic dissipation can be described by a two-point history-dependent phase field. This approach blends a two-point phase field with the deformation evolving according to Newton's second law by way of a nonlocal constitutive law. Here the nonlocality is in both space and time. The strain is given by an additive decomposition of elastic strain and irreversible strain. The stress-strain behavior is described by a strength envelope and a family of unloading laws based on damage and plasticity with elastic moduli that degrade in coordination with the accumulation of irreversible strain. The material displacement field is uniquely determined by the initial boundary value problem. The theory satisfies energy balance, with positive energy dissipation rate in accordance with the laws of thermodynamics. The fracture energy of flat cracks is recovered directly from the model and is the product of energy release rate and the crack area, moreover this formula is independent of the length scale of non-locality. The formulation delivers a mesh free method for predicting crack patterns and simulations show quantitative and qualitative agreement with experiments, including hysteresis and damage associated with three-point bending tests on concrete and size effects for quasi-brittle materials.",
+      "authors": [
+        "Hayden Bromley",
+        "Robert Lipton"
+      ],
+      "primary_category": "cond-mat.mtrl-sci",
+      "categories": [
+        "cond-mat.mtrl-sci"
+      ],
+      "published": "2026-03-12T17:31:39+00:00",
+      "link": "https://arxiv.org/pdf/2603.12210v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "phase field modeling of damage and fracture in quasi-brittle materials with plastic deformation",
+      "llm_evidence_cn": "准脆性材料损伤与断裂的相场建模，包含塑性变形影响",
+      "llm_evidence": "准脆性材料损伤与断裂的相场建模，包含塑性变形影响",
+      "canonical_evidence": "准脆性材料损伤与断裂的相场建模，包含塑性变形影响",
+      "llm_tldr_en": "Proposes a blended peridynamics and phase field approach for predicting damage and fracture in quasi-brittle materials.",
+      "llm_tldr_cn": "提出了一种结合近场动力学与相场的方法，用于预测准脆性材料在循环载荷下的损伤与断裂。",
+      "llm_tldr": "提出了一种结合近场动力学与相场的方法，用于预测准脆性材料在循环载荷下的损伤与断裂。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "phase field modeling of fracture and damage",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.11250v1",
+      "title": "A Machine Learning-Enhanced Hopf-Cole Formulation for Nonlinear Gas Flow in Porous Media",
+      "abstract": "Accurate modeling of gas flow through porous media is critical for many technological applications, including reservoir performance prediction, carbon capture and sequestration, and fuel cells and batteries. However, such modeling remains challenging due to strong nonlinear behavior and uncertainty in model parameters. In particular, gas slippage effects described by the Klinkenberg model introduce pressure-dependent permeability, which complicates numerical simulation and obscures deviations from classical Darcy flow behavior. To address these challenges, we present an integrated modeling framework for gas transport in porous media that combines a Klinkenberg-enhanced constitutive relation, Hopf-Cole-transformed mixed-form linear governing equations, a shared-trunk neural network architecture, and a Deep Least-Squares (DeepLS) solver. The Hopf-Cole transformation reformulates the original nonlinear flow equations into an equivalent linear system closely related to the Darcy model, while the mixed formulation, together with a shared-trunk neural architecture, enables simultaneous and accurate prediction of both pressure and velocity fields. A rigorous convergence analysis is performed both theoretically and numerically, establishing the stability and convergence properties of the proposed solver. Importantly, the proposed framework also naturally facilitates inverse modeling of pressure-dependent permeability and slippage parameters from limited or indirect observations, enabling efficient estimation of flow properties that are difficult to measure experimentally. Numerical results demonstrate accurate recovery of flow dynamics and parameters across a wide range of pressure regimes, highlighting the framework's robustness, accuracy, and computational efficiency for gas transport modeling and inversion in tight formations.",
+      "authors": [
+        "V. S. Maduru",
+        "K. B. Nakshatrala"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA",
+        "cs.LG",
+        "physics.flu-dyn"
+      ],
+      "published": "2026-03-11T19:17:18+00:00",
+      "link": "https://arxiv.org/pdf/2603.11250v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "nonlinear gas flow in porous media with Klinkenberg effects",
+      "llm_evidence_cn": "具有Klinkenberg效应的多孔介质非线性气体流动",
+      "llm_evidence": "具有Klinkenberg效应的多孔介质非线性气体流动",
+      "canonical_evidence": "具有Klinkenberg效应的多孔介质非线性气体流动",
+      "llm_tldr_en": "Presents a machine learning-enhanced framework for modeling nonlinear gas transport in porous media.",
+      "llm_tldr_cn": "提出了一种机器学习增强的框架，用于模拟多孔介质中的非线性气体输运。",
+      "llm_tldr": "提出了一种机器学习增强的框架，用于模拟多孔介质中的非线性气体输运。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "multiphysics coupling in porous media",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2603.09651v1",
+      "title": "Well Log-Guided Synthesis of Subsurface Images from Sparse Petrography Data Using cGANs",
+      "abstract": "Pore-scale imaging of subsurface formations is costly and limited to discrete depths, creating significant gaps in reservoir characterization. To address this, we present a conditional Generative Adversarial Network (cGAN) framework for synthesizing realistic thin section images of carbonate rock formations, conditioned on porosity values derived from well logs. The model is trained on 5,000 sub-images extracted from 15 petrography samples over a depth interval of 1992-2000m, the model generates geologically consistent images across a wide porosity range (0.004-0.745), achieving 81% accuracy within a 10\\% margin of target porosity values. The successful integration of well log data with the trained generator enables continuous pore-scale visualization along the wellbore, bridging gaps between discrete core sampling points and providing valuable insights for reservoir characterization and energy transition applications such as carbon capture and underground hydrogen storage.",
+      "authors": [
+        "Ali Sadeghkhani",
+        "A. Assadi",
+        "B. Bennett",
+        "A. Rabbani"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "physics.geo-ph"
+      ],
+      "published": "2026-03-10T13:29:38+00:00",
+      "link": "https://arxiv.org/pdf/2603.09651v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "synthesis of subsurface images for carbonate rock formations",
+      "llm_evidence_cn": "碳酸盐岩地层地下图像的合成",
+      "llm_evidence": "碳酸盐岩地层地下图像的合成",
+      "canonical_evidence": "碳酸盐岩地层地下图像的合成",
+      "llm_tldr_en": "Uses cGANs to synthesize realistic thin section images of carbonate rocks from well logs.",
+      "llm_tldr_cn": "利用cGAN根据测井数据合成碳酸盐岩的真实薄片图像。",
+      "llm_tldr": "利用cGAN根据测井数据合成碳酸盐岩的真实薄片图像。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "phase field approach for crack propagation in heterogeneous rock materials",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2603.07198v1",
+      "title": "Field-theoretical approach to estimate mean gap and gap distribution in randomly rough surface contact mechanics",
+      "abstract": "We extend the statistical field-theoretical framework of rough surface contact mechanics to characterize the interfacial gap between an elastic half-space and a randomly rough surface incorporating exponential repulsion. Building upon a cumulant expansion to second-order, we derive an explicit analytical relation between the mean gap and the applied normal pressure. This result provides a closed-form expression for the drift and diffusion coefficients in a convection-diffusion equation governing the scale-dependent evolution of the gap distribution. Solving this equation with appropriate initial and boundary conditions yields the gap distribution under varying external pressures. Both the mean gap and the gap distribution are found to be in good agreement with Green's function molecular dynamics (GFMD) simulations. Our results demonstrate that the field-theoretical approach enables quantitative predictions not only for contact stresses but also for interfacial gap in rough surface contacts.",
+      "authors": [
+        "Yunong Zhou",
+        "Hengxu Song",
+        "Zhichao Zhang",
+        "Yang Xu"
+      ],
+      "primary_category": "cond-mat.soft",
+      "categories": [
+        "cond-mat.soft",
+        "cond-mat.stat-mech"
+      ],
+      "published": "2026-03-07T13:18:06+00:00",
+      "link": "https://arxiv.org/pdf/2603.07198v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "contact mechanics and elastic deformation of rough surfaces",
+      "llm_evidence_cn": "粗糙表面的接触力学与弹性变形",
+      "llm_evidence": "粗糙表面的接触力学与弹性变形",
+      "canonical_evidence": "粗糙表面的接触力学与弹性变形",
+      "llm_tldr_en": "Uses field theory to characterize interfacial gaps in elastic contact mechanics for rough surfaces.",
+      "llm_tldr_cn": "利用场论方法表征了粗糙表面弹性接触力学中的界面间隙。",
+      "llm_tldr": "利用场论方法表征了粗糙表面弹性接触力学中的界面间隙。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "constitutive laws for rock damage and plasticity",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.11690v1",
+      "title": "Shear-Coupled Grain Growth Statistics",
+      "abstract": "Grain growth (GG), driven by grain boundary (GB) migration, is a fundamental mechanism of microstructural evolution in polycrystalline materials. GB migration is frequently accompanied by a relative shear displacement of grains meeting at GBs, a phenomenon known as shear coupling. This coupling induces internal stresses within the microstructure, which recent studies have shown to play a decisive role in dictating the evolution of microstructure and GG pathways. This work provides a detailed characterization of the statistical features of two-dimensional GG in the presence of GB shear coupling through continuum modeling of GB migration that incorporates fundamental microscopic mechanisms and diffuse-interface simulations. We demonstrate that incorporating shear coupling produces a more heterogeneous, less equiaxed microstructure than conventional curvature-driven GG, while yielding topological and geometric properties consistent with experimental and atomistic observations. We further demonstrate that as grain grows, internal stress relaxes. Highly stressed grains shrink faster, and lightly stressed grains grow faster than other grains. These findings demonstrate that internal stress, an intrinsic feature of GG, profoundly changes essential features of GG microstructure and kinetics, consistent with experiments and atomic-scale simulations.",
+      "authors": [
+        "Caihao Qiu",
+        "David J. Srolovitz",
+        "Gregory S. Rohrer",
+        "Jian Han",
+        "Marco Salvalaglio"
+      ],
+      "primary_category": "cond-mat.mtrl-sci",
+      "categories": [
+        "cond-mat.mtrl-sci"
+      ],
+      "published": "2026-03-12T08:56:15+00:00",
+      "link": "https://arxiv.org/pdf/2603.11690v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "diffuse-interface simulations of shear-coupled grain growth",
+      "llm_evidence_cn": "剪切耦合晶粒生长的弥散界面模拟",
+      "llm_evidence": "剪切耦合晶粒生长的弥散界面模拟",
+      "canonical_evidence": "剪切耦合晶粒生长的弥散界面模拟",
+      "llm_tldr_en": "Uses diffuse-interface modeling to study shear-coupled grain boundary migration and microstructural evolution.",
+      "llm_tldr_cn": "利用弥散界面模型研究了剪切耦合晶界迁移和微观结构演变。",
+      "llm_tldr": "利用弥散界面模型研究了剪切耦合晶界迁移和微观结构演变。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "crystal plasticity and viscoplastic phase field",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2603.07852v1",
+      "title": "Structural aging of a cohesive and amorphous granular solid under cyclic loading",
+      "abstract": "We investigate how cyclic loading evolves the structure and deformation behaviors of a granular raft composed of particles floating at an air-oil interface. The raft has a disordered particle packing structure, and is cohesive due to capillary interactions between particles. Under uniaxial cyclic loading with a small strain amplitude, the raft's packing structure experiences an aging process characterized by logarithmically increasing packing fraction and decreasing structural heterogeneity. The observed structural change is due to particle dynamics that are organized around morphologically evolving voids in the raft. The raft is then subjected to quasi-static tension or compression tests until failure. In comparison with non-aged rafts, the rafts that experienced cyclic loading show a higher strength, higher stiffness, and lower ductility, along with qualitatively different features, such as a stress overshoot in the loading curve.",
+      "authors": [
+        "William Hobson-Rhoades",
+        "Douglas J Durian",
+        "Yue Fan",
+        "Hongyi Xiao"
+      ],
+      "primary_category": "cond-mat.soft",
+      "categories": [
+        "cond-mat.soft"
+      ],
+      "published": "2026-03-09T00:01:33+00:00",
+      "link": "https://arxiv.org/pdf/2603.07852v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "deformation and failure of cohesive granular solids under cyclic loading",
+      "llm_evidence_cn": "循环载荷下内聚颗粒固体的变形与失效",
+      "llm_evidence": "循环载荷下内聚颗粒固体的变形与失效",
+      "canonical_evidence": "循环载荷下内聚颗粒固体的变形与失效",
+      "llm_tldr_en": "Studies structural aging and failure mechanisms of cohesive granular solids under cyclic loading.",
+      "llm_tldr_cn": "研究了循环载荷下内聚颗粒固体的结构老化和失效机制。",
+      "llm_tldr": "研究了循环载荷下内聚颗粒固体的结构老化和失效机制。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "mechanical behavior and failure of rock materials",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.11836v1",
+      "title": "A Decade of Generative Adversarial Networks for Porous Material Reconstruction",
+      "abstract": "Digital reconstruction of porous materials has become increasingly critical for applications ranging from geological reservoir characterization to tissue engineering and electrochemical device design. While traditional methods such as micro-computed tomography and statistical reconstruction approaches have established foundations in this field, the emergence of deep learning techniques, particularly Generative Adversarial Networks (GANs), has revolutionized porous media reconstruction capabilities. This review systematically analyzes 96 peer-reviewed articles published from 2017 to early 2026, examining the evolution and applications of GAN-based approaches for porous material image reconstruction. We categorize GAN architectures into six distinct classes, namely Vanilla GANs, Multi-Scale GANs, Conditional GANs, Attention-Enhanced GANs, Style-based GANs, and Hybrid Architecture GANs. Our analysis reveals substantial progress including improvements in porosity accuracy (within 1% of original samples), permeability prediction (up to 79% reduction in mean relative errors), and achievable reconstruction volumes (from initial $64^3$ to current $2{,}200^3$ voxels). Despite these advances, persistent challenges remain in computational efficiency, memory constraints for large-scale reconstruction, and maintaining structural continuity in 2D-to-3D transformations. This systematic analysis provides a comprehensive framework for selecting appropriate GAN architectures based on specific application requirements.",
+      "authors": [
+        "Ali Sadeghkhani",
+        "Brandon Bennett",
+        "Masoud Babaei",
+        "Arash Rabbani"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cond-mat.mtrl-sci",
+        "physics.geo-ph"
+      ],
+      "published": "2026-03-12T12:02:36+00:00",
+      "link": "https://arxiv.org/pdf/2603.11836v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "GAN-based reconstruction of porous materials for geological reservoir characterization",
+      "llm_evidence_cn": "基于GAN的孔隙材料重建，用于地质储层表征",
+      "llm_evidence": "基于GAN的孔隙材料重建，用于地质储层表征",
+      "canonical_evidence": "基于GAN的孔隙材料重建，用于地质储层表征",
+      "llm_tldr_en": "Reviews deep learning methods for digital reconstruction of porous media in geological and engineering contexts.",
+      "llm_tldr_cn": "综述了地质和工程背景下孔隙介质数字重建的深度学习方法。",
+      "llm_tldr": "综述了地质和工程背景下孔隙介质数字重建的深度学习方法。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "multiphysics coupling in porous media",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2603.08465v2",
+      "title": "MUSA-PINN: Multi-scale Weak-form Physics-Informed Neural Networks for Fluid Flow in Complex Geometries",
+      "abstract": "While Physics-Informed Neural Networks (PINNs) offer a mesh-free approach to solving PDEs, standard point-wise residual minimization suffers from convergence pathologies in topologically complex domains like Triply Periodic Minimal Surfaces (TPMS). The locality bias of point-wise constraints fails to propagate global information through tortuous channels, causing unstable gradients and conservation violations. To address this, we propose the Multi-scale Weak-form PINN (MUSA-PINN), which reformulates PDE constraints as integral conservation laws over hierarchical spherical control volumes. We enforce continuity and momentum conservation via flux-balance residuals on control surfaces. Our method utilizes a three-scale subdomain strategy-comprising large volumes for long-range coupling, skeleton-aware meso-scale volumes aligned with transport pathways, and small volumes for local refinement-alongside a two-stage training schedule prioritizing continuity. Experiments on steady incompressible flow in TPMS geometries show MUSA-PINN outperforms state-of-the-art baselines, reducing relative errors by up to 93% and preserving mass conservation.",
+      "authors": [
+        "Weizheng Zhang",
+        "Xunjie Xie",
+        "Hao Pan",
+        "Xiaowei Duan",
+        "Bingteng Sun",
+        "Qiang Du",
+        "Lin Lu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-03-09T15:03:50+00:00",
+      "link": "https://arxiv.org/pdf/2603.08465v2",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "physics-informed neural networks for fluid flow in complex geometries",
+      "llm_evidence_cn": "复杂几何结构中流体流动的物理信息神经网络",
+      "llm_evidence": "复杂几何结构中流体流动的物理信息神经网络",
+      "canonical_evidence": "复杂几何结构中流体流动的物理信息神经网络",
+      "llm_tldr_en": "Proposes a multi-scale weak-form PINN for solving fluid flow in topologically complex domains.",
+      "llm_tldr_cn": "提出了一种多尺度弱形式PINN，用于解决复杂拓扑域中的流体流动问题。",
+      "llm_tldr": "提出了一种多尺度弱形式PINN，用于解决复杂拓扑域中的流体流动问题。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "fluid flow and deformation in saturated porous rocks",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.11932v1",
+      "title": "Revealing 3D orientation and strain heterogeneity in calcite generated by bio-cementation",
+      "abstract": "Bio-cementation uses bacterially induced calcite to bind sand grains, offering a low-carbon approach to soil stabilization. However, the 3D morphology, orientation texture, and internal strain states of individual calcite bonds remain insufficiently characterized. Here, we combine computed micro-tomography, 3D X-ray Diffraction (3DXRD), and Dark-Field X-ray Microscopy (DFXM) to nondestructively characterize grain morphology, crystallographic orientation, and both type II (intergranular) and type III (intragranular) elastic strains in calcite formed at sand-sand contacts during bio-cementation. Tomography establishes the sample morphology and the cemented contact architecture; 3DXRD provides grain-averaged orientation and strain states; and DFXM resolves sub-grain misorientations and localized strain concentrations generated during growth with 100 nm resolution. The combined results show that calcite precipitation through bio-cementation produces anisotropic internal strain and distinct sub-domain structures that can influence bond integrity and load transfer at the macroscopic scale.",
+      "authors": [
+        "Marilyn Sarkis",
+        "James A. D. Ball",
+        "Michela La Bella",
+        "Antoine Naillon",
+        "Christian Geindreau",
+        "Fabrice Emeriault",
+        "Carsten Detlefs",
+        "Can Yildirim"
+      ],
+      "primary_category": "cond-mat.mtrl-sci",
+      "categories": [
+        "cond-mat.mtrl-sci"
+      ],
+      "published": "2026-03-12T13:46:04+00:00",
+      "link": "https://arxiv.org/pdf/2603.11932v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "strain heterogeneity in bio-cemented sand contacts",
+      "llm_evidence_cn": "生物胶结砂接触处的应变非均匀性",
+      "llm_evidence": "生物胶结砂接触处的应变非均匀性",
+      "canonical_evidence": "生物胶结砂接触处的应变非均匀性",
+      "llm_tldr_en": "Characterizes 3D morphology and strain in bio-cemented calcite bonds, relevant to rock and soil mechanics.",
+      "llm_tldr_cn": "表征了生物胶结方解石键的3D形态和应变，与岩土力学密切相关。",
+      "llm_tldr": "表征了生物胶结方解石键的3D形态和应变，与岩土力学密切相关。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "mechanical behavior and failure of rock materials",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2603.08992v1",
+      "title": "Four-field mixed finite elements for incompressible nonlinear elasticity",
+      "abstract": "We present a stable finite element method for incompressible nonlinear elasticity based on a four-field mixed formulation involving the displacement, displacement gradient, first Piola--Kirchhoff stress and pressure. Unlike existing four-field mixed formulations, such as the compatible strain mixed finite element method (CSFEM), the proposed approach employs a discontinuous displacement field and requires no stabilisation in either 2D or 3D. A Newton--Raphson linearisation is derived and finite element pairs satisfying the relevant inf-sup conditions are identified. To recover accurate continuous displacement fields, an efficient postprocessing technique is further introduced. We establish the well-posedness of the linearised continuous problem together with a priori error estimates for the discrete formulation. Extensive numerical experiments in both 2D and 3D demonstrate optimal or even super convergence rates and enhanced robustness, particularly in 3D where CSFEM typically requires stabilisation.",
+      "authors": [
+        "Santiago Badia",
+        "Wei Li",
+        "Ricardo Ruiz-Baier"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-03-09T22:28:11+00:00",
+      "link": "https://arxiv.org/pdf/2603.08992v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "mixed finite element method for nonlinear elasticity",
+      "llm_evidence_cn": "非线性弹性的混合有限元方法",
+      "llm_evidence": "非线性弹性的混合有限元方法",
+      "canonical_evidence": "非线性弹性的混合有限元方法",
+      "llm_tldr_en": "Develops a stable mixed finite element method for nonlinear elasticity, useful for geomechanical simulations.",
+      "llm_tldr_cn": "开发了一种用于非线性弹性的稳定混合有限元方法，可用于地质力学模拟。",
+      "llm_tldr": "开发了一种用于非线性弹性的稳定混合有限元方法，可用于地质力学模拟。",
+      "llm_tags": [
+        "query:pf-roc:composite"
+      ],
+      "matched_query_tag": "query:pf-roc:composite",
+      "matched_query_text": "Papers central to COMSOL Multiphysics 仿真软件相关技术文档与教程, especially work that connects or combines: phase field modeling of fracture and damage; mechanical behavior and failure of rock materials; multiphysics coupling in porous media; THM coupling in rock mass using phase field; numerical simulation of crack initiation and propagation; fluid flow and deformation in saturated porous rocks; constitutive laws for rock damage and plasticity; creep deformation mechanisms; crystal plasticity and viscoplastic phase field; phase field modeling of multi physical coupling in rock fracture.",
+      "matched_requirement_id": "req-composite-pf-roc",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.09038v1",
+      "title": "Accelerating High-Order Finite Element Simulations at Extreme Scale with FP64 Tensor Cores",
+      "abstract": "Finite element simulations play a critical role in a wide range of applications, from automotive design to tsunami modeling and computational electromagnetics. Performing these simulations efficiently at the high resolutions needed for practical applications and scientific insights necessitates the use of high-order methods and large-scale supercomputing. While much progress has been made in porting finite element codes to GPU systems in recent years, additional improvements in the efficiency and computational speed of GPU-accelerated high-order finite element simulations are in constant demand. In this paper, we demonstrate that the FP64 tensor cores on NVIDIA GPUs can be used to further accelerate such simulations, achieving significant speedups in key kernels of MFEM, a scalable open-source finite element library widely used in HPC applications. By integrating FP64 tensor cores with kernel fusion optimizations, we were able to achieve up to 2$\\times$ performance gains and up to 83% energy efficiency gains on NVIDIA's Grace Hopper GH200 and Grace Blackwell GB200 architectures. To the best of our knowledge, this is the first time that FP64 tensor cores have been directly programmed to accelerate large-scale finite element scientific computing applications. We demonstrate the performance of the optimized kernels at exascale by showing near-perfect weak scaling efficiency and 90% strong scaling efficiency across nearly 10,000 GPUs on the Alps system. The new algorithms and MFEM enhancements directly benefit complex production codes, including the 2025 Gordon Bell Prize-winning application for real-time tsunami forecasting.",
+      "authors": [
+        "Jiqun Tu",
+        "Ian Karlin",
+        "John Camier",
+        "Veselin Dobrev",
+        "Tzanio Kolev",
+        "Stefan Henneking",
+        "Omar Ghattas"
+      ],
+      "primary_category": "cs.DC",
+      "categories": [
+        "cs.DC",
+        "cs.MS",
+        "cs.PF"
+      ],
+      "published": "2026-03-10T00:12:47+00:00",
+      "link": "https://arxiv.org/pdf/2603.09038v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "accelerating finite element simulations for multiphysics applications",
+      "llm_evidence_cn": "加速多物理场应用中的有限元模拟",
+      "llm_evidence": "加速多物理场应用中的有限元模拟",
+      "canonical_evidence": "加速多物理场应用中的有限元模拟",
+      "llm_tldr_en": "Using FP64 tensor cores to accelerate high-order finite element simulations at extreme scale.",
+      "llm_tldr_cn": "利用FP64张量核心加速大规模高阶有限元数值模拟。",
+      "llm_tldr": "利用FP64张量核心加速大规模高阶有限元数值模拟。",
+      "llm_tags": [
+        "query:pf-roc:composite"
+      ],
+      "matched_query_tag": "query:pf-roc:composite",
+      "matched_query_text": "Papers central to COMSOL Multiphysics 仿真软件相关技术文档与教程, especially work that connects or combines: phase field modeling of fracture and damage; mechanical behavior and failure of rock materials; multiphysics coupling in porous media; THM coupling in rock mass using phase field; numerical simulation of crack initiation and propagation; fluid flow and deformation in saturated porous rocks; constitutive laws for rock damage and plasticity; creep deformation mechanisms; crystal plasticity and viscoplastic phase field; phase field modeling of multi physical coupling in rock fracture.",
+      "matched_requirement_id": "req-composite-pf-roc",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.09610v1",
+      "title": "Asymptotic behavior of the solution with positive temperature in nonlinear 3D thermoelasticity",
+      "abstract": "In this paper, we study a hyperbolic-parabolic coupled system arising in nonlinear three-dimensional thermoelasticity. We establish the global well-posedness and asymptotic behavior of solutions. Our main result shows that, a thermoelastic body asymptotically converges to an equilibrium state with a uniform temperature distribution for every initial data, determined by energy conservation. The proof of the global well-posedness is divided into some steps. To begin with, we introduce an approximate problem and derive its solvability. Next, we establish a time-independent upper bound for the temperature via Moser iteration technique. Together with an estimate of gradient of entropy, we use a functional involving the Fisher information of the temperature, which enables us to handle a delicate Gronwall-type inequality, to obtain required estimates of the higher-order derivatives. Further, we prove the strict positivity of temperature by applying Moser iteration again on the negative part of the logarithm of the temperature, followed by a uniqueness argument for the weak solution. Finally, we define a dynamical system on a proper functional phase space and analyze the $ω$-limit set for every initial data. This work provides a complete proof of the global well-posedness and the long-time behavior in the nonlinear three-dimensional thermoelasticity system.",
+      "authors": [
+        "Chuang Ma",
+        "Bin Guo"
+      ],
+      "primary_category": "math.AP",
+      "categories": [
+        "math.AP"
+      ],
+      "published": "2026-03-10T12:53:12+00:00",
+      "link": "https://arxiv.org/pdf/2603.09610v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "hyperbolic-parabolic coupled system in nonlinear thermoelasticity",
+      "llm_evidence_cn": "非线性热弹性中的双曲-抛物耦合系统",
+      "llm_evidence": "非线性热弹性中的双曲-抛物耦合系统",
+      "canonical_evidence": "非线性热弹性中的双曲-抛物耦合系统",
+      "llm_tldr_en": "Study of global well-posedness and asymptotic behavior in 3D nonlinear thermoelastic systems.",
+      "llm_tldr_cn": "研究三维非线性热弹性系统的全局适定性与渐近行为。",
+      "llm_tldr": "研究三维非线性热弹性系统的全局适定性与渐近行为。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "thermo hydro mechanical coupling in porous rock mass fracture",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.11265v1",
+      "title": "Conduction-Diffusion in N-Dimensional settings as irreversible port-Hamiltonian systems",
+      "abstract": "This work extends previous 1D irreversible port-Hamiltonian system (IPHS) formulations to boundary-controlled ND distributed parameter systems describing conduction-diffusion fluid phenomena. Within a unified and thermodynamically consistent framework, we show that conduction and diffusion can be represented through a single coherent structure that preserves global energy balance and ensures a correct characterization of entropy production. The resulting formulation provides a foundation for the systematic modeling and control of complex multi-physical processes governed by coupled transport mechanisms in N dimensions. In the longer term, this framework opens the door to structure-preserving numerical schemes capable of enforcing thermodynamic principles directly at the discretized level.",
+      "authors": [
+        "Luis Mora",
+        "Yann Le Gorrec",
+        "Hector Ramirez",
+        "Denis Matignon"
+      ],
+      "primary_category": "eess.SY",
+      "categories": [
+        "eess.SY"
+      ],
+      "published": "2026-03-11T19:49:31+00:00",
+      "link": "https://arxiv.org/pdf/2603.11265v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "conduction-diffusion in multi-physical processes",
+      "llm_evidence_cn": "多物理过程中的传导-扩散",
+      "llm_evidence": "多物理过程中的传导-扩散",
+      "canonical_evidence": "多物理过程中的传导-扩散",
+      "llm_tldr_en": "Develops a thermodynamically consistent framework for coupled transport mechanisms in multi-physical systems.",
+      "llm_tldr_cn": "为多物理系统中的耦合传输机制开发了一个热力学一致的框架。",
+      "llm_tldr": "为多物理系统中的耦合传输机制开发了一个热力学一致的框架。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "multiphysics coupling in porous media",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

@@ -1,0 +1,1146 @@
+Title: Shear-Coupled Grain Growth Statistics
+
+URL Source: https://arxiv.org/pdf/2603.11690v1
+
+Published Time: Fri, 13 Mar 2026 00:46:16 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+## Shear-Coupled Grain Growth Statistics 
+
+Caihao Qiu, 1, 2 David J. Srolovitz, 2, 3 Gregory S. Rohrer, 4 Jian Han, 1 and Marco Salvalaglio 5, 6, ∗
+
+> 1
+
+Department of Materials Science and Engineering, City University of Hong Kong, Hong Kong SAR, China 
+
+> 2
+
+Department of Mechanical Engineering, The University of Hong Kong, Pokfulam, Hong Kong SAR, China 
+
+> 3
+
+Materials Innovation Institute for Life Sciences and Energy (MILES), The University of Hong Kong, Shenzhen, China 
+
+> 4
+
+Department of Materials Science and Engineering, Carnegie Mellon University, Pittsburgh, PA, USA 
+
+> 5
+
+Institute of Scientific Computing, TU Dresden, 01062 Dresden, Germany 
+
+> 6
+
+Dresden Center for Computational Materials Science, TU Dresden, 01062 Dresden, Germany 
+
+(Dated: March 13, 2026) Grain growth (GG), driven by grain boundary (GB) migration, is a fundamental mechanism of microstructural evolution in polycrystalline materials. GB migration is frequently accompanied by a relative shear displacement of grains meeting at GBs, a phenomenon known as shear coupling. This coupling induces internal stresses within the microstructure, which recent studies have shown to play a decisive role in dictating the evolution of microstructure and GG pathways. This work provides a detailed characterization of the statistical features of two-dimensional GG in the presence of GB shear coupling through continuum modeling of GB migration that incorporates fundamental microscopic mechanisms and diffuse-interface simulations. We demonstrate that incorporating shear coupling produces a more heterogeneous, less equiaxed microstructure than conventional curvature-driven GG, while yielding topological and geometric properties consistent with experimental and atomistic observations. We further demonstrate that as grain grows, internal stress relaxes. Highly stressed grains shrink faster, and lightly stressed grains grow faster than other grains. These findings demonstrate that internal stress, an intrinsic feature of GG, profoundly changes essential features of GG microstructure and kinetics, consistent with experiments and atomic-scale simulations. 
+
+I. INTRODUCTION 
+
+Polycrystals are the most common type of engineering material, composed of crystalline domains (grains) with different crystallographic orientations separated by grain boundaries (GBs). The size, morphology, and topology of grains critically influence macroscopic material prop-erties. Among the various mechanisms of microstructure evolution in polycrystals, grain growth (GG) plays a par-ticularly prominent role. It occurs during thermal and thermomechanical treatments over a wide range of tem-peratures and length scales and is often deliberately ex-ploited to engineer the grain size distribution and crystal-lographic texture, or suppressed to stabilize fine-grained microstructures. The primary driving force for GG is capillarity. Since GBs are crystal defects with a positive excess energy, they migrate, particularly at elevated temperatures, to reduce the total GB area. This driving force leads to GB migration toward their centers of mean curvature; this is mean curvature or capillarity-driven flow. Mi-crostructure evolution during isotropic GG has been well characterized over the past several decades (e.g., see [1]). Anisotropic GB energies and mobilities produce weight-ing factors on the curvature, amongst other effects such as faceting. The collective outcome of this GB migration is a progressive decrease in the number of grains and  
+
+> ∗marco.salvalaglio@tu-dresden.de
+
+a corresponding increase in the average grain volume, as established by classical theories of normal GG [2–5] (the effect of GB anisotropy on GG has also been exam-ined [6, 7]). A number of experiments, atomistic simula-tions, and analyses, however, point to additional effects which cannot be simply ascribed to anisotropic GB en-ergy or mobilities, including stress-driven GG [8–10] and grain rotation during GG [11–14], and effective mobilities poorly correlating with GB degrees of freedom [15, 16]. Grain boundary migration is often accompanied by shear translations of one grain relative to another across GBs, a phenomenon known as shear-coupled migra-tion [17]. This phenomenon is mechanistically described by the flow of line defects that glide along GBs and have step and/or dislocation character, namely discon-nections [18–20]. The step nature of disconnections de-scribes GB curvature, and their motion leads to curvature flow. Moreover, disconnection motion generates internal stress and couples to external stress owing to their Burg-ers vectors [21]. Disconnections have been widely ob-served on GBs [22, 23] and heterophase interfaces [24–26]. The generation of internal stresses within the microstruc-ture during GG has been observed in experiments [14, 27] and atomistic simulations [28, 29]. Phenomenological models have been developed to in-corporate the effects of mechanical stress into GB migra-tion and to assess its impact on GG. In one class of ap-proaches, GBs are modeled in terms of geometrically nec-essary dislocations (GNDs), which can describe grain ro-tation and stress-driven GG [30, 31]. Other formulations explicitly account for dislocation densities stored within 
+
+> arXiv:2603.11690v1 [cond-mat.mtrl-sci] 12 Mar 2026
+
+2the grains, such that differences in the associated elastic energy across a GB act as an additional thermodynamic driving force for GB migration [32]. Elastic energy con-tributions associated with shear-coupled GB migration have also been introduced by effectively assigning a shear-coupling factor to individual grains, resulting in a shear-coupling “jump” at the boundary [33] and have been in-cluded in reduced-order modeling of microstructure evo-lution [34]. We recently extended a bicrystallography-respecting description of disconnection-mediated GB mi-gration to microstructure evolution [35, 36]. This frame-work uniquely enables the study of relatively large mi-crostructures consistent with observed microscopic mech-anisms of GB migration. This work demonstrated that GB shear coupling and the resulting internally generated stresses are essential ingredients for a realistic description of GG, in quantitative agreement with both experimental observations and atomistic simulations [37]. Despite this significant progress, a comprehensive un-derstanding of how internal and external stresses shape GG and its microstructures, as well as how internal stresses evolve in space and time, remains lacking. Large-scale characterization of GG has been effectively de-scribed through statistical analyses of the geometric and topological properties of the microstructure [38]. Such characterizations have been extensively reported from experimental measurements [39–41]. On the theoreti-cal and numerical side, capillarity-driven microstructure evolution has been investigated using Monte Carlo Potts model [42–44], phase-field methods [45–47], and front-tracking simulations [1, 48–50]. Nevertheless, system-atic discrepancies persist between microstructure statis-tics obtained from experiments or atomistic simulations and those predicted by classical curvature-driven mod-els [41, 46, 51, 52], pointing to missing physical ingredi-ents that are required for a realistic description of GG. In this work, we aim to close this gap by employing GG simulations that incorporate shear-coupled GB mi-gration [36, 37]. We investigate the role of internal stress and different types of external stress on the GG and the statistics of GG microstructure topology and geometry. The internal stress field is studied both by accounting for its spatial variation and through averaging within grains. We further explore the correlation between the evolution of internal stress and the evolution of various geometric properties. These results provide a new understanding of the essential role of shear coupling and stresses in the evolution of polycrystalline microstructures, which may be useful for controlling microstructure evolution and op-timizing microstructures.  
+
+> II. METHODS
+
+We exploit a multi-phase field (PF) model reproducing GB migration as described by the equation of motion in the presence of disconnection flow [35, 53], as proposed in our earlier studies [36, 37]. In brief, the polycrystalline microstructure is characterized by a set of order param-eter fields η(x) = {η1(x), η 2(x), · · · , η i(x), · · · , η Ng (x)},with x ∈ Ω ⊂ R2 and Ng is the total number of grains. The order parameters ηi represent the local volume frac-tion of grain i; hence, a local constraint must be im-posed [54, 55], namely, PNg 
+
+> i
+
+ηi(x) = 1. Inside grain i,
+
+ηi = 1 and ηj = 0 for i̸ = j. At the GB between grains i
+
+and j, ηiηj > 0, ηk = 0 for k̸ = i̸ = j. At the TJ among grains i, j and k, ηiηj ηk > 0, ηh = 0 for h̸ = i̸ = j̸ = k.The evolution of the order parameter field ηi incorpo-rating the constraint is given by 
+
+∂η i
+
+∂t =
+
+> Ng
+
+X
+
+> j
+
+Mij (fGB + fbulk + felastic ) ,fGB = γij 
+
+
+
+ηj ∇2ηi − ηi∇2ηj − π2
+
+2ε2 (ηj − ηi)
+
+
+
+,fbulk = πε
+
+√ηiηj (ψj − ψi) ,felastic = τ · β(i,j )|∇ ηj | [ˆ n(ηi) · ˆn(ηj )] ,
+
+(1) with Mij and γij refer to the mobility and GB energy density of GB-ij , respectively, ε is a parameter that re-lates to the GB thickness as realized in the considered diffuse domain approach, ψi and ψj are the bulk free en-ergy densities of grains i and j. τ = τ int + τ ext encodes the shear stress across the GB with τ ≡ (τ (k), τ (k+1) ), while k and k + 1 are index reference low-energy GBs (chosen from a prescribed set) which are the closest in orientation to GB-ij [35]. τ results from the superposi-tion of internal stresses (int) and external applied stresses (ext), and β(i,j ) ≡ (β(k)(i,j ), β (k+1) (i,j ) ) are the correspond-ing GB shear coupling factors. Here, τ ext is constant and τ int (x) is obtained by extending the corresponding quantities for the underlying sharp interface equation [35] in the direction normal to the GB (as in Level Set ap-proaches [56]), ˜ τ int (s) with s ∈ Γ ≡ S 
+
+> ij
+
+Γij and Γ ij the nominal sharp-interface between grains i and j. The in-ternal shear stresses are computed from the stress tensor ˜σint 
+
+> ℓm
+
+(¯ s) = K
+
+> Ng
+
+X
+
+> iNg
+
+X
+
+> j
+
+Z
+
+> Γ
+
+β(i,j )(s) · l(i,j )(s)˜ σedge  
+
+> ℓm
+
+(¯ s − s)d s,
+
+(2) where β(i,j ) is the shear coupling factor for a segment of GB between grains i and j, K = μ/ [2 π(1 − ν)], μ is the shear modulus, ν is the Poisson’s ratio, l(i,j ) is local tangent vector of the GB, σedge  
+
+> ℓm
+
+is the stress field com-ponent of an edge dislocation located at the origin [57] with Burgers vector dictated by kth reference GB. The 2D polycrystalline microstructures in our simula-tions are assumed to be a cross-section through a ⟨110 ⟩
+
+columnar microstructure of a face-centered cubic (FCC) material. For this polycrystal, GBs can be described in terms of an inclination between two symmetric tilt GBs (with normals [001] and [1¯ 1¯ 2]); i.e., a two-reference sys-tem description [35]. The local GB shear coupling factor 3γ, σint , σext    
+
+> 12
+> γ,σint ,σext
+> 11
+> γ,σint
+> γ
+
+(b) Initial configuration (c) γ
+
+(d) γ, σint 
+
+x1
+
+x2
+
+x3
+
+(a)     
+
+> 〈A〉 (×10 5)
+> 4
+> 3
+> 2
+> 1
+> 0
+> t(×10 6)
+> 0.5 1.0 2.0 0.0 1.5
+> π
+> 0
+> π/2
+> θ
+
+(e) γ, σint , σext (f) γ, σint , σext  
+
+> 12 11
+
+FIG. 1. (a) Mean grain size (area) ⟨A⟩ vs. time t during grain growth. Each curve is averaged over 10 independent PF simulations with and without internal stress ( σint ) and applied external stress ( σext ). The shaded regions indicate the standard deviation from the 10 initially random microstructures. (b) Initial microstructure (with a white GB network and colored orientation θ field) of a typical 1000-grain polycrystal. All microstructures are shown at the same mean grain area ⟨A⟩ ≈ 1×10 5,which evolved from the initial microstructure in the cases (c) of mean curvature flow ( γ), (d) with σint and no σext , (e) with 
+
+σint and applied external shear stress σext 12 , and (f) with σint and external tensile stress σext 11 .TABLE I. Dimensionless parameters used in the simulations. Case GB energy, γ GB mobility, M Shear modulus, μ Applied external stress, σext 
+
+γ (mean curvature flow) 1 π2/(2 ε) ≈ 0.1 0 0
+
+γ, σ int 1 π2/(2 ε) ≈ 0.1 6 0
+
+γ, σ int , σ ext 12 1 π2/(2 ε) ≈ 0.1 6 σext 12 = 0 .3
+
+γ, σ int , σ ext 11 1 π2/(2 ε) ≈ 0.1 6 σext 11 = 0 .3
+
+vector β(i,j ) is determined by the GB misorientation an-gle ∆ θij = θi − θj (the inclination dependence is auto-matically accounted for in the two-reference system de-scription) according to [21]: 
+
+β(1) (i,j )(∆ θij ) = S
+
+
+
+2 tan 
+
+ ∆θij 
+
+2
+
+
+
+, 0 ≤ ∆θij < α 1
+
+2 tan 
+
+ ∆θij − α0
+
+2
+
+
+
+, α 1 ≤ ∆θij < α 2
+
+2 tan 
+
+ ∆θij − π
+
+2
+
+
+
+, α 2 ≤ ∆θij < π β(2) (i,j )(∆ θij ) = β(1) (i,j )(π − ∆θij ),
+
+(3) where β(1) and β(2) are the shear coupling factors of the two symmetric reference GBs, α0 = 2 tan −1(√2) (i.e., the 4
+
+TABLE II. Fitting parameters of the mean grain area vs. time data in the form ⟨A⟩ = KAtnA .Case KA nA
+
+γ 9.460 ± 0.2473 1.006 ± 0.0026 
+
+γ, σ int 4.429 ± 0.0729 1.125 ± 0.0017 
+
+γ, σ int , σ ext 12 3.022 ± 0.0941 1.201 ± 0.0032 
+
+γ, σ int , σ ext 11 3.565 ± 0.0924 1.157 ± 0.0027 
+
+misorientation angle of an incoherent twin GB in FCC), 
+
+α1 = 7 π/ 18, α2 = 5 π/ 6, and S is a scaling factor (see below). The parameters used in this work are summarized in Table. I. Note, the dimensionless parameters employed in the simulations are approximately those of aluminum. However, we explicitly assume that GB energies are isotropic in the current study to investigate how shear-coupled GB migration alters conventional mean curva-ture flow (i.e., the von Neumann-Mullins relation). We set S = 0 .033 to account for the observation that shear coupling factors are smaller in polycrystals relative to bicrystals (by roughly this amount, associated with me-chanical constraint); see [22, 27, 28]. We employ the following non-dimensionalisation of variables in the simulations: (1) lengths ˜ x = x/a 0, (2) time intervals ∆˜ t = ∆ tM 0γ0/a 20, (3) GB mobility ˜Mij =
+
+Mij /M 0, (4) stress ˜ σ = σa 0/γ 0, (5) bulk free energy den-sity ˜ψ = ψa 0/γ 0, (6) GB energy ˜ γ = γ/γ 0, where a0 = 1 nm and γ0 = 1 J/m 2. The simulation cell is chosen to be square and is discretized into 250 ×250 grid points with uniform discretization δx 1 = δx 2 = ε/ 5 = 10. Numeri-cal simulations are performed by integrating Eq. (1) with time steps ∆ t = 10 via a simple finite-difference scheme. The initial microstructures for PF simulations are Voronoi tessellations of 1000 randomly distributed points (Poisson-distributed); see an example in Fig. 1b. For each investigation, we generate 10 independent initial microstructures with randomly distributed GB networks and grain orientations; e.g., see Fig. 1b. The results re-ported below are averages over the evolution of 10 ran-dom initial samples. 
+
+III. RESULTS A. Grain size evolution 
+
+We first illustrate the impact of internal stress and ap-plied external stress on GG; namely, the scaling of grain size with time in four different scenarios: (i) GG driven by curvature flow without internal stress ( γ), (ii) GG driven by curvature flow and internal stress ( γ, σ int ), (iii) GG driven by curvature flow, internal and applied exter-nal shear stress ( γ, σ int , σ ext 12 ), and (iv) driven by cur-vature flow, internal and applied external tensile stress γ, σint         
+
+> γ,σint ,σext
+> γ,σint ,σext
+> 11
+> 12
+> 0.0
+> 2.0
+> 1.5
+> 1.0
+> 1.0
+> −4−2024
+
+A (×3/( πMγ))      
+
+> P(A)
+> γ,σint
+> γ(curvature flow)
+> 0.00
+> 0.30
+> 0.25
+> 0.20
+> 0.15
+> 0.10
+> 0.05
+> P(A)
+> −4−2024
+
+A (×3/( πMγ))
+
+(a)
+
+(b)
+
+> N=6
+> N=7
+> N=5
+> N=4
+> N=3
+> N=8
+> N=9 N=10
+
+## .
+
+## .
+
+## .
+
+## .
+
+FIG. 2. Probability distribution of growth rates of individual grains in the cases (a) of curvature flow γ (grey diamond) and with internal stress γ, σ int (red circles), and with additional applied external (b) shear stress γ, σ int , σ ext 12 (blue squares) and tensile stress γ, σ int , σ ext 11 (green star). 
+
+(γ, σ int , σ ext 11 ). Figure 1 shows the evolution of the mean grain area ⟨A⟩ during GG, along with the evolving mi-crostructures, for the four cases. Figure 1a shows that including internal stresses accel-erates GG, and applying external (both shear and tensile) stresses accelerates it further. This is consistent with the experimental observation of stress-driven GG [8, 9]. The evolution of mean grain size is commonly fitted to a power law ⟨A⟩ = KAtnA (KA is a constant and nA
+
+is known as the GG exponent); the best fit parameters for our data are shown in Table II. Normal GG (i.e., mean curvature flow) in an isotropic system leads to a GG exponent nA = 1, in agreement with conventional GG theory [2]. However, when internal stresses, gener-ated during GG, are included in the simulations, the GG exponent increases to nA ≈ 1.125; i.e., the rate of GG increases with time (we return to this observation in the Discussion). Application of an external (shear or tensile) stress further increases the GG exponent; this effect is more pronounced for applied shear than tension. Inter-estingly, while application of an external stress increases the GG exponent nA, it lowers the GG prefactor KA by an even greater factor. This is consistent with the well-known compensation effect in GG [58]. 5N                 
+
+> P(N)
+> 0.00
+> 0.35
+> 0.30
+> 0.20
+> 0.15
+> 0.10
+> 0.05
+> 0.25
+> 246810 12 14
+> (a)
+> (b)
+> Exp t. (Barmak et al.)
+> PFC ( Boissonière et al.)
+> γ,σint
+> γ
+> Exp t. (Fradkov et al.)
+> N
+> P(N)
+> 0.00
+> 0.35
+> 0.30
+> 0.20
+> 0.15
+> 0.10
+> 0.05
+> 0.25
+> 246810 12 14
+> PF: present work
+> γ(c urvature flow)
+> Front tracking:
+> Mason et al.
+
+FIG. 3. Probability distributions of number of neighbors ( N )of individual grains during GG described by (a) γ (curva-ture flow), where the solid and dashed lines represent the results from the present and previous front-tracking model-ing work [1], respectively; and (b) γ, σ int , where the orange circles, green squares, blue crosses, and the red line are the results from GG experiments in an Al thin film [40, 41], PFC simulation [52] and the present work, respectively. 
+
+In the 1950s, von Neumann and Mullins [3, 4] showed that mean curvature flow leads to the rate of growth of any grain (of area A) in a polycrystal described by ˙A ≡ dA
+
+dt = −2πM γ 
+
+
+
+1 − 16 N
+
+
+
+, (4) where N is the number of neighbors/sides of grains (this has been extended to all dimensions [5]). Hence, the dis-tribution of GG rates during isotropic mean curvature flow P ( ˙A) is discrete. This is consistent with our curva-ture flow PF simulations (see Fig. 2a) with minor broad-ening associated with the diffuse interface nature of this simulation method. However, when internal stresses are included in the simulation, the GG rate distribution is completely different, as seen in Fig. 2a. That is, with in-ternal stresses, the growth rate distribution is completely smooth, with no remnants of the delta-function-like dis-tribution associated with mean curvature flow and the classic von Neumann–Mullins relation. The smooth form of the GG rate distribution survives the application of external stresses, as seen in Fig. 1b. Interestingly, the application of a shear stress shifts the GG rate distribu-tion toward smaller growth rates, while the application of a tensile stress leaves it unchanged relative to curvature flow alone (Fig. 1b). 
+
+B. Microstructural topology and geometry 
+
+Figures 1c–f show microstructures with a mean grain size of ⟨A⟩ ≈ 1 × 10 5 that evolved from the same initial configuration in Fig. 1b under the four GG scenarios. While all of the microstructures appear very similar (i.e., GBs meet at 120 ◦, 6 sides per grain on average, · · · ), there are also notable differences; e.g., the GBs appear more curved, and grains are less equiaxed when stress effects are included. In this section, we characterize the effects of internal and external stresses on the geometrical and topological features of evolved microstructures. The topological characteristics of a 2D microstructure are commonly described by the probability distribution of the number of grain neighbors (or sides), P (N ). In PF simulations, P (N ) peaks at N = 6 when GG is driven solely by curvature flow (see the solid line in Fig. 3a), consistent with previous independent numerical studies, such as the front-tracking (sharp-interface) results shown by the thick dashed line in Fig. 3a [1]. (Note, the front tracking simulations are based on a thousand times as many grains as our PF simulations, so they should be viewed as more accurate than our PF results - nonethe-less, the agreement is excellent.) When GB shear cou-pling and internal stress are included, the peak of P (N )shifts from N = 6 to N = 5 (see Fig. 3b). Comparison of the PF GG simulations results with experiment [40, 41] and diffusive-timescale “atomistic” (phase field crystal, PFC) simulations [52] shows very good agreement only when internal stresses are included. In particular, note that the peaks in the side distributions in the experi-ments, atomistic simulations, and PF with internal stress simulation are all at 5 (Fig. 3) rather than 6 (see Fig. 3a for two sets of curvature flow simulations). Another common descriptor of the microstructure is the grain size distribution (probability distribution of the reduced grain size), P (R/⟨R⟩ ) (here, R = √A). For isotropic curvature-driven GG, P (R/⟨R⟩ ) exhibits two peaks, at R/⟨R⟩ ≈ 0.9 and 1 .2 (observed both in our PF simulations and in front-tracking simulations [1]); see Fig. 4a. When GB shear coupling and the result-ing internal stress are included, these two peaks merge and shift towards a smaller grain size, R/⟨R⟩ ≈ 0.8, as shown by the red curve in Fig. 4b. Experiments and PFC simulations also display single-peak distributions, with peak locations in the range 0 .7–0 .8, cf. the red curve and the discrete symbols (circles [51], squares [41], and crosses [52]) in Fig. 4b. When an external stress is ap-plied, the grain size distribution retains the single peak; see Fig. 4c. An applied shear has a much larger effect on the grain size distribution than the same magnitude tensile stress (Fig. 4), shifting the grain size distribution towards smaller grain size. We also examine several other descriptors of the grain geometry; i.e., the probability distribution of the 6(d)                                         
+
+> (a)
+> PF: present work
+> γ(c urvature flow)
+> Front tracking:
+> Mason et al.
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> 0.0
+> 1.2
+> 1.0
+> 0.8
+> 0.6
+> 0.4
+> 0.2
+> (e)
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> 0.0
+> 1.2
+> 1.0
+> 0.8
+> 0.6
+> 0.4
+> 0.2
+> (b)
+> Exp t. (Barmak et al.)
+> PFC (Backofen et al.)
+> γ,σint γ
+> PFC ( Boissonière et al.)
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> 0.0
+> 1.2
+> 1.0
+> 0.8
+> 0.6
+> 0.4
+> 0.2
+> (c)
+> (f)
+> Reduced grain size,
+> P( )
+> Reduced grain size,
+> P( )
+> Reduced grain size,
+> P( )
+> γ,σint
+> γ,σint ,σext
+> 11
+> γ,σint ,σext
+> 12
+> 0
+> 16
+> 12
+> 8
+> 4
+> 0.5 0.6 0.7 0.8 0.9 1.0
+> Roundness, Ｏ
+> P(Ｏ)
+> 0
+> 16
+> 12
+> 8
+> 4
+> P(Ｏ)
+> 0.5 0.6 0.7 0.8 0.9 1.0
+> Roundness ,Ｏ
+> 0
+> 16
+> 12
+> 8
+> 4
+> 0.5 0.6 0.7 0.8 0.9 1.0
+> Roundness ,Ｏ
+> P(Ｏ)
+
+FIG. 4. Geometric properties of microstructures. probability distributions of (a)-(c) reduced grain size R/⟨R⟩ and (d)-(f) grain roundness ⃝. The grey, red, green, and blue lines correspond to our PF results for the case of curvature flow with internal stress, external tensile stress, and external shear stress, respectively. The thick grey dotted lines in (a) and (d) are the results obtained by the front-tracking method [1]. Green squares, blue crosses, and yellow circles are the results from experiments in an Al thin film [41] and PFC simulations [51, 52]. Note that each probability distribution is the averaged result based on microstructures with a mean grain area ⟨A⟩ > 5 × 10 4.
+
+grain roundness P (⃝) where roundness is defined as 
+
+⃝ = 4 πA/ C2 (Figs. 4d–f), the reduced grain perime-ter P (C/⟨C⟩ ) (Figs. S4a–c in supplementary material, SM), and the reduced GB length distribution P (L/⟨L⟩ )(Figs. S4d–f in SM). All linear measures of grain size ( R,
+
+C, L) show the same trends with respect to the com-parison of the curvature flow results and the inclusion of internal (and external) stresses (cf. Figs. 4 and SM Fig. S4). The roundness is a measure of compactness of the grain shape (i.e., how close the grain is to a circle). As seen in Fig. 4e, the grain roundness distribution for isotropic curvature flow has a relatively sharp single peak with a maximum near ⃝ = 0 .88; this distribution broad-ens and shifts to smaller roundness (peak at ⃝ = 0 .84 when internal (and external) stresses are included in the PF simulations. Overall, we find that GG microstructure becomes more inhomogeneous in the presence of shear coupling. To quantify the degree of inhomogeneity, we examine several geometric properties of the simulated microstruc-ture vs. mean grain size (or, equivalently, time - Fig. 1a); see Fig. 5. To describe the degree of GB faceting in the microstructure, we first calculate the degree of faceting of each GB as ∆Φ /ϕ c [59] ∆Φ = ϕc −
+
+Z
+
+min  
+
+> k
+
+ϕ(s) − ϕ(k)(s) ds
+
+, Z
+
+ds, (5) where the integral over s is along an entire GB, ϕ(s) = arccos( ˆl(s) · e1) is the local inclination angle ( ˆl(s) is the local tangent vector and e1 is the unit vector of 
+
+x1 axis), and ϕ(k) = 0 for k = 0 and ϕ(k) = π/ 2 for 
+
+k = 1. ϕc is the critical inclination angle when the GB is perfectly faceted, i.e., GBs are fully faceted when ∆Φ /ϕ c = 1, whereas ∆Φ /ϕ c = 0 corresponds to the ab-sence of faceting. It is important to note that GB facets correspond roughly to the reference interfaces for shear coupling. Note that for GBs with any anisotropy, these reference interfaces are highly coherent, relatively low-energy GB planes (corresponding to cusps in the GB energy versus inclination). Even though the GB en-ergies are isotropic, the GB shear coupling factors are anisotropic (inclination-dependent). This type of shear coupling-induced faceting need not be consistent with that from anisotropic GB energies (i.e., the Wulff con-struction) [59]. This is consistent with the observed lack of consistency between facet orientations and GB energy anisotropy in experiment [60]. As seen in Fig. 5a, the average degree of faceting 
+
+⟨∆Φ ⟩/ϕ c remains near constant under curvature flow conditions. When internal stress and/or applied exter-nal stresses are included, GBs rapidly begin to facet, and the degree of faceting tends to increase over time. Since external stress drives GB motion in a direction that does not necessarily favor faceting, the degree of faceting under external stress (blue squares and green star) is slightly smaller than that obtained when only internal stress is considered (red circles). 7We also investigate the the average grain aspect ratio 
+
+⟨AR ⟩ (the best fit of each grain shape to an ellipse is determined, and the aspect ratio is the ratio of the ma-jor and minor axes); the deviation of grain aspect ratio from perfect equaixed morphology ( ⟨AR ⟩ − 1) is shown in Fig. 5b. Similar to the GB degree of faceting, the aspect ratio appears to approach a steady state in the case of curvature flow. However, when internal stresses are included in the microstructure evolution, ⟨AR ⟩ − 1increases, consistent with the larger number of elongated grains visible in Fig. 1d; external stress further amplify this effect (cf. Figs. 1d–f). This demonstrates that GB shear coupling induces the formation of elongated grain shapes, even in the isotropic GB limit. This observa-tion offers significant implications for interpreting exper-imental observation where anisotropic grain morpholo-gies cannot be predicted from the GB energy anisotropy alone [7, 61]. A related geometric quantity is the aver-age grain roundness ⟨⃝⟩ ; grains with larger aspect ratios naturally exhibit lower roundness. We plot the degree by which the grain shape deviates from being perfectly circu-lar ⟨∆⃝⟩ = 1 − ⟨⃝⟩ in Fig. 5c. Consequently, the order-ing of the average deviation from a circle among the four scenarios is ⟨∆⃝ext 12 ⟩ < ⟨∆⃝ext 11 ⟩ < ⟨∆⃝int ⟩ ≪ ⟨ ∆⃝γ ⟩.Our analysis of the various topological and geomet-ric properties of the evolving microstructure shows that internal and applied external stresses drive pronounced deviations from an equiaxed grain morphology, leading instead to more elongated grains and increased inhomo-geneity in the distributions of grain size, grain perimeter, and GB length. 
+
+C. Internal stresses within grain growth microstructures 
+
+Given that internal stresses strongly modify GG, it is natural to ask: how do internal stresses evolve? Fig-ure 6 shows the temporal evolution of the average inter-nal shear (von Mises) stress, ⟨σvM ⟩. Figure 6a, shows that ⟨σvM ⟩ decrease continuously during GG. To quan-tify this behavior, we fit the internal stress dependence on the mean grain size through ⟨σvM ⟩ = Kσ ⟨A⟩−nσ ; the best fit parameters are shown in Table III C and the fit is very good. Examination of Fig. 6a and the fact that 
+
+nσ > 0 show that the stress in the microstructure de-cays as grains grow; as the density of GBs tends to zero, so does the stress (recall that the GBs are the source of the stress through GB shear coupling). It is inter-esting to observe that, with shear coupling, the average internal stress decays roughly as ⟨σvM ⟩ ∼ ⟨R⟩ 1/4 (while suggestive, we do not have a good model for such a re-lation). The relaxation of internal stress is slower in the cases with applied external stress than in those without, following an order opposite to that of the corresponding grain-growth rates (cf. Figs. 1a and 6a). Figure 6b shows the probability distribution of the reduced internal von Mises stress, P (σvM /⟨σvM ⟩). For cases both with and (c)                     
+
+> ⟨A⟩(×10 5)
+> 0.00
+> 0.25
+> 0.20
+> 0.15
+> 0.10
+> 0.05
+> 〈ΔＯ〉
+> -1/16
+> 1/4
+> 3/16
+> 1/8
+> 1/16
+> 0
+> 〈ΔΦ 〉/ϕc
+> (a)
+> ⟨A⟩(×10 5)
+> 0.0 0.5 1.0 1.5 2.5 2.0
+> ⟨A⟩(×10 5)
+> (b)
+> 0.0
+> 1.0
+> 0.8
+> 0.6
+> 0.4
+> 0.2
+> 〈AR 〉−1
+> 0.0 0.5 1.0 1.5 2.5 2.0
+> 0.0 0.5 1.0 1.5 2.5 2.0
+> γ
+> γ,σint
+> γ,σint ,σext
+> γ,σint ,σext
+> 11
+> 12
+
+FIG. 5. Evolution of the average (a) GB degree of faceting 
+
+⟨∆Φ ⟩/ϕ c, (b) grain aspect ratio ⟨AR ⟩ − 1 and (c) deviation from a circle ⟨∆⃝⟩ vs. mean grain area in the cases of γ (cur-vature flow, black circles); γ, σ int (red circles); γ, σ int , σ ext 11 
+
+(green star); and γ, σ int , σ ext 12 (blue squares). TABLE III. Fitted parameters of the internal stress vs. mean grain area data, ⟨σvM ⟩ = Kσ tnσ .Case Kσ (×10 5) nσ
+
+γ, σ int 0.598 ± 0.0022 0.129 ± 0.0030 
+
+γ, σ int , σ ext 11 0.617 ± 0.0035 0.107 ± 0.0048 
+
+γ, σ int , σ ext 12 0.646 ± 0.0042 0.094 ± 0.0054 
+
+without applied external stress, this distribution is log-normal-like and remains self-similar throughout GG (see Fig. S3). As shown previously [37], the internal stress is spatially inhomogeneous, and there is a considerable stress accu-8mulation at GBs and TJs. However, how internal stress evolves across different regions of the microstructure re-mains unclear. We show the evolution of internal stress within grains, at GBs, and at TJs (as defined by the mag-nitude of the order parameters in the phase field model) in Fig. 7. The evolution of the average internal von Mises stress within grains and at GBs follows the same trend as that measured for the whole microstructure (Fig. 6a), i.e., stress relaxation during evolution, with slower de-cay under applied external stress. In contrast, the in-ternal stress at TJs is noisy, but is roughly time- or 
+
+⟨A⟩-independent within the statistics of the simulation (Fig. 7c). In our continuum model, the origin of inter-nal stress relaxation is the evolution of the disconnec-tion Burgers vector density on GBs [35, 36, 62], and the stress in the grain interior is the long-range stress orig-inating from shear coupling. Therefore, it is unsurpris-ing that the internal stress evolution within grains and at GBs follows similar trends, with a relatively smaller stress magnitude and relaxation rate in grain interiors than GBs (due to the ∼ 1/r decay of the stress field away from disconnection cores on GBs [57]). However, TJs (with lower mobility than GBs) act as obstacles to GB migration, leading to disconnection pile-up at TJs ⟨A⟩ (×10 5)                                 
+
+> 0.0 0.5 1.0 1.5 2.5 2.0
+> ⟨σvM ⟩
+> (a)
+> 0.9
+> 0.8
+> 0.7
+> 0.6
+> 0.5
+> 0.4
+> (b)
+> σvM /⟨σvM ⟩
+> 0.0 0.5 1.0 1.5 3.0 2.0 2.5
+> 0.0
+> 1.0
+> 0.8
+> 0.6
+> 0.4
+> 0.2
+> P(σvM /⟨σvM ⟩)
+> γ,σint
+> γ,σint ,σext
+> 11
+> γ,σint ,σext
+> 12
+> FIG. 6. The temporal evolution of the internal stress field in the cases of γ, σint (red circles), γ, σint ,σext 11 (green star) and γ, σint ,σext 12 (blue squares). (a) Average internal von Mises stress ( ⟨σvM ⟩) vs. mean grain area. (b) Probability distribution of reduced internal von Mises stress ( σvM /⟨σvM ⟩). Note that each probability distribution is averaged over the microstructures with a mean grain area ⟨A⟩>5×10 4.
+
+and increased local internal stress [37, 63]. The order of the stress relaxation rates obtained from our PF simula-tions, ˙
+
+⟨σvM ⟩GB > ˙
+
+⟨σvM ⟩grain ≫ ˙
+
+⟨σvM ⟩TJ , consistent with the argument above.  
+
+> IV. DISCUSSION
+
+We demonstrated that internal stress (i) significantly alters the evolving microstructure and (ii) itself evolves during microstructure evolution. How does the evolution of microstructure co-evolve with internal stress? The co-evolution of stress and the geometric descrip-tors of microstructure can be described by considering the variation of those descriptors with the averaged in-ternal von Mises stresses, as shown in Fig. 8. All of these descriptors (the degree of faceting, grain aspect ra-tio, and deviation from a circle) decrease linearly with the averaged internal von Mises stress (see the fitted lines). While the grain shapes become more isotropic and faceting decreases with increasing average internal von Mises stress, application of an external stress (uniaxial or shear) changes the slopes as mint < |mext 11 | < |mext 12 |
+
+(the opposite occurs for GB faceting). External stress strengthens this dependence for the deviation from a cir-cle and aspect ratio, but weakens it for the degree of faceting. This is consistent with the effects of external stress on the evolution of the same properties with grain size in Fig. 5. These results demonstrate that the evolu-tion of the geometric descriptors of the GG microstruc-ture is strongly dependent on internal stress. We should note that the average von Mises stress in Fig. 8 increases from left to right, whereas time moves from right to left (i.e., the mean grain size increases and the average von Mises stress decreases with time; see Fig. S5). To gain further insight into the impact of stress on mi-crostructure evolution, we examine the role of internal stress on the growth rate of individual grains. Figure 9a shows the probability distributions of grain-growth rates, analogous to Fig. 2b. We identify the 10% of the grains that grow the fastest and the 10% of the grains that shrink the fastest in Fig. 9a (the fast-growing grains have ˙A > 3.5 are in blue and the fastest shrinking grains have ˙A < −2.3 in green). The white histogram in Figs. 9b,c shows the probability distribution of the internal von Mises stress (with internal stress and no external stress applied). In Figs. 9b,c, the blue and green histograms show the parts of the stress distribution corresponding to the fast-growing and fast-shrinking grains, respectively. The ratios of the fast-growing and fast-shrinking grains to the total number of grains in each stress bin are plot-ted as hollow blue and green circles in Figs. 9b and c, respectively (the best fit to these data is represented by the solid lines). We find that fast-growing grains tend to be those with small internal stress (i.e., the negative relation in Fig. 9b), whereas fast-shrinking grains tend to have large internal stress (i.e., the positive relation in Fig. 9c). 9⟨A⟩ (×10 5)                   
+
+> ⟨σvM ⟩grain
+> 0.4
+> 0.8
+> 0.7
+> 0.6
+> 0.5
+> 0.0 0.5 1.0 1.5 2.5 2.0
+> (a) Grain interior
+> γ,σint
+> γ,σint ,σext
+> 11
+> γ,σint ,σext
+> 12
+> ⟨A⟩(×10 5)
+> ⟨σvM ⟩TJ
+> 1.75
+> 2.15
+> 2.01
+> 1.95
+> 1.85
+> (c) Triple junction
+> 0.0 0.5 1.0 1.5 2.5 2.0
+> ⟨A⟩(×10 5)
+> ⟨σvM ⟩GB
+> 0.8
+> 1.2
+> 1.1
+> 1.0
+> 0.9
+> (b) Grain boundary
+> 0.0 0.5 1.0 1.5 2.5 2.0
+
+FIG. 7. The temporal evolution of the internal stress field (a) in grain interior, (b) at GBs, and (c) at TJs in the cases of 
+
+γ, σ int (red circles), γ, σ int , σ ext 11 (green star) and γ, σ int , σ ext 12 (blue squares). m = −0.60                        
+
+> m=−0.61
+> 0.5 0.6 0.7 0.8
+> 0.00
+> 0.25
+> 0.20
+> 0.15
+> 0.10
+> 0.05
+> 〈ΔＯ〉 m=−0.40
+> 0.5 0.6 0.7 0.8
+> 〈AR 〉−1
+> 0.2
+> 0.8
+> 0.6
+> 0.5
+> 0.4
+> 0.3
+> 0.7
+> m=−1.17
+> m=−1.46
+> 0.5 0.6 0.7 0.8
+> 〈ΔΦ 〉/ϕc
+> 0.00
+> 0.12
+> 0.08
+> 0.06
+> 0.04
+> 0.02
+> 0.10
+> m=−0.19
+> m=−0.31
+> m=−0.29
+
+(a) (b) (c)   
+
+> m=−0.79
+
+〈σvM 〉〈σvM 〉 〈σvM 〉     
+
+> γ,σint
+> γ,σint ,σext
+> 11
+> γ,σint ,σext
+> 12
+
+FIG. 8. (a) GB degree of faceting ⟨∆Φ ⟩/ϕ c, (b) grain aspect ratio ⟨AR ⟩ − 1 and (c) deviation from a circle ⟨∆⃝⟩ versus the averaged internal von Mises stress. The cases are γ, σ int (red circles), γ, σ int , σ ext 11 (green star) and γ, σ int , σ ext 12 (blue squares), respectively. Each data point is the microstructure average of a geometric property at a particular mean grain size. The solid lines are linear fits to the data, with slope m. Note that time runs from large to small ⟨σvM ⟩ (right to left). 
+
+To confirm that the inclusion of internal stress as a 
+
+driving force in the microstructure evolution is the cause of the correlation between internal stress and GG rate in Figs. 9b,c, we performed a similar analysis for microstruc-ture evolution only driven by capillarity (curvature flow; see Figs. S6 in SM); in other words, the internal stress is computed but not included in the driving force for GB migration. These results show that a correlation between internal stress and growth rate exists only when internal stress is included as a driving force for GB migration. In Section III A, Fig. 1a and Table II, we found that the GG exponent is larger than 1 when internal stresses are considered (in curvature flow, the exponent is 1). To understand the origin of this phenomenon, we track the evolution of the average capillarity force ( Fγ ) and elastic driving force ( Fσ ) along all GB segments as a function of grain size during GG; see the red and blue circles in Fig. 10. We fit these data to the function F ∼ ⟨R⟩ −nF
+
+(solid red and blue lines in the figure). According to conventional curvature-driven GG theory, the capillarity force scales inversely with the mean grain size (i.e., Fγ ∼⟨R⟩ −1). Our simulations yield a fitted exponent of nF ≈−0.90 for Fγ , which is close to the theoretical value of 
+
+−1 (the small deviation can be attributed to the diffuse-interface numerical method and the lack of data at very large size). In contrast, nF = −0.51 ≈ − 1/2 for the elastic driving force Fσ data. This difference in scaling implies that while capillarity dominates the early stages of growth when grains are small, elastic driving forces dominate GG kinetics at large grain sizes (this can also be seen by comparing the evolution of the probability distributions of the capillarity and elastic driving forces in Figs. S7a,b). The exponent nF ≈ − 0.5 of the elastic driving force can be understood in terms of disconnection pile-ups at the triple junction, similar to the yield stress decaying as ⟨R⟩ −0.5 when the bulk dislocations pile up at GBs in Hall-Petch relation [64] (see the theoretical model developed in SM). The crossover point is around 
+
+⟨R⟩ ≈ 220. If we fit the total force on GBs as a function of grain size ⟨R⟩ , we find nF = −0.64, which is between these two limits. If we assume d ⟨R⟩ /dt ∼ F [2], the GG law follows 
+
+⟨A⟩ = ⟨R⟩ 2 ∝ t if the driving force is only Fγ and 
+
+⟨A⟩ = ⟨R⟩ 2 ∝ t4/3 if only Fσ . Our numerical results for Ftot versus d ⟨R⟩ suggest that nA ≈ 1.22, which is 
+
+nA ∈ [1 , 4/3] when both capillarity force and elastic driv-10 A
+
+.
+
+(a) 
+
+(b)       
+
+> 0.0
+> 2.5
+> 2.0
+> 1.5
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 0.4
+> 0.3
+> 0.2
+> 0.1
+> 0.00 0.25 0.50 0.75 1.00 1.25 1.50
+> σvM
+> PσvM  & PσvM
+> PσvM  /PσvM
+
+(c)            
+
+> 0.0
+> 2.5
+> 2.0
+> 1.5
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 0.4
+> 0.3
+> 0.2
+> 0.1
+> 0.00 0.25 0.50 0.75 1.00 1.25 1.50
+> σvM
+> PσvM  & PσvM
+> PσvM  /PσvM
+> 0.00
+> 0.25
+> 0.20
+> 0.15
+> 0.10
+> 0.05
+> PA
+> .
+> 6−6−4−2024
+> −
+> + −
+> fast
+> growing
+> (+)
+> fast
+> shrinking
+> (−)
+> +
+
+FIG. 9. (a) Probability distribution of the GG rates in the case of γ, σint . The regions shaded in blue and green cor-respond to the 10% of the grains that grow the fastest and slowest, respectively. The probability distributions of internal von Mises stress for all grains (indicated by white bars), (b) for the fast-growing grains (indicated by blue bars), and (c) for the fast-shrinking grains (indicated by green bars). The ratios, P + 
+
+> σvM
+
+/P σvM and P − 
+
+> σvM
+
+/P σvM , are plotted as blue and green points. 
+
+ing force are considered. Our fitted nA results in Table II perfectly fall in this range and are consistent with the fit-ted force data in Fig. 10. We note that the GG exponent measured in experi-ments is rarely larger than 1. The discrepancy between our simulation/theoretical values of nA and those from experiments may stem from other forces present in ex-periments and not included in our model (e.g., solute drag) or from simplifications in the current continuum model. In our phase-field and disconnection-based ap-proaches [35–37], only a single disconnection mode is considered, whereas in real GB migration, multiple dis-4 85 6 7
+
+> −3
+> −4
+> −5
+> −6
+
+ln( ⟨ ⟩)             
+
+> ln( ⟨F⟩)
+> Fγ≈ 2.37 ⟨⟩−1
+> ⟨⟩*≈220
+> Fσ≈ 0.16 ⟨⟩−1/2 Ftot ≈0.58 ⟨⟩−0.64
+
+FIG. 10. Evolution of the average capillarity driving force (red circles), elastic driving force (blue circles) and total driving force (black circles) vs. mean grain size ⟨R⟩ during GG. The red solid line is the fit to the classical capillarity law, F ∼
+
+1/R (the fitted exponent is −0.90) and the blue solid line is 
+
+F ∼ 1/√R (the fitted exponent is −0.51). The black solid line is best fitted as F ∼ 1/R−0.64 .
+
+connection modes [14, 27] may play a role. This limi-tation may lead to an overestimation of the shear cou-pling factor and the resulting internal stress field [27, 65]. The inclusion of multiple disconnection modes will lower the elastic driving force (moving the blue line downward in Fig. 10), shifting the critical mean grain size where the capillarity and elastic driving forces cross over to a larger mean grain size (where other effects, such as solute drag, may dominate). The current model also neglects other possible stress relaxation pathways such as anneal-ing twin formation [66, 67] and dislocation emission from grain boundaries [68, 69]. The coupling of stress and GB motion has been clearly demonstrated by experiments on thin, quasi-two-dimensional polycrystals with nanoscale average grain sizes [14, 27]. The results in Fig. 4 indicate that the influ-ence of shear coupling increases with grain size, and this is consistent with reports that GB migration in three-dimensional polycrystals with micron-scale grain sizes is inconsistent with curvature flow [15, 70, 71]. However, we note that the three-dimensional X-ray data provide no evidence of internal strain from defects or grain ro-tations in nanocrystalline samples that are above the noise floor ( ∼ 0.1° lattice rotation) [72]. On the other hand, observations in thin films [14] show rotations larger than this and should be easily detectable in X-ray mea-surements. If the strains were localized to regions very close to grain boundaries (i.e., below the spatial res-olution of X-ray microscopy), they could evade detec-tion (although such strain distributions are not typically found in higher-resolution studies of GBs). Another pos-sibility is that the dimensionality of the experiment in-fluences the results. Simulations of shear-coupled GB migration in one dimension have illustrated the impor-11 tance of free and fixed boundary conditions [28]. In the fixed-boundary-condition case, multiple disconnec-tion modes are required to sustain GB migration. Quasi-two-dimensional samples have free boundary conditions at the top and bottom of the film, and Gauthier et al. [27] have shown that vertical displacements, normal to the film plane, occur when boundaries in the film migrate. Such displacements would not be accommodated in the three-dimensional case. Additional experiments and sim-ulations will be required to understand the effect of di-mensionality on shear-coupled motion in polycrystals.  
+
+> V. CONCLUSIONS
+
+We conducted a series of large-scale phase-field sim-ulations to investigate and quantify the effects of in-ternal and external stresses on GG, using a continuum model that reconciles curvature-driven and shear-coupled (disconnection-controlled) GB migration. We investi-gated (i) the evolution of the geometric and topological properties of the microstructures, (ii) the evolution of the internal stress field, and (iii) analyzed how these are correlated and can be reconciled with each other. Our main conclusions are as follows. 1. Compared to microstructure evolution by mean-curvature flow alone, internal stress leads to less homogeneous and less equiaxed grains, enhanced GB faceting, increased grain aspect ratio, reduced grain roundness, and a shift of the grain-size dis-tribution to smaller size, in agreement with exper-imental and atomistic results. 2. The average internal stress gradually relaxes dur-ing GG, with stress accumulation occurring around some TJs. 3. Grains with smaller internal stress tend to grow faster, whereas those with larger internal stress shrink faster. 4. Internal stress generation associated with GB shear coupling tends to accelerate GG (i.e., produce larger GG exponents). 5. The application of external stress increases the grain aspect ratio, weakens GB faceting and grain roundness, and reduces the overall degree of internal-stress relaxation over time. Our results demonstrate that incorporating internal stress captures fundamental features of GG, as observed in experiments and atomistic simulations, which cur-vature flow alone fails to reproduce. The formula-tion underlying our model, grounded in disconnection-mediated GB migration, enables simulations of detailed microstructural features that result from both intrinsic driving forces in GG - curvature flow AND stress genera-tion. The parameterization of our model, although min-imal, is theoretically applicable to all FCC metals [37], and can be readily extended to other crystalline metals and even to ceramics by adjusting material-specific pa-rameters. 
+
+> ACKNOWLEDGEMENTS
+
+CQ and DJS acknowledge support from the Hong Kong Research Grants Council Collaborative Research Fund C1005-19G and General Research Fund 17210723 and 17200424. JH acknowledges support of the National Key R & D Program of China 2021YFA1200202 and the Early Career Scheme (ECS) grant from the Hong Kong Re-search Grants Council CityU21213921. GSR acknowl-edges support by the National Science Foundation un-der DMREF Grant No. 2118945. MS acknowledges the support of the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) project No. 447241406 and 570666382.                 
+
+> [1] J. K. Mason, E. A. Lazar, R. D. MacPherson, and D. J. Srolovitz, Geometric and topological properties of the canonical grain-growth microstructure, Physical Review E
+> 92 , 063308 (2015). [2] J. Burke and D. Turnbull, Recrystallization and grain growth, Progress in Metal Physics 3, 220 (1952). [3] J. Von Neumann, Metal interfaces, American Society for Metals, Cleveland 108 (1952). [4] W. W. Mullins, Two-dimensional motion of idealized grain boundaries, Journal of Applied Physics 27 , 900 (1956). [5] R. D. MacPherson and D. J. Srolovitz, The von Neumann relation generalized to coarsening of three-dimensional mi-crostructures, Nature 446 , 1053 (2007). [6] J. Kim and N. C. Admal, Statistics of grain microstructure evolution under anisotropic grain boundary energies and mobilities using threshold-dynamics, Modelling and Sim-ulation in Materials Science and Engineering 32 , 035022 (2024). [7] S. K. Naghibzadeh, Z. Xu, D. Kinderlehrer, R. Suter, K. Dayal, and G. S. Rohrer, Impact of grain boundary energy anisotropy on grain growth, Physical Review Ma-terials 8, 093403 (2024). [8] M. Legros, D. S. Gianola, and K. J. Hemker, In situ TEM observations of fast grain-boundary motion in stressed nanocrystalline aluminum films, Acta Materialia 56 , 3380 (2008). [9] J. Sharon, P. Su, F. Prinz, and K. Hemker, Stress-driven grain growth in nanocrystalline Pt thin films, Scripta Ma-terialia 64 , 25 (2011). [10] M. Winning, Grain boundary engineering by application of mechanical stresses, Scripta Materialia 54 , 987 (2006).
+
+12 
+
+[11] K. Harris, V. Singh, and A. King, Grain rotation in thin films of gold, Acta Materialia 46 , 2623 (1998). [12] D. Farkas, S. Mohanty, and J. Monk, Linear grain growth kinetics and rotation in nanocrystalline Ni, Physical Re-view Letters 98 , 165502 (2007). [13] C. Qiu, M. Salvalaglio, D. J. Srolovitz, and J. Han, Disconnection flow–mediated grain rotation, Proceedings of the National Academy of Sciences 121 , e2310302121 (2024). [14] Y. Tian, X. Gong, M. Xu, C. Qiu, Y. Han, Y. Bi, L. V. Estrada, E. Boltynjuk, H. Hahn, J. Han, et al. , Grain rota-tion mechanisms in nanocrystalline materials: Multiscale observations in pt thin films, Science 386 , 49 (2024). [15] J. Zhang, W. Ludwig, Y. Zhang, H. H. B. Sørensen, D. J. Rowenhorst, A. Yamanaka, P. W. Voorhees, and H. F. Poulsen, Grain boundary mobilities in polycrystals, Acta Materialia 191 , 211 (2020). [16] C. Qiu, M. Punke, Y. Tian, Y. Han, S. Wang, Y. Su, M. Salvalaglio, X. Pan, D. J. Srolovitz, and J. Han, Grain boundaries are brownian ratchets, Science 385 , 980 (2024). [17] J. W. Cahn, Y. Mishin, and A. Suzuki, Coupling grain boundary motion to shear deformation, Acta Materialia 
+
+54 , 4953 (2006). [18] W. Bollmann, General geometrical theory of crystalline interfaces, in Crystal Defects and Crystalline Interfaces 
+
+(Springer, 1970) pp. 143–185. [19] M. Ashby, Boundary defects, and atomistic aspects of boundary sliding and diffusional creep, Surface Science 31 ,498 (1972). [20] J. P. Hirth and R. W. Balluffi, On grain boundary dislo-cations and ledges, Acta Metallurgica 21 , 929 (1973). [21] J. Han, S. L. Thomas, and D. J. Srolovitz, Grain-boundary kinetics: A unified approach, Progress in Ma-terials Science 98 , 386 (2018). [22] A. Rajabzadeh, M. Legros, N. Combe, F. Mompiou, and D. Molodov, Evidence of grain boundary dislocation step motion associated to shear-coupled grain boundary migra-tion, Philosophical Magazine 93 , 1299 (2013). [23] Q. Zhu, G. Cao, J. Wang, C. Deng, J. Li, Z. Zhang, and S. X. Mao, In situ atomistic observation of disconnection-mediated grain boundary migration, Nature Communica-tions 10 , 1 (2019). [24] R. C. Pond, S. Celotto, and J. P. Hirth, A comparison of the phenomenological theory of martensitic transfor-mations with a model based on interfacial defects, Acta Materialia 51 , 5385 (2003). [25] Y. Zheng, R. E. A. Williams, G. B. Viswanathan, W. A. T. Clark, and H. L. Fraser, Determination of the structure of α-β interfaces in metastable β-Ti alloys, Acta Materialia 150 , 25 (2018). [26] Y. Qi, G. Richter, E. Suadiye, L. Klinger, and E. Rabkin, Interdiffusion in bimetallic Au-Fe nanowhiskers controlled by interface mobility, Acta Materialia 197 , 137 (2020). [27] R. Gautier, F. Mompiou, O. Renk, C. Coupeau, N. Combe, G. Seine, and M. Legros, Quantifying grain boundary deformation mechanisms in small-grained met-als, Nature 648 , 327 (2025). [28] S. L. Thomas, K. Chen, J. Han, P. K. Purohit, and D. J. Srolovitz, Reconciling grain growth and shear-coupled grain boundary migration, Nature Communications 8, 1 (2017). [29] Y.-B. Guo, T. Xu, and M. Li, Generalized type iii in-ternal stress from interfaces, triple junctions and other microstructural components in nanocrystalline materials, Acta Materialia 61 , 4974 (2013). [30] N. C. Admal, G. Po, and J. Marian, A unified framework for polycrystal plasticity with grain boundary evolution, International Journal of Plasticity 106 , 1 (2018). [31] J. He and N. C. Admal, Polycrystal plasticity with grain boundary evolution: A numerically efficient dislocation-based diffuse-interface model, Modelling and Simulation in Materials Science and Engineering 30 , 025006 (2021). [32] G. Huang, A. Mensah, M. Chlupsa, Z. Croft, L. Qi, A. J. Shahani, and K. Thornton, Phase-field modeling of stored-energy-driven grain growth with intra-granular variation in dislocation density, Modelling and Simulation in Mate-rials Science and Engineering 32 , 045011 (2024). [33] M. Gokuli and B. Runnels, Multiphase field modeling of grain boundary migration mediated by emergent discon-nections, Acta Materialia 217 , 117149 (2021). [34] D. Bugas and B. Runnels, Grain boundary network plasticity: Reduced-order modeling of deformation-driven shear-coupled microstructure evolution, Journal of the Mechanics and Physics of Solids 184 , 105541 (2024). [35] J. Han, D. J. Srolovitz, and M. Salvalaglio, Disconnection-mediated migration of interfaces in microstructures: I. continuum model, Acta Materialia 
+
+227 , 117178 (2022). [36] M. Salvalaglio, D. J. Srolovitz, and J. Han, Disconnection-mediated migration of interfaces in microstructures: II. diffuse interface simulations, Acta Materialia 227 , 117463 (2022). [37] C. Qiu, D. J. Srolovitz, G. S. Rohrer, J. Han, and M. Salvalaglio, Why grain growth is not curvature flow, Proceedings of the National Academy of Sciences 122 ,e2500707122 (2025). [38] R. T. Dehoff, Topography and microstructure, Metallog-raphy 8, 71 (1975). [39] S. K. Kurtz and F. Carpay, Microstructure and normal grain growth in metals and ceramics. part ii. experiment, Journal of Applied Physics 51 , 5745 (1980). [40] V. Fradkov, A. Kravchenko, and L. Shvindlerman, Exper-imental investigation of normal grain growth in terms of area and topological class, Scripta Metallurgica 19 , 1291 (1985). [41] K. Barmak, E. Eggeling, D. Kinderlehrer, R. Sharp, S. Ta’asan, A. Rollett, and K. Coffey, Grain growth and the puzzle of its stagnation in thin films: The curious tale of a tail and an ear, Progress in Materials Science 58 , 987 (2013). [42] D. Srolovitz, M. P. Anderson, P. S. Sahni, and G. S. Grest, Computer simulation of grain growth—ii. grain size distribution, topology, and local dynamics, Acta Metallur-gica 32 , 793 (1984). [43] G. S. Grest, M. P. Anderson, and D. J. Srolovitz, Domain-growth kinetics for the q-state potts model in two and three dimensions, Physical Review B 38 , 4752 (1988). [44] P. Mulheran and J. Harding, A simple statistical model for grain growth in materials, Acta Metallurgica et Mate-rialia 39 , 2251 (1991). [45] D. Fan, C. Geng, and L.-Q. Chen, Computer simulation of topological evolution in 2-d grain growth using a con-tinuum diffuse-interface field model, Acta Materialia 45 ,1115 (1997). [46] C. E. Krill III and L.-Q. Chen, Computer simulation of 3-d grain growth using a phase-field model, Acta Materialia 
+
+50 , 3059 (2002). 13 
+
+[47] R. D. Kamachali and I. Steinbach, 3-d phase-field simu-lation of grain growth: Topological analysis versus mean-field approximations, Acta Materialia 60 , 2719 (2012). [48] E. A. Lazar, R. D. MacPherson, and D. J. Srolovitz, A more accurate two-dimensional grain growth algorithm, Acta Materialia 58 , 364 (2010). [49] E. A. Lazar, J. K. Mason, R. D. MacPherson, and D. J. Srolovitz, A more accurate three-dimensional grain growth algorithm, Acta Materialia 59 , 6837 (2011). [50] E. A. Lazar, J. K. Mason, R. D. MacPherson, and D. J. Srolovitz, Distribution of topological types in grain-growth microstructures, Physical Review Letters 125 , 015501 (2020). [51] R. Backofen, K. Barmak, K. Elder, and A. Voigt, Cap-turing the complex physics behind universal grain size dis-tributions in thin metallic films, Acta Materialia 64 , 72 (2014). [52] G. M. La Boissoni` ere, R. Choksi, K. Barmak, and S. Esedo¯ glu, Statistics of grain growth: experiment ver-sus the phase-field-crystal and mullins models, Materialia 
+
+6, 100280 (2019). [53] X. Zhong, M. N. Kelly, H. M. Miller, S. J. Dillon, and G. S. Rohrer, Grain boundary curvatures in polycrys-talline srtio3: Dependence on grain size, topology, and crystallography, Journal of the American Ceramic Society 
+
+102 , 7003 (2019). [54] I. Steinbach and F. Pezzolla, A generalized field method for multiphase transformations using interface fields, Physica D: Nonlinear Phenomena 134 , 385 (1999). [55] I. Steinbach, Phase-field models in materials science, Modelling and Simulation in Materials Science and En-gineering 17 , 073001 (2009). [56] J. A. Sethian, Level set methods and fast marching meth-ods: evolving interfaces in computational geometry, fluid mechanics, computer vision, and materials science , Vol. 3 (Cambridge university press, 1999). [57] P. Anderson, J. Hirth, and J. Lothe, Theory of Disloca-tions (Cambridge University Press, 2017). [58] G. Gottstein and L. Shvindlerman, The compensation effect in thermally activated interface processes, Interface Science 6, 267 (1998). [59] C. Qiu, M. Salvalaglio, D. J. Srolovitz, and J. Han, Inter-face faceting-defaceting mediated by disconnections, Acta Materialia 251 , 118880 (2023). [60] T. Radetic, C. Ophus, D. Olmsted, M. Asta, and U. Dah-men, Mechanism and dynamics of shrinking island grains in mazed bicrystal thin films of Au, Acta Materialia 60 ,7051 (2012). [61] S. Dillon, H. Miller, M. P. Harmer, and G. S. Rohrer, Grain boundary plane distributions in aluminas evolving by normal and abnormal grain growth and displaying dif-ferent complexions, Int. J. Mat. Res 101 , 1 (2010). [62] L. Zhang, J. Han, Y. Xiang, and D. J. Srolovitz, Equation of motion for a grain boundary, Physical Review Letters 
+
+119 , 246101 (2017). [63] S. L. Thomas, C. Wei, J. Han, Y. Xiang, and D. J. Srolovitz, Disconnection description of triple-junction mo-tion, Proceedings of the National Academy of Sciences 
+
+116 , 8756 (2019). [64] E. Hall, The deformation and ageing of mild steel: Iii discussion of results, Proceedings of the Physical Society. Section B 64 , 747 (1951). [65] R. Gautier, A. Rajabzadeh, M. Larranaga, N. Combe, F. Mompiou, and M. Legros, Shear-coupled migration of grain boundaries: the key missing link in the mechani-cal behavior of small-grained metals?, Comptes Rendus. Physique 22 , 19 (2021). [66] R. Fullman and J. Fisher, Formation of annealing twins during grain growth, Journal of Applied Physics 22 , 1350 (1951). [67] S. L. Thomas, A. H. King, and D. J. Srolovitz, When twins collide: Twin junctions in nanocrystalline nickel, Acta Materialia 113 , 301 (2016). [68] J. C. Li, Mechanical grain growth in nanocrystalline cop-per, Physical review letters 96 , 215506 (2006). [69] G. B. Bizana and L. A. Barrales-Mora, Kinetics of grain boundary migration in nanosized Al polycrystals, Acta Materialia 260 , 119261 (2023). [70] Z. Xu, Y.-F. Shen, S. K. Naghibzadeh, X. Peng, V. Mu-ralikrishnan, S. Maddali, D. Menasche, A. R. Krause, K. Dayal, R. M. Suter, et al. , Grain boundary migration in polycrystalline α-Fe, Acta Materialia 264 , 119541 (2024). [71] Z. Xu, F. Abdeljawad, and G. S. Rohrer, Can the grain boundary stiffness driving force explain observed grain boundary migration rates in polycrystals?, Scripta Ma-terialia 274 , 117135 (2026). [72] A. Bhattacharya, Y.-F. Shen, C. M. Hefferan, S. F. Li, J. Lind, R. M. Suter, C. E. Krill III, and G. S. Rohrer, Grain boundary velocity and curvature are not correlated in Ni polycrystals, Science 374 , 189 (2021). 1
+
+## SUPPLEMENTARY INFORMATION Shear-Coupled Grain Growth Statistics 
+
+Caihao Qiu, 1,2, David J. Srolovitz, 2,3, Gregory S. Rohrer 4, Jian Han 1, Marco Salvalaglio 5,6      
+
+> 1Department of Materials Science and Engineering, City University of Hong Kong, Hong Kong SAR, China
+> 2Department of Mechanical Engineering, The University of Hong Kong, Pokfulam Road, Hong Kong SAR, China
+> 3Materials Innovation Institute for Life Sciences and Energy (MILES), The University of Hong Kong, Shenzhen, China
+> 4Department of Materials Science and Engineering, Carnegie Mellon University, Pittsburgh, PA, USA
+> 5Institute of Scientific Computing, TU Dresden, 01062 Dresden, Germany
+> 6Dresden Center for Computational Materials Science, TU Dresden, 01062 Dresden, Germany TJ TJ
+> GB length l∝⟨⟩
+> x0l/2
+
+−l/2   
+
+> y
+> FIG. S-1. Illustration of disconnections (red steps with blue dislocation characters) pileup at TJs located at ( ±l/ 2,0) on the GB (black line).
+> S-I. GRAIN GROWTH EXPONENT
+
+In the main text, we find that the exponent of the elastic driving force on GBs vs. mean grain size is around 
+
+−0.5, leading to a grain-growth exponent of 4/3 for a purely elastic driving force. Here, we propose a model to explain this phenomenon. As widely accepted, GB migration is mediated by dis-connection motion [S1]. When a pair of disconnections is nucleated in the middle of the GB and glides away from each other, the elastic energy caused by disconnection gliding can be dissipated rapidly (this is an assumption built into our continuum model) [S2, S3]. However, the pair of disconnections will be blocked by the two ends of the GB, i.e., triple junctions (TJs); The elastic en-ergy caused by the disconnection pileup at TJs is the main cause of the slow dissipation of the total elastic en-ergy [S4]. Figure S-1 provides an illustration of a GB terminated at two TJs separated by a distance of l. This is simi-lar to the case of lattice dislocation pile-up at GBs (i.e., the Hall-Petch effect). Assuming that the two TJs are immobile, the nucleated disconnections due to the ap-plied shear stress (and/or the elastic interactions among all GB disconnections) will glide toward and be hindered at TJs. The GB will reach an equilibrium profile with the analytical solution for the equilibrium Burgers vec-tor density distribution (again, similar to the classical double-ended pileup of lattice dislocations) under an ap-plied shear stress τ is [S1, S5] 
+
+ρb(x) = 2(1 − ν)τμb 
+
+2x/l 
+
+p1 − (2 x/l )2 , (S-1) where ν and μ are Poisson’s ratio and shear modulus, and the equilibrium GB profile is [S21] 
+
+y(x) = 
+
+Z l/ 2
+
+> −l/ 2
+
+ρh(x′)d x′ = − 1
+
+β
+
+Z l/ 2
+
+> −l/ 2
+
+ρb(x′)d x′
+
+= (1 − ν)τ l βμb 
+
+p1 − (2 x/l )2,
+
+(S-2) where h is disconnection step height, ρh = −βρ b is the step density, β = b/h is the shear coupling factor of the GB disconnection. In the case of grain growth and GB disconnection, τ is related to the internal (and externally applied) shear stress on the GB. The total work/energy due to this kind of pileup is 
+
+W = τ b 
+
+2
+
+Z l/ 2
+
+> −l/ 2
+
+xρ b(x)d x
+
+= (1 − ν)τ 2
+
+μ
+
+Z l/ 2
+
+> −l/ 2
+
+2x2/l 
+
+p1 − (2 x/l )2 dx
+
+= π(1 − ν)l2τ 2
+
+8μ .
+
+(S-3) The related driving force is 
+
+f = − ∂W ∂l = − π(1 − ν)lτ 2
+
+4μ . (S-4) When the shear stress τ (i.e., shear stress to drive dis-connection motion) exceeds a certain critical value fc,the piled-up disconnections can be driven to transmit into other two GBs meeting at the TJ or into the sur-rounding grains, leading to TJ motion (and the con-sequent GB migration) and the relaxation of the stored elastic energy . The critical value of τ is 
+
+τc =
+
+s
+
+4μf c
+
+π(1 − ν) l−0.5. (S-5) 2Since the TJ separation length (and the GB length) is proportional to the mean grain size, the critical shear stress is 
+
+τc = C⟨D⟩−0.5. (S-6) The elastic driving force for GB migration is τ · β, where 
+
+τ is the (resolved) shear stress τc on GB derived above and β is the constant GB shear coupling factor. Hence, the analytical exponent of the elastic driving force vs. the mean grain size is nσF = −0.5, consistent with the value obtained from our simulations ( nσF = −0.51). 
+
+S-II. SUPPLEMENTARY RESULTS: TEMPORAL EVOLUTION OF THE PROBABILITY DISTRIBUTIONS OF THE GEOMETRIC PROPERTIES AND INTERNAL STRESS 
+
+In the main text, we investigate the geometric proper-ties of microstructures by analyzing their time-averaged probability distributions. A question remains as to whether the temporal evolution of the geometric prop-erties can reach a “steady state” such that time av-eraging is meaningful. Figure S-2 shows the temporal probability distributions of reduced grain size R/⟨R⟩ , re-duced grain perimeter C/⟨C⟩ , grain roundness ⟨⃝⟩ and reduced grain boundary (GB) length L/⟨L⟩ . In each sub-plot, the line colors represent the simulation time, pro-gressing from blue (initial results) to red (by 2 × 10 5). The four columns correspond to the cases of curvature flow (γ), with internal stress (γ, σ int ), with external shear stress ( γ, σ int , σ ext 12 ), and with external tensile stress (γ, σ int , σ ext 11 ), respectively. The commonality is that the initial probability distribution differs from the results at later times, and they all tend to converge to a similar profile as time evolves. The special case is the grain roundness, defined as ⃝ = 4 πA/ C2 = 4 πR2/C2 shown in Figs. S-2(c1)-(c4). The convergence to a similar dis-tribution takes much longer than the reduction in grain size and grain perimeter. As for the evolution of internal stresses, we demon-strate that temporal probability distributions of reduced internal von Mises stress σvM /⟨σvM ⟩ are always self-similar during grain growth, see Fig. S-3. Notably, this occurs without an obvious initial far-from-equilibrium distribution seen in the geometric properties, indicating a fundamentally different relaxation pathway. 
+
+[S1] J. Han, S. L. Thomas, and D. J. Srolovitz, Grain-boundary kinetics: A unified approach, Progress in Ma-terials Science 98 , 386 (2018). [S2] J. Han, D. J. Srolovitz, and M. Salvalaglio, Disconnection-mediated migration of interfaces in microstructures: I. continuum model, Acta Materialia 
+
+227 , 117178 (2022). [S3] M. Salvalaglio, D. J. Srolovitz, and J. Han, Disconnection-mediated migration of interfaces in microstructures: II. diffuse interface simulations, Acta Materialia 227 , 117463 (2022). [S4] S. L. Thomas, C. Wei, J. Han, Y. Xiang, and D. J. Srolovitz, Disconnection description of triple-junction motion, Proceedings of the National Academy of Sciences 
+
+116 , 8756 (2019). [S5] P. Anderson, J. Hirth, and J. Lothe, Theory of Disloca-tions (Cambridge University Press, 2017). [S6] W. Mullins, The statistical self-similarity hypothesis in grain growth and particle coarsening, Journal of Applied Physics 59 , 1341 (1986). [S7] J. K. Mason, E. A. Lazar, R. D. MacPherson, and D. J. Srolovitz, Geometric and topological properties of the canonical grain-growth microstructure, Physical Review E 92 , 063308 (2015). [S8] K. Barmak, E. Eggeling, D. Kinderlehrer, R. Sharp, S. Ta’asan, A. Rollett, and K. Coffey, Grain growth and the puzzle of its stagnation in thin films: The curious tale of a tail and an ear, Progress in Materials Science 
+
+58 , 987 (2013). [S9] G. M. La Boissoni` ere, R. Choksi, K. Barmak, and S. Esedo¯ glu, Statistics of grain growth: experiment ver-sus the phase-field-crystal and mullins models, Materialia 
+
+6, 100280 (2019). 3(a1) (a2) (a3) (a4) 
+
+(b1) (b2) (b3) (b4) 
+
+(c1) (c2) (c3) (c4) 
+
+(d1) (d2) (d3) (d4) 
+
+0
+
+2
+
+t (x10 5)
+
+γ (curvature flow) 11 
+
+γ, σint γ, σint , σex t γ, σint , σext 
+
+> 12
+
+FIG. S-2. Temporal probability distributions of (a1)-(a4) reduced grain size R/⟨R⟩ , (b1)-(b4) reduced grain perimeter C/⟨C⟩ ,(c1)-(c4) grain roundness ⃝ and (d1)-(d4) reduced GB length L/⟨L⟩ . The four columns refer to the PF results for the case of curvature flow with internal stress, external shear stress, and external tensile stress, respectively. Lines in blue are the initial results, and lines in red are the results at the time of 2 × 10 5.40
+
+2
+
+t (x10 5)
+
+(a) γ, σint 
+
+11 
+
+(c) γ, σint , σext (b) γ, σint , σex t
+
+12 
+
+FIG. S-3. Temporal probability distributions of reduced internal von Mises stress σvM /⟨σvM ⟩ in the cases with (a) only internal stress, (b) internal stress and applied external shear stress, and (c) internal stress and applied external tensile stress. (d) 
+
+(a)  
+
+> PF: present work
+> γ(c urvature flow)
+> Front tracking:
+> Mason et al.
+
+(e) 
+
+(b)    
+
+> Exp t. (Barmak et al.)
+> γ,σint γ
+> PFC ( Boissonière et al.)
+
+(c) 
+
+(f)                
+
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> 0.0
+> 1.2
+> 1.0
+> 0.8
+> 0.6
+> 0.4
+> 0.2
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> 0.0
+> 1.2
+> 1.0
+> 0.8
+> 0.6
+> 0.4
+> 0.2
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> 0.0
+> 1.2
+> 1.0
+> 0.8
+> 0.6
+> 0.4
+> 0.2
+
+Reduced GB length ,
+
+> P( )
+
+Reduced GB length ,
+
+> P( )
+
+Reduced GB length ,                    
+
+> P( )
+> γ,σint
+> γ,σint ,σext
+> 11
+> γ,σint ,σext
+> 12
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> 0.0
+> 1.2
+> 1.0
+> 0.8
+> 0.6
+> 0.4
+> 0.2
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> 0.0
+> 1.2
+> 1.0
+> 0.8
+> 0.6
+> 0.4
+> 0.2
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> 0.0
+> 1.2
+> 1.0
+> 0.8
+> 0.6
+> 0.4
+> 0.2
+
+Reduced grain perimeter ,
+
+> P( )
+
+Reduced grain perimeter ,
+
+> P( )
+
+Reduced grain perimeter ,
+
+> P( )
+
+FIG. S-4. Geometric properties of microstructures. probability distributions of (a)-(c) reduced grain perimeter C/⟨C⟩ , (g)-(i) reduced GB length L/⟨L⟩ . The grey, red, green, and blue lines correspond to our PF results for the case of curvature flow with internal stress, external tensile stress, and external shear stress, respectively. The thick grey dotted lines in (a), (d), (g), (j) are the results obtained by the front-tracking method [S7]. Green squares and blue crosses are the results from experiments in an Al thin film [S8] and PFC simulations [S9]. 5t (×10 6)
+
+0.5 1.0 1.5 0.0 
+
+> 〈σvM 〉 (×10 5)
+
+0. 9
+
+0.7 
+
+0.6 
+
+0.5 
+
+0.4 
+
+0.8 
+
+γ, σint 
+
+γ, σint , σext 
+
+γ, σint , σext 
+
+> 11
+> 12
+
+FIG. S-5. Temporal evolution of averaged internal von Mises stress versus time in the cases of γ, σ int (red circles); 
+
+γ, σ int , σ ext 11 (green star); and γ, σ int , σ ext 12 (blue squares).. 6A
+
+## .
+
+(a) 
+
+(b) 
+
+0.0 
+
+2.5 
+
+2.0 
+
+1.5 
+
+1.0 
+
+0.5 
+
+0.0 
+
+0.5 
+
+0.4 
+
+0.3 
+
+0.2 
+
+0.1 
+
+0.00 0.25 0.50 0.75 1.00 1.25 1.50 
+
+σvM 
+
+> PσvM  & PσvM
+> PσvM  /PσvM
+
+(c) 
+
+0.0 
+
+2.5 
+
+2.0 
+
+1.5 
+
+1.0 
+
+0.5 
+
+0.0 
+
+0.5 
+
+0.4 
+
+0.3 
+
+0.2 
+
+0.1 
+
+0.00 0.25 0.50 0.75 1.00 1.25 1.50 
+
+σvM 
+
+> PσvM  & PσvM
+> PσvM  /PσvM
+> −
+> + −
+> PA
+> .
+
+0.0 
+
+1.0 
+
+0.8 
+
+0.6 
+
+0.4 
+
+0.2 
+
+3−3 −2 −1 0 1 2
+
+> fast
+> growing
+> (+)
+> fast
+> shrinking
+> (−)
+> +
+
+FIG. S-6. (a) Probability distribution of the grain growth rates in the case of mean curvature flow γ. The probabil-ity distributions of “virtual” internal von Mises stress for all grains (indicated by white bars), (b) for the fast-growing grains (indicated by blue bars), and (c) for the fast-shrinking grains (indicated by green bars). The ratios, P fast grow  
+
+> σvM
+
+/P σvM 
+
+and P fast shrink  
+
+> σvM
+
+/P σvM , are plotted as blue and green points. 7(a) Capillarity force (b) Elastic driving force 
+
+## 0
+
+## 1.5 
+
+## t (x10 5)
+
+## (c) Reduced capillarity force (d) Reduced elastic driving force 
+
+FIG. S-7. Temporal probability distributions of (a) the capillarity force, (b) the elastic driving force, (c) reduced capillarity force and (d) reduced elastic driving force. Lines in blue are the initial results, and lines in red are the results at the time of 1.5 × 10 5.

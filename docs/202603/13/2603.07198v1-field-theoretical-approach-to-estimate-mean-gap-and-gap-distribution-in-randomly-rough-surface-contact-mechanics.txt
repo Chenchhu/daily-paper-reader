@@ -1,0 +1,757 @@
+Title: Field-theoretical approach to estimate mean gap and gap distribution in randomly rough surface contact mechanics
+
+URL Source: https://arxiv.org/pdf/2603.07198v1
+
+Published Time: Tue, 10 Mar 2026 00:44:24 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+# Field-theoretical approach to estimate mean gap and gap distribution in randomly rough surface contact mechanics 
+
+Yunong Zhou a, ∗, Hengxu Song b,c , Zhichao Zhang a, Yang Xu d,e, ∗∗ 
+
+> aDepartment of Civil Engineering, Yangzhou University, Yangzhou, 225127, Jiangsu, China
+> bLNM, Institute of Mechanics, Chinese Academy of Sciences, Beijing, 100190, China
+> cUniversity of Chinese Academy of Sciences, Beijing, 100049, China
+> dSchool of Mechanical Engineering, Hefei University of Technology, Hefei, 230009, Anhui, China
+> eAnhui Province Key Laboratory of Digital Design and Manufacturing, Hefei, 230009, Anhui, China
+
+Abstract 
+
+We extend the statistical field-theoretical framework of rough surface contact mechanics to characterize the interfa-cial gap between an elastic half-space and a randomly rough surface incorporating exponential repulsion. Building upon a cumulant expansion to second-order, we derive an explicit analytical relation between the mean gap and the applied normal pressure. This result provides a closed-form expression for the drift and di ff usion coe ffi cients in a convection–di ff usion equation governing the scale-dependent evolution of the gap distribution. Solving this equation with appropriate initial and boundary conditions yields the gap distribution under varying external pressures. Both the mean gap and the gap distribution are found to be in good agreement with Green’s function molecular dynamics (GFMD) simulations. Our results demonstrate that the field-theoretical approach enables quantitative predictions not only for contact stresses but also for interfacial gap in rough surface contacts. 
+
+Keywords: Contact mechanics, interfacial gap, field approach, rough surface 
+
+1. Introduction 
+
+When two nominally flat but microscopically rough surface are pressed together, only a small portion of the nominal contact area comes into solid-solid con-tact, while most of the interface still remains sepa-rated. In such a case, accurate characterization of in-terfacial properties, such as real contact area, contact stress distribution and gap distribution is crucial for predicting performance in applications involving seal-ing, lubrication, and thermal or electrical contact resis-tance [1, 2, 3, 4]. Over past decades, various theoretical models have been proposed to address the complexities of rough sur-face contact [5, 6, 7, 8, 9, 10, 11, 12]. Among these studies, Persson’s theory of contact has gained increas-ing attention due to its ability to provide a compre-hensive framework that captures multi-scale roughness and considers the long range elastic coupling [8, 13].    
+
+> ∗Corresponding author
+> ∗∗ Corresponding author
+> Email addresses: yunong.zhou@yzu.edu.cn (Yunong Zhou),
+> yang.xu@hfut.edu.cn (Yang Xu)
+
+Owing to these advantages, Persson theory has been shown to yield predictions that are in close agreement with both experiment observations and numerical simu-lations [14, 15, 16, 17]. The central idea of Persson theory is to observe how statistical properties in rough surface contacts, such as contact stress distribution, evolve with geometrical scale changes. This process is commonly implemented by starting from an ideally smooth interface and then gradually adding roughness components corresponding to smaller wavelengths, which is often described in terms of increasing “magnification” [18, 19]. The evolution of contact stress with increasing mag-nification can also be modeled as Markov process, in which the evolution of stress distribution only depends on this most “recent” magnification [20]. In such a way, the Chapman-Kolmogorov equation can be formu-lated and by further applying the no re-entry assump-tion, the di ff usion equation that governing the evolution of stress distribution can be deduced, which finally leads us to the solution of Persson theory [20, 21]. Building upon this, a wide range of extensions have been devel-oped to incorporate additional physical e ff ects, includ-
+
+> arXiv:2603.07198v1 [cond-mat.soft] 7 Mar 2026
+
+ing elastic–plastic deformation, electrostatic adhesion, wear, and percolation estimation [22, 23, 24, 25, 26, 27]. Complementary to Persson’s development, Müser formulated a statistical field-theoretical framework for contact mechanics, in which the pressure distribution is obtained through a statistical cumulant expansion, which reduces to Persson’s theory at the leading order but allows higher-order corrections to be incorporated. This formalism not only captures the elastic coupling between asperities but also provides a consistent method to include non-Gaussian tails in the pressure distribution when higher-order moments are considered. Using this formulation, the contact stress distribution has been cal-culated to high accuracy for elastic contact with expo-nential repulsive contacts [28, 29]. In fact, by following the basic idea of statistical field-theoretical approach, the explicit expression of mean gap can be derived ac-cordingly. On the other hand, Xu et al. [30] demonstrated that the evolution of gap distribution with increasing mag-nification can be described by the convection-di ff usion equation associated with proper initial and boundary conditions. Zhou et al. [31] derived the same govern-ing equation for gap distribution by following the basic idea of Persson’s original theory for contact stress distri-bution [8]. This di ff erential equation can be solved nu-merically once the drift and di ff usion coe ffi cients, which can be expressed as the change of mean and variance of the interfacial gap separately, are specified. Previ-ous studies demonstrated that the mean gap can be de-rived based on Persson’s theory directly or indirectly, and shown good agreement with numerical simulations with proper fudge factor to correct the elastic strain en-ergy for partial contacts [32, 33, 34]. In this study, we will extend the field-theoretical ap-proach to address mean gap in elastic contact between half-space and a rigid, randomly rough surface incor-porating the exponential repulsive interaction. We will derive the explicit relation between the applied pressure and the mean gap so that the drift and di ff usion coef-ficient can be determined accordingly. Based on this point, solving the convection–di ff usion equation with appropriate initial and boundary conditions yields the gap distribution under specified applied pressure and magnification. The theoretical predictions then will be validated with Green’s function molecular dynamics (GFMD) simu-lations [35, 36, 37] across a range of Hurst exponents and applied pressure. GFMD is a boundary element method (BEM) that propagate the displacement modes of surface layer in Fourier space according to Newton’s equation of motion until the local minimum of total po-tential is achieved. It has been widely used in elastic contact simulations incorporating multi-scale roughness and various boundary conditions [38, 39, 40]. The remainder of this paper is organized as follows: The model investigated in this study are introduced in Sect. 2. The derivation of mean gap and related results and discussions are presented in Sect. 3. The related results on gap distribution are summarized in Sect. 4 and conclusions would be sketched in Sect. 5. 
+
+2. Model 
+
+As shown in Fig. 1, we consider the frictionless contact between an elastic half-space and a rigid ran-domly rough surface. The elastic half-space is orig-inally flat, linearly elastic with plane strain modulus 
+
+E∗ ≡ E/(1 − ν2), where E denotes the elastic modu-lus and ν the Poisson ratio. The external pressure σ0 is uniformly distributed at the far end of the elastic half-space, which is equivalent to the case that σ0 applied at the center-of-mass mode of the elastic half-space in Fourier space. The randomly rough surface is fixed in space, and the height spectrum obeys the random phase approxi-mation, that is, the Fourier coe ffi cient of height ˜ h(q) =pC(q)/A exp( i2πXq), where Xq denotes a pseudo ran-dom number generator that yields values uniformly dis-tributed within the interval [0 , 1], and A denotes the nominal contact area which is fixed to unity by default. The height power spectrum C(q), which is presented in Fig. 1(c), is defined as 
+
+C(q) = C0
+
+qql
+
+!−2H−2
+
+, (1) where H denotes the Hurst exponent, C0 the pre-factor that can be fully determined as long as either the root-mean-square height or root-mean-square gradient is specified, q = |q| = ζql denotes the magnitude of the wave vector q that refined in the interval [ ql, qs], where 
+
+ql = 2π/λ l denotes the longest wave number, qs = 2π/λ s
+
+the shortest cut-o ff and ζ the magnification. Therefore, the height of the periodically repeated rough surface can be expressed as the inverse Fourier transform 
+
+h(r) = A
+
+(2 π)2
+
+Z
+
+d2q ˜h(q) exp( iq · r). (2) The associated Fourier transform then can be written as ˜h(q) = 1
+
+A
+
+Z
+
+d2r h (r) exp( −iq · r). (3) 2(a)  (b)  (c) Figure 1: (a) Schematic of frictionless contact between elastic half-space and rigid randomly rough surface. (b) Cross-section of deformed elastic half-space and rough surface; (c) A typical power spectral density (PSD) C(q) of randomly rough surface. 
+
+The interaction between counter faces is defined by an exponentially repulsive potential function, which is given as 
+
+Uint = γ0
+
+Z
+
+d2r e −g(r)/ρ , (4) where γ0 denotes the surface energy, ρ represents the interaction range and g(r) the interfacial gap, which is given by 
+
+g(r) = g0 + u(r) − h(r), (5) where g0 represents the mean gap, u(r) denotes the sur-face displacement of elastic half-space with ⟨u(r)⟩ = 0and h(r) the height of randomly rough surface with 
+
+⟨h(r)⟩ = 0, which can be fully determined by the in-verse Fourier transform of ˜ h(q). The elastic energy stored in the deformed counterface can be written as 
+
+Uela = E∗ A
+
+4
+
+X
+
+> q
+
+q|˜u(q)|2, (6) where ˜ u(q) denotes the Fourier coe ffi cient of surface displacement of elastic manifold. The work of external pressure can be given as 
+
+Uext = σ0 Ag 0. (7) Therefore, the total potential is 
+
+Utot = E∗ A
+
+4
+
+X
+
+> q
+
+q|˜u(q)|2 + γ0
+
+Z
+
+d2r e −g(r)/ρ 
+
++ σ0 Ag 0.
+
+(8) 
+
+3. Mean gap 
+
+The relation between the mean gap g0 and the ap-plied pressure σ0 follows from the equilibrium condi-tion ∂Utot /∂ g0 = 0. Evaluating this condition for the total energy, we obtain 
+
+g0(σ0) = ρ ln 
+
+( γ0
+
+ρAσ0
+
+Z
+
+d2r e [h(r)−u(r)] /ρ 
+
+)
+
+. (9) This expression is exact within the present exponential repulsive interaction model. Two limiting cases can be easily identified. First, in the limit of σ0 ≫ E∗ ¯g, where ¯ g denotes the root-mean-square gradient of height and is set to unity if not mentioned explicitly, the deformed surface of the elas-tic half-space conforms the rigid rough surface, so that 
+
+u(r) ≈ h(r). In this case the integral reduces to the nom-inal contact area, and one obtains 
+
+g0(σ0 ≫ E∗ ¯g) ≈ ρ ln γ0
+
+ρσ 0
+
+!
+
+. (10) Second, in the opposite limit where σ0 ≪ E∗ ¯g, the elas-tic displacements are negligible, that is u(r) ≈ 0, and thus 
+
+g0(σ0 ≪ E∗ ¯g) = ρ ln 
+
+( γ0
+
+ρAσ0
+
+Z
+
+d2r e h(r)/ρ 
+
+)
+
+. (11) The remaining integral contains the statistical contribu-tion of the roughness profile h(r). Since h(r) is assumed to follow Gaussian distribution with zero mean, we can write the cumulant expansion as ln ⟨eh(r)/ρ ⟩ =
+
+> ∞
+
+X
+
+> n=1
+
+1
+
+ρnn! κn, (12) where ⟨· · · ⟩ represents the ensemble averaging and κn
+
+denotes the n-th order cumulant of h(r). Since h(r)is assumed to follow Gaussian distribution with zero mean, all cumulants of order higher than two vanish, i.e., κ1 = ⟨h(r)⟩ = 0, κ2 = Var[ h(r)] and κn≥3 = 0. Therefore, we get 
+
+g0(σ0 ≪ E∗ ¯g) = ρ ln 
+
+( γ0
+
+ρσ 0
+
+eVar[ h(r)] /(2 ρ2)
+
+)
+
+= ρ ln γ0
+
+ρσ 0
+
+!
+
++ ¯h2
+
+2ρ ,
+
+(13) where ¯ h represents the root-mean-square height of the rough surface. Thus, in the low-pressure regime the 310 °2 10 °1 10 0                           
+
+> æ0/(E§¯g)
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> g0/¯h
+> (a) Ω/L = 2 .0£10 °3
+> ¯h/ Ω= 1 .192, H= 0 .3
+> Eq.(10)
+> Eq.(13)
+> Eq.(19)
+> GFMD
+> 10 °310 °210 °110 0
+> æ0/(E§¯g)
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> g0/¯h
+> (b) Ω/L = 1 .0£10 °3
+> ¯h/ Ω= 2 .384, H= 0 .3
+> Eq.(10)
+> Eq.(13)
+> Eq.(19)
+> GFMD
+> 10 °310 °210 °110 0
+> æ0/(E§¯g)
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> g0/¯h
+> (c) Ω/L = 5 .0£10 °4
+> ¯h/ Ω= 4 .767, H= 0 .3
+> Eq.(10)
+> Eq.(13)
+> Eq.(19)
+> GFMD
+
+Figure 2: Reduced mean gap g0/¯h as a function of reduced external pressure σ0/(E∗ ¯g) for interaction range ρ/ L equals to (a) 2 .0 × 10 −3, (b) 1.0 × 10 −3 and (c) 5 .0 × 10 −4 with Hurst exponent H = 0.3, where L denotes the system size and ¯ g the root-mean-square gradient of height. Red dashed line represents the large pressure limit, blue dashed line denotes the small pressure limit, the solid line denotes the field approach and open circles the GFMD simulation results. Specifically, the longest wavelength λl/L = 0.25, the shortest cut-o ff λs/L = 2.5 × 10 −3 and the root-mean-square gradient of surface height ¯ g is fixed to unity. The surface energy γ0/(E∗ L) = 1.0 × 10 −3.
+
+mean gap receives an additive correction proportional to the mean-square height of rough surface. Between these two asymptotic limits lies the crossover regime σ0 ≃ E∗ ¯g, where the competition between elastic energy and repulsive interaction deter-mines the interfacial gap. To describe this situation, we should start from Eq. (9) by expanding the e ff ective field 
+
+h(r) − u(r) to second-order cumulant expansion, and us-ing the Parseval’s theorem, we get 
+
+g0(σ0) ≈ ρ ln 
+
+
+
+γ0
+
+ρσ 0
+
+exp 
+
+X
+
+> q
+
+|˜h(q) − ˜u(q)|2
+
+2ρ2
+
+
+
+= ρ ln γ0
+
+ρσ 0
+
+!
+
++ 12ρ
+
+X
+
+> q
+
+|˜h(q) − ˜u(q)|2
+
+→ ρ ln γ0
+
+ρσ 0
+
+!
+
++ A
+
+4πρ 
+
+Z
+
+dq q |˜h(q) − ˜u(q)|2.
+
+(14) In the Fourier space, if the system is well behaved, the elastic displacement ˜ u(q) can be expanded as a power series of the ˜ h(q), which reads ˜u(q) = G1(q)˜ h(q) +
+
+X
+
+> q′
+
+G2(q, q′)˜ h(q − q′)˜ h(q′) + · · · ,
+
+(15) where Gn(q, q′, · · · ) denotes the expansion coe ffi cients and should depend on the applied pressure and the in-teraction between counter faces. To obtain the leading order of this expression, we write the total potential to second-order cumulant expansion, which reads 
+
+Utot 
+
+A = E∗
+
+4
+
+X
+
+> q
+
+q|˜u(q)|2 + σ0g0
+
++ γ0 exp 
+
+− g0
+
+ρ + 12ρ2
+
+X
+
+> q
+
+|˜h(q) − ˜u(q)|2
+
+ .
+
+(16) Taking the first derivative with respect to ˜ u(q), we get 1
+
+A
+
+∂Utot 
+
+∂˜u(q) = E∗
+
+2
+
+X
+
+> q
+
+q˜u(q) − γ0
+
+ρ2
+
+X
+
+> q
+
+h˜h(q) − ˜u(q)i
+
+× exp 
+
+− g0
+
+ρ + 12ρ2
+
+X
+
+> q
+
+|˜h(q) − ˜u(q)|2
+
+
+
+= E∗
+
+2
+
+X
+
+> q
+
+q˜u(q) − σ0
+
+ρ
+
+X
+
+> q
+
+h˜h(q) − ˜u(q)i .
+
+(17) This derivative requires vanish for arbitrary ˜ u(q), there-fore, ˜u(q) ≈ 11 + ηζ ˜h(q), (18) where we introduced the dimensionless parameter η =
+
+ρql E∗/(2 σ0). More details about the derivation can be refered in Müser’s pioneering work [28]. Substituting Eq. (18) into Eq. (14), and using the height spectrum given in Eq. (1) leads to 
+
+g0(σ0) ≈ ρ ln γ0
+
+ρσ 0
+
+!
+
++ H ¯h2
+
+ρ
+
+Z ζ
+
+> 1
+
+dζ′ ηζ ′
+
+1 + ηζ ′
+
+!2
+
+ζ′− 2H−1.
+
+(19) The first term is the contribution coming from the homo-geneous exponential repulsion, while the second term encodes the correction due to surface roughness. This integral representation smoothly interpolates between the two asymptotic limits, i.e., for η ≪ 1 ( σ0 ≫ E∗ ¯g), it reduces to Eq. (10) while for η ≫ 1 ( σ0 ≪ E∗ ¯g), it reproduces Eq. (13). Fig. 2 presents a comparison of predictions of the mean gap g0 as a function of applied pressure σ0 be-tween the field approach and GFMD for various inter-410 °4 10 °3 10 °2 10 °1 10 0                             
+
+> æ0/(E§¯g)
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> g0/¯h
+> (a) Ω/L = 5 .0£10 °3
+> ¯h/ Ω= 1 .796, H= 0 .8
+> Eq.(10)
+> Eq.(13)
+> Eq.(19)
+> GFMD
+> 10 °410 °310 °210 °110 0
+> æ0/(E§¯g)
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> g0/¯h
+> (b) Ω/L = 2 .0£10 °3
+> ¯h/ Ω= 4 .489, H= 0 .8
+> Eq.(10)
+> Eq.(13)
+> Eq.(19)
+> GFMD
+> 10 °410 °310 °210 °110 0
+> æ0/(E§¯g)
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> 7
+> g0/¯h
+> (c) Ω/L = 1 .0£10 °3
+> ¯h/ Ω= 8 .978, H= 0 .8
+> Eq.(10)
+> Eq.(13) Eq.(19)
+> GFMD
+
+Figure 3: Reduced mean gap g0/¯h as a function of reduced external pressure σ0/(E∗ ¯g) for interaction range ρ/ L equals to (a) 5 .0 × 10 −3, (b) 2.0 × 10 −3 and (c) 1 .0 × 10 −3 with Hurst exponent H = 0.8. Red dashed line represents the large pressure limit, blue dashed line denotes the small pressure limit, the solid line denotes the field approach and open circles the GFMD simulation results. Specifically, the longest wavelength 
+
+λl/L = 0.25, the shortest cut-o ff λs/L = 2.5 × 10 −3 and the root-mean-square gradient of surface height ¯ g is fixed to unity. The surface energy 
+
+γ0/(E∗ L) = 1.0 × 10 −3.
+
+action range ρ at H = 0.3. It is shown that for rela-tively large ranges of the repulsive potential ρ, e.g., in the cases where ρ/ L = 2.0 × 10 −3 and ρ/ L = 1.0 × 10 −3,the theoretical and numerical results exhibit good agree-ment, indicating that under conditions where the poten-tial varies smoothly and the contact response remains approximately linear, the first-order approximation of the field approach provides a quantitatively reliable de-scription of the mean gap as a function of applied pres-sure in rough surface contacts. However, as shown in Fig. 2(c), for small value of ρ, i.e., when the repulsive potential become short-ranged and steep, the field ap-proach systematically overestimates the mean gap com-pared to GFMD results when pressure is small, espe-cially when σ0/(E∗ ¯g) < 1.0 × 10 −2.For a larger Hurst exponent H = 0.8, the agreement becomes more restrictive with respect to the interaction range. As shown in Fig. 3(a), good quantitative agree-ment between theory and GFMD is obtained only for relatively large interaction range ρ/ L = 5 × 10 −3. When 
+
+ρ/ L is reduced to smaller values, as shown in Figs. 3(b-c), significant deviations emerges between the theoreti-cal and numerical results. The origin of this discrepancy could be explained by the linearization assumption adopted in the field-theoretical approach, which is based on the first-order approximation of the interfacial displacement with re-spect to the surface roughness in Fourier space. This as-sumption is valid when the local displacement of elastic surface is much smaller than the surface roughness and when the repulsive interaction varies smoothly with the interfacial gap. However, when ρ becomes small, the gradient of the repulsive potential increases sharply, giv-ing rise to pronounced nonlinear response, which makes the first-order approximation fails to capture the nonlin-ear e ff ect. In such a case, higher-order cumulant corrections would be required to capture the accurate behavior in the short-range interaction case. Unfortunately, this cor-rection is not applicable to the hard-wall constraint. The reason is that the hard-wall constraint is not a smooth function, which involves a discontinuous change in dis-placement as surfaces approach each other. This lack of smoothness prevents the system from being described by a power series expansion, which is essential for the higher-order corrections [28]. 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8
+
+H
+
+23456
+
+> g0/¯h
+
+σ0/(E∗¯g) = 0 .01 
+
+ρ/L = 2 .0 × 10 −3
+
+GFMD Field approach 
+
+Figure 4: Reduced mean gap g0/¯h as a function of Hurst exponent 
+
+H in the case of ρ/ L = 2.0 × 10 −3 and σ0/(E∗ ¯g) = 0.01. The solid line denotes the field approach and open circles the GFMD simulation results. 
+
+On the other hand, it can be observed in Fig. 2 and Fig. 3 that with increasing load σ0, the theoretical pre-dictions recover good consistency with GFMD. This ob-servation is further comfirmed by comparison of Fig. 4 and Fig. 5, in which larger external pressure leads to 50.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8       
+
+> H
+> 0.51.01.52.02.5
+> g0/¯h
+> σ0/(E∗¯g) = 0 .1
+> ρ/L = 2 .0×10 −3
+> GFMD Field approach Figure 5: Exactly the same as Fig. 4, while σ0/(E∗¯g)=0.1.
+
+better consistency between field approach and numeri-cal simulations. The reason is that with increasing ex-ternal load, the mean gap decreases and a larger fraction of asperities come into contact. This suppresses the in-fluence of local nonlinearity and statistical tail e ff ects in the gap distribution, e ff ectively restoring the valid-ity of the linear approximation. Consequently, in the high-load regime the displacement field becomes closer to the surface roughness, and the theoretical predictions consistent with GFMD, even for surfaces with relatively large Hurst exponents. For relatively small external load, as shown in Fig. 4, small Hurst exponents ( H < 0.5) leads to good agree-ment between field approach and GFMD, while discrep-ancy occurs with increasing Hurst exponent to H >
+
+0.5. As suggested by one of the anonymous review-ers, these discrepancies are closely related to the ratio between root-mean-square height and interaction range ¯h/ρ . This indeed make sense, because for a given moderate applied pressure, when ¯ h becomes larger, the surface’s local asperities increases, leading to stronger elastic coupling between contact regions. This in turn enhances the non-linearity of contact,making the first-order approximation less reliable. On the other hand, when ρ is smaller, the e ff ect of short-range interactions become more pronounced, and the e ff ects of roughness becomes more significant, further compromising the ac-curacy of the first-order approximation. Additionally, when the root-mean-square gradient ¯ g
+
+is fixed to unity, it is easy to demonstrate that the ¯ h
+
+monotonically increases with increasing Hurst exponent 
+
+H. Thus, the ratio ¯ h/ρ becomes larger as H increases, and leads to greater deviation between the theoretical approximation and GFMD results, which is observed in Fig. 4. This conclusion is further confirmed in Fig. 2 and Fig. 3. In both cases of H = 0.3 and H = 0.8, we observed that as ¯ h/ρ increases, the deviation between the theory and GFMD becomes more pronounced. This trend further reinforces the idea that surface roughness and interaction range play crucial roles in the accu-racy of the field approach, especially when dealing with higher Hurst exponents and smaller interaction ranges. Despite the deviations at higher Hurst exponents, the field approach remains of considerable theoretical and practical value as it provides an explicit analytical framework that captures the essential scaling behavior of the mean gap and applied pressure. Moreover, al-though many engineering surfaces exhibit Hurst expo-nents around 0 .8 [41, 42, 43], there also exist a substan-tial number of surfaces with H < 0.5 [44, 45], where the field approach performs particularly well. There-fore, even though quantitative discrepancies may arise in certain parameter regimes, the field approach con-tinues to serve as a valuable method to investigate the contact problems between rough surfaces. 
+
+4. Gap distribution 
+
+The knowledge of explicit expression of mean gap, as presented in Eq. (19), allows us to further investigate the gap distribution P(g, ζ ) with specified applied pres-sure. It can be conducted by considering the convection-di ff usion equation as follows 
+
+∂P
+
+∂ζ = −D1(ζ) ∂P
+
+∂g + D2(ζ) ∂2 P
+
+∂g2 , (20) where D1(ζ) denotes the drift coe ffi cient and D2(ζ) the di ff usion coe ffi cient [30, 31, 46]. It is equivalent to state that the gap should follow the stochastic di ff eren-tial equation (SDE) [47, 48] dg
+
+dζ = D1(ζ) + Γ (ζ), (21) where Γ(ζ) denotes the random noise that obey 
+
+⟨Γ(ζ)⟩ = 0,
+
+⟨Γ(ζ) Γ(ζ′)⟩ = 2D2(ζ) δ(ζ − ζ′), (22) where ⟨· · · ⟩ denotes the ensemble averaging and δ(· · · )represents the Dirac function. Eq. (21) allows us to sim-ulate the gap distribution directly as long as the explicit expression of D1(ζ) and D2(ζ) are specified. The drift term represents the deterministic change of the mean gap induced by the progressive inclusion of 6the shorter wavelength components into the roughness, the drift coe ffi cient D1(ζ) is given by the first derivative of the mean gap g0, which is given by Eq. (19), with respect to the magnification ζ. The di ff usion coe ffi cient 
+
+D2(ζ) denotes the statistical broadening of the gap dis-tribution due to the random roughness introduced when the magnification ζ is increased by an infinitesimal in-crement, which is defined as 
+
+D2(ζ) = 12 lim 
+
+> ∆ζ→0
+
+⟨[g(ζ + ∆ ζ) − g(ζ)] 2⟩
+
+∆ζ . (23) When the magnification is increased from ζ to ζ + ∆ ζ,only surface roughness with wave-vectors |q| in a nar-row range [ ζql, (ζ + ∆ ζ)ql] are newly introduced. The corresponding height increment δh(r) is therefore a su-perposition of statistical independent Fourier compo-nents with random phases. According to the analysis presented above, the incre-mental elastic displacement can be written as 
+
+δ˜u(q) ≈ 11 + ηζ δ˜h(q). (24) Consequently, we can write 
+
+⟨(δg)2⟩ ≈ ηζ 
+
+1 + ηζ 
+
+!2
+
+⟨(δh)2⟩∝ ηζ 
+
+1 + ηζ 
+
+!2
+
+ζ−2H−1∆ζ
+
+(25) and as a result, the di ff usion coe ffi cient can be obtained as 
+
+D2(ζ) ≈ C1
+
+ηζ 
+
+1 + ηζ 
+
+!2
+
+ζ−2H−1, (26) where C1 denotes a dimensionless pre-factor. After specifying the drift and di ff usion coe ffi cients, a crucial issue in the current stage concerns the treat-ment of the boundary conditions as the elastic slab ap-proaches the rough counter face. In traditional contact models with hard-wall constraints, the interfacial gap is strictly non-negative [30]. In the present work, how-ever, the interaction is assumed as exponential repul-sion, which gives a repulsive force 
+
+frep = γ0
+
+ρ exp( −g/ρ ). (27) This value of force increases rapidly as the gap de-creases and therefore provides a strong deterministic drift that prevents the stochastic particle from penetrat-ing into the negative gap zone. As a consequence, the gap evolution is governed by a SDE with exponential repulsive drift near g = 0. In practice, however, the repulsive force entering the SDE should be multiplied by a fudge factor C2 in order to reproduce the gap distribution obtained from GFMD simulations. This fudge factor reflects the reduction of the e ff ective local repulsion due to long range elastic coupling in rough surface contacts, thus can be inter-preted as an e ff ective renormalization of the interaction strength and should be quantitatively smaller than unity. 10 0 10 1                                   
+
+> g/ ¯h
+> 10 −3
+> 10 −2
+> 10 −1
+> 10 0
+> P (g/ ¯h, ζ )
+> σ0/E ∗= 1 .0×10 −2
+> σ0/E ∗= 1 .0×10 −3
+> σ0/E ∗= 1 .0×10 −4
+> Figure 6: Gap distribution P(g, ζ ) predicted by GFMD (open sym-bols) and field approach (solid lines) with varying external pres-sure. Dashed lines denote the low-pressure limits that can be cal-culated according to Eq. (50) in Ref.[30]. Specifically, the pre-factor
+> C0/L4=8.0×10 −6, the Hurst exponent is fixed to H=0.3, the longest wavelength λl/L=0.25, the shortest cut-o ff λs/L=2.5×10 −3,the surface energy γ0/(E∗L)=1.0×10 −3and the interaction range
+> ρ/ L=2.0×10 −3.
+
+The SDE for the interfacial gap is solved using a Monte Carlo scheme based on the Euler-Maruyama method. The drift and di ff usion coe ffi cients are pre-computed on the CPU as functions of the magnification and subsequently used to evolve an ensemble of inde-pendent gap measurements on the GPU. Each measure-ment is advanced from ζ = 1 to the target magnifica-tion by incorporating the deterministic drift, the expo-nential repulsion and a Gaussian noise term. The step size ∆ζ was chosen to ensure both numerical stability and convergence. After performing a convergence test, we found that a step size of ∆ζ = 1.0 × 10 −2 provided a good balance between computational e ffi ciency and accuracy. Further reduction in the step size did not sig-nificantly improve the results, but it did increase compu-tational cost. All simulations are performed in parallel on our personal cluster equipped with 64GB memory and an NVIDIA RTX 4090D GPU, enabling up to 10 7
+
+stochastic realizations within roughly 20 seconds. Fig. 6 compares the gap distribution P(g, ζ ) for vary-ing external pressures obtained from GFMD simula-7tions with the predictions of the SDE with field ap-proximations of the drift and di ff usion coe ffi cient. It is observed that, when the value of applied pressure is relatively small, such as σ0/E∗ = 1.0 × 10 −4, the gap distribution (solid blue line) predicted by the field approach are in excellent agreement with both GFMD (open circles) and prediction by Persson theory (dahsed blue line). As the external pressure increases, how-ever, systematic deviations gradually emerge, while the field approach still reproduces the qualitative trend of the distributions, noticeable quantitative di ff erences ap-pear, particularly in the small-gap region, and become more pronounced at higher external pressure. The observed trend can be understood from the change in the dominant contact mechanisms with in-creasing external pressure. At small external pressures, contact is limited to a few isolated asperities and the real contact area remains small, so the interfacial gap is mainly controlled by the statistical properties of surface roughness. In this regime, the elastic response can be well approximated as linear approximation, so that the field approach remain valid, leading to excellent agree-ment with GFMD. As the external pressure increases, long-range elastic coupling between contact patches becomes increasingly important, and the deformation field can no longer be re-garded as a weakly perturbed response to surface rough-ness. Therefore, the leading-order approximation of the displacement in Fourier space underlying the field ap-proach becomes insu ffi cient. As a result, higher-order elastic interactions between asperities, fully captured by GFMD, are only linearly approximated in the field approach, leading to increasing discrepancies with in-creasing external pressures. 
+
+5. Conclusions 
+
+In this study, we have extend the rigorous field ap-proach to describe the mean gap and gap distribution in the contact between an elastic half-space and a ran-domly rough surface. Starting from the explicit expres-sion of the mean gap derived based on the rigorous field approach, the evolution of the gap distribution is for-mulated in terms of a convection–di ff usion equation, or equivalently, a stochastic di ff erential equation char-acterized by scale-dependent drift and di ff usion coe ffi -cients. This approach provides a reduced yet physically transparent description of rough contact, in which the combined e ff ects of surface roughness, elastic deforma-tion, and exponential interfacial repulsion are coupled into an e ff ective stochastic process. The proposed framework enables an e ffi cient Monte Carlo simulation of the gap distribution over a wide range of external loads. By performing large-scale GPU-accelerated simulations, we demonstrate that the predicted gap distributions are in very good agreement with reference results obtained from Green’s function molecular dynamics (GFMD) and Persson theory. The agreement holds at small applied pressure, indicating that the statistical features of rough surface contacts can be accurately captured by the field approach with lead-ing order expansions. It is expected that the deviation between our approach and GFMD could be decreased by considering a few more higher order cumulant ex-pansions. Considering that our results demonstrate that the pro-posed framework provides a convincing and e ffi cient al-ternative for predicting mean gap and gap distribution in rough contact problems, future work may focus on incorporating adhesion and thermal e ff ects, thereby ex-tending the applicability of the approach to a broader range of contact mechanics. 
+
+Acknowledgments 
+
+YZ acknowledges the financial supports from the National Natural Science Foundation of China (Grant No.12402116) and the Opening fund of State Key Laboratory of Nonlinear Mechanics (Grant No. LNM202510). HS acknowledges the financial sup-port from the Strategic Priority Research Program of the Chinese Academy of Science through grant No. XDB0620101. YX acknowledges the financial support from the Natural Science Foundation of Anhui Province (Grant No. 2508085ME101). 
+
+Data Availability 
+
+The data are available from the corresponding author upon reasonable request. 
+
+Declaration 
+
+The author declares that he has no conflict interest. 
+
+Declaration of generative AI and AI-assisted tech-nologies in the manuscript preparation process 
+
+During the preparation of this manuscript, the authors used ChatGPT to assist with language editing and clar-ity improvement. All content was carefully reviewed and revised by the authors, who take full responsibility for the accuracy, originality, and integrity of the pub-lished work. 8Appendix A. Proof of the equivalence between Eq.( 20) and Eq.( 21) 
+
+We assume that the interfacial gap g between rough surfaces obey the stochastic di ff erential equation dg
+
+dζ = D1(ζ) + Γ (ζ) (A.1) If the magnification ζ increases to ζ + ∆ ζ, the increment of gap ∆g can be written as 
+
+∆g =
+
+Z ζ+∆ ζζ
+
+ds [D1(s) + Γ (s)] 
+
+≈ D1(ζ)∆ζ +
+
+Z ζ+∆ ζζ
+
+ds Γ(s)(A.2) as long as ∆ζ is small enough. Therefore, we get 
+
+⟨∆g⟩ = D1(ζ)∆ζ, 
+
+⟨∆g2⟩ = 2D2(ζ)∆ζ. (A.3) The gap distribution at magnification ζ + ∆ ζ is 
+
+P(g, ζ + ∆ ζ) =
+
+Z
+
+dg′ P(g, ζ + ∆ ζ|g′, ζ )P(g′, ζ )
+
+=
+
+Z
+
+d∆g P (g; g − ∆g)P(g − ∆g, ζ ),
+
+(A.4) where we assume g′ = g − ∆g and define P(g; g − ∆g) ≡
+
+P(g, ζ + ∆ ζ|g − ∆g, ζ ). We expand P(g − ∆g, ζ ) with Taylor series to second-order, then we get 
+
+P(g − ∆g, ζ ) ≈ P(g, ζ ) − ∆g ∂P
+
+∂g + 12 ∆g2 ∂2 P
+
+∂g2 . (A.5) Substituting Eq. (A.5) into Eq. (A.4), we get 
+
+P(g, ζ + ∆ ζ) = P(g, ζ ) − ⟨ ∆g⟩ ∂P
+
+∂g + 12 ⟨∆g2⟩ ∂2 P
+
+∂g2 . (A.6) Substituting Eq. (A.3) into Eq. (A.6) and assume that 
+
+∆ζ is small enough, we get 
+
+∂P
+
+∂ζ = −D1(ζ) ∂P
+
+∂g + D2(ζ) ∂2 P
+
+∂g2 . (A.7) 
+
+References 
+
+[1] B. N. J. Persson, O. Albohr, U. Tartaglino, A. I. Volokitin, E. Tosatti, On the nature of surface roughness with application to contact mechanics, sealing, rubber friction and adhe-sion, Journal of Physics: Condensed Matter 17 (1) (2004) R1–R62. doi:10.1088 /0953-8984 /17 /1/r01. URL http://dx.doi.org/10.1088/0953-8984/17/1/R01 
+
+[2] J. Wang, Z. Zhang, R. Shi, B. N. Chandrashekar, N. Shen, H. Song, N. Wang, J. Chen, C. Cheng, Impact of nanoscale roughness on heat trans-port across the solid–solid interface, Ad-vanced Materials Interfaces 7 (4) (Dec. 2019). doi:10.1002 /admi.201901582. URL http://dx.doi.org/10.1002/admi.201901582 
+
+[3] C. Zhai, D. Hanaor, G. Proust, Y. Gan, Stress-dependent electrical contact resistance at fractal rough surfaces, Journal of Engineering Mechanics 143 (3) (Mar. 2017). doi:10.1061 /(asce)em.1943-7889.0000967. URL http://dx.doi.org/10.1061/(ASCE)EM.1943-7889.00 
+
+[4] R. L. Jackson, E. R. Crandall, M. J. Bozack, Rough surface electrical contact resistance con-sidering scale dependent properties and quantum eff ects, Journal of Applied Physics 117 (19) (May 2015). doi:10.1063 /1.4921110. URL http://dx.doi.org/10.1063/1.4921110 
+
+[5] J. A. Greenwood, J. B. P. Williamson, Contact of nominally flat surfaces, Proceedings of the Royal Society of London. Series A. Mathematical and Physical Sciences 295 (1442) (1966) 300–319. doi:10.1098 /rspa.1966.0242. URL http://dx.doi.org/10.1098/rspa.1966.0242 
+
+[6] A. Bush, R. Gibson, T. Thomas, The elastic contact of a rough surface, Wear 35 (1) (1975) 87–111. doi:10.1016 /0043-1648(75)90145-3. URL http://dx.doi.org/10.1016/0043-1648(75)90145-3 
+
+[7] M. Ciavarella, G. Demelio, J. R. Barber, Y. H. Jang, Linear elastic contact of the weierstrass profile, Proceedings of the Royal Society of London. Series A: Mathematical, Physical and Engineering Sciences 456 (1994) (2000) 387–405. doi:10.1098 /rspa.2000.0522. URL http://dx.doi.org/10.1098/rspa.2000.0522 
+
+[8] B. N. J. Persson, Theory of rubber fric-tion and contact mechanics, The Journal of Chemical Physics 115 (8) (2001) 3840–3861. doi:10.1063 /1.1388626. URL http://dx.doi.org/10.1063/1.1388626 
+
+[9] F. Shen, Y.-H. Li, L.-L. Ke, A novel fractal contact model based on size distribution law, International Journal of Mechanical Sciences 249 (2023) 108255. doi:10.1016 /j.ijmecsci.2023.108255. URL http://dx.doi.org/10.1016/j.ijmecsci.2023.10825 
+
+9[10] G. F. Wang, X. M. Liang, D. Yan, An incremental equivalent circular contact model for rough sur-faces, Journal of Tribology 143 (8) (Apr. 2021). doi:10.1115 /1.4050602. URL http://dx.doi.org/10.1115/1.4050602 
+
+[11] W. Ta, S. Qiu, Y. Wang, J. Yuan, Y. Gao, Y. Zhou, Volumetric contact theory to electri-cal contact between random rough surfaces, Tribology International 160 (2021) 107007. doi:10.1016 /j.triboint.2021.107007. URL http://dx.doi.org/10.1016/j.triboint.2021.107007 
+
+[12] X.-M. Liang, S.-W. Chen, C.-Y. Li, X. Niu, G.-F. Wang, A general contact model for rough surfaces based on the incremental concept, Tribology International 198 (2024) 109882. doi:10.1016 /j.triboint.2024.109882. URL http://dx.doi.org/10.1016/j.triboint.2024.109882 
+
+[13] R. Xu, L. Gil, J. Singer, L. Gontard, W. Leverd, B. N. J. Persson, Leakage at interfaces: a compre-hensive study based on persson contact mechanics theory (2025). doi:10.48550 /ARXIV.2507.09571. URL https://arxiv.org/abs/2507.09571 
+
+[14] B. N. J. Persson, Relation between interfacial separation and load: A general theory of contact mechanics, Physical Review Letters 99 (12) (Sep. 2007). doi:10.1103 /physrevlett.99.125502. URL http://dx.doi.org/10.1103/PhysRevLett.99.125502 
+
+[15] F. Bottiglione, G. Carbone, G. Mantriota, Fluid leakage in seals: An approach based on percola-tion theory, Tribology International 42 (5) (2009) 731–737. doi:10.1016 /j.triboint.2008.10.002. URL http://dx.doi.org/10.1016/j.triboint.2008.10.002 
+
+[16] I. A. Lyashenko, L. Pastewka, B. N. J. Persson, On the validity of the method of reduction of di-mensionality: Area of contact, average interfacial separation and contact sti ff ness, Tribology Letters 52 (2) (2013) 223–229. doi:10.1007 /s11249-013-0208-9. URL http://dx.doi.org/10.1007/s11249-013-0208-9 
+
+[17] F. J. Fischer, K. Schmitz, A. Tiwari, B. N. J. Persson, Fluid leakage in metallic seals, Tribology Letters 68 (4) (Nov. 2020). doi:10.1007 /s11249-020-01358-x. URL http://dx.doi.org/10.1007/s11249-020-01358-x 
+
+[18] N. Prodanov, W. B. Dapp, M. H. Müser, On the contact area and mean gap of rough, elastic contacts: Dimensional analysis, numerical correc-tions, and reference data, Tribology Letters 53 (2) (2013) 433–448. doi:10.1007 /s11249-013-0282-z. URL http://dx.doi.org/10.1007/s11249-013-0282-z 
+
+[19] W. B. Dapp, N. Prodanov, M. H. Müser, Sys-tematic analysis of persson’s contact mechanics theory of randomly rough elastic surfaces, Journal of Physics: Condensed Matter 26 (35) (2014) 355002. doi:10.1088 /0953-8984 /26 /35 /355002. URL http://dx.doi.org/10.1088/0953-8984/26/35/35500 
+
+[20] Y. Xu, X. Li, Q. Chen, Y. Zhou, Persson’s theory of purely normal elastic rough sur-face contact: A tutorial based on stochas-tic process theory, International Journal of Solids and Structures 290 (2024) 112684. doi:10.1016 /j.ijsolstr.2024.112684. URL http://dx.doi.org/10.1016/j.ijsolstr.2024.11268 
+
+[21] Y. Xu, L. Zhu, F. Xiao, Y. Zhou, A new fudge factor for persson’s theory of purely normal elastic rough surface contact, Tribology Letters 72 (2) (Mar. 2024). doi:10.1007 /s11249-024-01838-4. URL http://dx.doi.org/10.1007/s11249-024-01838-4 
+
+[22] B. N. J. Persson, Elastoplastic contact be-tween randomly rough surfaces, Physi-cal Review Letters 87 (11) (Aug. 2001). doi:10.1103 /physrevlett.87.116101. URL http://dx.doi.org/10.1103/PhysRevLett.87.116101 
+
+[23] V. Lambert, E. E. Brodsky, Competition between roughness and strength for scale-dependent surfaces, Physical Review E 111 (6) (Jun. 2025). doi:10.1103 /physreve.111.065502. URL http://dx.doi.org/10.1103/PhysRevE.111.065502 
+
+[24] B. N. J. Persson, The dependency of adhesion and friction on electrostatic attraction, The Jour-nal of Chemical Physics 148 (14) (Apr. 2018). doi:10.1063 /1.5024038. URL http://dx.doi.org/10.1063/1.5024038 
+
+[25] B. N. J. Persson, R. Xu, N. Miyashita, Rub-ber wear: Experiment and theory, The Journal of Chemical Physics 162 (7) (Feb. 2025). doi:10.1063 /5.0248199. URL http://dx.doi.org/10.1063/5.0248199 
+
+[26] W. B. Dapp, A. Lücke, B. N. J. Persson, M. H. Müser, Self-a ffi ne elastic contacts: Percolation and leakage, Physical Review Letters 108 (24) (Jun. 2012). doi:10.1103 /physrevlett.108.244301. URL http://dx.doi.org/10.1103/PhysRevLett.108.24430 
+
+10 [27] C. Müller, M. H. Müser, G. Carbone, N. Menga, Significance of elastic coupling for stresses and leakage in frictional contacts, Physi-cal Review Letters 131 (15) (Oct. 2023). doi:10.1103 /physrevlett.131.156201. URL http://dx.doi.org/10.1103/PhysRevLett.131.156201 
+
+[28] M. H. Müser, Rigorous field-theoretical approach to the contact mechanics of rough elastic solids, Physical Review Letters 100 (5) (Feb. 2008). doi:10.1103 /physrevlett.100.055504. URL http://dx.doi.org/10.1103/PhysRevLett.100.055504 
+
+[29] C. Campañá, M. H. Müser, M. O. Robbins, Elastic contact between self-a ffi ne surfaces: compari-son of numerical stress and contact correlation functions with analytic predictions, Journal of Physics: Condensed Matter 20 (35) (2008) 354013. doi:10.1088 /0953-8984 /20 /35 /354013. URL http://dx.doi.org/10.1088/0953-8984/20/35/354013 
+
+[30] Y. Xu, J. Joe, X. Li, Y. Zhou, Stochastic process model for interfacial gap of purely normal elastic rough surface contact, Journal of the Mechan-ics and Physics of Solids 192 (2024) 105823. doi:10.1016 /j.jmps.2024.105823. URL http://dx.doi.org/10.1016/j.jmps.2024.105823 
+
+[31] Y. Zhou, H. Song, Data-driven enhanced rough contact mechanics: Pinn estimation of gap dis-tribution across length scales for partial contacts, Tribology International 214 (2026) 111100. doi:10.1016 /j.triboint.2025.111100. URL http://dx.doi.org/10.1016/j.triboint.2025.111100 
+
+[32] C. Yang, B. N. J. Persson, Molecular dynamics study of contact mechanics: Contact area and interfacial separation from small to full contact, Physical Review Letters 100 (2) (Jan. 2008). doi:10.1103 /physrevlett.100.024303. URL http://dx.doi.org/10.1103/PhysRevLett.100.024303 
+
+[33] C. Yang, B. N. J. Persson, Contact mechanics: contact area and interfacial separation from small contact to full contact, Journal of Physics: Condensed Matter 20 (21) (2008) 215214. doi:10.1088 /0953-8984 /20 /21 /215214. URL http://dx.doi.org/10.1088/0953-8984/20/21/215214 
+
+[34] A. Almqvist, C. Campañá, N. Prodanov, B. Persson, Interfacial separation between elastic solids with randomly rough surfaces: Comparison between theory and numerical techniques, Journal of the Mechanics and Physics of Solids 59 (11) (2011) 2355–2369. doi:10.1016 /j.jmps.2011.08.004. URL http://dx.doi.org/10.1016/j.jmps.2011.08.004 
+
+[35] C. Campañá, M. H. Müser, Practical green’s function approach to the simulation of elastic semi-infinite solids, Physical Review B 74 (7) (Aug. 2006). doi:10.1103 /physrevb.74.075420. URL http://dx.doi.org/10.1103/PhysRevB.74.075420 
+
+[36] Y. Zhou, M. Moseler, M. H. Müser, Solu-tion of boundary-element problems using the fast-inertial-relaxation-engine method, Physical Review B 99 (14) (Apr. 2019). doi:10.1103 /physrevb.99.144103. URL http://dx.doi.org/10.1103/PhysRevB.99.144103 
+
+[37] S. P. Venugopalan, L. Nicola, M. H. Müser, Green’s function molecular dynamics: in-cluding finite heights, shear, and body fields, Modelling and Simulation in Materials Sci-ence and Engineering 25 (3) (2017) 034001. doi:10.1088 /1361-651x /aa606b. URL http://dx.doi.org/10.1088/1361-651X/aa606b 
+
+[38] Y. Zhou, J. Yang, How thickness aff ects the area–pressure relation in line contacts, Tribology Letters 70 (4) (Sep. 2022). doi:10.1007 /s11249-022-01647-7. URL http://dx.doi.org/10.1007/s11249-022-01647-7 
+
+[39] Y. Zhou, Long-range electrostatic adhesive con-tact between an elastic half-space and a rigid indenter with power-law profile, Journal of Tribol-ogy 147 (6) (Nov. 2024). doi:10.1115 /1.4067044. URL http://dx.doi.org/10.1115/1.4067044 
+
+[40] J. S. van Dokkum, M. Khajeh Salehani, N. Irani, L. Nicola, On the proportionality between area and load in line contacts, Tribology Letters 66 (3) (Aug. 2018). doi:10.1007 /s11249-018-1061-7. URL http://dx.doi.org/10.1007/s11249-018-1061-7 
+
+[41] B. N. J. Persson, On the fractal dimension of rough surfaces, Tribology Letters 54 (1) (2014) 99–106. doi:10.1007 /s11249-014-0313-4. URL http://dx.doi.org/10.1007/s11249-014-0313-4 
+
+[42] A. Gujrati, S. R. Khanal, L. Pastewka, T. D. B. Jacobs, Combining tem, afm, and profilometry for quantitative topography characterization across all scales, ACS Applied Materials and Interfaces 10 (34) (2018) 29169–29178. doi:10.1021 /acsami.8b09899. URL http://dx.doi.org/10.1021/acsami.8b09899 
+
+11 [43] A. Gujrati, A. Sanner, S. R. Khanal, N. Moldovan, H. Zeng, L. Pastewka, T. D. B. Jacobs, Com-prehensive topography characterization of polycrystalline diamond coatings, Surface To-pography: Metrology and Properties 9 (1) (2021) 014003. doi:10.1088 /2051-672x /abe71f. URL http://dx.doi.org/10.1088/2051-672x/abe71f 
+
+[44] A. R. Hinkle, W. G. Nöhring, R. Leute, T. Junge, L. Pastewka, The emergence of small-scale self-a ffi ne surface roughness from deforma-tion, Science Advances 6 (7) (Feb. 2020). doi:10.1126 /sciadv.aax0847. URL http://dx.doi.org/10.1126/sciadv.aax0847 
+
+[45] J. M. Monti, L. Pastewka, M. O. Robbins, Fractal geometry of contacting patches in rough elastic contacts, Journal of the Mechan-ics and Physics of Solids 160 (2022) 104797. doi:10.1016 /j.jmps.2022.104797. URL http://dx.doi.org/10.1016/j.jmps.2022.104797 
+
+[46] Y. Xu, S. Yang, Y. Zhou, L. Luo, Revisiting the di ff usion equation derivation in persson’s theory of contact, Journal of Tribology 148 (3) (Sep. 2025). doi:10.1115 /1.4069634. URL http://dx.doi.org/10.1115/1.4069634 
+
+[47] H. Risken, Fokker-planck equation, Springer, 1989. [48] K. Itô, On a formula concerning stochastic di ff er-entials, Nagoya Mathematical Journal 3 (1951) 55–65. doi:10.1017 /s0027763000012216. URL http://dx.doi.org/10.1017/S0027763000012216 
+
+12
