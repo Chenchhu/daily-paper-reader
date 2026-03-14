@@ -1,0 +1,169 @@
+Title: High-fidelity level-set modeling of polycrystalline grain growth
+
+URL Source: https://arxiv.org/pdf/2603.11608v1
+
+Published Time: Fri, 13 Mar 2026 00:33:40 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+# HIGH -FIDELITY LEVEL -SET MODELING OF POLYCRYSTALLINE GRAIN GROWTH 
+
+Tianchi Li, Marc Bernacki 
+
+Mines Paris, PSL University Centre for material forming (CEMEF), UMR CNRS 06904 Sophia Antipolis, France 
+
+tianchi.li@minesparis.psl.eu, marc.bernacki@minesparis.psl.eu 
+
+# ABSTRACT 
+
+Accurate modeling of polycrystalline microstructure evolution under strong crystallographic hetero-geneities remains a major challenge for full-field numerical methods at the mesoscopic scale. In this work, we present a high-fidelity level-set framework for capillarity-driven grain growth in polycrys-tals with highly-heterogeneous, disorientation-dependent grain boundary energies. The novel frame-work represents a polycrystalline extension of our level-set formulation, previously developed and validated using a single triple junction benchmark case. In-depth comparisons with three established level-set models demonstrate that the proposed method yields the most energetically-consistent evo-lution of grain statistics, disorientation distribution function, and triple junction dihedral angles. Accuracy and robustness are maintained across the entire heterogeneity spectrum. To the best of our knowledge, this approach delivers the highest-fidelity front-capturing level-set modeling of grain growth based on Mullins’ mean curvature flow theory, paving the way for state-of-the-art digital twins for annealing applications. 
+
+Keywords annealing, grain growth, grain boundary migration, finite element analysis, level-set Annealing has long been practiced in blacksmithing to restore ductility in deformed metals. However, it was not until the early 20 th century that the grain coarsening occurring after recrystallization, now referred to as grain growth, was identified as a distinct metallurgical phenomenon through systematic metallographic observations [1]. By the mid-20 th 
+
+century, capillarity (surface tension) was recognized as the primary driving pressure for grain growth [2], enabling the development of quantitative kinetic models [3, 4]. In 1956, Mullins formulated the classical mean curvature flow equation for capillarity-driven grain boundary (GB) migration [5]: ⃗v = −μγκ⃗ n, (1) where ⃗v, μ, γ, κ,⃗n denote respectively the velocity, mobility, free energy, mean curvature, and unit outward normal vector of GBs. Despite its simplicity, Eq. (1) successfully predicts the evolution of mean grain size and even grain size distribution during grain growth [6]. This represents a core interest for grain growth modeling since the eventual grain size strongly influences the mechanical and functional properties of metallic components [7, 8]. However, the validity of Eq. (1) was questioned in recent microscopic studies focusing on individual GBs [9–12]. As discussed by Yang [13] and Bernacki [14], these discrepancies can arise from the neglect of GB heterogeneity and anisotropy in the current framework. Nevertheless, for large polycrystalline systems, Mullins’ equation remains statistically predictive of average grain growth behaviors, as proven by its longstanding success in annealing predictions. From a thermodynamic perspective, grain growth is driven by the reduction of total interfacial energy through the decrease of GB area. As derived by Herring [15], the first order capillarity driving pressure for an infinitesimal surface displacement is given by 
+
+P ≈ − (γI + ∇⃗n ∇⃗n γ)
+
+| {z }
+
+> L(⃗n)
+
+: K, (2) 
+
+> arXiv:2603.11608v1 [cond-mat.mtrl-sci] 12 Mar 2026
+
+with K = ∇⃗n the curvature tensor and L the GB stiffness tensor. When γ is assumed independent of interface in-clination ( ∇⃗n γ = 0 ), the driving pressure simplifies to the one used in Eq. (1): P ≈ − γκ [16]. This simplification excludes the full anisotropic GB energy description [17], thereby limiting the applicability of the traditional frame-work. To address these limitations, advanced level-set formulations have been proposed [18]. These approaches can be broadly categorized as 3-parameter heterogeneous models [19, 20], in which γ depends only on disorientation, and 5-parameter anisotropic models [21, 22], where γ depends on both disorientation and inclination. By including the spatial derivative of γ, the new models aim to better capture the influence of GB heterogeneity on triple junction (TJ) kinetics compared to the direct substitution of disorientation-dependent GB energy in Mullins’ equation [23]. De-spite increased complexity and computational costs associated to additional gradient terms, their overall performance remains limited, particularly in polycrystals with highly heterogeneous GB energies. In a previous study [24], we introduced a novel level-set formulation for capillarity-driven GB migration. The model accurately reproduces the velocity, dihedral angles, and equilibrium profile of a single TJ over a wide range of GB energy ratios, including extreme cases of wetting and complete stagnation. Although restricted to disorientation-dependent interface energies, the framework demonstrates strong potential for capturing realistic GB kinetics. In the present work, we extend this formulation to the polycrystalline scale and perform large-scale grain growth simulations under diverse GB energy configurations. The performance of the approach is systematically assessed through com-parison with existing level-set models, focusing on the evolution of global statistics, disorientation angle distribution, and TJ dihedral angles. The proposed formulation fundamentally differs from all other established level-set frameworks in the introduction of crystallographic heterogeneities. Rather than including a convective term based on the spatial gradient of GB energy 
+
+γ, one accounts for the disorientation dependency of γ through a source term on the right-hand side of the level-set transport equation: 
+
+∂ψ i
+
+∂t − MR∆ψi = Λ i
+
+1 − 
+
+> N−1
+
+X
+
+> j=0
+
+H(ψj )
+
+ . (3) Here, ψi denotes the i-th global level-set distance function obtained via coloring techniques [25]. Λi is the source term factor field associated with ψi, and H is a slightly regularized Heaviside function [26]. The diffusive term on the left-hand side preserves the classical curvature-driven mechanism, governed by the reduced mobility MR = μγ . To facilitate numerical implementation, the source term is expressed as Λi = λi max (Λ i), with λi the normalized source term factor and max (Λ i) a magnitude constant. For finite element simulations using unstructured triangular mesh, the optimal parameter relations are obtained through dimensional analysis: 
+
+max (Λ i) ≃
+
+r MR
+
+∆t , h ≃ pMR∆t, (4) with ∆t the simulation time step and h the minimum refined mesh size at TJs. Once the average reduced mobility MR
+
+is prescribed, the remaining parameters follow from the chosen spatial or temporal resolution. λi can be interpolated from the GB energy configuration at TJs using the dataset reported in [24]. In contrast to other existing level-set formulations, the present approach does not involve computationally expensive operations. Nevertheless, it accurately captures the influence of polycrystalline heterogeneity on the migration of individual interfaces and junctions during capillarity-driven grain growth, as illustrated in Fig. 1. To assess the performance of the proposed formulation at the polycrystalline scale, an initial microstructure with a log-normal grain size distribution (Fig. 2 (a)) is generated in a 1.5 × 1.5 mm 2 square domain using Laguerre–Voronoi tessellation [27]. Crystallographic orientations are assigned by randomly generating the Euler angles (φ1, Φ, φ 2) for all grains, resulting in a Mackenzie-type disorientation angle distribution [28] (Fig. 2 (b)). A graphical representation of the polycrystal is shown in Fig. 2 (c) using a color scheme based on orientation magnitude pφ21 + Φ 2 + φ22.As in [24], the GB energy γ is treated as dimensionless, since it enters the formulation only through the normalized source-term factor. Assuming that γ depends solely on the disorientation angle θ, three analytical GB energy functions are considered (Eqs. (5)–(7), Fig. 3 (a)). The Iso case corresponds to uniform GB energy and serves as a reference configuration. RS + extends the prevalent Read-Shockley model [29] by introducing a low-energy regime at high disorientation angles to mimic twin boundaries. However, both isotropic and Read-Shockley-type descriptions yield nearly constant energies in the mid-to-high disorientation range (30 ◦ to 55 ◦), which dominates the Mackenzie distribution. To probe strongly heterogeneous scenarios, a Bumpy function with amplified bumps and cusps is introduced, providing a stringent test of numerical robustness. 2(a) (c) (d) (b) Figure 1: Capillarity-driven grain growth strongly influenced by grain boundary (GB) heterogeneity. Rγ denotes the free-energy ratio between the 4 inner and 4 outer GBs. (a) Initial configuration and (b) evolved grain morphology for 
+
+Rγ = 100 . (c) Initial configuration and (d) evolved grain morphology for Rγ = 0 .5.
+
+Iso: 
+
+γ = 1 , (5) 
+
+RS +:
+
+γ =
+
+
+
+θθmax 
+
+
+
+1 − ln 
+
+ θθmax 
+
+ 
+
+, θ < θ max 
+
+1, θmax < θ < θ thresh 
+
+0.3, θ > θ thresh 
+
+, (6) where θmax = 30 ◦ and θthresh = 55 ◦,
+
+Bumpy: 
+
+γ = γb (α| sin(3 θ)| + β| sin(5 θ)|) , (7) where γb = 1 .17 , α = 0 .9, β = 0 .3.Three existing level-set formulations are selected for comparison (Eqs. (8)–(10)). The Heterogeneous (Het) model di-rectly incorporates γ(θ) into Mullins’ equation [23]. Although γ is constant along each individual GB, its discontinuity 3(b) (c) (a) Figure 2: Polycrystalline system used for simulations in this work. (a) Grain size distribution. (b) Disorientation angle distribution. (c) Orientation magnitude map. across junctions induces local heterogeneity. The Heterogeneous with Gradient (HetGrad) formulation captures this heterogeneity effect using the spatial gradient of γ [19]. Since γ is only defined on the GBs, one can further project ⃗ ∇γ
+
+along the interfaces to obtain the so-called Heterogeneous with Projected Gradient (HetGradProj) formulation [18]. 
+
+Het: ∂ψ ∂t − μγ (θ)∆ ψ = 0 (8) 
+
+HetGrad: ∂ψ ∂t − μγ (θ)∆ ψ + μ⃗ ∇γ(θ) ·⃗ ∇ψ = 0 (9) 
+
+HetGradProj: ∂ψ ∂t − μγ (θ)∆ ψ + μ⃗ ∇⃗n γ(θ) ·⃗ ∇ψ = 0 (10) In the present model, consistent with the dimensionless treatment of γ, the diffusive term is evaluated with γ = 1 . The reduced mobility MR in Eq. (3) therefore coincides with the GB mobility μ in Eqs. (8)–(10). Spatial discretization is performed using an unstructured triangular mesh with isotropic refinement near GBs. Considering the initial mean grain radius ¯R = 11 μm and a total simulation time of T = 3 h, the minimum mesh size and time step are set to h = 1 
+
+μm, ∆t = 10 s. The remaining parameters follow from Eq. (4), yielding 
+
+MR = μ = 0 .1 μm 2 s−1, max (Λ i) = 0 .1 μm s −1. (11) Grain growth simulations are performed with the four level-set formulations described above, using an in-house finite-element library [30–32]. The temporal evolution of the number of grains Ngr , the mean equivalent grain radius Req ,and the total normalized GB energy Etot are recorded and reported in Fig. 3 (b–d). To maximize the influence of interfacial heterogeneity, the Bumpy energy function is selected for this comparison. Across all three metrics, the proposed formulation exhibits the fastest and most coherent evolution. In contrast, the other existing models display mutually inconsistent trends. The Het formulation shows the slowest reduction of Etot , while predicting faster changes in Ngr and Req than both HetGrad and HetGradProj. HetGrad yields the slowest evolution in Ngr and Req , yet reduces total GB energy more rapidly than Het and HetGradProj. These discrepancies indicate a lack of energetic consistency in the existing formulations. Overall, the proposed framework provides the most energetically consistent grain growth kinetics among the four models. 40 20 40 60                  
+
+> 3(/)
+> 00.5 11.5 GB Energy .(3)
+> (a) Iso RS +
+> Bumpy
+> 0123
+> T(h)
+> 1000 3000 5000
+> Number of Grains N gr
+> (b)
+> 0123
+> T(h)
+> 11 18 25
+> Mean Radius R eq (7m)
+> (c)
+> 0123
+> T(h)
+> 0.4 0.7 1
+> Total Energy E tot
+> (d)
+> New Model Het HetGrad HetGradProj
+
+Figure 3: GB energy functions considered in the current work and grain growth statistics measured in the Bumpy case. 
+
+(a) The analytical forms of γ(θ) and the evolution of (b) number of grains, (c) mean equivalent grain radius, and (d) 
+
+total normalized GB energy in Bumpy simulations, with comparison to existing level-set models. The global grain statistics can be further elucidated through the analysis of disorientation distribution function (DDF). To this end, grain growth simulations are performed using all four formulations and the three GB energy functions. Figure 4 compares the DDF measured at T = 2 h with the initial reference distribution for each of the twelve cases. In the isotropic cases (Fig. 4, left column), all four models preserve the Mackenzie distribution, as expected for uniform GB energy. For heterogeneous GB energy distributions, the energy minimization principle dictates that high-energy interfaces should disappear faster than low-energy ones. The Het formulation, despite its widespread use, predicts the opposite trend: in both RS + and Bumpy cases, low-energy high-angle GBs are eliminated more rapidly than higher-energy interfaces (Fig. 4 (e)(f)), revealing a fundamental inconsistency. The inclusion of convective terms in HetGrad and HetGradProj partially restores the correct energetic bias. Contrary to the original modeling assumption, the ordinary gradient ∇γ in HetGrad (Fig. 4 (h)(i)) captures heterogeneity effects more effectively than the projected gradient employed in HetGradProj (Fig. 4 (k)(l)). The proposed formulation performs comparably to HetGrad in the case of RS + (Fig. 4 (n)). However, in strongly heterogeneous scenarios exemplified by the Bumpy case, it clearly outperforms all other models (Fig. 4 (o)). Not only the high-angle energy minimum near 60 ◦, but also the two bumps at 20 ◦ and 40 ◦, as well as the intermediate cusp, are accurately represented. Among the evaluated front-capturing level-set approaches, the proposed framework demonstrates the highest degree of energetic consistency in capturing heterogeneous GB kinetics. The superior performance of the proposed formulation stems from its accurate description of TJ kinetics during grain growth. As demonstrated in [24], the capillarity-driven motion of an isolated TJ is reproduced with high fidelity over a wide range of GB energy ratios. In the present work, an analogous TJ analysis is conducted at the polycrystalline 5Figure 4: Disorientation Distribution Function (DDF) weighted by grain boundary (GB) length after 2 hours of grain growth simulation using (a) Iso, (b) RS +, and (c) Bumpy GB energy functions, with comparison against initial DDF. Compared to (d)(e)(f) Het, (g)(h)(i) HetGrad, (j)(k)(l) HetGradProj formulations, (m)(n)(o) the new model gives the most energetically coherent DDF prediction. 6scale for all four level-set formulations. For the highly heterogeneous Bumpy case, dihedral angles of all TJs are measured at T = 2 h and compared to their theoretical equilibrium values computed from the local GB energies using Young’s equation (Fig. 5 (a)(c)(e)(g)). The deviations between measured and theoretical angles are further quantified (Fig. 5 (b)(d)(f)(h)). In the scatter plots, the dashed line denotes perfect agreement with theory, corresponding to 0◦
+
+deviation in the histograms. The proximity of data points to this line provides a direct measure of model accuracy. Among the existing approaches, the Het formulation exhibits the largest discrepancy: measured dihedral angles show little correlation with theoretical predictions (Fig. 5 (a)(b)). The HetGrad and HetGradProj models perform similarly. While they improve predictions under mild heterogeneity, their accuracy deteriorates significantly in strongly hetero-geneous regimes, where theoretical equilibrium angles deviate markedly from 120 ◦ (Fig. 5 (c)(d)(e)(f)). In contrast, the proposed formulation maintains accurate agreement with analytical dihedral angles across the entire heterogeneity spectrum, including extreme configurations approaching 0◦ and 180 ◦ (Fig. 5 (g)(h)). Nevertheless, it is worth noting that TJs have finite lifetimes in polycrystalline simulations. The junction interactions during grain growth lead to GB annihilation and reformation, altering local energy configurations and equilibrium angles. Many TJs are eliminated before reaching equilibrium, especially in fully-recrystallized fine-grained microstructures with high junction density. Furthermore, compared to the single-TJ benchmark in [24], large-scale simulations necessarily employ coarser mesh near TJs to maintain computational efficiency, which slightly reduces dihedral angle measurement precision. These factors explain the remaining deviations from analytical predictions. The proposed level-set formulation preserves its accuracy and robustness at the polycrystalline scale. Owing to its precise representation of TJ dihedral angles throughout evolving GB networks, it delivers the most energetically con-sistent grain growth kinetics among the level-set approaches examined in this work. Among the existing models, the widely used Het formulation exhibits the lowest overall accuracy. Incorporation of an energy gradient term in HetGrad improves predictions by partially accounting for local variations of GB energy at TJs. However, the gradient projection strategy employed in HetGradProj does not enhance predictive capability in the present polycrystalline simulations. While HetGradProj may yield improved TJ velocity in certain configurations, it does not provide superior dihedral angle accuracy. Since TJ dihedral angles are directly governed by the local energy balance through Young’s equation, their accurate prediction is essential for energetically consistent grain growth modeling. The proposed formulation prevails by capturing both TJ velocities and equilibrium dihedral angles with high fidelity. The present framework demonstrates strong capability for modeling grain growth in highly heterogeneous polycrys-tals. It provides an efficient and physically consistent solution to long-standing challenges in computational metallurgy, enabling the annealing study of complex polycrystalline materials. Beyond its direct application, the high-fidelity level-set simulations produced by this framework may benefit other numerical approaches, including front-tracking methods [33, 34] and emerging deep-learning-based models [14, 35]. In particular, they can serve as reference, e.g., as ground-truth training datasets for data-driven grain growth models or as benchmarks for cross-validation with front-tracking simulations. Future developments aim to extend the current framework from 2D to 3D, by taking into account the quadruple junctions. A further objective is to incorporate anisotropic GB properties, such as inclination-dependent interface energy, through the introduction of GB stiffness and curvature tensors. The disconnection-based GB migration theory may also be considered to introduce physical insights based on microscopic mechanisms [36]. 
+
+# CRediT authorship contribution statement 
+
+Tianchi Li : Software, Conceptualization, Methodology, Investigation, Formal analysis, Validation, Visualization, Writing – original draft, Writing – review & editing 
+
+Marc Bernacki : Supervision, Software, Conceptualization, Writing – review & editing, Funding acquisition, Project administration 
+
+# Declaration of competing interest 
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. 
+
+# Acknowledgements 
+
+The authors thank Carnot M.I.N.E.S and ANR for their financial support (Grant No. 230000488). 7Figure 5: Statistics of triple junction dihedral angles in Bumpy simulations using (a)(b) Het, (c)(d) HetGrad, (e)(f) 
+
+HetGradProj, and (g)(h) new model. left column: Measured angles plotted against their theoretical equilibrium values computed using Young’s equation. right column: Deviation of measured angles from theoretical predictions. 8References 
+
+[1] J. Humphreys, G. S. Rohrer, A. Rollett, Recrystallization and Related Annealing Phenomena (2017). [2] G. Rohrer, “Introduction to Grains, Phases, and Interfaces—an Interpretation of Microstructure”, Trans. AIME, 1948, vol. 175, pp. 15–51, by C.S. Smith, Metallurgical and Materials Transactions A 41 (2010) 1063–1100. 
+
+doi:10.1007/s11661-010-0215-5 .[3] J. Burke, D. Turnbull, Recrystallization and grain growth, Progress in Metal Physics 3 (1952) 220–292. doi: 10.1016/0502-8205(52)90009-9 .[4] J. Von Neumann, Metal interfaces, American Society for Metals, Cleveland 108 (1952) 108–110. [5] W. W. Mullins, Two-Dimensional Motion of Idealized Grain Boundaries, Journal of Applied Physics 27 (8) (1956) 900–904. doi:10.1063/1.1722511 .[6] M. Hillert, On the theory of normal and abnormal grain growth, Acta Metallurgica 13 (3) (1965) 227–238. 
+
+doi:10.1016/0001-6160(65)90200-2 .[7] A. Lasalmonie, J. L. Strudel, Influence of grain size on the mechanical behaviour of some high strength materials, Journal of Materials Science 21 (6) (1986) 1837–1852. doi:10.1007/BF00547918 .[8] C. Zhang, P. Wang, Z. Wen, Z. Xu, P. He, Z. Yue, Study on creep properties of nickel-based superalloy blades based on microstructure characteristics, Journal of Alloys and Compounds 890 (2022) 161710. doi:10.1016/ j.jallcom.2021.161710 .[9] A. Bhattacharya, Y.-F. Shen, C. M. Hefferan, S. F. Li, J. Lind, R. M. Suter, C. E. Krill, G. S. Rohrer, Grain boundary velocity and curvature are not correlated in Ni polycrystals, Science 374 (6564) (2021) 189–193. 
+
+doi:10.1126/science.abj3210 .[10] S. Florez, K. Alvarado, B. Murgas, N. Bozzolo, D. Chatain, C. E. Krill, M. Wang, G. S. Rohrer, M. Bernacki, Statistical behaviour of interfaces subjected to curvature flow and torque effects applied to microstructural evo-lutions, Acta Materialia 222 (2022) 117459. doi:10.1016/j.actamat.2021.117459 .[11] V. Muralikrishnan, H. Liu, L. Yang, B. Conry, C. J. Marvel, M. P. Harmer, G. S. Rohrer, M. R. Tonks, R. M. Suter, C. E. Krill, A. R. Krause, Observations of unexpected grain boundary migration in SrTiO3, Scripta Materialia 222 (2023) 115055. doi:10.1016/j.scriptamat.2022.115055 .[12] Z. Xu, Y.-F. Shen, S. K. Naghibzadeh, X. Peng, V. Muralikrishnan, S. Maddali, D. Menasche, A. R. Krause, K. Dayal, R. M. Suter, G. S. Rohrer, Grain boundary migration in polycrystalline α-Fe, Acta Materialia 264 (2024) 119541. doi:10.1016/j.actamat.2023.119541 .[13] L. Yang, V. Muralikrishnan, V. Yadav, Z. Tian, J. B. Harley, A. R. Krause, M. R. Tonks, Beyond curvature-driven grain growth: Insights from fully anisotropic Monte Carlo Potts simulations, Acta Materialia 302 (2026) 121672. 
+
+doi:10.1016/j.actamat.2025.121672 .[14] E. Younes, E. Hachem, M. Bernacki, Predicting Grain Growth in Polycrystalline Materials Using Deep Learning Time Series Models (2025). arXiv:2511.11630 .[15] C. Herring, Surface Tension as a Motivation for Sintering, Springer Berlin Heidelberg, Berlin, Heidelberg, 1999, pp. 33–69. doi:10.1007/978-3-642-59938-5_2 .[16] M. Bernacki, Kinetic equations and level-set approach for simulating solid-state microstructure evolutions at the mesoscopic scale: State of the art, limitations, and prospects, Progress in Materials Science 142 (2024) 101224. 
+
+doi:10.1016/j.pmatsci.2023.101224 .[17] V. V. Bulatov, B. W. Reed, M. Kumar, Grain boundary energy function for fcc metals, Acta Materialia 65 (2014) 161–175. doi:10.1016/j.actamat.2013.10.057 .[18] B. Murgas, S. Florez, N. Bozzolo, J. Fausty, M. Bernacki, Comparative Study and Limits of Different Level-Set Formulations for the Modeling of Anisotropic Grain Growth, Materials 14 (14) (2021). doi:10.3390/ ma14143883 .[19] J. Fausty, N. Bozzolo, D. Pino Mu˜ noz, M. Bernacki, A novel level-set finite element formulation for grain growth with heterogeneous grain boundary energies, Materials & Design 160 (2018) 578–590. doi:10.1016/ j.matdes.2018.09.050 .[20] J. Fausty, N. Bozzolo, M. Bernacki, A 2D level set finite element grain coarsening study with heterogeneous grain boundary energies, Applied Mathematical Modelling 78 (2020) 505–518. doi:10.1016/j.apm.2019.10.008 .[21] H. Hallberg, V. V. Bulatov, Modeling of grain growth under fully anisotropic grain boundary energy, Mod-elling and Simulation in Materials Science and Engineering 27 (4) (2019) 045002. doi:10.1088/1361-651X/ ab0c6c .9[22] J. Fausty, B. Murgas, S. Florez, N. Bozzolo, M. Bernacki, A new analytical test case for anisotropic grain growth problems, Applied Mathematical Modelling 93 (2021) 28–52. doi:10.1016/j.apm.2020.11.035 .[23] Y. Jin, N. Bozzolo, A. Rollett, M. Bernacki, 2D finite element modeling of misorientation dependent anisotropic grain growth in polycrystalline materials: Level set versus multi-phase-field method, Computational Materials Science 104 (2015) 108–123. doi:10.1016/j.commatsci.2015.03.012 .[24] T. Li, M. Bernacki, An accurate and robust level-set formulation for multiple junction kinetics, Scripta Materialia 269 (2025) 116904. doi:10.1016/j.scriptamat.2025.116904 .[25] B. Scholtes, M. Shakoor, A. Settefrati, P.-O. Bouchard, N. Bozzolo, M. Bernacki, New finite element devel-opments for the full field modeling of microstructural evolutions using the level-set method, Computational Materials Science 109 (2015) 388–398. doi:10.1016/j.commatsci.2015.07.042 .[26] H.-K. Zhao, T. Chan, B. Merriman, S. Osher, A Variational Level Set Approach to Multiphase Motion, Journal of Computational Physics 127 (1) (1996) 179–195. doi:10.1006/jcph.1996.0167 .[27] K. Hitti, P. Laure, T. Coupez, L. Silva, M. Bernacki, Precise generation of complex statistical Representative Volume Elements (RVEs) in a finite element context, Computational Materials Science 61 (2012) 224–238. 
+
+doi:10.1016/j.commatsci.2012.04.011 .[28] J. K. Mackenzie, Second Paper on Statistics Associated with the Random Disorientation of Cubes, Biometrika 45 (1-2) (1958) 229–240. doi:10.1093/biomet/45.1-2.229 .[29] W. T. Read, W. Shockley, Dislocation Models of Crystal Grain Boundaries, Phys. Rev. 78 (1950) 275–289. 
+
+doi:10.1103/PhysRev.78.275 .[30] H. Digonnet, L. Silva, T. Coupez, Cimlib: A Fully Parallel Application For Numerical Simulations Based On Components Assembly, AIP Conference Proceedings 908 (1) (2007) 269–274. doi:10.1063/1.2740823 .[31] H. D. Youssef Mesri, T. Coupez, Advanced parallel computing in material forming with CIMLib, European Journal of Computational Mechanics 18 (7-8) (2009) 669–694. doi:10.3166/ejcm.18.669-694 .[32] M. Bernacki, R. E. Log´ e, T. Coupez, Level set framework for the finite-element modelling of recrystallization and grain growth in polycrystalline materials, Scripta Materialia 64 (6) (2011) 525–528. doi:10.1016/j. scriptamat.2010.11.032 .[33] L. Barrales Mora, G. Gottstein, L. Shvindlerman, Three-dimensional grain growth: Analytical approaches and computer simulations, Acta Materialia 56 (20) (2008) 5915–5926. doi:10.1016/j.actamat.2008.08.006 .[34] S. Florez, K. Alvarado, D. P. Mu˜ noz, M. Bernacki, A novel highly efficient Lagrangian model for massively multidomain simulation applied to microstructural evolutions, Computer Methods in Applied Mechanics and Engineering 367 (2020) 113107. doi:10.1016/j.cma.2020.113107 .[35] P. Tep, M. Bernacki, High-fidelity grain growth modeling: Leveraging deep learning for fast computations, Acta Materialia 301 (2025) 121486. doi:10.1016/j.actamat.2025.121486 .[36] J. Han, S. L. Thomas, D. J. Srolovitz, Grain-boundary kinetics: A unified approach, Progress in Materials Science 98 (2018) 386–476. doi:10.1016/j.pmatsci.2018.05.004 .10

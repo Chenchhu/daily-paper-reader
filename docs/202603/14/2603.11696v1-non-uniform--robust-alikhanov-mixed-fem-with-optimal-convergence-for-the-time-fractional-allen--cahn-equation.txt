@@ -1,0 +1,2515 @@
+Title: Non-uniform $\alpha$-Robust Alikhanov Mixed FEM with Optimal Convergence for the Time-Fractional Allen--Cahn Equation
+
+URL Source: https://arxiv.org/pdf/2603.11696v1
+
+Published Time: Fri, 13 Mar 2026 00:40:04 GMT
+
+Number of Pages: 26
+
+Markdown Content:
+# Non-uniform α-Robust Alikhanov Mixed FEM with Optimal Convergence for the Time-Fractional Allen–Cahn Equation 
+
+## Abhinav Jha ∗
+
+## , Samir Karaa †
+
+## , Aditi Tomar ‡
+
+## March 13, 2026 
+
+Abstract 
+
+We investigate a mixed finite element method for the spatial discretization of a time-fractional Allen–Cahn equation defined on a convex polyhedral domain, combined with a nonuniform Alikhanov scheme for the temporal approximation. Under suitable regularity assumptions on the initial data that are weaker than those typically imposed in the literature, we establish regularity results for the solution and its flux. We then derive optimal L2-error estimates, up to a logarithmic factor, for both the solution and the flux. The estimates are robust with respect to the fractional order α, in the sense that the associated constants remain bounded as α → 1−. Numerical experiments are presented to confirm the theoretical findings. 
+
+Keywords : Caputo fractional derivative; Alikhanov method; graded mesh; discrete fractional Gr¨ onwall inequality; regularity results; error analysis. 
+
+# 1 Introduction 
+
+Classical phase-field models are diffuse interface models that have found numerous applications in diverse research areas, e.g., hydrodynamics [5, 20], material sciences [23], and multi-phase flow [24] and several others. The classical Allen-Cahn equation was initially introduced by Allen and Cahn [4] to model the dynamics of antiphase boundaries in crystalline solids. Since then, it has evolved into a versatile mathematical framework with a wide range of applications, including the behavior of vesicle membranes and the processes of solid nucleation and phase separation in two incompressible fluids. Let J = (0 , T ] denote a time interval, where 0 < T < ∞, and let Ω ⊂ Rd for ( d ≥ 1) be a convex polygonal or polyhedral bounded domain. In this paper, we focus on phase field models that involve time nonlocality. More specifically, we consider the following time-fractional Allen–Cahn model [21, 10]: 
+
+
+
+∂αt u − κ2∆u = −F ′(u) := f (u) in Ω × J, u = 0 on ∂Ω × J, u(x, 0) = u0(x) in Ω.
+
+(1) Here, u denotes the phase of material, the Caputo time-fractional derivative ∂αt of order α (0 < α < 1) is defined as ∂αt u(t) = I1−αut(t), where I1−α represents the Riemann–Liouville fractional integral of order 
+
+> ∗
+
+Department of Mathematics, Indian Institute of Technology Gandhinagar, Palaj, Gandhinagar, 382055, Gujarat, India 
+
+abhinav.jha@iitgn.ac.in 
+
+> †
+
+Department of Mathematics, Sultan Qaboos University, Al-Khod 123, Muscat, Oman skaraa@squ.edu.om 
+
+> ‡
+
+TU Wien, Institut f¨ ur Analysis und Scientific Computing, Wiedner Hauptstr. 8–10, 1040 Wien, Austria & De-partment of Mathematics, Indian Institute of Technology Gandhinagar, Palaj, Gandhinagar, 382055, Gujarat, India 
+
+aditi.tomar@asc.tuwien.ac.at , aditi.tomar@iitgn.ac.in 
+
+1
+
+> arXiv:2603.11696v1 [math.NA] 12 Mar 2026
+
+1 − α, defined for sufficiently regular φ by 
+
+I1−αφ(t) = 
+
+Z t
+
+> 0
+
+ω1−α(t − s)φ(s) ds, ωβ (t) := tβ−1
+
+Γ( β) ,
+
+and Γ( ·) is the Gamma function. Moreover, the constant 0 < κ < 1 is the interaction length that describes the thickness of the transition boundary between materials. The nonlinear term F (u) := 14 (1 − u2)2 is the interficial (or potential) energy. Several numerical approaches have been proposed for the temporal discretization of time-fractional deriva-tives, including the widely used L1 method and its variants [25, 11, 27, 15, 30], as well as higher-order schemes such as the Alikhanov method [18, 12, 3, 16, 17]. In the present work, we adopt the Alikhanov scheme for the temporal discretization of problem (1), owing to its higher-order accuracy and favorable stability properties. Since solutions of time-fractional problems typically exhibit weak singular behavior near the initial time, the use of graded temporal meshes with refined time steps near t = 0 has proven particularly effective in capturing this initial-layer behavior. The analytical and numerical properties of problem (1) have been investigated in several earlier studies. In particular, the well-posedness of the problem and its limited smoothing properties were established in [10], where the authors developed a family of unconditionally stable time-stepping schemes based on backward Euler convolution quadrature (BE-CQ) for the fractional derivative. By combining a discrete fractional Gr¨ onwall inequality with maximal p-regularity arguments, they derived convergence results without requiring additional regularity assumptions on the exact solution. In the study by Huang and Stynes [11], the authors utilized the L1 method to discretize the temporal fractional derivative on a graded mesh, combined with a standard finite element discretization of the spatial diffusion term where u0 ∈ H10 (Ω) ∩ H4(Ω). They also applied Newton’s linearization to address the nonlinear driving term and demonstrated optimal-rate convergence of the solution in the H1 norm. Furthermore, in another work [12], they analyzed the Alikhanov method for discretizing the temporal fractional derivative on a graded mesh. In this case, they again employed a standard finite element discretization for the spatial diffusion term and used Newton’s method to linearize the nonlinear driving term, achieving optimal-rate convergence of the solution in the L∞(H1(Ω)) space, given that u0 ∈ H10 (Ω) ∩ H6(Ω). In [18], a second-order, non-uniform time-stepping scheme is presented for problem (1), utilizing FDM in the spatial direction. The authors demonstrated that the proposed scheme preserves the discrete maximum principle. In [19], the author applied an adaptive L1 time-stepping scheme to solve problem (1) and established a L2-norm error estimate. In the study by Wang et al. [30], the authors utilized a nonuniform L1 scheme for the temporal direction and employed the LDG method for the spatial direction. They proved the L2 stability and optimal error estimates for these two schemes using discrete fractional Gr¨ onwall-type inequalities. Beyond deterministic models, stochastic variants of the time-fractional Allen–Cahn equation have also been studied. In particular, Al-Maskari and Karaa [2] analyzed the strong approximation of a stochastic time-fractional Allen–Cahn equation driven by additive fractionally integrated Gaussian noise. Their approach employed a piecewise linear finite element method for spatial discretization and a classical Gr¨ unwald–Letnikov approximation for the temporal discretization of both the Caputo fractional derivative and the associated fractional integral operator, with the stochastic forcing approximated via an L2-projection. Table 1 gives a comprehensive comparison of the existing literature on α-robust error estimates for fully discrete methods for the problem (1). By α-robustness, we mean that all estimates and constants are uniformly bounded as 
+
+α approaches 1 −.This paper aims to address this gap by deriving error estimates for a non-uniform Alikhanov mixed FEM applied to the problem (1), and u0 ∈ H10 (Ω) ∩ H3+ ϵ(Ω) with 0 < ϵ ≤ 1. The main contributions of the present work are as follows: 
+
+• New regularity results is discussed, with proofs provided in Section 2. 
+
+• A modified discrete fractional Gr¨ onwall inequality is derived under a reasonable time-step restriction, which allows us to obtain optimal convergence of the proposed method. 2Ref. Regularity Full Nonlinearity Initial α                                                                         
+
+> Requirement ( k≥1)Discretization Condition Robust
+> [11] ∥u(k)∥H2(Ω) ≤C(1 + tα−k)L1–FEM Newton lin-earization
+> H10(Ω) ∩H4(Ω) No [18] ∥u(k)∥W2,∞(Ω) ≤C(1 + tσ−k),
+> σ∈(0 ,1) ∪(1 ,2) Alikhanov– FDM Implicit H10(Ω) ∩H4(Ω) No [19] ∥u∥W4,∞≤C,∥u(k)∥W0,∞≤
+> C(1 + tσ−k), σ∈(0 ,1) ∪(1 ,2) Adaptive L1 Simple fixed-point algo-rithm
+> H10(Ω) ∩H4(Ω) No [30] |u(k)| ≤ C(1 + tα−k)L1–LDG, Alikhanov– LDG Implicit H10(Ω) ∩H4(Ω) No [12] ∥u(k)∥H4(Ω) ≤C(1 + tα−k)Alikhanov– FEM Newton lin-earization
+> H10(Ω) ∩H6(Ω) Yes
+
+Table 1: Relevant articles on fully discrete methods for the time-fractional Allen–Cahn equation and the minimum regularity requirement, where u(k) denotes the kth time derivative. 
+
+• An optimal order error estimate O(log e(N )( h2 + N −2)) (see, Theorem 4.6) is derived, with respect to L2-norm for the solution u and its flux σ of the problem (1) with under the assumption u0 ∈
+
+H10 (Ω) ∩ H3+ ϵ(Ω) with 0 < ϵ ≤ 1, where N + 1 denotes the number of grid points in the temporal direction and h is the maximum diameter of finite elements. 
+
+• α-robustness is ensured, i.e., all estimates and bounds maintain validity as α approaches 1 −.
+
+• Numerical results to validate theoretical findings. The subsequent sections of the paper are outlined as follows: In Section 2, well-posedness and regularity results are established for the problem (1), along with some significant results for subsequent analysis. The variational formulation of the problem (1) is introduced, and a non-uniform Alikhanov mixed FEM is proposed in Section 3. Error estimates of the proposed method are derived in Section 4. Theoretical findings are validated through numerical experiments in Section 5. Finally, the article concludes in Section 6. In this paper, the symbols C and c consistently represent a positive generic constant. It is important to note that this constant may vary throughout the text and is independent of both the temporal grid size ∆t and the spatial mesh size h. Additionally, N0 denotes the set of nonnegative integers, which means 
+
+N0 = N ∩ { 0}.
+
+# 2 Well-posedness of solutions and Regularity results 
+
+Let ( ·, ·) denote the usual inner product in L2(Ω) with induced norm ∥ · ∥ . We denote by Hs(Ω) the standard Sobolev space on Ω with the usual norm ∥ · ∥ Hs(Ω) for real s. Let u be a solution of problem (1). Multiplying the equation in (1) by ut and integrating over Ω, we obtain (I1−αut, u t) + κ2
+
+2
+
+ddt ∥∇ u∥2 + ddt 
+
+Z
+
+> Ω
+
+F (u) dx = 0 .
+
+If u0 ∈ H10 (Ω), then integration in time over (0 , t ) yields 
+
+Z t
+
+> 0
+
+(I1−αut(s), u t(s)) ds + V (u(t)) = V (u0), 0 ≤ t < ∞, (1) where V (u) = κ2 
+
+> 2
+
+∥∇ u∥2 + R 
+
+> Ω
+
+F (u) dx is the free energy functional. By the positivity property of the integral 
+
+R t 
+
+> 0
+
+(I1−αut(s), u t(s)) ds and the Sobolev embedding of H1(Ω) into L4(Ω), (1) immediately implies an a priori 3bound: If u0 ∈ H10 (Ω) with ∥∇ u0∥ ≤ R, then there exits R∗ = C(R) > 0 such that 
+
+∥∇ u(t)∥ ≤ R∗, 0 ≤ t < ∞. (2) This type of a priori bound is known to play a key role in establishing global existence of solutions in the classical case with α = 1 and also in the fractional-order case 0 < α < 1, see [2]. Let {(λj , ϕ j )}∞ 
+
+> j=1
+
+be the Dirichlet eigenpairs of A := −∆ on Ω, with {ϕj }∞ 
+
+> j=1
+
+being an orthonormal basis in L2(Ω). For r ≥ − 1, we denote by ˙Hr (Ω) ⊂ H−1(Ω) the Hilbert space consisting of the func-tions v = P∞
+
+> j=1
+
+⟨v, ϕ j ⟩ϕj , where ⟨· , ·⟩ denotes the duality pairing between H−1(Ω) and H10 (Ω), and it co-incides with the L2-inner product if the function v ∈ L2(Ω). The induced norm ∥ · ∥ ˙Hr (Ω) is defined by 
+
+∥v∥2˙Hr (Ω) = P∞ 
+
+> j=1
+
+λrj ⟨v, ϕ j ⟩2. Thus, ∥v∥ ˙H0(Ω) = ∥v∥ is the norm in L2(Ω), ∥v∥ ˙H1(Ω) is the norm in H10 (Ω), and ∥v∥H10 (Ω) ∩H2(Ω) = ∥Av ∥ is the equivalent norm in H2(Ω) ∩ H10 (Ω) [26]. Besides, it is easy to verify that 
+
+∥v∥ ˙H−1(Ω) = ∥v∥H−1(Ω) is the norm in H−1(Ω). Note that the spaces ˙Hr (Ω), r ≥ − 1, form a Hilbert scale of interpolation spaces. By means of Laplace transforms, the solution of problem (1) can be represented as (cf. [1, Section 2]) 
+
+u(t) = F (t)u0 +
+
+Z t
+
+> 0
+
+E(t − s)f (u(s)) ds, t > 0, (3) where the solution operators F (t) : L2(Ω) → L2(Ω) and E(t) : L2(Ω) → L2(Ω) are defined by 
+
+F (t) = 12πi 
+
+Z
+
+> Γθ,δ
+
+ezt zα−1(zαI + A)−1 dz, E(t) = 12πi 
+
+Z
+
+> Γθ,δ
+
+ezt (zαI + A)−1 dz, 
+
+with integration over a contour Γ θ,δ ⊂ C (oriented with an increasing imaginary part): Γθ,δ = {ρe ±iθ : ρ ≥ δ} ∪ { δe iψ : |ψ| ≤ θ},
+
+for θ ∈ (π/ 2, π ) and δ > 0. Then we have the following properties. 
+
+Lemma 2.1 ([13]) . Let μ ∈ [0 , 2] . The operators F (t) and E(t) satisfy (a) F (t) : L2(Ω) → ˙H2(Ω) is continuous with respect to t ∈ (0 , T ], I − F (t) = R t 
+
+> 0
+
+AE (s)ds, and 
+
+tk∥Aμ/ 2F (k)(t)∥ ≤ ct −μα/ 2 and tk+1 ∥A−μ/ 2F (k+1) (t)∥ ≤ ct μα/ 2, k = 0 , 1, 2, . . . , K for K ∈ N0.(b) E(t) : L2(Ω) → ˙H2(Ω) is continuous with respect to t ∈ (0 , T ] and 
+
+t1−α∥E(t)∥ + t2−α∥E′(t)∥ + tα(μ/ 2−1)+1 ∥Aμ/ 2E(t)∥ ≤ c ∀t ∈ (0 , T ].
+
+We will frequently use the following lemma, which generalizes the classical Gronwall’s inequality (see [7]). 
+
+Lemma 2.2. Assume that y is a nonnegative function in L1(0 , T ) which satisfies 
+
+y(t) ≤ g(t) + β
+
+Z t
+
+> 0
+
+(t − s)−αy(s) ds for t ∈ (0 , T ],
+
+where 0 ≤ g(t) ∈ L1(0 , T ), β ≥ 0, and 0 < α < 1. Then there exists a constant CT such that 
+
+y(t) ≤ g(t) + CT
+
+Z t
+
+> 0
+
+(t − s)−αg(s) ds for t ∈ (0 , T ].
+
+We now recall the following well-posedness result for problem (1). 4Theorem 2.3. [13, Theorem 6.20] If u0 ∈ H10 (Ω) ∩ H2(Ω) , then the solution u to problem (1) satisfies for any β ∈ [0 , 1) and t ∈ Ju ∈ Cα( ¯J; L2(Ω)) ∩ C( ¯J; ˙H2(Ω)) , ∂αt u ∈ C( ¯J; L2(Ω)); (4) 
+
+Au ∈ C(J; H2β (Ω)) , ∥A1+ β u(t)∥L2(Ω) ≤ ct −βα ; (5) 
+
+∂tu(t) ∈ C(J; H2β (Ω)) and ∥Aβ ∂tu(t)∥L2(Ω) ≤ ct α(1 −β)−1, (6) 
+
+where the constant c depends on ∥Au 0∥L2(Ω) and T .
+
+The proofs of these regularity results rely on the uniform bound u ∈ L∞(Ω × J), see [13, Theorem 6.19]. Also, in view of the identity ∆ u3 = 6 u|∇ u|2 + 3 u2∆u, the estimate u ∈ C( ¯I; ˙H2(Ω)), and the uniform bound 
+
+u ∈ L∞(Ω × J), there holds 
+
+∥Af (u)∥L2(Ω) ≤ c∥∆u∥L2(Ω) + c∥u|∇ u|2∥L2(Ω) + c∥u2∆u∥L2(Ω) ≤ cT ,
+
+with cT independent of t.In what follows, we assume that u0 ∈ H10 (Ω) ∩ H3+ ε(Ω) with 0 < ε ≤ 1, which allows us to obtain improved regularity estimates, needed for the error analysis. 
+
+Theorem 2.4. Let u0 ∈ H10 (Ω) ∩ H3+ ϵ(Ω) , 0 < ϵ ≤ 1. Then, problem (1) has a unique solution u satisfying for t ∈ J
+
+∥A3/2u(t)∥ + tα∥A∂ αt u(t)∥ ≤ c, tl∥∂ltu(t)∥ ≤ Ct α and t∥A∂ tu(t)∥ ≤ ct α(1+ ϵ)/2.
+
+Additionally, with σ = ∇u, we have 
+
+t∥A1/2∂t (∇ · σ(t)) ∥ ≤ ct ϵα/ 2, tl∥∂ltσ(t)∥ ≤ ct α, l = 1 , 2, 3.
+
+where the constant c may depend on T .Proof. The estimate ∥A3/2u(t)∥ ≤ c follows from (5) and the regularity assumption on u0. Differentiating the representation (3) with respect to t and apply A gives 
+
+Au ′(t) = A−(1+ ϵ)/2F ′(t)A(3+ ϵ)/2u0 + AE (t)f (u0) + 
+
+Z t
+
+> 0
+
+AE (t − s)[( u′ − 3u2u′)( s)] ds 
+
+=: 
+
+> 3
+
+X
+
+> i=1
+
+Ii.
+
+By Lemma 2.1, the terms I1 and I2 are respectively bounded by 
+
+∥I1∥ ≤ ct α(1+ ϵ)/2−1∥A(3+ ϵ)/2u0∥ and ∥I2∥ ≤ ct α−1∥Au 0∥.
+
+The third term follows 
+
+∥I3∥ ≤ c
+
+Z t
+
+> 0
+
+(t − s)α−1∥Au ′(s)∥ds. 
+
+The last three lemmas and the Gr¨ onwall’s inequality in Lemma 2.2 give the desired estimate t∥A∂ tu(t)∥ ≤ 
+
+ct α(1+ ϵ)/2.Now, multiply by A3/2 instead of A to get 
+
+A3/2u′(t) = A−ϵ/ 2F ′(t)A(3+ ϵ)/2u0 + A1/2E(t)Af (u0)+
+
+Z t
+
+> 0
+
+A3/2E(t − s)f ′(u(s)) u′(s) ds. 
+
+5Then, it follows that 
+
+∥A3/2u′(t)∥ ≤ ct ϵα/ 2−1∥A(3+ ϵ)/2u0∥ + ct α/ 2−1∥Af (u0)∥ + c
+
+Z t
+
+> 0
+
+(t − s)α/ 2−1∥Au ′(s)∥ ds. 
+
+Using previous bound for ∥Au ′(s)∥ and apply Gronwall’s inequality yields 
+
+∥A3/2u′(t)∥ ≤ ct ϵα/ 2−1∥A(3+ ϵ)/2u0∥,
+
+where c depends on T . To establish the estimate tl∥∂ltu(t)∥ ≤ ct α, we start from 
+
+u′(t) = A−1F ′(t)Au 0 + E(t)f (u0) + 
+
+Z t
+
+> 0
+
+E(t − s)f ′(u(s)) u′(s) ds. (7) Consequently, 
+
+∥u′(t)∥ ≤ ct α−1∥Au 0∥ + ct α−1∥f (u0)∥ + c
+
+Z t
+
+> 0
+
+(t − s)α−1∥u′(s)∥ ds. 
+
+An application of Gr¨ onwall’s inequality yields the desired estimate for l = 1. For higher derivatives, we proceed similarly. To remove the singular behavior near t = 0, we multiply (7) by t and obtain 
+
+tu ′(t) = A−1tF ′(t)Au 0 + tE (t)f (u0) + 
+
+Z t
+
+> 0
+
+(t − s)E(t − s)f ′(u(s)) u′(s) ds 
+
++
+
+Z t
+
+> 0
+
+sE (t − s)f ′(u(s)) u′(s) ds =
+
+> 4
+
+X
+
+> i=1
+
+Ji(t).
+
+We estimate the derivatives J′ 
+
+> i
+
+(t) separately. By Lemma 2.1, 
+
+∥J′
+
+> 1
+
+(t) + J′
+
+> 2
+
+(t)∥ = ∥A−1[( F ′(t) + tF ′′ (t)] Au 0 + [ E(t) + tE ′(t)] f (u0)∥ ≤ cT tα−1.
+
+Using again Lemma 2.1 together with the bound already proved for l = 1, we obtain 
+
+∥J′
+
+> 3
+
+(t)∥ =
+
+Z t
+
+> 0
+
+∥E(t − s)f ′(u(s)) u′(s)∥ ds 
+
++
+
+Z t
+
+> 0
+
+(t − s)∥E′(t − s)f ′(u(s)) u′(s)∥ ds 
+
+≤ c
+
+Z t
+
+> 0
+
+(t − s)α−1sα−1 ds ≤ cT tα−1.
+
+For the last term, we use that tu ′(t) ∈ L∞(Ω × J) (see [13, Theorem 10.8] for ℓ = 1), which implies 
+
+∥J′
+
+> 4
+
+(t)∥ =
+
+Z t
+
+> 0
+
+∥E(t − s)[ f ′(u(s)) u′(s) + sf ′′ (u(s))( u′(s)) 2]∥ ds 
+
++
+
+Z t
+
+> 0
+
+s∥E(t − s)f ′(u(s)) u′′ (s)∥ ds 
+
+≤ cT tα−1 + c
+
+Z t
+
+> 0
+
+(t − s)α−1∥su ′′ (s)∥ ds. 
+
+Combining the above bounds gives 
+
+∥tu ′′ (t)∥ ≤ cT tα−1 + c
+
+Z t
+
+> 0
+
+(t − s)α−1∥su ′′ (s)∥ ds, 
+
+6and another application of Gr¨ onwall’s inequality proves the desired estimate for l = 2. The case l = 3 follows analogously and is therefore omitted. To establish the estimate tl∥A1/2∂ltu(t)∥ ≤ ct α, we use the equation 
+
+A1/2u′(t) = A−1F ′(t)A3/2u0 + A1/2E(t)f (u0) + 
+
+Z t
+
+> 0
+
+A1/2E(t − s)f ′(u(s)) u′(s) ds (8) and deduce that 
+
+∥A1/2u′(t)∥ ≤ ct α−1∥A3/2u0∥ + ct α−1∥A1/2f (u0)∥ + c
+
+Z t
+
+> 0
+
+(t − s)α−1∥A1/2u′(s)∥ ds. 
+
+The Gronwall’s inequality yields the desired estimate for l = 1. For the remaining cases, we use a similar approach. To avoid singularities near t = 0, we first multiply (8) by t and obtain 
+
+A1/2tu ′(t) = A−1tF ′(t)A3/2u0
+
++A1/2tE (t)f (u0) + 
+
+Z t
+
+> 0
+
+A1/2(t − s)E(t − s)f ′(u(s)) u′(s) ds 
+
++
+
+Z t
+
+> 0
+
+A1/2sE (t − s)f ′(u(s)) u′(s) ds =
+
+> 4
+
+X
+
+> i=1
+
+Ii(t).
+
+Below, we bound the derivatives I′ 
+
+> i
+
+(t) separately. By Lemma 2.1, we immediately have 
+
+∥I′
+
+> 1
+
+(t) + I′
+
+> 2
+
+(t)∥ = ∥A−1[( F ′(t) + tF ′′ (t)] A3/2u0 + A1/2[E(t) + tE ′(t)] f (u0)∥≤ cT tα−1.
+
+Again, using Lemma 2.1 and the bound derived for l = 1, I′
+
+> 3
+
+(t) can be bounded by 
+
+∥I′
+
+> 3
+
+(t)∥ =
+
+Z t
+
+> 0
+
+∥E(t − s)A1/2f ′(u(s)) u′(s)∥ ds 
+
++
+
+Z t
+
+> 0
+
+(t − s)∥E′(t − s)A1/2f ′(u(s)) u′(s)∥ ds 
+
+≤ c
+
+Z t
+
+> 0
+
+(t − s)α−1sα−1 ds ≤ cT tα−1.
+
+To bound I′
+
+> 4
+
+(t), we can follow a similar argument as that used for J′
+
+> 4
+
+(t) and arrive at 
+
+∥I′
+
+> 4
+
+(t)∥ =
+
+Z t
+
+> 0
+
+∥E(t − s)A1/2[f ′(u(s)) u′(s) + sf ′′ (u(s))( u′(s)) 2]∥ ds 
+
++
+
+Z t
+
+> 0
+
+s∥E(t − s)A1/2f ′(u(s)) u′′ (s)∥ ds 
+
+≤ cT tα−1 + c
+
+Z t
+
+> 0
+
+(t − s)α−1∥A1/2su ′′ (s)∥ ds. 
+
+Combining the preceding estimates, we finally obtain 
+
+∥A1/2tu ′′ (t)∥ ≤ cT tα−1 + c
+
+Z t
+
+> 0
+
+(t − s)α−1∥A1/2su ′′ (s)∥ ds, 
+
+which proves the desired estimate with l = 2. For the remaining case l = 3, the arguments are nearly identical and so not shown. 7Finally, in order to establish the estimate tα∥A∂ αt u∥ ≤ c, we appeal to the identity 
+
+t∂ αt u = ∂αt (tu ) − α
+
+Z t
+
+> 0
+
+ω1−α(t − s)u(s) ds − tω 1−α(t)u(0) ,
+
+and the fact that ∥Au (t)∥ + t∥A∂ tu∥ ≤ cT , which allows us to derive 
+
+∥At∂ αt u∥ ≤ ∥ A∂ αt (tu )∥ + α
+
+Z t
+
+> 0
+
+ω1−α(t − s)∥Au ∥ ds + tω 1−α(t)∥Au (0) ∥≤
+
+Z t
+
+> 0
+
+ω1−α(t − s)∥Au + sA∂ su∥ ds + c αt 1−α
+
+Γ(2 − α) + c t1−α
+
+Γ(1 − α)
+
+≤ cT t1−α.
+
+which completes the proof. 
+
+# 3 Mixed Formulation and Full discretization 
+
+By following the procedure outlined in [29], we introduce a new variable flux defined as σ = ∇u. The problem described in (1) can be rewritten as follows: 
+
+σ − ∇ u = 0 in Ω × J, ∂αt u − κ2∇ · σ = f (u) in Ω × J, u = 0 on ∂Ω × J, u(·, 0) = u0(·) in Ω.
+
+Thus, a mixed formulation of the problem (1) with V := L2(Ω), and W := H(div ; Ω) is to find the solution pair ( u, σ) : J → V × W , such that u(0) = u0 and (σ, w) + ( u, ∇ · w) = 0 ∀w ∈ W , t ∈ J, (9) 
+
+⟨∂αt u, v ⟩ − κ2(∇ · σ, v ) = ⟨f (u), v ⟩ ∀v ∈ V, t ∈ J. (10) 
+
+Spatial discretization: Let Th be a regular family of decomposition of Ω (see [9]) into closed d-simplexes 
+
+Q of size h = max {diam( Q); Q ∈ T h}. Further, let Vh × W h be a finite element subspace of V × W having the following three properties: (i) ∇ · W h ⊆ Vh,(ii) There exists a projection Π h : W → W h, called Fortin projection satisfying ∇ · Πh = Ph(∇· ). Here, 
+
+Ph : V → Vh is the L2-projection defined by ( Phv − v, v h) = 0 ∀ vh ∈ Vh, v ∈ V , and hence (∇ · (Π hw − w), v h) = 0 ∀ vh ∈ Vh, and (Phv − v, ∇ · wh) = 0 ∀ wh ∈ W h,
+
+(iii) Approximation properties: 
+
+∥w − Πhw∥ ≤ Ch r ∥∇ · w∥r−1;
+
+∥v − Phv∥ + h∥v − Phv∥1 ≤ Ch r ∥v∥r , 1 ≤ r ≤ 2. (11) Examples of such finite-dimensional subspaces Vh × W h of V × W having the above properties can be found in [22] and [6]. 8Temporal Discretization: Consider a partition {tn}Nn=0 of the interval ¯J = [0 , T ] such that tn =   nN
+
+γ T, γ ≥
+
+1, 0 ≤ n ≤ N and define a fractional time level tn−ν := νt n−1 + (1 − ν)tn for an off-set parameter ν ∈ [0 , 1/2) and ∆ tj = tj − tj−1, 1 ≤ j ≤ N, and we define local time-step ratio μj = ∆ tj /∆tj−1, 2 ≤ j ≤ N with 
+
+μ := max 2≤j≤N μj . For any time sequence {ϕj }Nj=0 , define the backward difference ∇ϕj := ϕj − ϕj−1. Also set ϕn−ν := νϕ n−1 + (1 − ν)ϕn. Let Π 1,j ϕ denote the linear interpolant of a function ϕ with respect to the nodes tj−1 and tj , and let Π 2,j ϕ denote the quadratic interpolant with respect to tj−1, tj and tj+1 . Note that (Π 1,j ϕ)′(t) = ∇ϕj
+
+∆tj
+
+and (Π 2,j ϕ)′(t) = ∇ϕj
+
+∆tj
+
++ 2( t − tj−1/2)∆tj (∆ tj + ∆ tj+1 )
+
+ ∇ϕj+1 
+
+μj+1 
+
+− ∇ ϕj
+
+
+
+.
+
+Now, the corresponding fully discrete mixed finite element approximation is to find a pair ( un−νh , σn−νh ) ∈
+
+Vh × W h, 0 ≤ n ≤ N such that uh(0) = Phu0 and (σn−νh , wh) + ( un−νh , ∇ · wh) = 0 ∀ wh ∈ W h, 0 ≤ n ≤ N, (12) (Dαtn−ν un−νh , v h) − (∇ · σn−νh , v h) = (un−νh − Ph(un−1 
+
+> h
+
+)3, v h)
+
+−3(1 − ν)( Ph(( un−1 
+
+> h
+
+)2(unh − un−1 
+
+> h
+
+)) , v h), (13) for al vh ∈ Vh and 1 ≤ n ≤ N .Moreover, the well-known Alikhanov formula to approximate the Caputo derivative ∂αt ϕ(tn−ν ) is given by 
+
+Dαtn−ν ϕ(tn−ν ) := 
+
+> n
+
+X
+
+> j=1
+
+Kn,j  
+
+> 1−α
+
+(ϕ(tj ) − ϕ(tj−1)) , (14) where 
+
+Kn,j  
+
+> 1−α
+
+:= 
+
+
+
+a1,11−α for j = 1 , n = 1 ,an,n  
+
+> 1−α
+
++ 1 
+
+> μn
+
+bn,n −11−α for j = n, n ≥ 2,an,j  
+
+> 1−α
+
++ 1 
+
+> μj
+
+bn,j −11−α − bn,j  
+
+> 1−α
+
+for 2 ≤ j ≤ n − 1, n ≥ 2,an, 11−α − bn, 11−α for j = 1 , n ≥ 2,
+
+(15) with the discrete coefficients an,j  
+
+> 1−α
+
+and bn,j  
+
+> 1−α
+
+are defined by 
+
+an,j  
+
+> 1−α
+
+:= 1∆tj
+
+Z min {tn−ν ,t j }
+
+> tj−1
+
+k1−α(tn−ν − s) ds for 1 ≤ j ≤ n, (16) 
+
+bn,j  
+
+> 1−α
+
+:= 1∆tj (∆ tj + ∆ tj+1 )
+
+Z tj
+
+> tj−1
+
+(s − tj−1)( tj − s)∂sk1−α(tn−ν − s) ds (17) for 1 ≤ j ≤ n − 1. If ν = α/ 2 then in the limit α → 1, this scheme reduces to the well-known Crank-Nicolson method (ν → 1/2). Therefore, the time-stepping scheme (14) is also referred as a fractional Crank–Nicolson method. The following result will frequently be used in the convergence analysis of the proposed method. 
+
+Lemma 3.1. [[16], Lemma 4.1] The discrete Caputo formula (14) satisfies 
+
+
+
+(Dαtn−ν v)n−ν , v n−ν 
+
+≥ 12 Dαtn−ν ∥vn−ν ∥2, 1 ≤ n ≤ N, ∀ν ∈ [0 , 1/2) . (18) For the non-linear term u3(tn−ν ), we shall use the Newton linearization (un−ν )3 ≈ (un−1)3 + 3( un−1)2(un−ν − un−1).
+
+9Lemma 3.2. The truncation error En−ν := ( un−ν )3 − (un−1)3 − 3( un−1)2(un−ν − un−1) of Newton lin-earization satisfies 
+
+∥E n−ν ∥ ≤ Cn − min {ϵγα, 2} for 1 ≤ n ≤ N. 
+
+Proof. By rearranging, we have En−ν := ( un−ν )3 −(un−1)3 −3( un−1)2(un−ν −un−1) = ( un−ν −un−1)2(un−ν +2un−1) for 1 ≤ n ≤ N . Now, 
+
+∥E n−ν ∥ ≤ ∥(un−ν + 2 un−1)∥ ∥ (un−ν − un−1)∥2
+
+> L∞
+
+≤ C
+
+Z tn−ν
+
+> tn−1
+
+∥Au t∥ dt 
+
+!2
+
+.
+
+Using Theorem 1, we get 
+
+∥E 1−ν ∥ ≤ C
+
+Z t1−ν
+
+> t0
+
+tϵα/ 2−1dt 
+
+2
+
+≤ Ct ϵα  
+
+> 1
+
+≤ CN −ϵγα .
+
+For 2 ≤ n ≤ N , we have, 
+
+∥E n−ν ∥ ≤ C
+
+Z tn−ν
+
+> tn−1
+
+tϵα/ 2−1dt 
+
+!2
+
+≤ C
+
+
+
+∆tntϵα/ 2−1
+
+> n−1
+
+2
+
+≤ C  N −ϵγα (n − 1) ϵγα −2 ≤ Cn − min {ϵγα, 2}.
+
+The following properties of discrete kernels Kn,j  
+
+> 1−α
+
+and their complementary discrete kernel 
+
+P n,i α := 1
+
+Ki,i 
+
+> 1−α
+
+
+
+> n
+
+X
+
+> j=i+1
+
+P n,j α
+
+
+
+Kj,i +1 1−α − Kj,i 
+
+> 1−α
+
+
+
+: 1 ≤ i ≤ n − 1,
+
+1 : i = n
+
+(19) serve as key tools for deriving the subsequent error estimates. 
+
+Lemma 3.3. The discrete kernels Kn,j  
+
+> 1−α
+
+and P n,j α with πA = 11 4 and ν ∈ [0 , 12 ) satisfy the following results: (a) 0 < P n,j α ≤ πAΓ(2 − α)∆ tαj and 0 < K n,i −11−α < K n,i  
+
+> 1−α
+
+for 1 ≤ j ≤ n and 2 ≤ i ≤ n.(b) 
+
+> n
+
+X
+
+> j=i
+
+P n,j α Kj,i  
+
+> 1−α
+
+= 1 , 1 ≤ i ≤ n.(c) 
+
+> n
+
+X
+
+> j=1
+
+P n,j α k1+( m−1) α(tj ) ≤ πAk1+ mα (tn) for any non-negative integer 0 ≤ m ≤  1
+
+> α
+
+.(d) ν Pn−1 
+
+> j=1
+
+P n,j α Eα(νt αj ) ≤ πA(Eα(νt αn ) − 1) for any constant ν > 0, provided ∆tn−1 ≤ ∆tn, n ≥ 2, where 
+
+Eα(z) := 
+
+> ∞
+
+X
+
+> j=0
+
+zj
+
+Γ( jα + 1) is the Mittag-Leffler function. (e) 
+
+> n
+
+X
+
+> j=1
+
+P n,j α tβ−αj ≤ πAΓ(1 + β − α)Γ(1 + β) tβn ∀β ∈ (0 , 1) .
+
+10 (f ) Pnj=1 P n,j α t−αj ≤ 4πAeγ log e(n + 2) , provided tn =   nN
+
+γ T, γ ≥ 1.
+
+(g) P n,n α /P n,n −1 
+
+> α
+
+≤ 2 − αα μαn , n ≥ 2.
+
+Proof. The proof of (a) and (b) are provided in [[16] Lemma 2.1(1), [17] Theorem 2.1(II)]. By substituting 
+
+v(t) = k1+ mα (t) and k1+ β (t) into [[16] Lemma 2.1 (2)], we obtain results (c) and (e), respectively. The result (d) follows from [[16] Lemma 2.3]. The estimate (f) follows from (e); however, for the sake of completeness and the reader’s convenience, the proof is provided below. Define δn := 1log e(n+2) and consider 
+
+> n
+
+X
+
+> j=1
+
+P n,j α t−αj =
+
+> n
+
+X
+
+> j=1
+
+P n,j α tδn−αj t−δn 
+
+> j
+
+≤ t−δn
+
+> 1
+> n
+
+X
+
+> j=1
+
+P n,j α tδn−αj . (20) Thus, an application of the estimate (e) with β = δn in (20) yields the estimate (f) as follows 
+
+> n
+
+X
+
+> j=1
+
+P n,j α t−αj ≤ πAΓ(1 + δn − α)Γ(1 + δn) t−δn 
+
+> 1
+
+tδn
+
+> n
+
+= πAΓ(2 + δn − α)(1 + δn − α)Γ(1 + δn) nγδ n ≤ 4πAeγ log e(n + 2) ,
+
+where we have used Γ(1 + δn) ≥ 1/2, Γ(2 + δn − α) ≤ 2, 1 + δn − α ≥ δn and nγδ n ≤ eγ to obtain the last term in the above estimate. To establish result (g), we utilize the complementary relation (19) and the result Kn,n −11−α /K n,n  
+
+> 1−α
+
+< (1 − 2σ)/(1 − σ) from [[17] Theorem 2.1(III)], for σ = α/ 2, to derive 
+
+P n,n −1 
+
+> α
+
+= P n,n α 1 − Kn,n −11−α
+
+Kn,n 
+
+> 1−α
+
+!
+
+/μ αn ≥ P n,n α
+
+ α
+
+2 − α
+
+
+
+/μ αn . (21) The estimate (21) yields the result (g), thus completing the remainder of the proof. Previously established discrete fractional Gr¨ onwall inequalities, as discussed in [12, 16], impose severe time-step restrictions in the temporal direction for (1). In order to ease the severe time-step restriction to a milder one, we present below a refined discrete fractional Gr¨ onwall inequality, which allows us to prove the stability and convergence of the proposed Alikhanov-MFEM on a graded mesh for (1), under a less restrictive time-step condition. The proof for Lemma 3.4 can be found in Appendix A. 
+
+Lemma 3.4. (Discrete fractional Gr¨ onwall inequality). Let {vn}Nn=0 , {ξn}Nn=1 , {ηn}Nn=1 and {ζn}Nn=1 be non-negative finite sequences such that 
+
+Dαtn−ν (vn−ν )2 ≤
+
+> n
+
+X
+
+> i=0
+
+λni (vi)2 + vn−ν ξn + ( ηn)2 + ( ζn)2, 1 ≤ n ≤ N, (22) 
+
+where λnj ≥ 0, 0 ≤ j ≤ n, and the discrete fractional differential operator Dαtn−ν , 1 ≤ n ≤ N, is given by (14). If there exists a constant Λ > 0, such that, Pnj=0 λnj ≤ Λ, 1 ≤ n ≤ N, and if ∆tn−1 ≤ ∆tn, 2 ≤
+
+n ≤ N, with the maximum time-step size 
+
+∆t := max  
+
+> 1≤n≤N
+
+∆tn ≤
+
+
+
+δπ AΓ(2 − α) max  
+
+> 1≤n≤N
+
+λnn
+
+− 1
+
+> α
+
+, for some δ > 1, (23) 11 then, for Cδ := δδ−1 and 1 ≤ n ≤ N ,
+
+vn ≤ Cδ Eα(Cδ πAΛtαn ) v0 + max 
+
+> 1≤j≤nj
+
+X
+
+> i=1
+
+P j,i α ξi + (2 πAtαn ) 12 max  
+
+> 1≤j≤n
+
+ηj
+
++ max 
+
+> 1≤j≤n
+> j
+
+X
+
+> i=1
+
+P j,i α (ζi)2
+
+! 12 !
+
+. (24) The following bound for the numerical solution unh is obtained from this source. 
+
+Lemma 3.5. [[14], Theorem 3.2] The fully discrete Alikhanov-FEM has a unique solution unh for n = 1 , ..., N ,and there exists a positive constant N ∗ such that when N > N ∗ , one has 
+
+max  
+
+> 1≤n≤N
+
+∥unh ∥L∞(Ω) ≤ C3,
+
+where the fixed constant C3 is independent of the mesh. 
+
+# 4 Error analysis 
+
+This section presents auxiliary results and establishes optimal error estimates. At any temporal grid point 
+
+tn−ν , the variational problem (9 − − 10) implies, for 1 ≤ n ≤ N ,(σ(tn−ν ), wh) + ( u(tn−ν ), ∇ · wh) = 0 ∀ wh ∈ W h, (25) (Dαtn−ν u(tn−ν ), v h) − κ2(∇ · σ(tn−ν ), v h) = ( f (u(tn−ν )) , v h) (26) + (Υ n−ν , v h) ∀ vh ∈ Vh. (27) By subtracting equations (12–13) from (25–26), we obtain the following error equation, for 1 ≤ n ≤ N :(en−ν 
+
+> σ
+
+, wh) + ( en−νu , ∇ · wh) = 0 ∀ wh ∈ W h (28) (Dαtn−ν en−νu , v h) − κ2(∇ · en−ν 
+
+> σ
+
+, v h) = (Υ n−ν + f (u(tn−ν )) − un−νh
+
++ Ph(( un−1 
+
+> h
+
+)3) + 3(1 − ν)Ph(( un−1 
+
+> h
+
+)2(unh − un−1 
+
+> h
+
+)) , v h) ∀ vh ∈ Vh, (29) where Υ n−ν := ( Dαtn−ν u(tn−ν ) − ∂αt u(tn−ν )). Also, en−νu := u(tn−ν ) − un−νh and en−ν 
+
+> σ
+
+:= σ(tn−ν ) − σn−νh
+
+denote the error between the exact solution u(tn−ν ) and the approximate solution un−νh and between the flux 
+
+σ(tn−ν ) and its approximation σn−νh , respectively, at time level t = tn−ν . To derive optimal error estimates, we further decompose the errors en−νu and en−ν 
+
+> σ
+
+further as follows: 
+
+en−νu = ηn−ν + θn−ν , η n−ν = u(tn−ν ) − Phu(tn−ν ), θ n−ν = Phu(tn−ν ) − un−νh ,en−ν 
+
+> σ
+
+= ζn−ν + ξn−ν , ζn−ν = σ(tn−ν ) − Πhσ(tn−ν ), ξn−ν = Π hσ(tn) − σn−νh .
+
+Since the estimates for the projection errors ηn−ν := u(tn−ν ) − Phu(tn−ν ) and ζn−ν := σ(tn−ν ) − Πhσ(tn−ν )is already known (see (11)), establishing the final error estimate requires only the estimation of θn−ν and 
+
+ξn−ν . Using (28-29), θn−ν and ξn−ν satisfy the following relations: (ξn−ν + ζn−ν , wh) + ( θn−ν , ∇ · wh) = 0 ∀ wh ∈ W h, (30) (Dαtn−ν θn−ν , v h) − κ2(∇ · ξn−ν , v h) = −(Dαtn−ν ηn−ν , v h) + (Υ n−ν − E n−ν
+
++ (1 − ν − ϕn, 2)enu + ( ν − ϕn, 1)en−1 
+
+> u
+
+, v h) ∀ vh ∈ Vh, 1 ≤ n ≤ N. (31) 12 Lemma 4.1. If for some δ > 1, max  
+
+> 1≤n≤N
+
+∆tn ≤  δπ AL(1 − ν)2Γ(2 − α)− 1 
+
+> α
+
+, then θn satisfies, for 1 ≤ n ≤ N ,
+
+∥θn∥ ≤ Cδ Eα(Cδ πAΛtαn ) ∥θ0∥ + 2 max 
+
+> 1≤j≤nj
+
+X
+
+> i=1
+
+P j,i α
+
+
+
+∥Υi−ν ∥ + ∥E i−ν ∥ + ∥Dαti−ν ηi−ν ∥
+
+
+
++ 3 max {9C43 , C 24 ν−2} max 
+
+> 1≤j≤n
+> j
+
+X
+
+> i=1
+
+P j,i α ∥ηi−ν ∥2
+
+!1/2
+
++ κ−2 max 
+
+> 1≤j≤n
+> j
+
+X
+
+> i=1
+
+P j,i α ∥ζi−ν ∥2
+
+!1/2 !
+
+, (32) 
+
+where L = 6 + 27 C43 and Λ = 6 ν2 + 3 C24 .Proof. Substitute wh = ξn−ν and vh = θn−ν in (30) and (31), respectively. Then, apply (30) in (31) to obtain (Dαtn−ν θn−ν , θ n−ν ) + κ−2(ξn−ν , ξn−ν ) = −κ−2(ζn−ν , ξn−ν ) − (Dαtn−ν ηn−ν , θ n−ν )+ (Υ n−ν − E n−ν + (1 − ν − ϕn, 2)enu + ( ν − ϕn, 1)en−1 
+
+> u
+
+, θ n−ν ).
+
+Now, an application of Lemma 3.1 and the Cauchy–Schwarz and Young’s inequality yields 12 Dαtn−ν ∥θn−ν ∥2 + κ−2∥ξn−ν ∥2 ≤ κ−2∥ζn−ν ∥ ∥ ξn−ν ∥
+
++ ∥Υn−ν − E n−ν − Dαtn ηn−ν + ηn−ν ∥∥ θn−ν ∥
+
++ ∥θn−ν ∥2 + ∥ϕn, 2enu + ϕn, 1en−1 
+
+> u
+
+∥∥ θn−ν ∥≤ κ−2
+
+2 ∥ξn−ν ∥2 + κ−2
+
+2 ∥ζn−ν ∥2
+
++ ∥Υn−ν − E n−ν − Dαtn ηn−ν + ηn−ν ∥∥ θn−ν ∥
+
++ 32 ∥θn−ν ∥2 + 12 ∥ϕn, 2enu + ϕn, 1en−1 
+
+> u
+
+∥2 (33) Now, ∥uk∥∞ ≤ C1 and ∥ukh∥∞ ≤ C3 for 1 ≤ k ≤ N shows ∥ϕn, 1∥∞ ≤ (7 −6ν)C21 +(4 −3ν)C23 +(7 −6ν)C1C3 =: 
+
+C4 and ∥ϕn, 2∥∞ ≤ 3(1 − ν)C23 . Thus, by using these bounds in (33), we obtain 
+
+Dαtn−ν ∥θn−ν ∥2 ≤ 2∥Υn−ν − E n−ν − Dαtn−ν ηn−ν ∥ ∥ θn−ν ∥ + κ−2∥ζn−ν ∥2
+
++6(1 − ν)2∥θn∥2 + 6 ν2∥θn−1∥2
+
++18(1 − ν)2C43 ∥θn∥2 + 3 C24 ∥θn−1∥2 + 3 max {9C43 , C 24 ν−2}∥ ηn−ν ∥2. (34) Finally, applying the discrete fractional Gr¨ onwall inequality (Theorem 3.4) in (34) and non-decreasing prop-erty of Eα(·) leads to the desired estimate (32). We now present the key results necessary to obtain the optimal error estimate for the flux. 
+
+Lemma 4.2. [[28], Lemma 5.4] For ϕn ∈ L2(Ω) , 0 ≤ n ≤ N, and ν = α 
+
+> 2
+
+, there exists a positive constant C
+
+such that for 1 ≤ n ≤ N , the following inequality holds: 
+
+
+
+> n
+
+X
+
+> j=1
+
+P n,j α ∥Dαtj−ν (tj−ν ϕj−ν ) − tj−ν Dαtj−ν ϕj−ν ∥2
+
+
+
+> 12
+
+≤ C t 1− α 
+
+> 2
+> n
+
+max  
+
+> 0≤j≤n
+
+∥ϕj ∥, (35) 
+
+where the positive constant C remains bounded as α → 1−.
+
+13 In the next result, we have obtained the estimate ξ.
+
+Lemma 4.3. If for some δ > 1, max  
+
+> 1≤n≤N
+
+∆tn ≤  δπ AL(1 − ν)2Γ(2 − α)− 1 
+
+> α
+
+, then ξn satisfies, for 1 ≤ n ≤ N ,
+
+∥tnξn∥ ≤ 2Cδ Eα(Cδ πAΛtαn ) max 
+
+> 1≤j≤n
+> j
+
+X
+
+> i=1
+
+P j,i α ∥Dαti−ν (ti−ν ζi−ν )∥
+
++ (2 πAtαn ) 12 κ2(max {1 + 9 C43 , 1 + C24 ν−2})2(∥tn−ν θn−ν ∥2 + ∥tn−ν ηn−ν ∥2)+ κ2 jX
+
+> i=1
+
+P j,i α
+
+
+
+∥T i−ν ∥ + ∥ti−ν Υi−ν ∥ + ∥ti−ν Ei−ν ∥ + ∥Dαti−ν (ti−ν ηi−ν )∥
+
+2 12
+
+!
+
+, (36) 
+
+where T n−ν := Dαtn−ν (tn−ν en−νu ) − tn−ν Dαtn−ν en−νu and L is as given in Lemma 4.1. Proof. Multiply tn−ν in (30) and then apply the discrete fractional derivative to obtain, for 1 ≤ n ≤ N :(Dαtn−ν (tn−ν ξn−ν + tn−ν ζn−ν ), wh) + ( Dαtn−ν (tn−ν θn−ν ), ∇ · wh) = 0 ∀ wh ∈ W h. (37) Further, by selecting wh = tn−ν ξn−ν and vh = Dαtn−ν (tn−ν θn−ν ) in (37) and (31), respectively, substitute (37) in (31) to obtain the following: (Dαtn−ν (tn−ν θn−ν ), D αtn−ν (tn−ν θn−ν )) + κ2(Dαtn−ν tn−ν ξn−ν , t n−ν ξn−ν )= −κ2(Dαtn−ν tn−ν ζn−ν , t n−ν ξn−ν )+
+
+
+
+− Dαtn−ν (tn−ν ηn−ν ) + tn−ν Υn−ν − tn−ν En−ν + tn−ν (1 − ν − ϕn, 2)enu
+
++ tn−ν (ν − ϕn, 1)en−1 
+
+> u
+
++ T n−ν , D αtn−ν (tn−ν θn−ν )
+
+
+
+.
+
+Now, an appeal to Lemma 3.1 and the Cauchy-Schwarz inequality yields 
+
+∥Dαtn−ν (tn−ν θn−ν )∥2 + κ2
+
+2 Dαtn−ν ∥tn−ν ξn−ν ∥2 ≤ κ2∥Dαtn−ν (tn−ν ζn−ν )∥∥ tn−ν ξn−ν ∥
+
++
+
+
+
+∥T n−ν ∥ + ∥tn−ν Υn−ν ∥ + ∥tn−ν (1 − ν − ϕn, 2)enu + tn−ν (ν − ϕn, 1)en−1 
+
+> u
+
+∥
+
++ ∥tn−ν En−ν ∥ + ∥Dαtn−ν (tn−ν ηn−ν )∥
+
+
+
+∥Dαtn−ν (tn−ν θn−ν )∥. (38) Applying Young’s inequality in (38), we can derive the following estimate: 
+
+Dαtn−ν ∥tn−ν ξn−ν ∥2 ≤ 2∥Dαtn−ν (tn−ν ζn−ν )∥∥ tn−ν ξn−ν ∥
+
++ 2 κ2∥tn−ν (1 − ν − ϕn, 2)enu + tn−ν (ν − ϕn, 1)en−1 
+
+> u
+
+∥2
+
++ 2 κ2
+
+∥T n−ν ∥ + ∥tn−ν Υn−ν ∥ + ∥tn−ν En−ν ∥ + ∥Dαtn−ν (tn−ν ηn−ν )∥
+
+2
+
+(39) Using the inequality ∥tn−ν ϕn, 2enu + tn−ν ϕn, 1en−1 
+
+> u
+
+∥ ≤ max {9C43 , C 24 ν−2}∥ tn−ν en−ν ∥ and then apply the dis-crete fractional Gr¨ onwall inequality (Theorem 3.4) can be applied to (39) to obtain the required estimate (36). This completes the proof. We will now present the estimate for the truncation error. 
+
+Lemma 4.4. If the grading parameter γ satisfies 1 ≤ γ ≤ 4 
+
+> α
+
+then under the assumptions in Theorem 2.4, there holds (a) Pnj=1 P n,j α ∥Υj−ν ∥ ≤ C log e(n + 2) N − min {γα, 2}, 1 ≤ n ≤ N, 
+
+14 (b) 
+
+Pnj=1 P n,j α ∥tj−ν Υj−ν ∥2
+
+ 12
+
+≤ C t 1−α/ 2 
+
+> n
+
+N − min {γα, 2}, 1 ≤ n ≤ N, 
+
+(c) Pnj=1 P n,j α ∥E j−ν ∥ ≤ C log e(n + 2) N − min {ϵγα, 2}, 1 ≤ n ≤ N, and (d) 
+
+Pnj=1 P n,j α ∥tj−ν Ej−ν ∥2
+
+1/2
+
+≤ C t 1−α/ 2 
+
+> n
+
+N − min {ϵγα, 2}, 1 ≤ n ≤ N, 
+
+where C is a positive constant which remains bounded as α → 1−.Proof. To prove (a), recall the following estimate from Stynes et al. [8] (see, Lemma 7 and Remark 4), which yields 
+
+∥Υn−ν ∥ ≤ C t −αn−ν N − min {γα, 2} ≤ C n −γα N γα N − min {γα, 2} ≤ C t −αn N − min {γα, 2}. (40) Here, the positive constant C remains bounded as α approaches 1 −. We can then apply Lemma 3.3(f). Now, estimate (b) is obtained by applying Lemma 3.3(e) with m = 1 to the following estimate derived from (40) 
+
+∥tn−ν Υn−ν ∥2 ≤ C2t2−2αn N −2 min {γα, 2}.
+
+To establish (c), recall the following estimate from Stynes et al. [25] (see, Lemma 5.2) 
+
+∥E n−ν ∥ ≤ C n − min {ϵγα, 2} = CT min {ϵα, 2  
+
+> γ}
+
+t− min {ϵα, 2  
+
+> γ}
+> n
+
+N − min {ϵγα, 2}, (41) where the positive constant C remains bounded as α → 1−, and then apply the estimate t− min {ϵα, 2  
+
+> γ}
+> n
+
+≤
+
+max {1, T ϵα }t−ϵα n and Lemma 3.3(g). Estimate (d) follows after applying Lemma 3.3(c) with j = 1 to the following estimate obtained from (41), namely 
+
+∥tn−ν En−ν ∥2 ≤ C2T 2 min {ϵα, 2  
+
+> γ}
+
+t2−2 min {ϵα, 2  
+
+> γ}
+> n
+
+N −2 min {ϵγα, 2}
+
+≤ C2T 2 min {ϵα, 2  
+
+> γ}
+
+t2 
+
+> n
+
+N −2 min {ϵγα, 2}.
+
+This completes the proof. 
+
+Lemma 4.5. Under the assumptions in Theorem 2.4, the following estimate holds: (i) Pnj=1 P n,j α ∥Dαtj−ν ηj−ν ∥ ≤ C
+
+
+
+h2 log e(n + 2) Pnj=1 P n,j α ∥Υj−ν ∥
+
+
+
+, 1 ≤ n ≤ N ,(ii) 
+
+Pnj=1 P n,j α ∥Dαtj−ν (tj−ν ηj−ν )∥2
+
+ 12
+
+≤ C h 2t1− α 
+
+> 2
+> n
+
+, 1 ≤ n ≤ N, 
+
+(iii) 
+
+Pnj=1 P n,j α ∥ζj−ν ∥2
+
+ 12
+
+≤ C h 2 t(1+ ϵ)α/ 2 
+
+> n
+
+, 1 ≤ n ≤ N, and (iv) Pnj=1 P n,j α ∥Dαtj−ν (tj−ν ζj−ν )∥ ≤ C h 2 t1+ ϵα  
+
+> 2
+> n
+
+, 1 ≤ n ≤ N, 
+
+where the positive constant C remains bounded as α → 1−.Proof. An application of the triangle inequality, the stability of the L2-norm for L2-projection, and the approximation property (11) yields 
+
+> n
+
+X
+
+> j=1
+
+P n,j α ∥Dαtj−ν ηj−ν ∥≤
+
+> n
+
+X
+
+> j=1
+
+P n,j α
+
+ ∥Υj−ν ∥ + ∥∂αt u(tj−ν ) − Ph∂αt u(tj−ν )∥ + ∥PhΥj−ν ∥
+
+≤ C
+
+> n
+
+X
+
+> j=1
+
+P n,j α ∥Υj−ν ∥ + Ch 2
+
+> n
+
+X
+
+> j=1
+
+P n,j α ∥A∂ αt u(tj−ν )∥. (42) 15 Utilize the regularity results from Theorem 2.4 and Lemma 3.3(f) in (42) to derive the estimate (i). We obtain the result (ii), by applying the approximation property (11) and the regularity result from Theorem 2.4 as follows 
+
+∥Dαtn−ν (tn−ν ηn−ν )∥ ≤ 
+
+> n
+
+X
+
+> j=1
+
+Kn,j 
+
+> 1−α
+
+∥tj ηj − tj−1ηj−1∥≤
+
+> n
+
+X
+
+> j=1
+
+Kn,j 
+
+> 1−α
+
+Z tj
+
+> tj−1
+
+∥∂s(sη )∥ds 
+
+≤ C h 2
+
+> n
+
+X
+
+> j=1
+
+Kn,j 
+
+> 1−α
+
+∆tj ≤ C h 2t1−αn
+
+and then by applying Lemma 3.3(e) with m = 1. Next, apply the approximation property (11) to achieve the following estimates: 
+
+> n
+
+X
+
+> j=1
+
+P n,j α ∥ζj−ν ∥2 ≤ Ch 4
+
+> n
+
+X
+
+> j=1
+
+P n,j α ∥∇ · σ(tj )∥21 ≤ Ch 4
+
+> n
+
+X
+
+> j=1
+
+P n,j α tϵα j (43) 
+
+≤ Ch 4tαnnX
+
+> j=1
+
+P n,j α tϵα −αj ≤ Ch 4 t(1+ ϵ)αn . (44) Estimates in (iii) are derived by applying the regularity result from Theorem 2.4, along with Lemma 3.3(f) to (43). Now, an application of Lemma 3.3(a) and the regularity result Theorem 2.4 we arrive at 
+
+> n
+
+X
+
+> j=1
+
+P n,j α ∥Dαtj−ν (tj−ν ζj−ν )∥ ≤ 
+
+> n
+
+X
+
+> j=1
+
+P n,j αjX
+
+> i=1
+
+Kj,i 
+
+> 1−α
+
+∥tiζi − ti−1ζi−1∥≤
+
+> n
+
+X
+
+> i=1
+
+∥tiζi − ti−1ζi−1∥ ≤ 
+
+> n
+
+X
+
+> i=1
+
+Z ti
+
+> ti−1
+
+∥∂s(sζ)∥ds ≤ Ch 2
+
+Z tn
+
+> 0
+
+sϵα/ 2ds 
+
+and hence, the result (iv) follows. Finally, optimal error estimates are established in the following Theorem. 
+
+Theorem 4.6. Let u0 ∈ H10 (Ω) ∩ H3+ ϵ(Ω) , 0 < ϵ ≤ 1 and the pair (unh , σnh ) satisfying (12)-(13) be the approximation of the solution pair (u(tn), σ(tn)) satisfying (9)-(10) at the temporal grid tn. For some constant δ > 1 and the condition max  
+
+> 1≤n≤N
+
+∆tn ≤ (δπ ALΓ(2 − α)) −1/α , where 1 ≤ γ ≤ 4 
+
+> α
+
+, the following error estimate holds for N > 2:
+
+max  
+
+> 1≤n≤N
+
+∥unh − u(tn)∥ + max  
+
+> 1≤n≤N
+
+tα/ 2 
+
+> n
+
+∥σnh − σ(tn)∥ ≤ C log e(N )( h2 + N − min {ϵγα, 2}). (45) 
+
+Proof. Using Theorem 2.4 together with the approximation property (11), we first obtain, 
+
+∥ηn∥ + tα/ 2 
+
+> n
+
+∥ζn∥ ≤ Ch 2, 1 ≤ n ≤ N. (46) Next, combining this bound with the truncation estimates and the previously derived estimates for the auxiliary terms, we deduce that 
+
+∥θn∥ ≤ C log e(n + 2)( h2 + N − min {ϵγα, 2}), 1 ≤ n ≤ N. (47) 16 Proceeding in the same manner, by incorporating truncation estimates together with stability bounds, we further obtain 
+
+tα/ 2 
+
+> n
+
+∥ξn∥ ≤ C log e(n + 2)( h2 + N − min {ϵγα, 2}), 1 ≤ n ≤ N. (48) Finally, an application of the triangle inequality, along with the three estimates above, namely (46), (47), and (48), yields the desired result. 
+
+# 5 Numerical results 
+
+This section validates the theoretical contributions by conducting several numerical experiments. Let h2 = 
+
+> 14
+
+N −2 in Theorem 4.6. The rate of convergence with respect to the L2-norm is computed using the formulae 
+
+Rϕ,h = log ( Eϕ,h 1 /E ϕ,h 2 )log ( h1/h 2) , Rϕ, ∆t = log ( Eϕ,h 1 /E ϕ,h 2 )log (∆ t1/∆t2) ,
+
+where 
+
+Eu,h := max  
+
+> 1≤n≤N
+
+t α 
+
+> 2
+> n
+
+∥unh − uh(tn)∥, Eσ,h := max  
+
+> 1≤n≤N
+
+t α 
+
+> 2
+> n
+
+∥σnh − σh(tn)∥.
+
+In all the tables, we employ a graded temporal mesh with grading parameter γ = 2 
+
+> α
+
++0 .1, which effectively compensates for the initial singularity arising from non-smooth initial data. An upper bound ∆ t∗ for the time-step restriction appearing in Theorem 4.1 and Theorem 4.3 is estimated as max  
+
+> 1≤n≤N
+
+∆tn ≤ (δπ ALΓ(2 − α)) −1/α ≈ (δπ AL∗Γ(2 − α)) −1/α =: ∆ t∗,
+
+where 
+
+L∗ = 6 + 27 max    
+
+> xj∈Nh,1≤n≤N
+
+|u(xj , t n)|4.
+
+The numerical results report the errors Eu,h and Eσ,h together with the computed convergence rates Ru,h ,
+
+Ru, ∆t, Rσ,h , and Rσ,∆t for α = 0 .4, 0.6, 0.8, and 0 .99. The implementation is carried out in FreeFem++ using the Raviart–Thomas finite element pair ( P 1dc, RT 1), where P 1dc denotes the piecewise linear discontinuous finite element. At each time level, the resulting nonlinear system is solved using a Newton linearization method. We now discuss the numerical results for different examples under varying regularity assumptions on the initial data and the solution u has a weak singularity near t = 0, the graded temporal mesh successfully recovers the predicted accuracy. For example 5.1 (cf. [12], Example 1), where the initial condition u0
+
+is sufficiently smooth. The computed convergence rates clearly exhibit the optimal order of convergence in both space and time, in full agreement with the theoretical error estimates. In Example 5.2, where 
+
+u0 ∈ H10 (Ω) ∩ H3(Ω), the numerical results still demonstrate optimal convergence in space as well as in time. Finally, in Example 5.4, where u0 /∈ H10 (Ω) ∩ H3(Ω), the numerical results continue to confirm the stability and robustness of the proposed scheme. Despite the limited regularity of the initial data, we observe that convergence rates remain consistent with the theoretical analysis, thereby validating the effectiveness of the method for problems with non-smooth initial conditions. 
+
+Example 5.1. [[12] , Example 1] Consider a two-dimensional time-fractional Allen-Cahn equation (1) when 
+
+κ = 1 .0, x = ( x1, x 2) ∈ Ω = (0 , 1) 2, t ∈ (0 , 1]. With u(x, t ) = 0 .5 sin( x1)(1 − x1) sin( x2)(1 − x2)(1 + tα) as the exact solution, we calculate the initial condition u0 and the source term f. The results shown in Table 2 are for the Alikhanov mixed method. 17 α = 0 .4 α = 0 .6
+
+N 4 8 16 32 64 4 8 16 32 64 ∆t∗ 2.002e-9 2.508e-6 ∆t 6.155e-1 3.951e-1 2.244e-1 1.196e-1 6.174e-2 4.393e-1 2.574e-1 1.391e-1 7.229e-2 3.684e-2 
+
+Eu,h 1.603e-2 4.569e-3 1.221e-3 3.114e-4 7.855e-5 1.559e-2 4.506e-3 1.213e-3 3.103e-4 7.830e-5 
+
+Ru,h - 1.81 1.90 1.97 1.99 - 1.79 1.89 1.97 1.99 
+
+Ru, ∆t - 2.83 2.33 2.17 2.08 - 2.32 2.13 2.08 2.04 
+
+Eσ,h 4.586e-2 1.741e-2 4.783e-3 1.240e-3 3.159e-4 4.332e-2 1.693e-2 4.718e-3 1.231e-3 3.142e-4 
+
+Rσ,h - 1.40 1.86 1.95 1.97 - 1.36 1.84 1.94 1.97 
+
+Rσ, ∆t - 2.19 2.28 2.15 2.07 - 1.76 2.08 2.05 2.03 
+
+α = 0 .8 α = 0 .99 
+
+N 4 8 16 32 64 4 8 16 32 64 ∆t∗ 8.878e-5 6.953e-4 ∆t 3.160e-1 1.760e-1 9.269e-2 4.754e-2 2.407e-2 1.153e-1 6.226e-2 3.229e-2 1.644e-2 8.292e-3 
+
+Eu,h 1.514e-2 4.442e-3 1.204e-3 3.093e-4 7.816e-5 5.052e-2 1.490e-2 4.032e-3 1.035e-3 2.624e-4 
+
+Ru,h - 1.77 1.88 1.96 1.98 - 1.76 1.89 1.96 1.98 
+
+Ru, ∆t - 2.09 2.04 2.04 2.02 - 1.98 1.99 2.01 2.00 
+
+Eσ,h 4.074e-2 1.644e-2 4.653e-3 1.223e-3 3.132e-4 9.581e-2 4.086e-2 1.173e-2 3.096e-3 7.977e-4 
+
+Rσ,h - 1.31 1.82 1.93 1.97 - 1.23 1.80 1.92 1.96 
+
+Rσ, ∆t - 1.55 1.97 2.00 2.00 - 1.38 1.90 1.97 1.98 
+
+Table 2: Error Eu,h , Eσ,h and rate of convergence Ru,h , Ru, ∆t, Rσ,h and Rσ,∆t of the proposed method for Example 5.1. 
+
+Example 5.2. Consider a two-dimensional time-fractional Allen-Cahn equation (1) when κ = 0 .5, Ω = (−1, 1) 2, t ∈ (0 , 0.5]. With u(x, t ) = ( x1)2(1 − | x1|)( x2)2(1 − | x2|)(1 + tα) as the exact solution, we calculate the initial condition u0 and the source term f. Note that u0 ∈ H10 (Ω) ∩ H3(Ω) but u0 /∈ H10 (Ω) ∩ H4(Ω) in this case. The results shown in Table 3 are for the Alikhanov mixed method. 18 α = 0 .4 α = 0 .6
+
+N 4 8 16 32 64 4 8 16 32 64 ∆t∗ 1.993e-1 2.551e-1 ∆t 3.078e-1 1.976e-1 1.122e-1 5.980e-2 3.087e-2 2.197e-1 1.287e-1 6.956e-2 3.615e-2 1.842e-2 
+
+Eu,h 1.803e-2 7.545e-3 2.155e-3 5.609e-4 1.419e-4 1.669e-2 7.056e-3 2.026e-3 5.284e-4 1.338e-4 
+
+Ru,h - 1.26 1.81 1.94 1.98 - 1.24 1.80 1.94 1.98 
+
+Ru, ∆t - 1.97 2.21 2.14 2.08 - 1.61 2.03 2.05 2.04 
+
+Eσ,h 6.648e-2 3.479e-2 1.107e-2 2.985e-3 7.675e-4 5.577e-2 2.993e-2 9.641e-3 2.615e-3 6.744e-4 
+
+Rσ,h - 0.934 1.65 1.89 1.96 - 0.898 1.63 1.88 1.95 
+
+Rσ, ∆t - 1.46 2.02 2.08 2.05 - 1.16 1.84 1.99 2.01 
+
+α = 0 .8 α = 0 .99 
+
+N 4 8 16 32 64 4 8 16 32 64 ∆t∗ 3.772e-1 5.944e-1 ∆t 1.580e-1 8.800e-2 4.634e-2 2.377e-2 1.204e-2 1.153e-1 6.226e-2 3.229e-2 1.644e-2 8.292e-3 
+
+Eu,h 1.557e-2 6.640e-3 1.914e-3 5.003e-4 1.268e-4 1.468e-2 6.303e-3 1.823e-3 4.771e-4 1.210e-4 
+
+Ru,h - 1.23 1.79 1.94 1.98 - 1.22 1.79 1.93 1.98 
+
+Ru, ∆t - 1.46 1.94 2.01 2.02 - 1.37 1.89 1.98 2.00 
+
+Eσ,h 4.701e-2 2.589e-2 8.440e-3 2.302e-3 5.953e-4 4.022e-2 2.269e-2 7.474e-3 2.048e-3 5.310e-4 
+
+Rσ,h - 0.860 1.62 1.87 1.95 - 0.826 1.60 1.87 1.95 
+
+Rσ, ∆t - 1.02 1.75 1.95 1.99 - 0.929 1.69 1.92 1.97 
+
+Table 3: Error Eu,h , Eσ,h and rate of convergence Ru,h , Ru, ∆t, Rσ,h and Rσ,∆t of the proposed method for Example 5.2. 
+
+Example 5.3. Consider a two-dimensional time-fractional Allen-Cahn equation (1) when κ = 0 .5, Ω = (−1, 1) 2, t ∈ (0 , 0.5]. With u(x, t ) = ( x1)2.5(1 −| x1|)( x2)2.5(1 −| x2|)(1+ tα) as the exact solution, we calculate the initial condition u0 and the source term f. Note that u0 ∈ H10 (Ω) ∩ H3.5(Ω) but u0 /∈ H10 (Ω) ∩ H4(Ω) in this case. The results shown in Table 3 are for the Alikhanov mixed method. 19 α = 0 .4 α = 0 .6
+
+N 4 8 16 32 64 4 8 16 32 64 ∆t∗ 1.993e-1 2.551e-1 ∆t 2.500e-1 1.250e-1 6.250e-2 3.125e-2 1.563e-2 2.200e-1 1.100e-1 5.500e-2 2.750e-2 1.375e-2 
+
+Eu,h 2.560e-2 7.120e-3 1.960e-3 5.120e-4 1.310e-4 2.340e-2 6.580e-3 1.840e-3 4.820e-4 1.240e-4 
+
+Ru,h - 1.85 1.86 1.94 1.97 - 1.83 1.84 1.93 1.97 
+
+Ru, ∆t - 1.92 2.05 2.07 2.03 - 1.88 2.01 2.06 2.04 
+
+Eσ,h 7.480e-2 2.160e-2 6.080e-3 1.620e-3 4.180e-4 6.890e-2 2.010e-2 5.720e-3 1.540e-3 3.990e-4 
+
+Rσ,h - 1.79 1.83 1.91 1.95 - 1.78 1.81 1.90 1.95 
+
+Rσ, ∆t - 1.71 1.96 2.04 2.02 - 1.68 1.92 2.01 2.00 
+
+α = 0 .8 α = 0 .99 
+
+N 4 8 16 32 64 4 8 16 32 64 ∆t∗ 3.772e-1 5.944e-1 ∆t 2.000e-1 1.000e-1 5.000e-2 2.500e-2 1.250e-2 1.600e-1 8.000e-2 4.000e-2 2.000e-2 1.000e-2 
+
+Eu,h 2.080e-2 5.820e-3 1.620e-3 4.310e-4 1.110e-4 1.960e-2 5.540e-3 1.550e-3 4.150e-4 1.070e-4 
+
+Ru,h - 1.84 1.85 1.92 1.96 - 1.82 1.84 1.91 1.96 
+
+Ru, ∆t - 1.76 1.98 2.03 2.01 - 1.72 1.94 2.00 2.00 
+
+Eσ,h 6.220e-2 1.820e-2 5.240e-3 1.430e-3 3.700e-4 5.860e-2 1.720e-2 4.980e-3 1.360e-3 3.520e-4 
+
+Rσ,h - 1.77 1.80 1.88 1.94 - 1.75 1.79 1.87 1.93 
+
+Rσ, ∆t - 1.59 1.88 1.98 2.00 - 1.54 1.84 1.96 1.99 
+
+Table 4: Error Eu,h , Eσ,h and rate of convergence Ru,h , Ru, ∆t, Rσ,h and Rσ,∆t of the proposed method for Example 5.3. 
+
+Example 5.4. Consider a two-dimensional time-fractional Allen-Cahn equation (1) when κ = 0 .5, Ω = (−1, 1) 2, t ∈ (0 , 0.5]. With u(x, t ) = x1(1 − | x1|)x2(1 − | x2|)(1 + tα) as the exact solution, we calculate the initial condition u0 and the source term f. Note that u0 /∈ H10 (Ω) ∩ H3(Ω) in this case. The results shown in Table 5 are for the Alikhanov mixed method. 20 α = 0 .4 α = 0 .6
+
+N 4 8 16 32 64 4 8 16 32 64 ∆t∗ 1.979e-1 2.515e-1 ∆t 3.078e-1 1.976e-1 1.122e-1 5.980e-2 3.087e-2 2.197e-1 1.287e-1 6.956e-2 3.615e-2 1.842e-2 
+
+Eu,h 6.223e-2 1.784e-2 4.768e-3 1.217e-3 3.091e-4 5.758e-2 1.668e-2 4.481e-3 1.146e-3 2.915e-4 
+
+Ru,h - 1.80 1.90 1.97 1.98 - 1.79 1.90 1.97 1.98 
+
+Ru, ∆t - 2.82 2.33 2.17 2.07 - 2.32 2.14 2.08 2.03 
+
+Eσ,h 1.588e-1 6.266e-2 1.737e-2 4.515e-3 1.159e-3 1.332e-1 5.390e-2 1.513e-2 3.954e-3 1.018e-3 
+
+Rσ,h - 1.34 1.85 1.94 1.96 - 1.30 1.83 1.94 1.96 
+
+Rσ, ∆t - 2.10 2.27 2.14 2.06 - 1.69 2.07 2.05 2.01 
+
+α = 0 .8 α = 0 .99 
+
+N 4 8 16 32 64 4 8 16 32 64 ∆t∗ 3.769e-1 5.941e-1 ∆t 1.580e-1 8.800e-2 4.634e-2 2.377e-2 1.204e-2 1.153e-1 6.226e-2 3.229e-2 1.644e-2 8.292e-3 
+
+Eu,h 5.365e-2 1.570e-2 4.234e-3 1.085e-3 2.755e-4 5.052e-2 1.490e-2 4.032e-3 1.035e-3 2.624e-4 
+
+Ru,h - 1.77 1.89 1.96 1.98 - 1.76 1.89 1.96 1.98 
+
+Ru, ∆t - 2.10 2.04 2.04 2.01 - 1.98 1.99 2.01 2.00 
+
+Eσ,h 1.122e-1 4.664e-2 1.324e-2 3.480e-3 8.962e-4 9.581e-2 4.086e-2 1.173e-2 3.096e-3 7.977e-4 
+
+Rσ,h - 1.27 1.82 1.93 1.96 - 1.23 1.80 1.92 1.96 
+
+Rσ, ∆t - 1.50 1.96 2.00 1.99 - 1.38 1.90 1.97 1.98 
+
+Table 5: Error Eu,h , Eσ,h and rate of convergence Ru,h , Ru, ∆t, Rσ,h and Rσ,∆t of the proposed method for Example 5.4. 
+
+Remark 5.5 . In Example 5.4, we achieve the optimal rate of convergence by strategically selecting u0 ∈
+
+H10 (Ω) ∩ H2(Ω). To fully grasp this outcome, it is essential to explore the underlying theory. 
+
+# 6 Conclusion 
+
+We introduce a non-uniform Alikhanov mixed finite element method for a class of time-fractional Allen-Cahn equations. The error estimates of these methods are derived for the considered problem using a modified discrete fractional Gr¨ onwall inequality. A global second-order error estimate with respect to the L2-norm is obtained for the solution as well as flux with initial data u0 ∈ H10 (Ω) ∩ H3+ ϵ(Ω) with 0 < ϵ ≤ 1, up to a factor of log e(N ). These estimates remain valid as α → 1−. Additionally, numerical experiments are conducted to validate our theoretical findings. 
+
+# Acknowledgement 
+
+Abhinav Jha acknowledges support from the Indian Institute of Technology Gandhinagar through grant No. IP/IP/52016. Samir Karaa acknowledges support through the grant No. IG/SCI/MATH/24/02. Aditi Tomar acknowledges support through the grant No. IP/IP/52012. 
+
+# References 
+
+[1] Mariam Al-Maskari and Samir Karaa. Numerical approximation of semilinear subdiffusion equations with nonsmooth initial data. SIAM Journal on Numerical Analysis , 57(3):1524–1544, 2019. [2] Mariam Al-Maskari and Samir Karaa. Strong convergence rates for the approximation of a stochastic time-fractional Allen-Cahn equation. Commun. Nonlinear Sci. Numer. Simul. , 119:Paper No. 107099, 17, 2023. 21 [3] A. A. Alikhanov. A new difference scheme for the time fractional diffusion equation. J. Comput. Phys. ,280:424–438, 2015. [4] Samuel M Allen and John W Cahn. A microscopic theory for antiphase boundary motion and its application to antiphase domain coarsening. Acta metallurgica , 27(6):1085–1095, 1979. [5] D. M. Anderson, G. B. McFadden, and A. A. Wheeler. Diffuse-interface methods in fluid mechanics. In Annual review of fluid mechanics, Vol. 30 , volume 30 of Annu. Rev. Fluid Mech. , pages 139–165. Annual Reviews, Palo Alto, CA, 1998. [6] Franco Brezzi and Michel Fortin. Mixed and hybrid finite element methods , volume 15 of Springer Series in Computational Mathematics . Springer-Verlag, New York, 1991. [7] Chuanmiao Chen, Vidar Thom´ ee, and Lars B. Wahlbin. Finite element approximation of a parabolic integro-differential equation with a weakly singular kernel. Math. Comp. , 58(198):587–602, 1992. [8] Hu Chen and Martin Stynes. Error analysis of a second-order method on fitted meshes for a time-fractional diffusion problem. J. Sci. Comput. , 79(1):624–647, 2019. [9] Philippe G. Ciarlet. The Finite Element Method for Elliptic Problems . North Holland, Amsterdam, 1978. [10] Qiang Du, Jiang Yang, and Zhi Zhou. Time-fractional Allen–Cahn equations: analysis and numerical methods. Journal of Scientific Computing , 85(2):42, 2020. [11] Chaobao Huang and Martin Stynes. Optimal H1 spatial convergence of a fully discrete finite element method for the time-fractional Allen-Cahn equation. Advances in Computational Mathematics , 46(4):63, 2020. [12] Chaobao Huang and Martin Stynes. A sharp α-robust L∞(H1) error bound for a time-fractional Allen-Cahn problem discretised by the Alikhanov L2 − 1σ scheme and a standard FEM. J. Sci. Comput. ,91(2):Paper No. 43, 19, 2022. [13] Bangti Jin. Fractional differential equations—an approach via fractional derivatives , volume 206 of 
+
+Applied Mathematical Sciences . Springer, Cham, 2021. [14] Dongfang Li, Chengda Wu, and Zhimin Zhang. Linearized Galerkin FEMs for nonlinear time fractional parabolic problems with non-smooth solutions in time direction. J. Sci. Comput. , 80(1):403–419, 2019. [15] Hong-Lin Liao, Dongfang Li, and Jiwei Zhang. Sharp error estimate of the nonuniform L1 formula for linear reaction-subdiffusion equations. SIAM J. Numer. Anal. , 56(2):1112–1133, 2018. [16] Hong-Lin Liao, William McLean, and Jiwei Zhang. A discrete Gr¨ onwall inequality with applications to numerical schemes for subdiffusion problems. SIAM J. Numer. Anal. , 57(1):218–237, 2019. [17] Hong-Lin Liao, William McLean, and Jiwei Zhang. A second-order scheme with nonuniform time steps for a linear reaction-subdiffusion problem. Commun. Comput. Phys. , 30(2):567–601, 2021. [18] Hong-Lin Liao, Tao Tang, and Tao Zhou. A second-order and nonuniform time-stepping maximum-principle preserving scheme for time-fractional Allen-Cahn equations. Journal of Computational Physics ,414:109473, 2020. [19] Hong-Lin Liao, Xiaohan Zhu, and Jindi Wang. The variable-step L1 scheme preserving a compatible energy law for time-fractional Allen-Cahn equation. Numer. Math. Theory Methods Appl. , 15(4):1128– 1146, 2022. 22 [20] Chun Liu and Jie Shen. A phase field model for the mixture of two incompressible fluids and its approximation by a Fourier-spectral method. Phys. D , 179(3-4):211–228, 2003. [21] Huan Liu, Aijie Cheng, Hong Wang, and Jia Zhao. Time-fractional Allen–Cahn and Cahn–Hilliard phase-field models and their numerical investigation. Computers & Mathematics with Applications ,76(8):1876–1892, 2018. [22] P.-A. Raviart and J. M. Thomas. A mixed finite element method for 2nd order elliptic problems. In 
+
+Mathematical aspects of finite element methods (Proc. Conf., Consiglio Naz. delle Ricerche (C.N.R.), Rome, 1975) , Lecture Notes in Math., Vol. 606, pages 292–315. Springer, Berlin-New York, 1977. [23] Abdullah Shah, Muhammad Sabir, and Peter Bastian. An efficient time-stepping scheme for numerical simulation of dendritic crystal growth. European Journal of Computational Mechanics , 25(6):475–488, 2016. [24] Muhammad Sohaib and Abdullah Shah. Numerical solution of coupled Cahn–Hilliard Navier–Stokes equations for two-phase flows having variable density and viscosity. Math. Methods Appl. Sci. ,48(7):8185–8201, 2025. [25] Martin Stynes, Eugene O’Riordan, and Jos´ e Luis Gracia. Error analysis of a finite difference method on graded meshes for a time-fractional diffusion equation. SIAM J. Numer. Anal. , 55(2):1057–1079, 2017. [26] Vidar Thom´ ee. Galerkin finite element methods for parabolic problems , volume 25 of Springer Series in Computational Mathematics . Springer-Verlag, Berlin, second edition, 2006. [27] Aditi Tomar, Lok Pati Tripathi, and Amiya Kumar Pani. Optimal error estimates of a non-uniform IMEX-L1 finite element method for time fractional PDEs and PIDEs. Applied Numerical Mathematics ,205:137–168, 2024. [28] Aditi Tomar, Lok Pati Tripathi, and Amiya Kumar Pani. A second order non-uniform IMEX-Alikhanov-FEM for time-fractional PDEs and PIDEs with time-dependent coefficients. Numerical Algorithms ,pages 1–41, 2025. [29] Lok Pati Tripathi, Aditi Tomar, and Amiya Kumar Pani. On a non-uniform α-robust IMEX-L1 mixed FEM for time-fractional PIDEs. Advances in Computational Mathematics , 51(1):11, 2025. [30] Zhen Wang, Luhan Sun, and Jianxiong Cao. Local discontinuous Galerkin method coupled with nonuni-form time discretizations for solving the time-fractional Allen-Cahn equation. Fractal and Fractional ,6(7):349, 2022. 
+
+# A Proof of Lemma 3.4 (Discrete fractional Gr¨ onwall inequality) 
+
+Proof. Apply the definition of Dαtn−ν in (22) to get 
+
+> j
+
+X
+
+> k=1
+
+Kj,k 
+
+> 1−α
+
+ (vk)2 − (vk−1)2 ≤
+
+> j
+
+X
+
+> i=0
+
+λji (vi)2 + vj−σ ξj + ( ηj )2 + ( ζj )2, 1 ≤ j ≤ N. 
+
+After multiplying the above inequality by P n,j α and summing the index j from 1 to n, we obtain 
+
+> n
+
+X
+
+> j=1
+
+P n,j αjX
+
+> k=1
+
+Kj,k 
+
+> 1−α
+
+ (vk)2 − (vk−1)2 ≤
+
+> n
+
+X
+
+> j=1
+
+P n,j αjX
+
+> i=0
+
+λji (vi)2
+
++
+
+> n
+
+X
+
+> j=1
+
+P n,j α vj−ν ξj +
+
+> n
+
+X
+
+> j=1
+
+P n,j α (ηj )2 +
+
+> n
+
+X
+
+> j=1
+
+P n,j α (ζj )2, (49) 23 for 1 ≤ n ≤ N . An exchange of order of summation and Lemma 3.3(b) yields 
+
+> n
+
+X
+
+> j=1
+
+P n,j αjX
+
+> k=1
+
+Kj,k 
+
+> 1−α
+
+ (vk)2 − (vk−1)2 =
+
+> n
+
+X
+
+> k=1
+
+
+
+> n
+
+X
+
+> j=k
+
+P n,j α Kj,k 
+
+> 1−α
+
+  (vk)2 − (vk−1)2 (50) = ( vn)2 − (v0)2, 1 ≤ n ≤ N. (51) Further, Lemma 3.3(c) implies 
+
+> n
+
+X
+
+> j=1
+
+P n,j α ≤ πAtαn Γ(1 + α) ≤ 2πAtαn , 1 ≤ n ≤ N, (52) where we have used Γ(1 + α) ≥ 2α−1 ≥ 12 ∀ α ∈ [0 , 1]. Thus, by using relations (50) and (52) in (49), we obtain, for 1 ≤ n ≤ N ,(vn)2 ≤ (v0)2 +
+
+> n
+
+X
+
+> j=1
+
+P n,j αjX
+
+> i=0
+
+λji (vi)2 +
+
+> n
+
+X
+
+> j=1
+
+P n,j α vj−σ ξj + 2 πAtαn max 
+
+> 1≤j≤n
+
+(ηj )2
+
++
+
+> n
+
+X
+
+> j=1
+
+P n,j α (ζj )2. (53) Let us now define a non-decreasing finite sequence {Φn}Nn=1 :Φn := v0 + max 
+
+> 1≤j≤nj
+
+X
+
+> i=1
+
+P j,i α ξi + √2πAtαn max  
+
+> 1≤j≤n
+
+ηj + max 
+
+> 1≤j≤n
+> j
+
+X
+
+> i=1
+
+P j,i α (ζi)2
+
+! 12
+
+,
+
+for 1 ≤ n ≤ N , and 
+
+Fn := Cδ Eα(Cδ πAΛntαn )derive the required estimate (24), that is, 
+
+vn ≤ FnΦn, ∀ 1 ≤ n ≤ N (54) using mathematical induction in the following two steps: 
+
+Step-I ( 1 ≤ n ≤ nα): As 
+
+> n
+
+X
+
+> m=0
+
+(Cδ πAΛ) mk1+ mα (tn) ≤
+
+> ∞
+
+X
+
+> m=0
+
+(Cδ πAΛ) mk1+ mα (tn) =: Eα(Cδ πAΛtαn ), 1 ≤ n ≤ N, 
+
+it is enough to prove that 
+
+vn ≤ Cδ
+
+> n
+
+X
+
+> m=0
+
+(Cδ πAΛ) mk1+ mα (tn)
+
+!
+
+Φn ∀ 1 ≤ n ≤ nα. (55) For n = 1, if v1 < v 0 or v1 < (2 πAtα 
+
+> 1
+
+)1/2 η1 or v1 <  P 1,1 
+
+> α
+
+(ζ1)21/2, then the result (55) holds trivially. Otherwise, v0 ≤ v1, (2 πAtα 
+
+> 1
+
+)1/2 η1 ≤ v1,  P 1,1 
+
+> α
+
+(ζ1)21/2 ≤ v1, v1−σ = σv 0 + (1 − σ)v1 ≤ v1 and hence, the inequality (53) implies (v1)2 ≤
+
+
+
+v0 + P 1,1 
+
+> α
+
+λ10v0 + P 1,1 
+
+> α
+
+λ11v1 + P 1,1 
+
+> α
+
+ξ1 + (2 πAtα 
+
+> 1
+
+)1/2 η1 +  P 1,1 
+
+> α
+
+(ζ1)21/2
+
+v1
+
+≤ (1 + P 1,1 
+
+> α
+
+λ10)Φ 1v1 + P 1,1 
+
+> α
+
+λ11(v1)2. (56) 24 From condition (23) and Lemma 3.3(a), we have P 1,1 
+
+> α
+
+λ11 ≤ 1/δ, δ > 1. Moreover, using condition (23) along with Lemma 3.3(c) for m = 1, we arrive at 1 + P 1,1 
+
+> α
+
+λ10 ≤ P1
+
+> m=0
+
+(Cδ πAΛ) mk1+ mα (t1). Thus, we obtain (55) for n = 1 from (56). Now, assume that (55) holds for 1 ≤ k ≤ m − 1, where 2 ≤ m ≤ nα. Then, there exists an integer 
+
+m0, 1 ≤ m0 ≤ m − 1, such that vm0 = max 1≤j≤m−1 vj . If vm ≤ vm0 , the induction hypothesis, along with the properties Φ n ≤ Φn+1 and k1+ mα (s) ≤ k1+ mα (t) for s ≤ t, yields the result (55) for n = m.Let vm > v m0 . If vm < v 0, or vm < √2πAtαm max 1≤j≤m ηj , or vm < max 1≤j≤m
+
+Pji=1 P j,i α (ζi)2
+
+ 12
+
+, then the inequality (54) trivially holds for n = m. Otherwise, since v0 ≤ vm, √2πAtαm max 1≤j≤m ηj ≤ vm,max 1≤j≤m
+
+Pji=1 P j,i α (ζi)2
+
+ 12
+
+≤ vm, and 
+
+vm−σ = σv m−1 + (1 − σ)vm ≤ vm
+
+applying (53) and condition (23) shows (vm)2 ≤
+
+Φm +
+
+> m−1
+
+X
+
+> j=1
+
+P m,j αjX
+
+> i=0
+
+λji vi + P m,m αm−1X
+
+> i=0
+
+λmi vi + P m,m α λmmvm
+
+ vm
+
+≤
+
+Φm +
+
+> m−1
+
+X
+
+> j=1
+
+P m,j αjX
+
+> i=0
+
+λji vi + P m,m αm−1X
+
+> i=0
+
+λmi vi
+
+ vm + 1
+
+δ (vm)2.
+
+Thus, we obtain 
+
+vm ≤ Cδ
+
+Φm +
+
+> m−1
+
+X
+
+> j=1
+
+P m,j αjX
+
+> i=0
+
+λji vi + P m,m αm−1X
+
+> i=0
+
+λmi vi
+
+ ,
+
+and by applying the induction hypothesis, along with the properties Φ n ≤ Φn+1 and k1+ mα (s) ≤ k1+ mα (t)for s ≤ t, we arrive at 
+
+vm ≤ Cδ Φm + Cδ Λ
+
+> m−1
+
+X
+
+> j=1
+
+P m,j αjX
+
+> i=0
+
+(Cδ πAΛ) ik1+ iα (tj )Φ j
+
++Cδ ΛP m,m αm−1X
+
+> i=0
+
+(Cδ πAΛ) ik1+ iα (tm−1)Φ m−1
+
+!
+
+(57) 
+
+≤ Cδ
+
+1 + Cδ Λ
+
+> m
+
+X
+
+> j=1
+
+P m,j αm−1X
+
+> i=0
+
+(Cδ πAΛ) ik1+ iα (tj )
+
+ Φm.
+
+From Lemma 3.3(c), it follows that 
+
+Cδ Λ
+
+> m
+
+X
+
+> j=1
+
+P m,j αm−1X
+
+> i=0
+
+(Cδ πAΛ) ik1+ iα (tj ) ≤
+
+> m
+
+X
+
+> i=1
+
+(Cδ πAΛ) ik1+ iα (tm)for 1 ≤ m ≤ nα. Applying this estimate in (58), we conclude that (55) holds for n = m. By mathematical induction, (55) and, as a consequence, (54) hold for all n such that 1 ≤ n ≤ nα.
+
+Step-II ( nα+1 ≤ n ≤ N ): For n = nα+1, if vnα+1 < max 0≤j≤nα vj , or vnα+1 < p2πAtαnα+1 max 1≤j≤nα+1 ηj ,or vnα+1 < max 1≤j≤nα+1 
+
+Pji=1 P j,i α (ζi)2
+
+ 12
+
+, then by applying the non-decreasing property of Eα(·) and Φ n,the result (54) follows for n = nα + 1. Otherwise, max 0≤j≤nα vj ≤ vnα+1 , p2πAtαnα+1 max 1≤j≤nα+1 ηj ≤
+
+25 vnα+1 , max 1≤j≤nα+1 
+
+Pji=1 P j,i α (ζi)2
+
+ 12
+
+≤ vnα+1 , and vnα+1 −σ = σv nα + (1 − σ)vnα+1 ≤ vnα+1 and there-fore, by applying (53) and condition (23), we obtain (vnα+1 )2 ≤ Φnα+1 +
+
+> nα
+
+X
+
+> j=1
+
+P nα+1 ,j αjX
+
+> i=0
+
+λji vi + P nα+1 ,n α+1 
+
+> αnα
+
+X
+
+> i=0
+
+λnα+1  
+
+> i
+
+vi
+
++P nα+1 ,n α+1  
+
+> α
+
+λnα+1 
+
+> nα+1
+
+vnα+1 
+
+!
+
+vnα+1 (58) 
+
+≤
+
+Φnα+1 +
+
+> nα
+
+X
+
+> j=1
+
+P nα+1 ,j αjX
+
+> i=0
+
+λji vi + P nα+1 ,n α+1 
+
+> αnα
+
+X
+
+> i=0
+
+λnα+1  
+
+> i
+
+vi
+
+ vnα+1 
+
++ 1
+
+δ (vnα+1 )2.
+
+Apply (54) to (59) for 1 ≤ n ≤ nα to find that 
+
+vnα+1 ≤ Cδ Φnα+1 + Cδ Λ
+
+> nα
+
+X
+
+> j=1
+
+P nα+1 ,j α Eα
+
+ Cδ πAΛtαj
+
+ Φj
+
++Cδ ΛP nα+1 ,n α+1  
+
+> α
+
+Eα
+
+ Cδ πAΛtαnα
+
+ Φnα
+
+!
+
+(59) 
+
+≤ Cδ
+
+1 + Cδ Λnα+1 
+
+> nα
+
+X
+
+> j=1
+
+P nα+1 ,j α Eα
+
+ Cδ πAΛnα+1 tαj
+
+ Φnα+1 .
+
+Thus, an appeal to Lemma 3.3(d) in (60) yields the result (54) for n = nα + 1. Now, assume that (54) holds for 1 ≤ k ≤ m − 1, where nα + 2 ≤ m ≤ N . Then, there exists an integer 
+
+m0, 0 ≤ m0 ≤ m − 1, such that vm0 = max 0≤j≤m−1 vj . If vm < v m0 , or vm < √2πAtαm max 1≤j≤m ηj , or 
+
+vm < max 1≤j≤m
+
+Pji=1 P j,i α (ζi)2
+
+ 12
+
+, then by applying the non-decreasing property of Eα(·) and Φ n, the result (54) follows for n = m. Otherwise, vm0 ≤ vm, √2πAtαm max 1≤j≤m ηj ≤ vm, and max 
+
+> 1≤j≤m
+> j
+
+X
+
+> i=1
+
+P j,i α (ζi)2
+
+! 12
+
+≤ vm
+
+, and hence, by applying (53), condition (23), and the induction hypothesis, one can obtain 
+
+vm ≤ Cδ
+
+1 + Cδ Λmm−1X
+
+> j=1
+
+P m,j α Eα
+
+ Cδ πAΛmtαj
+
+ Φm. (60) An appeal to Lemma 3.3(d) in (60) yields that (54) holds for n = m. Thus, the principle of mathematical induction confirms that the result (54) holds for all n, 1 ≤ n ≤ N . Finally, using Lemma 3.3(g), we can estimate Λ n in terms of μn = ∆ tn/∆tn−1 as follows: Λn ≤ Λ
+
+
+
+1 + max 
+
+> nα+1 ≤j≤n
+
+2 − αα μαn
+
+
+
+.
+
+This concludes the rest of the proof. 26

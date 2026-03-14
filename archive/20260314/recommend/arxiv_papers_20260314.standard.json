@@ -1,0 +1,276 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-03-14T19:20:35.963830+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 7,
+    "quick_skim_target": 11,
+    "quick_selected": 7
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2603.07383v1",
+      "title": "DiffSIM: Unconditional and conditional facies simulation based on denoising diffusion generative models",
+      "abstract": "Constructing subsurface facies models that are geologically plausible and constrained by well facies is essential for analyzing sedimentary evolution, reservoir characterization, and flow simulation. Recent deep generative model-based geomodelling methods have demonstrated promising capabilities for both unconditional and conditional settings. We investigate denoising diffusion models as a generative framework for producing realistic and diverse facies realizations in both settings. Diffusion models generate samples through a fixed forward noising process and a learned reverse denoising process. For unconditional geomodelling, we use denoising diffusion probabilistic models (DDPMs) to learn geological patterns from training facies models, and adopt denoising diffusion implicit models (DDIMs) to accelerate sampling by reducing inference steps from 1500 to 50 (30x fewer steps). We assess the geological plausibility using data distribution, class proportions, variograms, and geometric features. To enable conditional generation, we encode well facies and their spatial locations as conditional indicators and apply a mask-based denoising strategy that generates facies only in between-well regions, guaranteeing hard conditioning without introducing additional loss weights. We evaluate both unconditional and conditional generation on three scenarios: two two-dimensional cases (meandering channels and point bars) and one three-dimensional point-bar case. Across these scenarios, unconditional generation reproduces geological realism, and conditional generation honors well data while producing geologically consistent between-well realizations, demonstrating practical utility for facies geomodelling applications.",
+      "authors": [
+        "Minghui Xu",
+        "Suihong Song",
+        "Tapan Mukerji"
+      ],
+      "primary_category": "physics.geo-ph",
+      "categories": [
+        "physics.geo-ph"
+      ],
+      "published": "2026-03-07T23:51:16+00:00",
+      "link": "https://arxiv.org/pdf/2603.07383v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "subsurface facies simulation for reservoir characterization",
+      "llm_evidence_cn": "用于储层表征的地下相模拟",
+      "llm_evidence": "用于储层表征的地下相模拟",
+      "canonical_evidence": "用于储层表征的地下相模拟",
+      "llm_tldr_en": "Uses diffusion generative models for realistic subsurface facies simulation and reservoir characterization.",
+      "llm_tldr_cn": "利用扩散生成模型进行逼真的地下相模拟和储层表征。",
+      "llm_tldr": "利用扩散生成模型进行逼真的地下相模拟和储层表征。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "application of phase field method in geomechanics and rock engineering",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.08465v1",
+      "title": "MUSA-PINN: Multi-scale Weak-form Physics-Informed Neural Networks for Fluid Flow in Complex Geometries",
+      "abstract": "While Physics-Informed Neural Networks (PINNs) offer a mesh-free approach to solving PDEs, standard point-wise residual minimization suffers from convergence pathologies in topologically complex domains like Triply Periodic Minimal Surfaces (TPMS). The locality bias of point-wise constraints fails to propagate global information through tortuous channels, causing unstable gradients and conservation violations. To address this, we propose the Multi-scale Weak-form PINN (MUSA-PINN), which reformulates PDE constraints as integral conservation laws over hierarchical spherical control volumes. We enforce continuity and momentum conservation via flux-balance residuals on control surfaces. Our method utilizes a three-scale subdomain strategy-comprising large volumes for long-range coupling, skeleton-aware meso-scale volumes aligned with transport pathways, and small volumes for local refinement-alongside a two-stage training schedule prioritizing continuity. Experiments on steady incompressible flow in TPMS geometries show MUSA-PINN outperforms state-of-the-art baselines, reducing relative errors by up to 93% and preserving mass conservation.",
+      "authors": [
+        "Weizheng Zhang",
+        "Xunjie Xie",
+        "Hao Pan",
+        "Xiaowei Duan",
+        "Bingteng Sun",
+        "Qiang Du",
+        "Lin lu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-03-09T15:03:50+00:00",
+      "link": "https://arxiv.org/pdf/2603.08465v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "PINNs for fluid flow in complex geometries",
+      "llm_evidence_cn": "用于复杂几何结构中流体流动的物理信息神经网络",
+      "llm_evidence": "用于复杂几何结构中流体流动的物理信息神经网络",
+      "canonical_evidence": "用于复杂几何结构中流体流动的物理信息神经网络",
+      "llm_tldr_en": "Introduces MUSA-PINN, a weak-form neural network for solving fluid flow in complex, tortuous geometries.",
+      "llm_tldr_cn": "引入了 MUSA-PINN，一种用于解决复杂扭曲几何结构中流体流动的弱形式神经网络。",
+      "llm_tldr": "引入了 MUSA-PINN，一种用于解决复杂扭曲几何结构中流体流动的弱形式神经网络。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "fluid flow and deformation in saturated porous rocks",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.10923v1",
+      "title": "Long-time dynamics of a bulk-surface convective Cahn--Hilliard system: Pullback attractors and convergence to equilibrium",
+      "abstract": "We study the long-time dynamics of a bulk-surface convective Cahn--Hilliard system describing phase separation processes with bulk-surface interaction. The presence of convection terms leads to a non-autonomous dynamical system and prevents the associated free energy from being a Lyapunov functional, which makes the analysis of the asymptotic behavior considerably more challenging. First, we establish an instantaneous regularization property for weak solutions. Next, interpreting the evolution as a continuous two-parameter process, we prove the existence of a minimal pullback attractor. Finally, under suitable decay assumptions on the velocity fields, we show that every solution converges as $t\\to\\infty$ to a single steady state. The proof of this convergence relies on the Łojasiewicz--Simon inequality combined with customized decay estimates that compensate for the lack of a monotone energy functional.",
+      "authors": [
+        "Patrik Knopf",
+        "Andrea Poiatti",
+        "Jonas Stange",
+        "Sema Yayla"
+      ],
+      "primary_category": "math.AP",
+      "categories": [
+        "math.AP"
+      ],
+      "published": "2026-03-11T16:06:17+00:00",
+      "link": "https://arxiv.org/pdf/2603.10923v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Cahn-Hilliard system for phase separation processes",
+      "llm_evidence_cn": "用于相分离过程的Cahn-Hilliard系统",
+      "llm_evidence": "用于相分离过程的Cahn-Hilliard系统",
+      "canonical_evidence": "用于相分离过程的Cahn-Hilliard系统",
+      "llm_tldr_en": "Analyzes the long-time dynamics and attractors of a bulk-surface convective Cahn-Hilliard phase field system.",
+      "llm_tldr_cn": "分析了体-表对流Cahn-Hilliard相场系统的长期动力学和吸引子。",
+      "llm_tldr": "分析了体-表对流Cahn-Hilliard相场系统的长期动力学和吸引子。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "phase field modeling of fracture and damage",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.11544v1",
+      "title": "Deep Ritz Physics-Informed Neural Network Method for Solving the Variational Inequality",
+      "abstract": "Variational inequalities are widely applied in mechanical engineering, fluid penetration, transportation, and other fields. In this paper, a Deep Ritz method based on Physics-Informed Neural Networks (PINNs) is proposed to enhance the accuracy and efficiency of solving elliptic variational inequalities. The Ritz variational method is firstly utilized to transform the variational inequality problem into an optimization problem. Then Bayesian optimization is employed to tune the weights of the loss function, and a residual-based adaptive dataset update strategy is introduced to improve the convergence and accuracy of the model. Numerical experiments show that the proposed method can effectively approximate the analytical solution.",
+      "authors": [
+        "Qijia Zhou",
+        "Yiyang Wang",
+        "Shengyuan Deng",
+        "Chenliang Li"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-03-12T05:00:25+00:00",
+      "link": "https://arxiv.org/pdf/2603.11544v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Deep Ritz method for variational inequalities in fluid penetration and mechanics",
+      "llm_evidence_cn": "用于流体渗透和力学变分不等式求解的Deep Ritz方法",
+      "llm_evidence": "用于流体渗透和力学变分不等式求解的Deep Ritz方法",
+      "canonical_evidence": "用于流体渗透和力学变分不等式求解的Deep Ritz方法",
+      "llm_tldr_en": "Proposes a PINN-based Deep Ritz method to solve variational inequalities common in fluid and mechanical engineering.",
+      "llm_tldr_cn": "提出一种基于PINN的Deep Ritz方法，用于解决流体和力学工程中常见的变分不等式问题。",
+      "llm_tldr": "提出一种基于PINN的Deep Ritz方法，用于解决流体和力学工程中常见的变分不等式问题。",
+      "llm_tags": [
+        "query:pf-roc:composite"
+      ],
+      "matched_query_tag": "query:pf-roc:composite",
+      "matched_query_text": "Papers central to COMSOL Multiphysics 仿真软件相关技术文档与教程, especially work that connects or combines: phase field modeling of fracture and damage; mechanical behavior and failure of rock materials; multiphysics coupling in porous media; THM coupling in rock mass using phase field; numerical simulation of crack initiation and propagation; fluid flow and deformation in saturated porous rocks; constitutive laws for rock damage and plasticity; creep deformation mechanisms; crystal plasticity and viscoplastic phase field; phase field modeling of multi physical coupling in rock fracture.",
+      "matched_requirement_id": "req-composite-pf-roc",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.11608v1",
+      "title": "High-fidelity level-set modeling of polycrystalline grain growth",
+      "abstract": "Accurate modeling of polycrystalline microstructure evolution under strong crystallographic heterogeneities remains a major challenge for full-field numerical methods at the mesoscopic scale. In this work, we present a high-fidelity level-set framework for capillarity-driven grain growth in polycrystals with highly-heterogeneous, disorientation-dependent grain boundary energies. The novel framework represents a polycrystalline extension of our level-set formulation, previously developed and validated using a single triple junction benchmark case. In-depth comparisons with three established level-set models demonstrate that the proposed method yields the most energetically-consistent evolution of grain statistics, disorientation distribution function, and triple junction dihedral angles. Accuracy and robustness are maintained across the entire heterogeneity spectrum. To the best of our knowledge, this approach delivers the highest-fidelity front-capturing level-set modeling of grain growth based on Mullins' mean curvature flow theory, paving the way for state-of-the-art digital twins for annealing applications.",
+      "authors": [
+        "Tianchi Li",
+        "Marc Bernacki"
+      ],
+      "primary_category": "cond-mat.mtrl-sci",
+      "categories": [
+        "cond-mat.mtrl-sci"
+      ],
+      "published": "2026-03-12T07:02:50+00:00",
+      "link": "https://arxiv.org/pdf/2603.11608v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "level-set modeling of polycrystalline grain growth",
+      "llm_evidence_cn": "多晶晶粒生长的水平集建模",
+      "llm_evidence": "多晶晶粒生长的水平集建模",
+      "canonical_evidence": "多晶晶粒生长的水平集建模",
+      "llm_tldr_en": "Presents a high-fidelity level-set framework for modeling grain growth in heterogeneous polycrystals.",
+      "llm_tldr_cn": "提出了一种用于模拟非均匀多晶体中晶粒生长的水平集框架。",
+      "llm_tldr": "提出了一种用于模拟非均匀多晶体中晶粒生长的水平集框架。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "crystal plasticity and viscoplastic phase field",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.11695v1",
+      "title": "PolyCrysDiff: Controllable Generation of Three-Dimensional Computable Polycrystalline Material Structures",
+      "abstract": "The three-dimensional (3D) microstructures of polycrystalline materials exert a critical influence on their mechanical and physical properties. Realistic, controllable construction of these microstructures is a key step toward elucidating structure-property relationships, yet remains a formidable challenge. Herein, we propose PolyCrysDiff, a framework based on conditional latent diffusion that enables the end-to-end generation of computable 3D polycrystalline microstructures. Comprehensive qualitative and quantitative evaluations demonstrate that PolyCrysDiff faithfully reproduces target grain morphologies, orientation distributions, and 3D spatial correlations, while achieving an $R^2$ over 0.972 on grain attributes (e.g., size and sphericity) control, thereby outperforming mainstream approaches such as Markov random field (MRF)- and convolutional neural network (CNN)-based methods. The computability and physical validity of the generated microstructures are verified through a series of crystal plasticity finite element method (CPFEM) simulations. Leveraging PolyCrysDiff's controllable generative capability, we systematically elucidate how grain-level microstructural characteristics affect the mechanical properties of polycrystalline materials. This development is expected to pave a key step toward accelerated, data-driven optimization and design of polycrystalline materials.",
+      "authors": [
+        "Chi Chen",
+        "Tianle Jiang",
+        "Xiaodong Wei",
+        "Yanming Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cond-mat.mtrl-sci"
+      ],
+      "published": "2026-03-12T09:04:57+00:00",
+      "link": "https://arxiv.org/pdf/2603.11695v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "generation of computable 3D polycrystalline microstructures for mechanical properties",
+      "llm_evidence_cn": "生成用于力学性能分析的可计算3D多晶微观结构",
+      "llm_evidence": "生成用于力学性能分析的可计算3D多晶微观结构",
+      "canonical_evidence": "生成用于力学性能分析的可计算3D多晶微观结构",
+      "llm_tldr_en": "A diffusion-based framework for generating realistic 3D polycrystalline structures for mechanical simulations.",
+      "llm_tldr_cn": "一种基于扩散模型的框架，用于生成用于力学模拟的真实3D多晶结构。",
+      "llm_tldr": "一种基于扩散模型的框架，用于生成用于力学模拟的真实3D多晶结构。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "phase field approach for crack propagation in heterogeneous rock materials",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2603.11696v1",
+      "title": "Non-uniform $α$-Robust Alikhanov Mixed FEM with Optimal Convergence for the Time-Fractional Allen--Cahn Equation",
+      "abstract": "We investigate a mixed finite element method for the spatial discretization of a time-fractional Allen--Cahn equation defined on a convex polyhedral domain, combined with a nonuniform Alikhanov scheme for the temporal approximation. Under suitable regularity assumptions on the initial data that are weaker than those typically imposed in the literature, we establish regularity results for the solution and its flux. We then derive optimal $L^2$-error estimates, up to a logarithmic factor, for both the solution and the flux. The estimates are robust with respect to the fractional order $α$, in the sense that the associated constants remain bounded as $α\\to 1^{-}$. Numerical experiments are presented to confirm the theoretical findings.",
+      "authors": [
+        "Abhinav Jha",
+        "Samir Karaa",
+        "Aditi Tomar"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-03-12T09:05:48+00:00",
+      "link": "https://arxiv.org/pdf/2603.11696v1",
+      "tags": [
+        "keyword:PF ROC",
+        "query:PF ROC"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Numerical analysis of the Allen-Cahn phase field equation",
+      "llm_evidence_cn": "Allen-Cahn相场方程的数值分析",
+      "llm_evidence": "Allen-Cahn相场方程的数值分析",
+      "canonical_evidence": "Allen-Cahn相场方程的数值分析",
+      "llm_tldr_en": "Develops a robust mixed finite element method for the time-fractional Allen-Cahn phase field equation.",
+      "llm_tldr_cn": "为时间分数阶Allen-Cahn相场方程开发了一种稳健的混合有限元方法。",
+      "llm_tldr": "为时间分数阶Allen-Cahn相场方程开发了一种稳健的混合有限元方法。",
+      "llm_tags": [
+        "query:pf-roc"
+      ],
+      "matched_query_tag": "query:pf-roc",
+      "matched_query_text": "phase field modeling of fracture and damage",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
